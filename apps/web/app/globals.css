@@ -119,15 +119,15 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* Dashboard Theme Colors */
-  --color-dash-bg-base: var(--dash-bg-base, #050505);
-  --color-dash-bg-surface: var(--dash-bg-surface, rgba(10,10,10,0.9));
-  --color-dash-bg-elevated: var(--dash-bg-elevated, #1a1a26);
-  --color-dash-bg-card: var(--dash-bg-card, #14141f);
-  --color-dash-text-primary: var(--dash-text-primary, #ffffff);
-  --color-dash-text-secondary: var(--dash-text-secondary, rgba(255,255,255,0.4));
-  --color-dash-border-subtle: var(--dash-border-subtle, rgba(255,255,255,0.08));
-  --color-dash-border-strong: var(--dash-border-strong, rgba(255,255,255,0.15));
+  /* Dashboard Theme Colors — Refined Human-Crafted Neutral Palette */
+  --color-dash-bg-base: var(--dash-bg-base, #0c0e14);
+  --color-dash-bg-surface: var(--dash-bg-surface, #10141d);
+  --color-dash-bg-elevated: var(--dash-bg-elevated, #161b26);
+  --color-dash-bg-card: var(--dash-bg-card, #121620);
+  --color-dash-text-primary: var(--dash-text-primary, #f1f5f9);
+  --color-dash-text-secondary: var(--dash-text-secondary, #94a3b8);
+  --color-dash-border-subtle: var(--dash-border-subtle, rgba(255, 255, 255, 0.07));
+  --color-dash-border-strong: var(--dash-border-strong, rgba(255, 255, 255, 0.14));
 }
 
 @layer base {
@@ -202,14 +202,14 @@ html.lenis, html.lenis body {
 }
 
 .dashboard-dark {
-  --dash-bg-base: #050505;
-  --dash-bg-surface: rgba(10, 10, 10, 0.9);
-  --dash-bg-elevated: #1a1a26;
-  --dash-bg-card: #14141f;
-  --dash-text-primary: #ffffff;
-  --dash-text-secondary: rgba(255, 255, 255, 0.4);
-  --dash-border-subtle: rgba(255, 255, 255, 0.08);
-  --dash-border-strong: rgba(255, 255, 255, 0.15);
+  --dash-bg-base: #0c0e14;
+  --dash-bg-surface: #10141d;
+  --dash-bg-elevated: #161b26;
+  --dash-bg-card: #121620;
+  --dash-text-primary: #f1f5f9;
+  --dash-text-secondary: #94a3b8;
+  --dash-border-subtle: rgba(255, 255, 255, 0.07);
+  --dash-border-strong: rgba(255, 255, 255, 0.14);
 }
 
 /* The Mesh Background Animation */

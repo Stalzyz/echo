@@ -63,18 +63,18 @@ export default function DashboardHome() {
 function StaffDashboard() {
   return (
     <div className="flex flex-col h-full bg-dash-bg-surface text-dash-text-primary p-8">
-      <h1 className="text-3xl font-bold mb-2">Staff Portal</h1>
-      <p className="text-dash-text-secondary mb-8">Welcome to your workspace.</p>
+      <h1 className="text-2xl font-semibold text-slate-100 tracking-tight mb-1">Staff Portal</h1>
+      <p className="text-slate-400 text-sm mb-6">Welcome to your workspace.</p>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard title="My Projects" value="4" icon={<Briefcase className="w-5 h-5"/>} color="text-blue-400" bg="bg-blue-500/10" />
-        <StatCard title="Open Tasks" value="12" icon={<Activity className="w-5 h-5"/>} color="text-amber-400" bg="bg-amber-500/10" />
-        <StatCard title="Hours Logged" value="32h" icon={<Clock className="w-5 h-5"/>} color="text-emerald-400" bg="bg-emerald-500/10" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <StatCard title="My Projects" value="4" trend="Active assignments" icon={<Briefcase className="w-4 h-4 text-sky-400"/>} />
+        <StatCard title="Open Tasks" value="12" trend="Pending completion" icon={<Activity className="w-4 h-4 text-amber-400"/>} />
+        <StatCard title="Hours Logged" value="32h" trend="This week" icon={<Clock className="w-4 h-4 text-emerald-400"/>} />
       </div>
 
-      <div className="mt-8 bg-dash-bg-card border border-dash-border-subtle rounded-3xl p-6">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><CheckCircle className="w-5 h-5 text-emerald-400"/> Recent Activity</h2>
-        <div className="text-sm text-dash-text-secondary">You recently completed the "Wireframing" task for Project X.</div>
+      <div className="mt-6 bg-[#121620] border border-white/[0.08] rounded-xl p-6">
+        <h2 className="text-sm font-semibold text-slate-100 mb-3 flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400"/> Recent Activity</h2>
+        <div className="text-sm text-slate-400">You recently completed the &quot;Wireframing&quot; task for Project X.</div>
       </div>
     </div>
   )
@@ -83,18 +83,18 @@ function StaffDashboard() {
 function StudentDashboard() {
   return (
     <div className="flex flex-col h-full bg-dash-bg-surface text-dash-text-primary p-8">
-      <h1 className="text-3xl font-bold mb-2">My Academy</h1>
-      <p className="text-dash-text-secondary mb-8">Welcome back! Ready to continue learning?</p>
+      <h1 className="text-2xl font-semibold text-slate-100 tracking-tight mb-1">My Academy</h1>
+      <p className="text-slate-400 text-sm mb-6">Welcome back! Ready to continue learning?</p>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard title="Enrolled Courses" value="3" icon={<BookOpen className="w-5 h-5"/>} color="text-blue-400" bg="bg-blue-500/10" />
-        <StatCard title="Completed" value="1" icon={<GraduationCap className="w-5 h-5"/>} color="text-emerald-400" bg="bg-emerald-500/10" />
-        <StatCard title="Pending Assignments" value="2" icon={<Briefcase className="w-5 h-5"/>} color="text-amber-400" bg="bg-amber-500/10" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <StatCard title="Enrolled Courses" value="3" trend="Currently active" icon={<BookOpen className="w-4 h-4 text-sky-400"/>} />
+        <StatCard title="Completed" value="1" trend="Certifications earned" icon={<GraduationCap className="w-4 h-4 text-emerald-400"/>} />
+        <StatCard title="Pending Assignments" value="2" trend="Due this week" icon={<Briefcase className="w-4 h-4 text-amber-400"/>} />
       </div>
 
-      <div className="mt-8 bg-dash-bg-card border border-dash-border-subtle rounded-3xl p-6">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><BookOpen className="w-5 h-5 text-blue-400"/> Continue Learning</h2>
-        <div className="text-sm text-dash-text-secondary">You are currently taking "Advanced Web Development". You have completed 45% of the course.</div>
+      <div className="mt-6 bg-[#121620] border border-white/[0.08] rounded-xl p-6">
+        <h2 className="text-sm font-semibold text-slate-100 mb-3 flex items-center gap-2"><BookOpen className="w-4 h-4 text-sky-400"/> Continue Learning</h2>
+        <div className="text-sm text-slate-400">You are currently taking &quot;Advanced Web Development&quot;. You have completed 45% of the course.</div>
       </div>
     </div>
   )
@@ -103,13 +103,13 @@ function StudentDashboard() {
 function EducatorDashboard() {
   return (
     <div className="flex flex-col h-full bg-dash-bg-surface text-dash-text-primary p-8">
-      <h1 className="text-3xl font-bold mb-2">Educator Portal</h1>
-      <p className="text-dash-text-secondary mb-8">Here is the overview of your classes and students.</p>
+      <h1 className="text-2xl font-semibold text-slate-100 tracking-tight mb-1">Educator Portal</h1>
+      <p className="text-slate-400 text-sm mb-6">Overview of your classes and students.</p>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard title="Active Classes" value="4" icon={<BookOpen className="w-5 h-5"/>} color="text-blue-400" bg="bg-blue-500/10" />
-        <StatCard title="Total Students" value="128" icon={<Users className="w-5 h-5"/>} color="text-emerald-400" bg="bg-emerald-500/10" />
-        <StatCard title="Assignments to Grade" value="15" icon={<AlertCircle className="w-5 h-5"/>} color="text-amber-400" bg="bg-amber-500/10" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <StatCard title="Active Classes" value="4" trend="Live cohorts" icon={<BookOpen className="w-4 h-4 text-sky-400"/>} />
+        <StatCard title="Total Students" value="128" trend="Enrolled learners" icon={<Users className="w-4 h-4 text-emerald-400"/>} />
+        <StatCard title="Assignments to Grade" value="15" trend="Pending review" icon={<AlertCircle className="w-4 h-4 text-amber-400"/>} />
       </div>
     </div>
   )
@@ -851,65 +851,60 @@ function AdminDashboard({ session }: { session: any }) {
   return (
     <div className="flex flex-col h-full bg-dash-bg-surface text-dash-text-primary overflow-y-auto custom-scrollbar">
       {/* Header */}
-      <div className="px-8 py-10">
-        <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-dash-text-primary to-dash-text-secondary bg-clip-text text-transparent">
-          Welcome back, {session?.user?.name || 'Commander'}
+      <div className="px-8 py-8 border-b border-white/[0.06]">
+        <h1 className="text-2xl font-semibold text-slate-100 tracking-tight">
+          Welcome back, {session?.user?.name || 'Admin'}
         </h1>
-        <p className="text-dash-text-secondary mt-2 text-lg">Here is your system overview for today.</p>
+        <p className="text-slate-400 mt-1 text-sm">Here is your workspace overview and real-time operations.</p>
       </div>
 
-      <div className="px-8 pb-10 space-y-8">
+      <div className="px-8 py-8 space-y-8">
         
         {/* Top Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard 
             title="Total Revenue" 
             value={isLoading ? "..." : `${symbol}${revenue.toLocaleString()}`} 
-            trend="Live Data" 
-            icon={<DollarSign className="w-5 h-5" />} 
-            color="text-emerald-400"
-            bg="bg-emerald-500/10"
+            trend="Collected to date" 
+            icon={<DollarSign className="w-4 h-4 text-emerald-400" />} 
           />
           <StatCard 
             title="Active Students" 
             value={isLoading ? "..." : students.toLocaleString()} 
-            trend="Live Data" 
-            icon={<GraduationCap className="w-5 h-5" />} 
-            color="text-blue-400"
-            bg="bg-blue-500/10"
+            trend="Enrolled across courses" 
+            icon={<GraduationCap className="w-4 h-4 text-sky-400" />} 
           />
           <StatCard 
             title="Open Projects" 
             value={isLoading ? "..." : activeProjects.toLocaleString()} 
-            trend="Live Data" 
-            icon={<Briefcase className="w-5 h-5" />} 
-            color="text-purple-400"
-            bg="bg-purple-500/10"
+            trend="In progress deliverables" 
+            icon={<Briefcase className="w-4 h-4 text-indigo-400" />} 
           />
           <StatCard 
             title="Support Tickets" 
             value={isLoading ? "..." : openTickets.toLocaleString()} 
-            trend="Live Data" 
-            icon={<AlertCircle className="w-5 h-5" />} 
-            color="text-amber-400"
-            bg="bg-amber-500/10"
+            trend="Pending resolutions" 
+            icon={<AlertCircle className="w-4 h-4 text-amber-400" />} 
           />
         </div>
 
         {/* Two Col Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Main Chart Area */}
-          <div className="lg:col-span-2 bg-dash-bg-card border border-dash-border-subtle rounded-3xl p-6 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 blur-[100px] rounded-full" />
-            <h2 className="text-lg font-bold mb-6 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-blue-400" /> Revenue Growth
-            </h2>
+          <div className="lg:col-span-2 bg-[#121620] border border-white/[0.08] rounded-xl p-6">
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/[0.06]">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-slate-300" />
+                <h2 className="text-sm font-semibold text-slate-100">Revenue Trajectory</h2>
+              </div>
+              <span className="text-xs text-slate-500 font-mono">Last 8 Months</span>
+            </div>
             
             {/* Live Chart Visualization using CSS Grid */}
-            <div className="h-64 flex items-end gap-3 pt-6 border-b border-white/10 relative">
+            <div className="h-64 flex items-end gap-3 pt-4 border-b border-white/[0.08] relative">
               {/* Y Axis labels */}
-              <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col justify-between text-[10px] text-white/30 font-mono py-2">
+              <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col justify-between text-[10px] text-slate-500 font-mono py-2">
                 <span>{symbol}50k</span>
                 <span>{symbol}25k</span>
                 <span>{symbol}0</span>
@@ -918,16 +913,16 @@ function AdminDashboard({ session }: { session: any }) {
               <div className="flex-1 flex items-end gap-4 pl-12 h-full">
                 {revenueData?.data?.map((m: any, i: number) => {
                   const maxRev = Math.max(...(revenueData.data.map((d: any) => d.revenue || 0)), 50000)
-                  const hPct = m.revenue > 0 ? Math.max((m.revenue / maxRev) * 100, 5) : 2 // 2% minimum height
+                  const hPct = m.revenue > 0 ? Math.max((m.revenue / maxRev) * 100, 6) : 3
                   
                   return (
                     <div key={i} className="flex-1 group relative h-full flex items-end">
                       <div 
-                        className="w-full bg-gradient-to-t from-blue-600/50 to-blue-400/80 rounded-t-md border-t border-x border-blue-400/50 transition-all duration-500 hover:from-blue-500 hover:to-blue-300"
+                        className="w-full bg-slate-700/80 hover:bg-slate-500 rounded-t border-t border-x border-white/10 transition-all duration-300"
                         style={{ height: `${hPct}%` }}
                       />
                       {/* Tooltip */}
-                      <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-black/80 px-2 py-1 rounded text-[10px] font-mono whitespace-nowrap transition-opacity">
+                      <div className="opacity-0 group-hover:opacity-100 pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 bg-[#10141d] border border-white/[0.1] px-2.5 py-1 rounded text-[11px] font-mono text-slate-200 whitespace-nowrap transition-opacity shadow-lg">
                         {symbol}{m.revenue.toLocaleString()}
                       </div>
                     </div>
@@ -935,7 +930,7 @@ function AdminDashboard({ session }: { session: any }) {
                 })}
               </div>
             </div>
-            <div className="flex justify-between pl-12 pr-4 pt-4 text-[10px] text-white/40 font-mono">
+            <div className="flex justify-between pl-12 pr-2 pt-3 text-[11px] text-slate-400 font-mono">
               {revenueData?.data?.map((m: any, i: number) => (
                 <span key={i} className="flex-1 text-center">{m.month}</span>
               ))}
@@ -943,12 +938,13 @@ function AdminDashboard({ session }: { session: any }) {
           </div>
 
           {/* Activity Feed */}
-          <div className="lg:col-span-1 bg-dash-bg-card border border-dash-border-subtle rounded-3xl p-6">
-            <h2 className="text-lg font-bold mb-6 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-purple-400" /> Recent Activity
-            </h2>
-            <div className="space-y-6">
-              <div className="text-center text-white/30 text-xs py-4">No recent activity logs.</div>
+          <div className="lg:col-span-1 bg-[#121620] border border-white/[0.08] rounded-xl p-6">
+            <div className="flex items-center gap-2 mb-6 pb-4 border-b border-white/[0.06]">
+              <Activity className="w-4 h-4 text-slate-300" />
+              <h2 className="text-sm font-semibold text-slate-100">Recent Activity</h2>
+            </div>
+            <div className="space-y-4">
+              <div className="text-center text-slate-500 text-xs py-8">No recent activity logged.</div>
             </div>
           </div>
         </div>
@@ -958,18 +954,17 @@ function AdminDashboard({ session }: { session: any }) {
   )
 }
 
-function StatCard({ title, value, trend, icon, color, bg }: any) {
+function StatCard({ title, value, trend, icon }: { title: string; value: string; trend: string; icon: React.ReactNode }) {
   return (
-    <div className="bg-dash-bg-card border border-dash-border-subtle rounded-3xl p-6 hover:bg-dash-bg-elevated transition-colors group relative overflow-hidden">
-      <div className="absolute -right-4 -top-4 w-24 h-24 bg-dash-bg-elevated rounded-full blur-2xl group-hover:bg-dash-border-subtle transition-colors" />
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-bold text-dash-text-secondary tracking-wider uppercase">{title}</h3>
-        <div className={`p-2 rounded-xl ${bg} ${color}`}>
+    <div className="bg-[#121620] border border-white/[0.08] rounded-xl p-5 hover:border-white/[0.14] transition-colors">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">{title}</span>
+        <div className="p-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06]">
           {icon}
         </div>
       </div>
-      <div className="text-3xl font-bold font-mono tracking-tight mb-2">{value}</div>
-      <div className="text-xs text-white/40">{trend}</div>
+      <div className="text-2xl font-semibold text-slate-100 tracking-tight tabular-nums mb-1">{value}</div>
+      <div className="text-xs text-slate-500">{trend}</div>
     </div>
   )
 }

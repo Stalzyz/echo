@@ -77,20 +77,20 @@ function NavGroup({ item, pathname, onClose }: { item: NavItem; pathname: string
         href={item.href}
         onClick={onClose}
         className={cn(
-          "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all group",
+          "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors group",
           isGroupActive
-            ? "bg-blue-500/10 text-blue-400 shadow-[inset_2px_0_0_0_rgba(59,130,246,1)]"
-            : "text-dash-text-primary/50 hover:bg-dash-bg-elevated hover:text-dash-text-primary"
+            ? "bg-white/[0.08] text-white font-medium shadow-sm"
+            : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
         )}
       >
-        <Icon className={cn("h-4 w-4 shrink-0 transition-colors", isGroupActive ? "text-blue-400" : "text-dash-text-primary/30 group-hover:text-dash-text-primary/70")} />
+        <Icon className={cn("h-4 w-4 shrink-0 transition-colors", isGroupActive ? "text-blue-400" : "text-zinc-500 group-hover:text-zinc-300")} />
         {item.title}
       </Link>
     )
   }
 
   return (
-    <div className="mb-1">
+    <div className="mb-0.5">
       {/* Group header — toggles open/close AND navigates */}
       <button
         onClick={() => {
@@ -101,27 +101,27 @@ function NavGroup({ item, pathname, onClose }: { item: NavItem; pathname: string
           }
         }}
         className={cn(
-          "w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all group",
+          "w-full flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors group",
           isGroupActive
-            ? "text-dash-text-primary font-bold"
-            : "text-dash-text-primary/50 hover:bg-dash-bg-elevated hover:text-dash-text-primary"
+            ? "text-zinc-200 font-semibold"
+            : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
         )}
       >
-        <Icon className={cn("h-4 w-4 shrink-0 transition-colors", isGroupActive ? "text-blue-400" : "text-dash-text-primary/30 group-hover:text-dash-text-primary/70")} />
-        <span className="flex-1 text-left tracking-wide">{item.title}</span>
+        <Icon className={cn("h-4 w-4 shrink-0 transition-colors", isGroupActive ? "text-blue-400" : "text-zinc-500 group-hover:text-zinc-300")} />
+        <span className="flex-1 text-left">{item.title}</span>
         {open
-          ? <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-40 group-hover:opacity-100 transition-opacity" />
-          : <ChevronRight className="h-3.5 w-3.5 shrink-0 opacity-40 group-hover:opacity-100 transition-opacity" />
+          ? <ChevronDown className="h-3.5 w-3.5 shrink-0 text-zinc-500 group-hover:text-zinc-300 transition-colors" />
+          : <ChevronRight className="h-3.5 w-3.5 shrink-0 text-zinc-500 group-hover:text-zinc-300 transition-colors" />
         }
       </button>
 
       {/* Sub items */}
       <div className={cn(
         "grid transition-all duration-200 ease-in-out",
-        open ? "grid-rows-[1fr] opacity-100 mt-1" : "grid-rows-[0fr] opacity-0"
+        open ? "grid-rows-[1fr] opacity-100 mt-0.5" : "grid-rows-[0fr] opacity-0"
       )}>
         <div className="overflow-hidden">
-          <div className="ml-5 pl-3 border-l border-dash-border-strong space-y-1">
+          <div className="ml-5 pl-2.5 border-l border-white/[0.08] space-y-0.5 py-0.5">
             {item.children!.map(child => {
               const isChildActive = pathname === child.href
               return (
@@ -130,13 +130,13 @@ function NavGroup({ item, pathname, onClose }: { item: NavItem; pathname: string
                   href={child.href}
                   onClick={onClose}
                   className={cn(
-                    "flex items-center gap-2 rounded-md px-3 py-2 text-xs font-medium transition-all group",
+                    "flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors group",
                     isChildActive
-                      ? "bg-blue-500/10 text-blue-400"
-                      : "text-dash-text-primary/40 hover:bg-dash-bg-elevated hover:text-dash-text-primary"
+                      ? "bg-white/[0.08] text-white font-medium"
+                      : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
                   )}
                 >
-                  <span className={cn("w-1.5 h-1.5 rounded-full transition-all", isChildActive ? "bg-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.8)]" : "bg-dash-border-strong group-hover:bg-dash-bg-elevated0")} />
+                  <span className={cn("w-1.5 h-1.5 rounded-full transition-colors", isChildActive ? "bg-blue-400" : "bg-zinc-600/50 group-hover:bg-zinc-500")} />
                   {child.title}
                 </Link>
               )
@@ -205,41 +205,36 @@ export function Sidebar() {
   }
 
   const sidebarContent = (
-    <div className="flex flex-1 w-full flex-col min-h-0 overflow-hidden bg-dash-bg-surface/40 backdrop-blur-2xl text-dash-text-primary font-sans relative">
+    <div className="flex flex-1 w-full flex-col min-h-0 overflow-hidden bg-dash-bg-base text-dash-text-primary font-sans relative">
       
-      {/* Background ambient glow inside sidebar */}
-      <div className="absolute top-0 left-0 w-full h-64 bg-blue-500/5 blur-[100px] pointer-events-none" />
-
       {/* Header / Logo — Dynamic Whitelabel */}
       <OrgHeader />
 
       {/* Role badge */}
-      <div className="px-6 py-4 relative z-10">
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-dash-bg-elevated border border-dash-border-subtle w-fit">
-          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-dash-text-primary/60">
-            {role} CLEARANCE
-          </span>
-        </div>
+      <div className="px-5 py-2 relative z-10">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/[0.04] border border-white/[0.08] text-[11px] font-medium text-zinc-400 capitalize">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+          {role.toLowerCase().replace('_', ' ')}
+        </span>
       </div>
 
       {/* Nav items */}
-      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-3 space-y-1 pb-6 relative z-10">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-3 space-y-0.5 pb-6 relative z-10">
         {navItems.map(item => (
           <NavGroup key={item.href} item={item} pathname={pathname} onClose={() => setMobileOpen(false)} />
         ))}
       </div>
 
       {/* User footer */}
-      <div className="p-4 relative z-10 border-t border-dash-border-subtle bg-gradient-to-t from-black/60 to-transparent">
+      <div className="p-3 relative z-10 border-t border-white/[0.08] bg-dash-bg-base">
         <div className="flex items-center gap-3">
-          <div onClick={() => signOut()} className="flex-1 flex items-center gap-3 p-3 rounded-xl hover:bg-dash-bg-elevated transition-colors cursor-pointer border border-transparent hover:border-dash-border-strong" title="Click to logout">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-dash-border-strong flex items-center justify-center text-dash-text-primary font-bold text-sm shrink-0">
+          <div onClick={() => signOut()} className="flex-1 flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/[0.04] transition-colors cursor-pointer border border-transparent hover:border-white/[0.08]" title="Click to logout">
+            <div className="h-9 w-9 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center text-zinc-200 font-medium text-sm shrink-0">
               {session?.user?.name?.charAt(0) || "U"}
             </div>
             <div className="flex flex-col min-w-0">
-              <span className="text-sm font-semibold leading-none truncate tracking-wide text-dash-text-primary/90">{session?.user?.name || "System User"}</span>
-              <span className="text-xs text-dash-text-primary/40 mt-1.5 truncate font-mono">{session?.user?.email}</span>
+              <span className="text-xs font-medium leading-none truncate text-zinc-200">{session?.user?.name || "User"}</span>
+              <span className="text-[11px] text-zinc-500 mt-1 truncate">{session?.user?.email}</span>
             </div>
           </div>
         </div>
