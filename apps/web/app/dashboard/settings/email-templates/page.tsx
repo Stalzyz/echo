@@ -16,7 +16,10 @@ import {
   ChevronRight,
   ToggleLeft,
   ToggleRight,
-  Info
+  Info,
+  Monitor,
+  Smartphone,
+  Check
 } from "lucide-react"
 import { useApi, fetchApi } from "@/lib/useApi"
 import { toast } from "sonner"
@@ -27,6 +30,126 @@ const CATEGORY_MAP: Record<string, { label: string; icon: any; color: string }> 
   STUDENT: { label: "Student & Academy", icon: GraduationCap, color: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20" }
 }
 
+const SAMPLE_VARIABLES: Record<string, string> = {
+  clientName: "Jane Doe",
+  companyName: "Acme Visuals Corp",
+  portalLink: "https://garage.grekam.in/portal/dashboard",
+  accountManager: "Stalin Kumar",
+  invoiceNumber: "INV-2026-089",
+  projectName: "Website & Brand Refresh",
+  amount: "45,000",
+  dueDate: "Sep 25, 2026",
+  invoiceUrl: "https://garage.grekam.in/portal/invoices",
+  proposalTitle: "Ecommerce Platform Redesign",
+  estimatedAmount: "1,20,000",
+  proposalLink: "https://garage.grekam.in/portal/proposals",
+  staffName: "Sales Officer",
+  leadName: "Rahul Sharma",
+  phone: "+91 98765 43210",
+  email: "rahul@example.com",
+  leadSource: "Google Ads",
+  interestTier: "High (Website & App)",
+  crmLink: "https://garage.grekam.in/dashboard/crm",
+  taskTitle: "Design System Figma Components",
+  priority: "HIGH",
+  taskUrl: "https://garage.grekam.in/dashboard/projects",
+  studentName: "Aarav Patel",
+  courseName: "UI/UX Design Masterclass",
+  batchName: "Batch 2026-A",
+  rollNo: "GK-2026-042",
+  startDate: "Sep 15, 2026",
+  lmsLink: "https://academy.grekam.in",
+  certificateUrl: "https://academy.grekam.in/verify/CERT-99201",
+  completionDate: "Sep 12, 2026",
+  todayDate: "Sep 12, 2026",
+  pendingTasksCount: "4",
+  leadsToCallCount: "7",
+  highPriorityTickets: "2",
+  dashboardLink: "https://garage.grekam.in/dashboard",
+  leaveType: "Casual Leave",
+  endDate: "Sep 20, 2026",
+  leaveStatus: "APPROVED",
+  approverNotes: "Approved by Operations Manager",
+  hrLink: "https://garage.grekam.in/dashboard/hr",
+  monthYear: "August 2026",
+  netPay: "65,000",
+  paymentDate: "Aug 31, 2026",
+  payslipUrl: "https://garage.grekam.in/dashboard/hr/payslips",
+  feePortalLink: "https://academy.grekam.in/dashboard/fees",
+  attendancePercentage: "68",
+  attendedClasses: "17",
+  totalClasses: "25",
+  attendanceLink: "https://academy.grekam.in/dashboard/attendance",
+}
+
+function buildPreviewEmailHtml(bodyHtml: string, subject: string) {
+  let content = bodyHtml || ""
+  Object.keys(SAMPLE_VARIABLES).forEach(k => {
+    content = content.replace(new RegExp(`{{\\s*${k}\\s*}}`, "gi"), SAMPLE_VARIABLES[k])
+  })
+
+  // Inline buttons
+  content = content.replace(
+    /class=["']btn-primary["']/gi,
+    `style="display:inline-block;background-color:#4f46e5;color:#ffffff !important;text-decoration:none !important;font-weight:600;font-size:14px;padding:13px 26px;border-radius:8px;text-align:center;box-shadow:0 2px 4px rgba(79,70,229,0.2);"`
+  )
+  content = content.replace(
+    /class=["']button-container["']/gi,
+    `style="margin:26px 0;text-align:center;"`
+  )
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${subject}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;color:#334155;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f1f5f9;padding:24px 8px;">
+    <tr>
+      <td align="center" valign="top">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#ffffff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(15,23,42,0.06);">
+          <tr>
+            <td style="background-color:#4f46e5;background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);padding:24px 30px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td valign="middle">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="background-color:rgba(255,255,255,0.22);width:34px;height:34px;border-radius:8px;text-align:center;vertical-align:middle;">
+                          <span style="color:#ffffff;font-size:17px;font-weight:800;line-height:34px;display:inline-block;">G</span>
+                        </td>
+                        <td style="padding-left:12px;vertical-align:middle;">
+                          <div style="color:#ffffff;font-size:15px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;">Grekam Visuals</div>
+                          <div style="color:#e0e7ff;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;">Agency &amp; Academy Workspace</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px 30px 28px;background-color:#ffffff;color:#334155;font-size:15px;line-height:1.65;">
+              ${content}
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color:#f8fafc;border-top:1px solid #e2e8f0;padding:20px 30px;text-align:center;font-size:12px;line-height:1.6;color:#64748b;">
+              <p style="margin:0 0 4px 0;font-weight:600;color:#475569;">Grekam Visuals Pvt. Ltd. · Bangalore, India</p>
+              <p style="margin:0;color:#64748b;">Official notification sent from <a href="https://garage.grekam.in" style="color:#4f46e5;text-decoration:underline;font-weight:600;">garage.grekam.in</a></p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
+}
+
 export default function EmailTemplatesSettingsPage() {
   const { data: response, isLoading, mutate } = useApi<any>("/settings/templates")
   const templates: any[] = response?.data || []
@@ -34,6 +157,7 @@ export default function EmailTemplatesSettingsPage() {
   const [selectedCode, setSelectedCode] = useState<string>("")
   const [activeCategory, setActiveCategory] = useState<string>("ALL")
   const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit")
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop")
 
   // Form State
   const [formData, setFormData] = useState({
@@ -43,6 +167,8 @@ export default function EmailTemplatesSettingsPage() {
   })
   const [isSaving, setIsSaving] = useState(false)
   const [isSendingTest, setIsSendingTest] = useState(false)
+  const [isDispatchingEmail, setIsDispatchingEmail] = useState(false)
+  const [testRecipientInput, setTestRecipientInput] = useState("")
   const [testResult, setTestResult] = useState<any>(null)
   const [isTestModalOpen, setIsTestModalOpen] = useState(false)
 
@@ -104,15 +230,41 @@ export default function EmailTemplatesSettingsPage() {
     setIsSendingTest(true)
     try {
       const res = await fetchApi<any>(`/settings/templates/${currentTemplate.code}/test`, {
-        method: "POST"
+        method: "POST",
+        body: JSON.stringify({})
       })
       setTestResult(res)
+      setTestRecipientInput(res.recipient || "")
       setIsTestModalOpen(true)
-      toast.success(`Test preview generated for ${res.recipient}`)
+      toast.success(`Test preview generated`)
     } catch (err: any) {
-      toast.error(err.message || "Failed to generate test email")
+      toast.error(err.message || "Failed to generate test preview")
     } finally {
       setIsSendingTest(false)
+    }
+  }
+
+  const handleDispatchLiveEmail = async () => {
+    if (!currentTemplate || !testRecipientInput.trim()) {
+      toast.error("Please provide a valid recipient email address")
+      return
+    }
+    setIsDispatchingEmail(true)
+    try {
+      const res = await fetchApi<any>(`/settings/templates/${currentTemplate.code}/test`, {
+        method: "POST",
+        body: JSON.stringify({ sendToEmail: testRecipientInput.trim() })
+      })
+      if (res.sent) {
+        toast.success(`Live test email successfully dispatched to ${testRecipientInput.trim()}!`)
+      } else {
+        toast.success(`Preview updated for ${testRecipientInput.trim()}`)
+      }
+      setTestResult(res)
+    } catch (err: any) {
+      toast.error(err.message || "Failed to dispatch test email")
+    } finally {
+      setIsDispatchingEmail(false)
     }
   }
 
@@ -278,9 +430,22 @@ export default function EmailTemplatesSettingsPage() {
                 </button>
               </div>
 
-              <div className="text-[11px] text-muted-foreground flex items-center gap-1">
-                <Info className="w-3.5 h-3.5" /> Standard Grekam header & footer are attached automatically.
-              </div>
+              {activeTab === "preview" && (
+                <div className="flex items-center gap-2 bg-muted/40 p-1 rounded-lg border border-border/50">
+                  <button
+                    onClick={() => setPreviewDevice("desktop")}
+                    className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all ${previewDevice === "desktop" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                  >
+                    <Monitor className="w-3.5 h-3.5" /> Desktop
+                  </button>
+                  <button
+                    onClick={() => setPreviewDevice("mobile")}
+                    className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all ${previewDevice === "mobile" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                  >
+                    <Smartphone className="w-3.5 h-3.5" /> Mobile
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Tab Editor / Preview Content */}
@@ -295,25 +460,36 @@ export default function EmailTemplatesSettingsPage() {
                 />
               </div>
             ) : (
-              <div className="border border-border/60 rounded-xl overflow-hidden bg-[#0b0f17] p-6 min-h-[400px]">
-                <div 
-                  className="max-w-xl mx-auto bg-[#161e2e] border border-[#2a364f] rounded-2xl overflow-hidden shadow-2xl p-6 text-slate-200 text-sm leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: formData.bodyHtml }}
-                />
+              <div className="border border-border/60 rounded-xl overflow-hidden bg-slate-950/60 p-6 flex flex-col items-center justify-center min-h-[480px]">
+                <div className={`transition-all duration-300 w-full ${previewDevice === "mobile" ? "max-w-[390px]" : "max-w-[640px]"}`}>
+                  <div className="bg-muted/40 px-4 py-2 border-t border-x border-border/60 rounded-t-xl text-[11px] font-mono text-muted-foreground flex items-center justify-between">
+                    <span>Subject: {formData.subject || "(No Subject)"}</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded bg-card/80 border border-border/40 font-bold uppercase">{previewDevice}</span>
+                  </div>
+                  <div className="border border-border/60 rounded-b-xl overflow-hidden shadow-2xl bg-[#f1f5f9] h-[520px]">
+                    <iframe
+                      srcDoc={buildPreviewEmailHtml(formData.bodyHtml, formData.subject)}
+                      className="w-full h-full border-0"
+                      title="Email Live Preview"
+                    />
+                  </div>
+                </div>
               </div>
             )}
           </div>
         ) : null}
       </div>
 
-      {/* Test Preview Modal */}
+      {/* Test Preview & Delivery Modal */}
       {isTestModalOpen && testResult && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-card border border-border/60 rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border/50 pb-3">
               <div>
-                <h3 className="font-bold text-foreground text-sm">Test Email Preview</h3>
-                <p className="text-xs text-muted-foreground">Recipient: {testResult.recipient}</p>
+                <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-primary" /> Test Email Preview &amp; Delivery
+                </h3>
+                <p className="text-xs text-muted-foreground">Send a live test email directly to your inbox to verify styling.</p>
               </div>
               <button
                 onClick={() => setIsTestModalOpen(false)}
@@ -323,16 +499,38 @@ export default function EmailTemplatesSettingsPage() {
               </button>
             </div>
 
-            <div>
-              <p className="text-xs font-mono text-muted-foreground mb-1">Subject:</p>
-              <p className="text-sm font-bold text-foreground bg-muted/30 p-2.5 rounded-lg border border-border/50">{testResult.rendered.subject}</p>
+            {/* Recipient Address & Dispatch Input */}
+            <div className="bg-muted/30 border border-border/50 rounded-xl p-3 flex flex-col sm:flex-row gap-2.5 items-center">
+              <div className="flex-1 w-full">
+                <label className="block text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-1">Recipient Email Address:</label>
+                <input
+                  type="email"
+                  value={testRecipientInput}
+                  onChange={e => setTestRecipientInput(e.target.value)}
+                  placeholder="name@example.com"
+                  className="w-full bg-card border border-border/60 rounded-lg px-3 py-2 text-xs font-medium text-foreground outline-none focus:border-primary"
+                />
+              </div>
+              <button
+                onClick={handleDispatchLiveEmail}
+                disabled={isDispatchingEmail || !testRecipientInput.trim()}
+                className="w-full sm:w-auto mt-auto px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 whitespace-nowrap h-[35px]"
+              >
+                {isDispatchingEmail ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                Send Live Test
+              </button>
             </div>
 
             <div>
-              <p className="text-xs font-mono text-muted-foreground mb-1">Rendered HTML Output:</p>
-              <div className="h-80 overflow-y-auto border border-border/50 rounded-lg p-2 bg-[#0b0f17]">
+              <p className="text-xs font-mono text-muted-foreground mb-1">Subject Line:</p>
+              <p className="text-xs font-bold text-foreground bg-muted/30 p-2.5 rounded-lg border border-border/50">{testResult.rendered?.subject}</p>
+            </div>
+
+            <div>
+              <p className="text-xs font-mono text-muted-foreground mb-1">Rendered Email Output:</p>
+              <div className="h-80 overflow-hidden border border-border/50 rounded-lg bg-[#f1f5f9]">
                 <iframe
-                  srcDoc={testResult.rendered.html}
+                  srcDoc={testResult.rendered?.html}
                   className="w-full h-full border-0"
                   title="Email Test Preview"
                 />

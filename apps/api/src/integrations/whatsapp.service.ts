@@ -472,16 +472,33 @@ export class WhatsAppService {
       else if (/\.(mp4|mov|avi|mkv)($|\?)/.test(lower)) effectiveHeaderType = 'VIDEO';
     }
 
+const KNOWN_TEMPLATE_MEDIA: Record<string, string> = {
+  shopify_to_ecommerce: 'https://garage.grekam.in/og-image.png',
+  grafty_common_template_all_industries: 'https://garage.grekam.in/og-image.png',
+  grafty_for_shopify: 'https://garage.grekam.in/og-image.png',
+  ecommerce_webdevelopment: 'https://garage.grekam.in/og-image.png',
+  grafty_partnership_intro: 'https://garage.grekam.in/og-image.png',
+  ecommerce_start: 'https://garage.grekam.in/og-image.png'
+};
+
     // Build components array for Meta Cloud API & Grafty
     const templateComponents: any[] = [];
 
+    const sanitizedName = templateName.toLowerCase().trim().replace(/[^a-z0-9_]/g, '_');
+
     // Resolve effective media URL:
-    // If the caller provided a mediaUrl, use it.
+    // If the caller provided a mediaUrl, use it (rewriting any internal localhost:4000 to public https://garage.grekam.in domain).
     // If the template requires an IMAGE, DOCUMENT, or VIDEO header and no mediaUrl was supplied,
     // automatically fall back to the template's approved defaultMediaUrl (e.g. Meta sample image header_handle)!
-    const activeMediaUrl = (mediaUrl && mediaUrl.trim())
-      ? mediaUrl.trim()
-      : (['IMAGE', 'DOCUMENT', 'VIDEO'].includes(effectiveHeaderType) ? (matchedTpl?.defaultMediaUrl || '') : '');
+    let resolvedMediaUrl = mediaUrl ? mediaUrl.trim() : '';
+    if (resolvedMediaUrl.includes('localhost:4000') || resolvedMediaUrl.includes('127.0.0.1:4000')) {
+      resolvedMediaUrl = resolvedMediaUrl.replace(/https?:\/\/(localhost|127\.0\.0\.1):4000/g, 'https://garage.grekam.in');
+    }
+
+    const knownMedia = KNOWN_TEMPLATE_MEDIA[templateName] || KNOWN_TEMPLATE_MEDIA[sanitizedName] || '';
+    const activeMediaUrl = (resolvedMediaUrl)
+      ? resolvedMediaUrl
+      : (['IMAGE', 'DOCUMENT', 'VIDEO'].includes(effectiveHeaderType) ? (matchedTpl?.defaultMediaUrl || knownMedia || '') : '');
 
     // 1. Add Header Component if media URL is provided and header type requires media
     if (activeMediaUrl && ['IMAGE', 'DOCUMENT', 'VIDEO'].includes(effectiveHeaderType)) {
@@ -556,8 +573,6 @@ export class WhatsAppService {
 
     // List of candidate template names to try if the requested templateName gets #132012 parameter mismatch.
     // CRITICAL: If mediaUrl is absent, text-only templates (grafty_welcome) MUST be prioritized over document templates (grafty_proposals).
-    // Sending a document template (grafty_proposals) without a document header causes Meta API to accept the HTTP call but drop delivery at the handset level.
-    const sanitizedName = templateName.toLowerCase().trim().replace(/[^a-z0-9_]/g, '_');
     // Only target requested templateName or sanitized lowercase identifier — strictly prevent unwanted fallback to grafty_proposals
     const templateNamesToTry = Array.from(new Set([templateName, sanitizedName]));
 

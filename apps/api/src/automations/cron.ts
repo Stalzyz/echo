@@ -36,12 +36,14 @@ export function initializeCronJobs() {
           await sendEmail(email, {
             subject: `Still thinking about ${proposal.title}?`,
             html: `
-              <h2 style="color:#fff;font-size:22px;margin:0 0 8px;">Just checking in!</h2>
-              <p style="color:rgba(255,255,255,0.6);font-size:15px;line-height:1.7;margin:0 0 24px;">
-                Hi ${name}, we noticed you haven't reviewed the proposal for <strong>${proposal.title}</strong> yet. 
-                If you have any questions or need adjustments, we're here to help!
+              <h2 style="color:#0f172a;font-size:22px;font-weight:700;margin:0 0 10px;">Just checking in!</h2>
+              <p style="color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px;">
+                Hi ${name}, we noticed you haven't reviewed the proposal for <strong style="color:#0f172a;">${proposal.title}</strong> yet. 
+                If you have any questions or need scope adjustments, our creative team is ready to help!
               </p>
-              <a href="${link}" style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;text-decoration:none;padding:14px 28px;border-radius:10px;font-weight:600;font-size:14px;">Review Proposal</a>
+              <div style="margin:24px 0;">
+                <a href="${link}" style="display:inline-block;background-color:#4f46e5;color:#ffffff !important;text-decoration:none;padding:13px 26px;border-radius:8px;font-weight:600;font-size:14px;">Review Proposal &rarr;</a>
+              </div>
             `
           });
           console.log(`[Cron] Sent 24h abandoned proposal drip to ${email}`);
@@ -76,11 +78,16 @@ export function initializeCronJobs() {
           await sendEmail(lead.email, {
             subject: `Re-engage with Grekam Visuals`,
             html: `
-              <h2 style="color:#fff;font-size:22px;margin:0 0 8px;">Hi ${lead.name},</h2>
-              <p style="color:rgba(255,255,255,0.6);font-size:15px;line-height:1.7;margin:0 0 24px;">
-                It's been a while since we last spoke! Are you still interested in starting a project with us? 
-                Reply to this email and let's get the conversation moving.
+              <h2 style="color:#0f172a;font-size:22px;font-weight:700;margin:0 0 10px;">Hi ${lead.name},</h2>
+              <p style="color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px;">
+                It's been a while since we last spoke! Are you still interested in starting a project or exploring visual production with us?
               </p>
+              <p style="color:#334155;font-size:15px;line-height:1.65;margin:0 0 24px;">
+                Simply reply directly to this email and let's get the conversation moving. We'd love to partner with you!
+              </p>
+              <div style="margin:24px 0;">
+                <a href="https://garage.grekam.in" style="display:inline-block;background-color:#4f46e5;color:#ffffff !important;text-decoration:none;padding:13px 26px;border-radius:8px;font-weight:600;font-size:14px;">Visit Grekam OS &rarr;</a>
+              </div>
             `
           });
           console.log(`[Cron] Sent 14-day cold lead nurture to ${lead.email}`);
@@ -116,14 +123,23 @@ export function initializeCronJobs() {
           await sendEmail(contact.email, {
             subject: `Upcoming Billing Reminder: ${sub.planName}`,
             html: `
-              <h2 style="color:#fff;font-size:22px;margin:0 0 8px;">Billing Reminder</h2>
-              <p style="color:rgba(255,255,255,0.6);font-size:15px;line-height:1.7;margin:0 0 24px;">
-                Hi ${contact.firstName}, this is a friendly reminder that your subscription for <strong>${sub.planName}</strong> 
-                will automatically renew on <strong>${sub.nextBilling.toLocaleDateString()}</strong>.
+              <h2 style="color:#0f172a;font-size:22px;font-weight:700;margin:0 0 10px;">Billing Reminder</h2>
+              <p style="color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px;">
+                Hi ${contact.firstName}, this is a friendly reminder that your subscription for <strong style="color:#0f172a;">${sub.planName}</strong> 
+                will automatically renew on <strong style="color:#0f172a;">${sub.nextBilling.toLocaleDateString()}</strong>.
               </p>
-              <p style="color:rgba(255,255,255,0.6);font-size:15px;">
-                Expected Charge: ₹${sub.mrr}
-              </p>
+              <div style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin-bottom:24px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="color:#334155;font-size:14px;">
+                  <tr>
+                    <td style="color:#64748b;">Plan:</td>
+                    <td align="right" style="color:#0f172a;font-weight:700;">${sub.planName}</td>
+                  </tr>
+                  <tr>
+                    <td style="color:#64748b;padding-top:8px;">Expected Charge:</td>
+                    <td align="right" style="color:#0f172a;font-weight:800;padding-top:8px;">₹${sub.mrr}</td>
+                  </tr>
+                </table>
+              </div>
             `
           });
           console.log(`[Cron] Sent billing reminder to ${contact.email} for subscription ${sub.id}`);
@@ -150,15 +166,20 @@ export function initializeCronJobs() {
         await sendEmail(org.supportEmail, {
           subject: `Weekly Summary Report for Grekam`,
           html: `
-            <h2 style="color:#fff;font-size:22px;margin:0 0 8px;">Weekly Report</h2>
-            <p style="color:rgba(255,255,255,0.6);font-size:15px;line-height:1.7;margin:0 0 24px;">
-              Here's what happened over the last week:
+            <h2 style="color:#0f172a;font-size:22px;font-weight:700;margin:0 0 10px;">Weekly Report</h2>
+            <p style="color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px;">
+              Here's your activity overview over the past 7 days:
             </p>
-            <ul>
-              <li style="color:#fff;">New Leads: ${newLeads}</li>
-            </ul>
-            <p style="color:rgba(255,255,255,0.6);font-size:15px;line-height:1.7;margin-top:24px;">
-              Keep up the great work!
+            <div style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin-bottom:24px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="color:#334155;font-size:14px;">
+                <tr>
+                  <td style="color:#64748b;">New Leads Inquired:</td>
+                  <td align="right" style="color:#4f46e5;font-weight:700;font-size:18px;">${newLeads}</td>
+                </tr>
+              </table>
+            </div>
+            <p style="color:#334155;font-size:14px;line-height:1.65;margin-top:20px;">
+              Keep up the great momentum!
             </p>
           `
         });
@@ -191,11 +212,11 @@ export function initializeCronJobs() {
               await sendEmail(attendee.employee.user.email, {
                 subject: `Reminder: ${meeting.title} starts in 30 minutes`,
                 html: `
-                  <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:#111;color:#fff;padding:20px;border-radius:10px;">
-                    <h2 style="color:#3b82f6;">Meeting Reminder</h2>
-                    <p>Your meeting <strong>${meeting.title}</strong> is starting soon.</p>
-                    <p><strong>Time:</strong> ${meeting.startTime.toLocaleString()}</p>
-                    ${meeting.meetLink ? `<p><a href="${meeting.meetLink}" style="display:inline-block;padding:10px 20px;background:#3b82f6;color:#fff;text-decoration:none;border-radius:5px;">Join Google Meet</a></p>` : ''}
+                  <h2 style="color:#0f172a;font-size:20px;font-weight:700;margin:0 0 10px;">Meeting Reminder</h2>
+                  <p style="color:#334155;font-size:15px;line-height:1.65;margin:0 0 16px;">Your scheduled staff meeting <strong style="color:#0f172a;">${meeting.title}</strong> is starting in 30 minutes.</p>
+                  <div style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin-bottom:24px;">
+                    <p style="color:#334155;font-size:14px;margin:0 0 8px;"><strong>Scheduled Time:</strong> ${meeting.startTime.toLocaleString()}</p>
+                    ${meeting.meetLink ? `<div style="margin-top:14px;"><a href="${meeting.meetLink}" style="display:inline-block;padding:11px 22px;background-color:#4f46e5;color:#ffffff !important;text-decoration:none;border-radius:8px;font-weight:600;font-size:13px;">Join Video Meeting &rarr;</a></div>` : ''}
                   </div>
                 `
               });
@@ -218,11 +239,11 @@ export function initializeCronJobs() {
           await sendEmail(meeting.attendeeEmail, {
             subject: `Reminder: Your meeting starts in 30 minutes`,
             html: `
-              <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:#111;color:#fff;padding:20px;border-radius:10px;">
-                <h2 style="color:#3b82f6;">Meeting Reminder</h2>
-                <p>Your scheduled meeting <strong>${meeting.summary}</strong> is starting soon.</p>
-                <p><strong>Time:</strong> ${meeting.startTime.toLocaleString()}</p>
-                ${meeting.meetLink ? `<p><a href="${meeting.meetLink}" style="display:inline-block;padding:10px 20px;background:#3b82f6;color:#fff;text-decoration:none;border-radius:5px;">Join Google Meet</a></p>` : ''}
+              <h2 style="color:#0f172a;font-size:20px;font-weight:700;margin:0 0 10px;">Meeting Reminder</h2>
+              <p style="color:#334155;font-size:15px;line-height:1.65;margin:0 0 16px;">Your consultation with Grekam <strong style="color:#0f172a;">${meeting.summary}</strong> is starting soon.</p>
+              <div style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin-bottom:24px;">
+                <p style="color:#334155;font-size:14px;margin:0 0 8px;"><strong>Scheduled Time:</strong> ${meeting.startTime.toLocaleString()}</p>
+                ${meeting.meetLink ? `<div style="margin-top:14px;"><a href="${meeting.meetLink}" style="display:inline-block;padding:11px 22px;background-color:#4f46e5;color:#ffffff !important;text-decoration:none;border-radius:8px;font-weight:600;font-size:13px;">Join Video Meeting &rarr;</a></div>` : ''}
               </div>
             `
           });

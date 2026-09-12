@@ -12,13 +12,13 @@ const CURRENCIES = [
 ];
 
 const UpdateFinanceSettingsSchema = z.object({
-  baseCurrency:    z.string().optional(),
-  currencySymbol:  z.string().optional(),
+  baseCurrency:    z.string().nullable().optional().or(z.literal('')),
+  currencySymbol:  z.string().nullable().optional().or(z.literal('')),
   taxModel:        z.enum(['GST', 'VAT', 'NONE']).optional(),
-  gstNumber:       z.string().optional().or(z.literal('')),
-  vatNumber:       z.string().optional().or(z.literal('')),
+  gstNumber:       z.string().nullable().optional().or(z.literal('')),
+  vatNumber:       z.string().nullable().optional().or(z.literal('')),
   fiscalYearStart: z.number().min(1).max(12).optional(),
-  invoicePrefix:   z.string().optional(),
+  invoicePrefix:   z.string().nullable().optional().or(z.literal('')),
 });
 
 export default async function financeSettingsRouter(app: FastifyInstance) {
@@ -34,15 +34,31 @@ export default async function financeSettingsRouter(app: FastifyInstance) {
   // PATCH /api/v1/settings/finance
   app.patch('/finance', async (req, reply) => {
     const body = UpdateFinanceSettingsSchema.parse(req.body);
+    
+    const dataToSave: any = { ...body };
+    if (!dataToSave.baseCurrency) delete dataToSave.baseCurrency;
+    if (!dataToSave.currencySymbol) delete dataToSave.currencySymbol;
+    if (!dataToSave.invoicePrefix) delete dataToSave.invoicePrefix;
+    if (dataToSave.gstNumber === '') dataToSave.gstNumber = null;
+    if (dataToSave.vatNumber === '') dataToSave.vatNumber = null;
+
     let settings = await app.prisma.financeSettings.findFirst();
     if (!settings) {
-      settings = await app.prisma.financeSettings.create({ data: body });
+      settings = await app.prisma.financeSettings.create({ data: dataToSave });
     } else {
       settings = await app.prisma.financeSettings.update({
         where: { id: settings.id },
-        data: body,
+        data: dataToSave,
       });
     }
+
+    // Keep GST synchronized with Organization if provided
+    if (body.gstNumber !== undefined) {
+      await app.prisma.organization.updateMany({
+        data: { gstNumber: body.gstNumber || null }
+      }).catch(() => {});
+    }
+
     return settings;
   });
 }

@@ -183,6 +183,19 @@ model Organization {
   website        String?
   phone          String?
 
+  // Company & Legal Details
+  companyName    String? // Registered Legal Entity Name
+  panNumber      String? // Permanent Account Number (PAN)
+  gstNumber      String? // GST / GSTIN Identification Number
+
+  // Social Media Handles
+  instagramUrl   String?
+  youtubeUrl     String?
+  linkedinUrl    String?
+  twitterUrl     String?
+  facebookUrl    String?
+  whatsappNumber String?
+
   // API Integrations
   openAiKey      String?
   resendApiKey   String?

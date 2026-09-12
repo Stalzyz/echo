@@ -33,6 +33,9 @@ export default function SystemSettingsPage() {
   const [academyFaviconPreview, setAcademyFaviconPreview] = useState<string | null>(null)
   const [logoUploading, setLogoUploading] = useState(false)
   const [workspaceName, setWorkspaceName] = useState('Grekam Visuals')
+  const [companyName, setCompanyName] = useState('')
+  const [panNumber, setPanNumber] = useState('')
+  const [gstNumber, setGstNumber] = useState('')
   const [phone, setPhone] = useState('')
   const [website, setWebsite] = useState('')
   const [supportEmail, setSupportEmail] = useState('')
@@ -47,6 +50,9 @@ export default function SystemSettingsPage() {
   // Pre-populate from live org data when context loads
   useEffect(() => {
     if (org.name) setWorkspaceName(org.name)
+    if (org.companyName) setCompanyName(org.companyName)
+    if (org.panNumber) setPanNumber(org.panNumber)
+    if (org.gstNumber) setGstNumber(org.gstNumber)
     if (org.logoUrl && !logoPreview) setLogoPreview(org.logoUrl)
     if (org.faviconUrl && !faviconPreview) setFaviconPreview(org.faviconUrl)
     if (org.academyLogoUrl && !academyLogoPreview) setAcademyLogoPreview(org.academyLogoUrl)
@@ -88,10 +94,13 @@ export default function SystemSettingsPage() {
       setLogoUploading(true)
       const body: Record<string, string | null> = { 
         name: workspaceName,
-        phone,
-        website,
-        supportEmail,
-        billingAddress,
+        companyName: companyName ? companyName.trim() : null,
+        panNumber: panNumber ? panNumber.trim().toUpperCase() : null,
+        gstNumber: gstNumber ? gstNumber.trim().toUpperCase() : null,
+        phone: phone ? phone.trim() : null,
+        website: website ? website.trim() : null,
+        supportEmail: supportEmail ? supportEmail.trim() : null,
+        billingAddress: billingAddress ? billingAddress.trim() : null,
         logoUrl: logoPreview || null,
         faviconUrl: faviconPreview || null,
         academyLogoUrl: academyLogoPreview || null,
@@ -147,6 +156,12 @@ export default function SystemSettingsPage() {
           >
             <Building className="w-4 h-4" /> Company Details
           </button>
+          <a 
+            href="/dashboard/settings/organization"
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-colors text-white/70 hover:bg-white/10 hover:text-white group"
+          >
+            <Sparkles className="w-4 h-4 text-blue-400 group-hover:text-blue-300" /> Organization & Branding
+          </a>
           <button 
             onClick={() => setActiveTab('notifications')}
             className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-colors ${activeTab === 'notifications' ? 'bg-blue-600 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'}`}
@@ -414,11 +429,61 @@ export default function SystemSettingsPage() {
             )}
 
             {activeTab === 'company' && (
-              <div className="bg-white/5 border border-white/10 rounded-3xl p-8">
-                <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                  <Building className="w-5 h-5 text-emerald-400" /> Company Details
-                </h2>
+              <div className="bg-white/5 border border-white/10 rounded-3xl p-8 space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-bold flex items-center gap-2">
+                    <Building className="w-5 h-5 text-emerald-400" /> Company & Legal Particulars
+                  </h2>
+                  <a
+                    href="/dashboard/settings/organization"
+                    className="text-xs text-blue-400 hover:text-blue-300 font-mono flex items-center gap-1"
+                  >
+                    Manage Full Branding & Socials →
+                  </a>
+                </div>
                 <div className="grid grid-cols-2 gap-6">
+                  <div className="col-span-2 md:col-span-1">
+                    <label className="text-sm font-bold text-white/70 block mb-2">Registered Legal Company Name</label>
+                    <input 
+                      type="text" 
+                      value={companyName} 
+                      onChange={e => setCompanyName(e.target.value)} 
+                      placeholder="Grekam Visuals & Technologies Pvt Ltd" 
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500/50" 
+                    />
+                  </div>
+                  <div className="col-span-2 md:col-span-1">
+                    <label className="text-sm font-bold text-white/70 block mb-2">Workspace Display Name</label>
+                    <input 
+                      type="text" 
+                      value={workspaceName} 
+                      onChange={e => setWorkspaceName(e.target.value)} 
+                      placeholder="Grekam Visuals" 
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500/50" 
+                    />
+                  </div>
+                  <div className="col-span-2 md:col-span-1">
+                    <label className="text-sm font-bold text-white/70 block mb-2">Income Tax PAN Number</label>
+                    <input 
+                      type="text" 
+                      value={panNumber} 
+                      onChange={e => setPanNumber(e.target.value.toUpperCase())} 
+                      placeholder="ABCDE1234F" 
+                      maxLength={10}
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-sm font-mono uppercase focus:outline-none focus:border-emerald-500/50" 
+                    />
+                  </div>
+                  <div className="col-span-2 md:col-span-1">
+                    <label className="text-sm font-bold text-white/70 block mb-2">GSTIN (GST Identification Number)</label>
+                    <input 
+                      type="text" 
+                      value={gstNumber} 
+                      onChange={e => setGstNumber(e.target.value.toUpperCase())} 
+                      placeholder="33AAAAA0000A1Z5" 
+                      maxLength={15}
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-sm font-mono uppercase focus:outline-none focus:border-emerald-500/50" 
+                    />
+                  </div>
                   <div className="col-span-2 md:col-span-1">
                     <label className="text-sm font-bold text-white/70 block mb-2">Phone Number</label>
                     <input type="text" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+91 98400 12345" className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500/50" />

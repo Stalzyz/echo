@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Folder, FileText, Image as ImageIcon, Video, File, Plus, Upload, Search, Filter, MoreVertical, HardDrive, Share2, Download, Trash2, Zap, Loader2 } from "lucide-react"
+import { Folder, FileText, Image as ImageIcon, Video, File, Plus, Upload, Search, MoreVertical, HardDrive, Share2, Download, Trash2, Zap, Loader2, X, Eye, ExternalLink } from "lucide-react"
 import { useApi, fetchApi } from "@/lib/useApi"
 import { SlideOver } from "@/components/SlideOver"
 import { format } from "date-fns"
@@ -18,6 +18,7 @@ export default function DrivePage() {
   const [isUploading, setIsUploading] = useState(false)
   const [aiMatchedIds, setAiMatchedIds] = useState<string[] | null>(null)
   const [isAiSearching, setIsAiSearching] = useState(false)
+  const [previewFile, setPreviewFile] = useState<any | null>(null)
 
   const handleSearchChange = (val: string) => {
     setSearchQuery(val)
@@ -54,6 +55,18 @@ export default function DrivePage() {
     }
   }
 
+  const handleDeleteFolder = async (folder: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm(`Are you sure you want to delete folder "${folder.name}" and all its contents?`)) return;
+    try {
+      await fetchApi(`/drive/folders/${folder.id}`, { method: 'DELETE' });
+      toast.success("Folder deleted");
+      mutate();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete folder");
+    }
+  }
+
   const handleAiSearch = async () => {
     if (!searchQuery.trim()) return
     setIsAiSearching(true)
@@ -87,22 +100,22 @@ export default function DrivePage() {
 
     setIsUploading(true);
     try {
-      // 1. Get presigned URL from backend
+      // 1. Get presigned upload URL from backend
       const { uploadUrl, key, downloadUrl } = await fetchApi<any>('/storage/upload-url', {
         method: 'POST',
         body: JSON.stringify({
           filename: file.name,
-          contentType: file.type,
+          contentType: file.type || 'application/octet-stream',
           prefix: currentFolderId === 'root' ? 'drive/root' : `drive/${currentFolderId}`
         })
       });
 
-      // 2. Upload directly to S3
+      // 2. Upload file directly
       await fetch(uploadUrl, {
         method: 'PUT',
         body: file,
         headers: {
-          'Content-Type': file.type
+          'Content-Type': file.type || 'application/octet-stream'
         }
       });
 
@@ -111,34 +124,83 @@ export default function DrivePage() {
         method: 'POST',
         body: JSON.stringify({
           name: file.name,
-          mimeType: file.type,
+          mimeType: file.type || 'application/octet-stream',
           sizeBytes: file.size,
           fileUrl: downloadUrl,
           folderId: currentFolderId === 'root' ? null : currentFolderId
         })
       });
 
-      mutate(); // refresh file list
-    } catch (err) {
+      toast.success(`Uploaded ${file.name}`);
+      mutate();
+    } catch (err: any) {
       console.error('Upload failed', err);
+      toast.error(err.message || "File upload failed");
     } finally {
       setIsUploading(false);
+      e.target.value = '';
     }
   };
 
+  const handleDownloadFile = (file: any, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const a = document.createElement('a');
+    a.href = file.fileUrl;
+    a.download = file.name;
+    a.target = '_blank';
+    a.rel = 'noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    toast.success(`Downloading ${file.name}`);
+  }
+
+  const handleShareFile = (file: any, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(file.fileUrl);
+      toast.success("File URL copied to clipboard!");
+    } else {
+      toast.info(file.fileUrl);
+    }
+  }
+
+  const handleDeleteFile = async (file: any, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (!confirm(`Are you sure you want to permanently delete "${file.name}"?`)) return;
+    try {
+      await fetchApi(`/drive/files/${file.id}`, { method: 'DELETE' });
+      toast.success("File deleted successfully");
+      if (previewFile?.id === file.id) setPreviewFile(null);
+      mutate();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete file");
+    }
+  }
+
   const getFilePreview = (file: any) => {
-    if (file.mimeType.includes('image') && file.fileUrl) {
+    const isImg = file.mimeType?.includes('image') || /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(file.name);
+    if (isImg && file.fileUrl) {
       return (
-        <img 
-          src={file.fileUrl} 
-          alt={file.name} 
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-        />
+        <div className="w-full h-full relative flex items-center justify-center bg-black/40">
+          <img 
+            src={file.fileUrl} 
+            alt={file.name} 
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            onError={(e) => {
+              (e.target as HTMLElement).style.display = 'none';
+            }}
+          />
+          <ImageIcon className="w-8 h-8 text-blue-400 absolute pointer-events-none opacity-30" />
+        </div>
       );
     }
-    if (file.mimeType.includes('image')) return <ImageIcon className="w-8 h-8 text-blue-400" />
-    if (file.mimeType.includes('video')) return <Video className="w-8 h-8 text-purple-400" />
-    if (file.mimeType.includes('pdf')) return <FileText className="w-8 h-8 text-red-400" />
+    if (file.mimeType?.includes('video') || /\.(mp4|webm|mov)(\?.*)?$/i.test(file.name)) {
+      return <Video className="w-8 h-8 text-purple-400" />
+    }
+    if (file.mimeType?.includes('pdf') || /\.pdf$/i.test(file.name)) {
+      return <FileText className="w-8 h-8 text-red-400" />
+    }
     return <File className="w-8 h-8 text-white/40" />
   }
 
@@ -242,12 +304,21 @@ export default function DrivePage() {
                     <div 
                       key={folder.id} 
                       onClick={() => setCurrentFolderId(folder.id)}
-                      className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center gap-3 cursor-pointer hover:bg-white/10 transition-colors group"
+                      className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors group"
                     >
-                      <div className="p-2 bg-blue-500/10 text-blue-400 rounded-lg group-hover:bg-blue-500 flex-shrink-0 transition-colors">
-                        <Folder className="w-5 h-5" />
+                      <div className="flex items-center gap-3 truncate">
+                        <div className="p-2 bg-blue-500/10 text-blue-400 rounded-lg group-hover:bg-blue-500 flex-shrink-0 transition-colors">
+                          <Folder className="w-5 h-5" />
+                        </div>
+                        <span className="font-bold text-sm truncate">{folder.name}</span>
                       </div>
-                      <span className="font-bold text-sm truncate">{folder.name}</span>
+                      <button 
+                        onClick={(e) => handleDeleteFolder(folder, e)}
+                        title="Delete folder"
+                        className="opacity-0 group-hover:opacity-100 p-1 text-red-400 hover:text-red-300 transition-opacity"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -262,21 +333,55 @@ export default function DrivePage() {
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {displayedFiles.map((file: any) => (
-                    <div key={file.id} className="bg-black/40 border border-white/10 rounded-2xl overflow-hidden group hover:border-white/20 transition-all">
+                    <div 
+                      key={file.id} 
+                      onClick={() => setPreviewFile(file)}
+                      className="bg-black/40 border border-white/10 rounded-2xl overflow-hidden group hover:border-blue-500/40 transition-all cursor-pointer shadow-lg"
+                    >
                       <div className="aspect-square bg-white/[0.02] border-b border-white/10 flex items-center justify-center relative overflow-hidden group-hover:bg-white/[0.04]">
                         {getFilePreview(file)}
                         
                         {/* Hover Overlay Actions */}
-                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                          <button className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"><Download className="w-4 h-4" /></button>
-                          <button className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"><Share2 className="w-4 h-4" /></button>
-                          <button className="p-2 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-full transition-colors"><Trash2 className="w-4 h-4" /></button>
+                        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-10">
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); setPreviewFile(file); }}
+                            title="Preview"
+                            className="p-2.5 bg-white/15 hover:bg-white/30 rounded-full transition-all text-white hover:scale-110"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button 
+                            onClick={(e) => handleDownloadFile(file, e)}
+                            title="Download"
+                            className="p-2.5 bg-white/15 hover:bg-white/30 rounded-full transition-all text-white hover:scale-110"
+                          >
+                            <Download className="w-4 h-4" />
+                          </button>
+                          <button 
+                            onClick={(e) => handleShareFile(file, e)}
+                            title="Copy link"
+                            className="p-2.5 bg-white/15 hover:bg-white/30 rounded-full transition-all text-white hover:scale-110"
+                          >
+                            <Share2 className="w-4 h-4" />
+                          </button>
+                          <button 
+                            onClick={(e) => handleDeleteFile(file, e)}
+                            title="Delete"
+                            className="p-2.5 bg-red-500/20 text-red-400 hover:bg-red-500/40 rounded-full transition-all hover:scale-110"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
                       <div className="p-4">
                         <div className="flex items-start justify-between gap-2">
-                          <h4 className="font-bold text-sm truncate">{file.name}</h4>
-                          <button className="text-white/30 hover:text-white"><MoreVertical className="w-4 h-4" /></button>
+                          <h4 className="font-bold text-sm truncate text-white/90 group-hover:text-blue-400 transition-colors" title={file.name}>{file.name}</h4>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); setPreviewFile(file); }}
+                            className="text-white/30 hover:text-white flex-shrink-0"
+                          >
+                            <MoreVertical className="w-4 h-4" />
+                          </button>
                         </div>
                         <div className="flex items-center gap-2 mt-2 text-[10px] font-mono text-white/40">
                           <span>{formatBytes(file.sizeBytes)}</span>
@@ -293,6 +398,114 @@ export default function DrivePage() {
           </div>
         )}
       </div>
+
+      {/* File Preview Modal */}
+      {previewFile && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 md:p-8 animate-in fade-in"
+          onClick={() => setPreviewFile(null)}
+        >
+          <div 
+            className="bg-[#0f0f10] border border-white/15 rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-5 border-b border-white/10 flex items-center justify-between bg-black/40">
+              <div className="flex items-center gap-3 truncate">
+                <div className="p-2 rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                  {previewFile.mimeType?.includes('image') ? <ImageIcon className="w-5 h-5" /> : previewFile.mimeType?.includes('video') ? <Video className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
+                </div>
+                <div className="truncate">
+                  <h3 className="font-bold text-base text-white truncate max-w-md">{previewFile.name}</h3>
+                  <p className="text-xs text-white/40 font-mono mt-0.5">
+                    {formatBytes(previewFile.sizeBytes)} • {format(new Date(previewFile.createdAt), 'MMM d, yyyy h:mm a')}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleDownloadFile(previewFile)}
+                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 transition-all flex items-center gap-1.5 text-xs font-medium"
+                  title="Download file"
+                >
+                  <Download className="w-4 h-4" /> Download
+                </button>
+                <button
+                  onClick={() => handleShareFile(previewFile)}
+                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 transition-all flex items-center gap-1.5 text-xs font-medium"
+                  title="Copy share link"
+                >
+                  <Share2 className="w-4 h-4" /> Copy Link
+                </button>
+                <a
+                  href={previewFile.fileUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 transition-all flex items-center gap-1.5 text-xs font-medium"
+                  title="Open in new tab"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+                <button
+                  onClick={() => handleDeleteFile(previewFile)}
+                  className="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-all flex items-center gap-1.5 text-xs font-medium"
+                  title="Delete file"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setPreviewFile(null)}
+                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 transition-all"
+                  title="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body / Viewer */}
+            <div className="flex-1 overflow-auto p-6 flex items-center justify-center bg-black/60 min-h-[360px]">
+              {previewFile.mimeType?.includes('image') || /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(previewFile.name) ? (
+                <img 
+                  src={previewFile.fileUrl} 
+                  alt={previewFile.name} 
+                  className="max-h-[65vh] w-auto max-w-full object-contain rounded-xl shadow-2xl"
+                />
+              ) : previewFile.mimeType?.includes('video') || /\.(mp4|webm|mov)(\?.*)?$/i.test(previewFile.name) ? (
+                <video 
+                  src={previewFile.fileUrl} 
+                  controls 
+                  autoPlay 
+                  className="max-h-[65vh] w-auto max-w-full rounded-xl shadow-2xl" 
+                />
+              ) : previewFile.mimeType?.includes('pdf') || /\.pdf$/i.test(previewFile.name) ? (
+                <iframe 
+                  src={previewFile.fileUrl} 
+                  className="w-full h-[65vh] rounded-xl border border-white/10" 
+                  title={previewFile.name}
+                />
+              ) : (
+                <div className="text-center py-12 space-y-4">
+                  <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto text-white/50">
+                    <FileText className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-lg text-white">{previewFile.name}</h4>
+                    <p className="text-sm text-white/40 mt-1">This file type cannot be previewed directly in the browser.</p>
+                  </div>
+                  <button
+                    onClick={() => handleDownloadFile(previewFile)}
+                    className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl transition-all shadow-lg"
+                  >
+                    <Download className="w-4 h-4" /> Download to View
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* SlideOver for New Folder */}
       <SlideOver

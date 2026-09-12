@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { ApiClient } from "@/lib/api";
 import { Loader2, DollarSign, CheckCircle } from "lucide-react";
+import { toast } from "sonner";
 
 const TAX_MODELS = ['GST', 'VAT', 'NONE'] as const;
 const MONTHS = [
@@ -17,10 +18,14 @@ export default function FinanceSettingsPage() {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    ApiClient.get("/settings/finance").then((data) => {
-      setCurrencies(data.currencies || []);
-      setSettings(data);
-    });
+    ApiClient.get("/settings/finance")
+      .then((data) => {
+        setCurrencies(data.currencies || []);
+        setSettings(data);
+      })
+      .catch((err) => {
+        toast.error("Failed to load finance settings");
+      });
   }, []);
 
   const handleCurrencyChange = (code: string) => {
@@ -31,18 +36,24 @@ export default function FinanceSettingsPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const updated = await ApiClient.patch("/settings/finance", {
-        baseCurrency: settings.baseCurrency,
-        currencySymbol: settings.currencySymbol,
-        taxModel: settings.taxModel,
-        gstNumber: settings.gstNumber,
-        vatNumber: settings.vatNumber,
-        fiscalYearStart: settings.fiscalYearStart,
-        invoicePrefix: settings.invoicePrefix,
-      });
+      const payload = {
+        baseCurrency: settings.baseCurrency || "INR",
+        currencySymbol: settings.currencySymbol || "₹",
+        taxModel: settings.taxModel || "NONE",
+        gstNumber: settings.gstNumber ? settings.gstNumber.trim() : null,
+        vatNumber: settings.vatNumber ? settings.vatNumber.trim() : null,
+        fiscalYearStart: Number(settings.fiscalYearStart) || 4,
+        invoicePrefix: settings.invoicePrefix ? settings.invoicePrefix.trim() : "INV",
+      };
+
+      const updated = await ApiClient.patch("/settings/finance", payload);
       setSettings({ ...updated, currencies });
       setSaved(true);
+      toast.success("Finance settings saved successfully!");
       setTimeout(() => setSaved(false), 3000);
+    } catch (err: any) {
+      console.error("Failed to save finance settings:", err);
+      toast.error(err?.response?.data?.message || err?.message || "Failed to save finance settings");
     } finally {
       setSaving(false);
     }

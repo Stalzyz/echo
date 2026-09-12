@@ -96,7 +96,16 @@ export default async function storageRouter(app: FastifyInstance) {
 
       await pipeline(data.file, fs.createWriteStream(destinationPath));
 
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+      const hostHeader = (req.headers['x-forwarded-host'] as string) || (req.headers.host as string) || '';
+      const protoHeader = (req.headers['x-forwarded-proto'] as string) || ((req.socket as any)?.encrypted ? 'https' : 'http');
+      let API_URL = process.env.NEXT_PUBLIC_API_URL || '';
+      if (!API_URL || API_URL.includes('localhost') || API_URL.includes('127.0.0.1')) {
+        if (hostHeader && !hostHeader.includes('localhost') && !hostHeader.includes('127.0.0.1')) {
+          API_URL = `${protoHeader}://${hostHeader}/api/v1`;
+        } else {
+          API_URL = 'https://garage.grekam.in/api/v1';
+        }
+      }
       const downloadUrl = `${API_URL}/uploads/${key}`;
 
       return reply.send({ downloadUrl, key, success: true });

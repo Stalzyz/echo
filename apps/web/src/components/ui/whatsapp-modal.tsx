@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Modal } from './modal';
-import { MessageSquare, Send, CheckCircle2, AlertCircle, Loader2, Phone, User, FileText, ExternalLink, Sparkles, CheckCheck, Upload, Image as ImageIcon, Paperclip, FileUp, X } from 'lucide-react';
+import { MessageSquare, Send, CheckCircle2, AlertCircle, Loader2, Phone, User, FileText, ExternalLink, Sparkles, CheckCheck, Upload, Image as ImageIcon, Paperclip, FileUp, X, HardDrive, Search } from 'lucide-react';
 import { fetchApi, useApi } from '@/lib/useApi';
 import { toast } from 'sonner';
 
@@ -39,7 +39,7 @@ const FALLBACK_TEMPLATES: TemplateDef[] = [
     event: 'CRM_LEAD_FOLLOWUP',
     description: 'Shopify store migration assessment pitch with image banner and quick reply button',
     headerType: 'IMAGE',
-    defaultMediaUrl: 'https://scontent.whatsapp.net/v/t61.29466-34/642678768_850317051240573_175361912867767487_n.png?ccb=1-7&_nc_sid=8b1bef&_nc_ohc=CDkvmhkUMagQ7kNvwHOX_8z&_nc_oc=AdpkwzbRCw6w_gB2AZwpW5bujnQJPnjqwa2bUEME4fDsQCFGQlEGamdYkYMK8CZ1swk&_nc_zt=3&_nc_ht=scontent.whatsapp.net&edm=AH51TzQEAAAA&_nc_gid=Yx9IAnyyOgb6iTpRKAgrEA&_nc_tpa=Q5bMBQIBsEJ3uz2kFVS9w82KRYo-ADZOtgqCFI3Yy_n7JlSehl2KpoAE-HV73ippszZqKBvSEfu-EU4psg&oh=01_Q5Aa5gF2O7PQ39GRKgCMNKLDJWxEZvcFRv8pcr6GD9Vm0bV2qQ&oe=6ACA58B0',
+    defaultMediaUrl: 'https://garage.grekam.in/og-image.png',
     variables: [],
     bodyPattern: 'Stop Renting Your Shopify Store.\n\nOwn your platform. Save thousands every month.\n\nFind out if your Shopify store is eligible for a FREE Migration Assessment.',
     buttons: ['Check Eligibility']
@@ -52,7 +52,7 @@ const FALLBACK_TEMPLATES: TemplateDef[] = [
     event: 'CRM_LEAD_FOLLOWUP',
     description: 'All industries WhatsApp API overview with image banner and link',
     headerType: 'IMAGE',
-    defaultMediaUrl: 'https://scontent.whatsapp.net/v/t61.29466-34/719633934_1256828006528059_7342898372785317285_n.png?ccb=1-7&_nc_sid=8b1bef&_nc_ohc=efWWcxqoSIsQ7kNvwGlVAEG&_nc_oc=AdqrK9QSyEPO1lVR1acz3m4Y3cpxWAMFQHxLpFfQjQ5fdaZzl8S5DVcnC0_nvhOou-U&_nc_zt=3&_nc_ht=scontent.whatsapp.net&edm=AH51TzQEAAAA&_nc_gid=Yx9IAnyyOgb6iTpRKAgrEA&_nc_tpa=Q5bMBQK_FkKViCXxHTKzejNZeZA-hBpWfwWIzRNsDXUKmTo9L7ZY05dMl15vm6egTFjYAtnz4tEHN8Mrjg&oh=01_Q5Aa5gGkOiwdPbupThZ3BUcJkVS6Y0lfdQcIKEt8TXJwSjw0gQ&oe=6ACA671E',
+    defaultMediaUrl: 'https://garage.grekam.in/og-image.png',
     variables: [],
     bodyPattern: 'Grow Your Business with WhatsApp\n\nConnect with your customers instantly using WhatsApp API.\n\n• Send notifications & updates\n• Automate customer conversations\n• Follow up with leads\n• Send offers & campaigns\n• Manage customer communication',
     buttons: ['Free Login']
@@ -205,7 +205,10 @@ export function WhatsAppModal({
   const [selectedTemplateId, setSelectedTemplateId] = useState(defaultTemplateId);
   const [variableValues, setVariableValues] = useState<Record<string, string>>(defaultVariables);
   const [mediaUrl, setMediaUrl] = useState<string>('');
-  const [mediaSourceMode, setMediaSourceMode] = useState<'upload' | 'url'>('upload');
+  const [mediaSourceMode, setMediaSourceMode] = useState<'upload' | 'drive' | 'url'>('upload');
+  const [driveSearch, setDriveSearch] = useState('');
+  const { data: driveData, isLoading: isDriveLoading } = useApi<any>('/drive/folders/root/contents');
+  const driveFiles = driveData?.files || [];
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string>('');
   const [localPreviewUrl, setLocalPreviewUrl] = useState<string>('');
@@ -280,7 +283,11 @@ export function WhatsAppModal({
 
       const data = await res.json();
       if (data.downloadUrl) {
-        setMediaUrl(data.downloadUrl);
+        let finalUrl = data.downloadUrl;
+        if (finalUrl.includes('localhost:4000') || finalUrl.includes('127.0.0.1:4000')) {
+          finalUrl = finalUrl.replace(/https?:\/\/(localhost|127\.0\.0\.1):4000/g, 'https://garage.grekam.in');
+        }
+        setMediaUrl(finalUrl);
         toast.success(`Uploaded "${file.name}" from local drive!`);
       } else {
         throw new Error('No download URL returned');
@@ -323,6 +330,11 @@ export function WhatsAppModal({
         (v) => variableValues[v.name] || v.placeholder
       );
 
+      let effectiveMediaUrl = (mediaUrl.trim() || selectedTemplate.defaultMediaUrl || '').trim();
+      if (effectiveMediaUrl.includes('localhost:4000') || effectiveMediaUrl.includes('127.0.0.1:4000')) {
+        effectiveMediaUrl = effectiveMediaUrl.replace(/https?:\/\/(localhost|127\.0\.0\.1):4000/g, 'https://garage.grekam.in');
+      }
+
       const res = await fetchApi<any>('/integrations/whatsapp/send-template', {
         method: 'POST',
         body: JSON.stringify({
@@ -332,7 +344,7 @@ export function WhatsAppModal({
           templateName: selectedTemplate.templateName,
           variables: formattedVars,
           headerType: selectedTemplate.headerType,
-          mediaUrl: mediaUrl.trim() || undefined,
+          mediaUrl: effectiveMediaUrl || undefined,
           provider,
         }),
       });
@@ -587,29 +599,40 @@ export function WhatsAppModal({
                     <button
                       type="button"
                       onClick={() => setMediaSourceMode('upload')}
-                      className={`text-[9px] font-mono px-2 py-0.5 rounded transition-all ${
+                      className={`text-[9px] font-mono px-2 py-0.5 rounded transition-all flex items-center gap-1 ${
                         mediaSourceMode === 'upload'
                           ? 'bg-emerald-500 text-black font-bold'
                           : 'text-white/60 hover:text-white'
                       }`}
                     >
-                      Local Drive File
+                      <Upload className="w-2.5 h-2.5" /> Local Drive
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMediaSourceMode('drive')}
+                      className={`text-[9px] font-mono px-2 py-0.5 rounded transition-all flex items-center gap-1 ${
+                        mediaSourceMode === 'drive'
+                          ? 'bg-emerald-500 text-black font-bold'
+                          : 'text-white/60 hover:text-white'
+                      }`}
+                    >
+                      <HardDrive className="w-2.5 h-2.5" /> Asset Drive
                     </button>
                     <button
                       type="button"
                       onClick={() => setMediaSourceMode('url')}
-                      className={`text-[9px] font-mono px-2 py-0.5 rounded transition-all ${
+                      className={`text-[9px] font-mono px-2 py-0.5 rounded transition-all flex items-center gap-1 ${
                         mediaSourceMode === 'url'
                           ? 'bg-emerald-500 text-black font-bold'
                           : 'text-white/60 hover:text-white'
                       }`}
                     >
-                      Public Link URL
+                      <ExternalLink className="w-2.5 h-2.5" /> Link URL
                     </button>
                   </div>
                 </div>
 
-                {mediaSourceMode === 'upload' ? (
+                {mediaSourceMode === 'upload' && (
                   <div className="space-y-2">
                     <label className="relative flex flex-col items-center justify-center p-4 border-2 border-dashed border-emerald-500/40 hover:border-emerald-400 bg-black/40 hover:bg-black/60 rounded-xl cursor-pointer transition-all group">
                       <input
@@ -643,7 +666,90 @@ export function WhatsAppModal({
                       )}
                     </label>
                   </div>
-                ) : (
+                )}
+
+                {mediaSourceMode === 'drive' && (
+                  <div className="space-y-2.5 bg-black/40 border border-emerald-500/30 rounded-xl p-3">
+                    <div className="relative">
+                      <Search className="w-3.5 h-3.5 text-white/40 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        placeholder="Search Asset Drive..."
+                        value={driveSearch}
+                        onChange={(e) => setDriveSearch(e.target.value)}
+                        className="w-full bg-black/60 border border-white/10 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder:text-white/30 focus:border-emerald-400 outline-none"
+                      />
+                    </div>
+
+                    {isDriveLoading ? (
+                      <div className="flex items-center justify-center py-6 text-white/40 text-xs gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin text-emerald-400" /> Loading Asset Drive files...
+                      </div>
+                    ) : driveFiles.length === 0 ? (
+                      <div className="text-center py-6 text-white/40 text-xs">
+                        No files found in Asset Drive. You can upload via Local Drive above.
+                      </div>
+                    ) : (
+                      <div className="max-h-48 overflow-y-auto space-y-1.5 custom-scrollbar pr-1">
+                        {driveFiles
+                          .filter((f: any) => !driveSearch || f.name.toLowerCase().includes(driveSearch.toLowerCase()))
+                          .map((f: any) => {
+                            const isSelected = mediaUrl === f.fileUrl;
+                            const isImg = f.mimeType?.includes('image') || /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(f.name);
+                            return (
+                              <div
+                                key={f.id}
+                                onClick={() => {
+                                  setMediaUrl(f.fileUrl);
+                                  setUploadedFileName(f.name);
+                                  setLocalPreviewUrl(f.fileUrl);
+                                  toast.success(`Selected "${f.name}" from Asset Drive`);
+                                }}
+                                className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all border ${
+                                  isSelected
+                                    ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300'
+                                    : 'bg-white/5 border-white/10 hover:bg-white/10 text-white/80'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2.5 truncate min-w-0">
+                                  <div className="w-8 h-8 rounded bg-black/60 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                    {isImg ? (
+                                      <img
+                                        src={f.fileUrl}
+                                        alt=""
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
+                                      />
+                                    ) : (
+                                      <FileText className="w-4 h-4 text-emerald-400" />
+                                    )}
+                                  </div>
+                                  <div className="truncate text-left">
+                                    <p className="text-xs font-semibold truncate text-white">{f.name}</p>
+                                    <p className="text-[10px] text-white/40 font-mono">
+                                      {(f.sizeBytes / 1024).toFixed(1)} KB
+                                    </p>
+                                  </div>
+                                </div>
+
+                                {isSelected ? (
+                                  <span className="text-[10px] bg-emerald-500 text-black font-bold px-2 py-0.5 rounded flex items-center gap-1 flex-shrink-0">
+                                    <CheckCircle2 className="w-3 h-3" /> Selected
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] text-white/40 hover:text-white px-2 py-0.5 flex-shrink-0">
+                                    Select
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {mediaSourceMode === 'url' && (
                   <div className="space-y-2">
                     <input
                       type="url"

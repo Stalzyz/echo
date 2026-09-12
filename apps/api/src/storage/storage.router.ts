@@ -94,10 +94,21 @@ export default async function storageRouter(app: FastifyInstance) {
     const safeFilename = body.filename.replace(/[^a-zA-Z0-9.\-_]/g, '');
     const key = `${body.prefix}/${Date.now()}_${uniqueId}_${safeFilename}`;
 
+    // Resolve public API URL (avoiding localhost in production so external services like Meta/WhatsApp can download media)
+    const hostHeader = (req.headers['x-forwarded-host'] as string) || (req.headers.host as string) || '';
+    const protoHeader = (req.headers['x-forwarded-proto'] as string) || ((req.socket as any)?.encrypted ? 'https' : 'http');
+    let API_URL = process.env.NEXT_PUBLIC_API_URL || '';
+    if (!API_URL || API_URL.includes('localhost') || API_URL.includes('127.0.0.1')) {
+      if (hostHeader && !hostHeader.includes('localhost') && !hostHeader.includes('127.0.0.1')) {
+        API_URL = `${protoHeader}://${hostHeader}/api/v1`;
+      } else {
+        API_URL = 'https://garage.grekam.in/api/v1';
+      }
+    }
+
     // MOCK UPLOAD LOGIC IF NO CREDENTIALS
     if (!process.env.R2_ACCESS_KEY_ID) {
       console.warn('[Storage] R2 Credentials missing. Returning local fallback upload URL.');
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
       const safeKey = key.replace(/\//g, '_');
       return {
         uploadUrl: `${API_URL}/storage/mock-upload/${encodeURIComponent(key)}`,
@@ -116,8 +127,6 @@ export default async function storageRouter(app: FastifyInstance) {
       // The presigned URL allows the frontend to upload directly to R2 for 15 minutes
       const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 900 });
 
-      // We don't have a custom domain setup yet, so we'll mock the public download URL or construct it if there's a public dev URL
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
       const publicDomain = process.env.R2_PUBLIC_DOMAIN;
       const downloadUrl = publicDomain ? `${publicDomain}/${key}` : `${API_URL}/storage/asset/${key}`;
 

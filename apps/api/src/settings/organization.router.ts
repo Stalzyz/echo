@@ -3,26 +3,35 @@ import { z } from 'zod';
 
 const UpdateOrganizationSchema = z.object({
   name: z.string().optional(),
-  logoUrl: z.string().optional().or(z.literal('')),
-  faviconUrl: z.string().optional().or(z.literal('')),
-  academyLogoUrl: z.string().optional().or(z.literal('')),
-  academyFaviconUrl: z.string().optional().or(z.literal('')),
-  primaryColor: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/).optional(),
-  secondaryColor: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/).optional(),
-  accentColor: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/).optional(),
+  companyName: z.string().nullable().optional().or(z.literal('')),
+  panNumber: z.string().nullable().optional().or(z.literal('')),
+  gstNumber: z.string().nullable().optional().or(z.literal('')),
+  logoUrl: z.string().nullable().optional().or(z.literal('')),
+  faviconUrl: z.string().nullable().optional().or(z.literal('')),
+  academyLogoUrl: z.string().nullable().optional().or(z.literal('')),
+  academyFaviconUrl: z.string().nullable().optional().or(z.literal('')),
+  primaryColor: z.string().nullable().optional().or(z.literal('')),
+  secondaryColor: z.string().nullable().optional().or(z.literal('')),
+  accentColor: z.string().nullable().optional().or(z.literal('')),
   darkModeDefault: z.boolean().optional(),
-  supportEmail: z.string().email().optional().or(z.literal('')),
-  billingAddress: z.string().optional().or(z.literal('')),
-  website: z.string().optional().or(z.literal('')),
-  phone: z.string().optional().or(z.literal('')),
-  openAiKey: z.string().optional().or(z.literal('')),
-  resendApiKey: z.string().optional().or(z.literal('')),
-  bankName: z.string().optional().or(z.literal('')),
-  accountName: z.string().optional().or(z.literal('')),
-  accountNumber: z.string().optional().or(z.literal('')),
-  ifscCode: z.string().optional().or(z.literal('')),
-  swiftCode: z.string().optional().or(z.literal('')),
-  bankBranch: z.string().optional().or(z.literal('')),
+  supportEmail: z.string().email().nullable().optional().or(z.literal('')),
+  billingAddress: z.string().nullable().optional().or(z.literal('')),
+  website: z.string().nullable().optional().or(z.literal('')),
+  phone: z.string().nullable().optional().or(z.literal('')),
+  instagramUrl: z.string().nullable().optional().or(z.literal('')),
+  youtubeUrl: z.string().nullable().optional().or(z.literal('')),
+  linkedinUrl: z.string().nullable().optional().or(z.literal('')),
+  twitterUrl: z.string().nullable().optional().or(z.literal('')),
+  facebookUrl: z.string().nullable().optional().or(z.literal('')),
+  whatsappNumber: z.string().nullable().optional().or(z.literal('')),
+  openAiKey: z.string().nullable().optional().or(z.literal('')),
+  resendApiKey: z.string().nullable().optional().or(z.literal('')),
+  bankName: z.string().nullable().optional().or(z.literal('')),
+  accountName: z.string().nullable().optional().or(z.literal('')),
+  accountNumber: z.string().nullable().optional().or(z.literal('')),
+  ifscCode: z.string().nullable().optional().or(z.literal('')),
+  swiftCode: z.string().nullable().optional().or(z.literal('')),
+  bankBranch: z.string().nullable().optional().or(z.literal('')),
 });
 
 export default async function organizationRouter(app: FastifyInstance) {
@@ -35,17 +44,21 @@ export default async function organizationRouter(app: FastifyInstance) {
       org = await app.prisma.organization.create({
         data: {
           name: "Grekam Visuals",
+          companyName: "Grekam Visuals & Technologies Pvt Ltd",
           logoUrl: "/visuals-logo.png",
           academyLogoUrl: "/academy-logo.png",
           faviconUrl: "/favicon.ico",
           academyFaviconUrl: "/favicon.ico",
-          primaryColor: "#2DA16D",
-          secondaryColor: "#E1992D",
-          accentColor: "#49abc9",
+          primaryColor: "#4f46e5",
+          secondaryColor: "#7c3aed",
+          accentColor: "#10b981",
           darkModeDefault: true,
-          supportEmail: "greeksacademy@gmail.com",
+          supportEmail: "contact@grekam.in",
           billingAddress: "Coimbatore, Tamil Nadu, India",
           website: "https://grekam.in",
+          instagramUrl: "https://instagram.com/grekamvisuals",
+          youtubeUrl: "https://youtube.com/@grekamvisuals",
+          linkedinUrl: "https://linkedin.com/company/grekam",
         }
       });
     }
@@ -53,13 +66,14 @@ export default async function organizationRouter(app: FastifyInstance) {
     return {
       ...org,
       name: org.name || "Grekam Visuals",
+      companyName: org.companyName || "Grekam Visuals & Technologies Pvt Ltd",
       logoUrl: org.logoUrl || "/visuals-logo.png",
       academyLogoUrl: org.academyLogoUrl || "/academy-logo.png",
       faviconUrl: org.faviconUrl || "/favicon.ico",
       academyFaviconUrl: org.academyFaviconUrl || "/favicon.ico",
-      primaryColor: org.primaryColor || "#2DA16D",
-      secondaryColor: org.secondaryColor || "#E1992D",
-      accentColor: org.accentColor || "#49abc9",
+      primaryColor: org.primaryColor || "#4f46e5",
+      secondaryColor: org.secondaryColor || "#7c3aed",
+      accentColor: org.accentColor || "#10b981",
     };
   });
 
@@ -67,17 +81,30 @@ export default async function organizationRouter(app: FastifyInstance) {
   app.patch('/organization', async (req, reply) => {
     const body = UpdateOrganizationSchema.parse(req.body);
     
+    const dataToSave: any = { ...body };
+    if (!dataToSave.primaryColor) delete dataToSave.primaryColor;
+    if (!dataToSave.secondaryColor) delete dataToSave.secondaryColor;
+    if (!dataToSave.accentColor) delete dataToSave.accentColor;
+    if (!dataToSave.name) delete dataToSave.name;
+
     let org = await app.prisma.organization.findFirst();
     
     if (!org) {
       org = await app.prisma.organization.create({
-        data: { name: "Grekam OS", ...body }
+        data: { name: "Grekam OS", ...dataToSave }
       });
     } else {
       org = await app.prisma.organization.update({
         where: { id: org.id },
-        data: body,
+        data: dataToSave,
       });
+    }
+
+    // Keep GST synchronized with FinanceSettings if provided
+    if (body.gstNumber !== undefined) {
+      await app.prisma.financeSettings.updateMany({
+        data: { gstNumber: body.gstNumber || null }
+      }).catch(() => {});
     }
 
     return org;

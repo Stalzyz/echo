@@ -364,6 +364,7 @@ export default async function emailTemplatesRouter(app: FastifyInstance) {
   app.post('/:code/test', async (req, reply) => {
     const { code } = req.params as { code: string };
     const user = req.user;
+    const body = (req.body || {}) as { sendToEmail?: string };
 
     const template = await app.prisma.emailTemplate.findUnique({
       where: { code },
@@ -428,9 +429,28 @@ export default async function emailTemplatesRouter(app: FastifyInstance) {
 
     const rendered = renderEmailTemplate(template.bodyHtml, template.subject, sampleData);
 
+    const targetRecipient = body.sendToEmail?.trim() || user.email;
+    let sent = false;
+    let messageId: string | null = null;
+    let previewUrl: string | null = null;
+
+    if (body.sendToEmail) {
+      const { sendEmail } = await import('../integrations/email.service');
+      const res = await sendEmail(targetRecipient, {
+        subject: `[TEST] ${rendered.subject}`,
+        html: rendered.html,
+      });
+      sent = true;
+      messageId = res.messageId;
+      previewUrl = res.previewUrl;
+    }
+
     return {
       success: true,
-      recipient: user.email,
+      recipient: targetRecipient,
+      sent,
+      messageId,
+      previewUrl,
       rendered,
     };
   });
