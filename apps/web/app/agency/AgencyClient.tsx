@@ -3,21 +3,23 @@
 import { useState, useEffect, useRef, useMemo } from "react"
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue, animate } from "framer-motion"
 import Link from "next/link"
-import { X, Zap, Code2, Rocket, Palette, Fingerprint, Users, Volume2, VolumeX, TriangleAlert, Mail, Phone, MapPin, Send, ChevronDown, Orbit, CheckCircle2, CalendarDays, IndianRupee, Layers, Check, Monitor, Tablet, Smartphone, ExternalLink, RotateCw, Lock, Copy, Sparkles, Eye, Globe, GraduationCap, ArrowRight, Scale, Shield, CreditCard, RefreshCw, Truck, Pencil, Trash2, Wrench, ShoppingBag, Megaphone, MessageSquare, LayoutGrid, Briefcase, ShieldCheck, FileText, Waves, Sliders, Music, Radio, Disc } from "lucide-react"
+import { X, Zap, Code2, Rocket, Palette, Fingerprint, Users, Volume2, VolumeX, TriangleAlert, Mail, Phone, MapPin, Send, ChevronDown, Orbit, CheckCircle2, CalendarDays, IndianRupee, Layers, Check, Monitor, Tablet, Smartphone, ExternalLink, RotateCw, Lock, Copy, Sparkles, Eye, Globe, GraduationCap, ArrowRight, Scale, Shield, CreditCard, RefreshCw, Truck, Pencil, Trash2, Wrench, ShoppingBag, Megaphone, MessageSquare, LayoutGrid, Briefcase, ShieldCheck, FileText, Waves, Sliders, Music, Radio, Disc, Calculator } from "lucide-react"
 import { useOrganization } from "@/context/OrganizationContext"
+import WebsiteCostCalculator from "@/components/calculator/WebsiteCostCalculator"
 import { CardData, ProjectData, PosterCardItem, INITIAL_CARDS, CINEMATIC_POSTERS_DATA, BRANDING_PROJECTS, DUMMY_PROJECTS } from "./agency-data"
 
 export { INITIAL_CARDS, CINEMATIC_POSTERS_DATA, BRANDING_PROJECTS, DUMMY_PROJECTS }
 
 
 const ServiceDetailsSection = ({ card, darkText = false }: { card: CardData; darkText?: boolean }) => {
+  if (card.isCostCalculator || card.id === 'cost_calculator') return null
   if (!card.features && !card.deliverables && !card.techStack) return null
 
   return (
-    <div className={`w-full mt-6 text-left border-t ${darkText ? 'border-black/30' : 'border-white/10'} pt-6 space-y-6`}>
+    <div className={`w-full mt-10 text-left border-t ${darkText ? 'border-black/30' : 'border-white/10'} pt-12 space-y-12`}>
       {/* Target Fit & Turnaround Banner */}
       {(card.idealFor || card.turnaround) && (
-        <div className={`grid grid-cols-1 md:grid-cols-2 gap-3 p-4 rounded-2xl ${darkText ? 'bg-white border-2 border-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' : 'bg-[#12141A] border border-white/10 text-zinc-100 shadow-sm'}`}>
+        <div className={`grid grid-cols-1 md:grid-cols-2 gap-8 p-8 rounded-3xl ${darkText ? 'bg-white border-2 border-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' : 'bg-[#12141A] border border-white/5 text-zinc-100 shadow-xl'}`}>
           {card.idealFor && (
             <div>
               <span className={`text-[10px] font-mono uppercase tracking-widest font-bold block mb-1 ${darkText ? 'text-black' : 'text-emerald-400'}`}>
@@ -39,14 +41,14 @@ const ServiceDetailsSection = ({ card, darkText = false }: { card: CardData; dar
 
       {/* Scope Checklist / Included Features */}
       {card.features && card.features.length > 0 && (
-        <div>
-          <h4 className={`text-xs uppercase tracking-widest font-mono font-bold mb-3 flex items-center gap-2 ${darkText ? 'text-black font-black' : 'text-emerald-400'}`}>
+        <div className="space-y-6">
+          <h4 className={`text-xs uppercase tracking-widest font-mono font-bold flex items-center gap-2 ${darkText ? 'text-black font-black' : 'text-emerald-400'}`}>
             <CheckCircle2 className="w-3.5 h-3.5" /> [ CORE CAPABILITIES & SCOPE ]
           </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {card.features.map((feat, idx) => (
-              <div key={idx} className={`flex items-start gap-2.5 p-3.5 rounded-xl text-xs leading-relaxed ${darkText ? 'bg-white border-2 border-black text-black font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'bg-[#12141A] border border-white/10 text-zinc-200 shadow-sm'}`}>
-                <Check className={`w-4 h-4 shrink-0 mt-0.5 ${darkText ? 'text-black stroke-[3]' : 'text-emerald-400 stroke-[2.5]'}`} />
+              <div key={idx} className={`flex items-start gap-4 p-5 rounded-2xl text-sm leading-relaxed ${darkText ? 'bg-white border-2 border-black text-black font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'bg-[#12141A] border border-white/5 text-zinc-300 shadow-xl'}`}>
+                <Check className={`w-5 h-5 shrink-0 mt-0.5 ${darkText ? 'text-black stroke-[3]' : 'text-emerald-400 stroke-[2.5]'}`} />
                 <span>{feat}</span>
               </div>
             ))}
@@ -911,6 +913,7 @@ const PricingCalculator = () => {
 
 // Dynamic Icon Renderer Helper (Font Icons)
 const FONT_ICON_MAP: Record<string, string> = {
+  Calculator: "fa-solid fa-calculator",
   LayoutGrid: "fa-solid fa-table-cells-large",
   Sparkles: "fa-solid fa-layer-group",
   Palette: "fa-solid fa-palette",
@@ -1471,14 +1474,39 @@ const DockItem = ({ card, index, mouseX, isMobile, playSound, onClick }: {
         </motion.div>
 
         <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-zinc-900 border border-white/20 rounded-lg text-[10px] font-mono font-bold text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-2xl z-50">
-          {card.category || card.title}
+          {card.title || card.category}
         </div>
       </motion.button>
     </div>
   )
 }
 
-const LayoutCreativeOS = ({ cards, playSound, playDockSound, selectedInstrument, setSelectedInstrument, INSTRUMENTS, cmsData, onPreviewProject }: any) => {
+
+const UniversalLaunchpad = ({ allCards, onSelect }: any) => {
+  return (
+    <div className="w-full flex-1 p-6 md:p-12 overflow-y-auto custom-scrollbar flex items-center justify-center bg-zinc-950 rounded-3xl border border-white/10 my-8 shadow-2xl">
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-6 sm:gap-8 md:gap-12 w-full max-w-4xl mx-auto items-start justify-items-center">
+        {allCards?.filter((c: any) => c.id !== 'launchpad').map((card: any) => (
+          <button 
+            key={card.id}
+            onClick={() => { onSelect?.(card); }}
+            className="flex flex-col items-center gap-3 group cursor-pointer w-20 md:w-24"
+          >
+            <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white/10 group-hover:border-white/30 shadow-lg relative overflow-hidden" style={{ color: card.colorHex || '#fff' }}>
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity" style={{ backgroundColor: card.colorHex || '#fff' }} />
+              <i className={`${card.icon || card.iconName} text-2xl md:text-3xl relative z-10`} />
+            </div>
+            <span className="text-[10px] md:text-xs text-center font-mono font-bold text-white/70 group-hover:text-white line-clamp-2 leading-tight">
+              {card.title || card.category}
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+const LayoutCreativeOS = ({ cards, allCards, playSound, playDockSound, selectedInstrument, setSelectedInstrument, INSTRUMENTS, cmsData, onPreviewProject, volume, setVolume, isMuted, setIsMuted }: any) => {
   const [activeCard, setActiveCard] = useState<CardData | null>(null)
   const mouseX = useMotionValue(Infinity)
   const [isMobile, setIsMobile] = useState(false)
@@ -1539,7 +1567,7 @@ const LayoutCreativeOS = ({ cards, playSound, playDockSound, selectedInstrument,
         className="absolute bottom-4 md:bottom-8 left-0 right-0 z-40 flex justify-center w-full px-4 pointer-events-auto"
       >
          <div className="relative flex items-center gap-2 max-w-[95vw] px-3 md:px-4 py-2 rounded-2xl bg-zinc-950/90 border border-white/15 backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.95)] shrink-0">
-           <motion.div onMouseMove={(e) => mouseX.set(e.clientX)} onMouseLeave={() => mouseX.set(Infinity)} className="flex h-14 md:h-16 items-center gap-2 md:gap-3 px-1 overflow-x-auto max-w-[calc(100vw-150px)] md:max-w-[65vw] custom-scrollbar pointer-events-auto shrink">
+           <motion.div onMouseMove={(e) => mouseX.set(e.clientX)} onMouseLeave={() => mouseX.set(Infinity)} className="flex h-14 md:h-16 items-center gap-2 md:gap-3 px-1 overflow-visible max-w-[calc(100vw-140px)] md:max-w-[78vw] xl:max-w-none pointer-events-auto shrink">
              {cards.map((card: CardData, index: number) => (
                <DockItem 
                  key={card.id} 
@@ -1557,31 +1585,57 @@ const LayoutCreativeOS = ({ cards, playSound, playDockSound, selectedInstrument,
            <div className="w-[1px] h-8 bg-white/20 shrink-0 mx-1" />
 
            {/* Integrated Instrument Selector Switcher Button & Dropdown */}
-           <div ref={menuRef} className="relative shrink-0 z-[1000]">
+           <div ref={menuRef} className="relative shrink-0 z-[1000] flex items-center gap-2">
              {(() => {
                const SelectedIcon = INSTRUMENTS.find((i: any) => i.id === selectedInstrument)?.icon || Waves;
-               const selectedName = INSTRUMENTS.find((i: any) => i.id === selectedInstrument)?.name || 'Odysseus Strings';
                return (
-                 <button
-                   type="button"
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     setMenuOpen(prev => !prev);
-                     playDockSound(0);
-                   }}
-                   className="flex items-center gap-2 px-3 md:px-3.5 py-2 md:py-2.5 rounded-xl bg-white/10 hover:bg-emerald-500/20 border border-emerald-500/40 hover:border-emerald-400 text-emerald-400 transition-all cursor-pointer shadow-md active:scale-95 text-xs font-mono font-bold"
-                   title="Choose Sound Instrument"
-                 >
-                   <SelectedIcon className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                   <span className="hidden sm:inline tracking-wider">{selectedName}</span>
-                   <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${menuOpen ? 'rotate-180' : ''}`} />
-                 </button>
+                 <>
+                   <button
+                     type="button"
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       setMenuOpen(prev => !prev);
+                       playDockSound(0);
+                     }}
+                     className="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-xl bg-white/10 hover:bg-emerald-500/20 border border-emerald-500/40 hover:border-emerald-400 transition-all cursor-pointer shadow-md active:scale-95"
+                     title="Choose Sound Instrument"
+                   >
+                     <SelectedIcon className="w-4 h-4 text-emerald-400" />
+                   </button>
+                   
+                   <button
+                     type="button"
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       setIsMuted(!isMuted);
+                     }}
+                     className={`flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-xl bg-white/10 hover:bg-white/20 border transition-all cursor-pointer shadow-md active:scale-95 ${isMuted ? 'border-red-500/40 hover:border-red-400' : 'border-white/10'}`}
+                     title={isMuted ? "Unmute" : "Mute"}
+                   >
+                     {isMuted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4 text-white/70" />}
+                   </button>
+                 </>
                )
              })()}
 
              {menuOpen && (
                <div className="absolute bottom-full right-0 mb-3 p-2 bg-zinc-950 border border-white/20 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.95)] min-w-[220px] space-y-1 z-[9999] pointer-events-auto">
-                 <div className="px-3 py-1.5 text-[9px] font-mono uppercase tracking-widest text-white/50 border-b border-white/10 mb-1">
+                 <div className="px-3 py-2 border-b border-white/10 mb-1 flex items-center gap-2">
+                   <Volume2 className="w-3.5 h-3.5 text-white/50 shrink-0" />
+                   <input 
+                     type="range" 
+                     min="0" max="1" step="0.01" 
+                     value={volume}
+                     onChange={(e) => { 
+                       e.stopPropagation();
+                       setVolume(parseFloat(e.target.value)); 
+                       if(isMuted) setIsMuted(false); 
+                     }}
+                     onClick={(e) => e.stopPropagation()}
+                     className="w-full h-1 bg-white/20 rounded-full appearance-none outline-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-emerald-400 [&::-webkit-slider-thumb]:rounded-full cursor-pointer"
+                   />
+                 </div>
+                 <div className="px-3 py-1.5 text-[9px] font-mono uppercase tracking-widest text-white/50 border-b border-white/10 mb-1 mt-1">
                    Select Tone Instrument
                  </div>
                  {INSTRUMENTS.map((inst: any, idx: number) => {
@@ -1631,7 +1685,7 @@ const LayoutCreativeOS = ({ cards, playSound, playDockSound, selectedInstrument,
                exit={{ opacity: 0, scale: 0.95, y: 20 }} 
                className="fixed inset-0 z-[2001] flex items-center justify-center pointer-events-none p-3 sm:p-4 pt-16 pb-20 md:p-12"
              >
-               <div className="pointer-events-auto w-full max-w-5xl h-full md:h-[80vh] max-h-[850px] bg-zinc-950/95 backdrop-blur-3xl border border-white/20 rounded-[2rem] flex flex-col overflow-hidden shadow-[0_25px_80px_-15px_rgba(0,0,0,0.95)] ring-1 ring-white/10 relative">
+               <div className={`pointer-events-auto w-full ${activeCard.isCostCalculator ? 'max-w-6xl' : 'max-w-5xl'} h-full md:h-[85vh] max-h-[900px] bg-zinc-950/95 backdrop-blur-3xl border border-white/20 rounded-[2rem] flex flex-col overflow-hidden shadow-[0_25px_80px_-15px_rgba(0,0,0,0.95)] ring-1 ring-white/10 relative`}>
                  <div className="h-14 md:h-16 border-b border-white/10 flex items-center justify-between px-4 md:px-6 bg-white/5 shrink-0">
                    <div className="text-[10px] md:text-xs uppercase tracking-widest text-cyan-400 font-mono font-bold flex items-center gap-2">
                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
@@ -1646,22 +1700,45 @@ const LayoutCreativeOS = ({ cards, playSound, playDockSound, selectedInstrument,
                      <span className="text-[10px] font-bold uppercase md:hidden">Close</span>
                    </button>
                  </div>
-                <div className="flex-1 p-6 md:p-12 flex flex-col items-center text-center overflow-y-auto custom-scrollbar">
-                  {/* Glowing Icon Frame */}
-                  <div className="relative mb-6 md:mb-8 shrink-0">
-                    <motion.div 
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                      className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-cyan-500 to-indigo-500 opacity-30 blur-md" 
-                    />
-                    <div className="relative w-16 h-16 md:w-24 md:h-24 rounded-2xl bg-black/80 border border-white/15 flex items-center justify-center shadow-xl" style={{ color: activeCard.colorHex }}>
-                      {renderIcon(activeCard.iconName, activeCard.icon)}
+                  {activeCard.isLaunchpad ? (
+                    <div className="flex-1 p-6 md:p-12 overflow-y-auto custom-scrollbar w-full flex items-center justify-center">
+                       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-6 sm:gap-8 md:gap-12 w-full max-w-4xl mx-auto items-start justify-items-center">
+                         {allCards.filter((c: any) => c.id !== 'launchpad').map((card: any) => (
+                           <button 
+                             key={card.id}
+                             onClick={() => { playSound(); setActiveCard(card); }}
+                             className="flex flex-col items-center gap-3 group cursor-pointer w-20 md:w-24"
+                           >
+                             <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-black/40 border border-white/10 flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white/10 group-hover:border-white/30 shadow-lg relative overflow-hidden" style={{ color: card.colorHex }}>
+                               <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity" style={{ backgroundColor: card.colorHex }} />
+                               {renderIcon(card.iconName, card.icon, "text-2xl md:text-3xl relative z-10")}
+                             </div>
+                             <span className="text-[10px] md:text-xs text-center font-mono font-bold text-white/70 group-hover:text-white line-clamp-2 leading-tight">
+                               {card.title || card.category}
+                             </span>
+                           </button>
+                         ))}
+                       </div>
                     </div>
-                  </div>
-                  <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">{activeCard.title}</h1>
-                  <p className="text-lg md:text-xl text-white/60 max-w-2xl mb-6 shrink-0">{activeCard.subtitle}</p>
-                  
-                  <ServiceDetailsSection card={activeCard} />
+                  ) : (
+                    <div className="flex-1 p-6 md:p-12 flex flex-col items-center text-center overflow-y-auto custom-scrollbar">
+                      {/* Glowing Icon Frame */}
+                      <div className="relative mb-6 md:mb-8 shrink-0">
+                        <motion.div 
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                          className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-cyan-500 to-indigo-500 opacity-30 blur-md" 
+                        />
+                        <div className="relative w-16 h-16 md:w-24 md:h-24 rounded-2xl bg-black/80 border border-white/15 flex items-center justify-center shadow-xl" style={{ color: activeCard.colorHex }}>
+                          {renderIcon(activeCard.iconName, activeCard.icon)}
+                        </div>
+                      </div>
+                      <h1 className="text-4xl md:text-6xl font-black mb-8 tracking-tighter leading-none">{activeCard.title}</h1>
+                      <p className="text-xl md:text-2xl text-white/50 max-w-prose mb-12 shrink-0 leading-relaxed font-light">{activeCard.subtitle}</p>
+                      
+                      {!activeCard.isCostCalculator && activeCard.id !== 'cost_calculator' && (
+                        <ServiceDetailsSection card={activeCard} />
+                      )}
                   
                   {/* Projects / Products Grid */}
                   {((activeCard.projects && activeCard.projects.length > 0) || (activeCard.isPortfolio && cmsData?.portfolio) || (activeCard.isProducts && cmsData?.products)) && (
@@ -1732,6 +1809,18 @@ const LayoutCreativeOS = ({ cards, playSound, playDockSound, selectedInstrument,
                     </div>
                   )}
 
+                  {/* Website Cost Calculator */}
+                  {(activeCard.isCostCalculator || activeCard.id === 'cost_calculator') && (
+                    <div className="w-full mt-6 text-left">
+                      <div className="bg-[#090a0f] border border-white/10 rounded-[2rem] shadow-2xl w-full p-2 md:p-4 my-8 relative z-[999] overflow-hidden"><WebsiteCostCalculator /></div>
+                     {(card.id === 'launchpad' || card.isLaunchpad) && (
+                        <div className="w-full mt-8">
+                           <UniversalLaunchpad allCards={cards || []} onSelect={(c: any) => window.dispatchEvent(new CustomEvent('selectCard', { detail: c.id }))} />
+                        </div>
+                     )}
+                    </div>
+                  )}
+
                   {/* Services Cinematic Posters & Scope Showcase */}
                   {(activeCard.isServices || activeCard.id === 'intro') && (
                     <ServicesCinematicShowcase cards={cards} />
@@ -1791,9 +1880,8 @@ const LayoutCreativeOS = ({ cards, playSound, playDockSound, selectedInstrument,
                         />
                      </div>
                   )}
-                  
-
                 </div>
+              )}
               </div>
             </motion.div>
           </>
@@ -1945,7 +2033,7 @@ const LayoutScatteredCards = ({ cards, playSound, cmsData, onPreviewProject }: a
       
       {(!isSmallSquare && !isDesktopShrunk && (!isMobile || isActive)) && <p className={`text-white/60 mb-6 ${isActive ? 'text-lg md:text-xl max-w-2xl' : 'text-sm'}`}>{card.subtitle}</p>}
       
-      {isActive && <ServiceDetailsSection card={card} />}
+      {isActive && !card.isCostCalculator && card.id !== 'cost_calculator' && <ServiceDetailsSection card={card} />}
       
       {isActive && (card.projects || (card.isPortfolio && cmsData?.portfolio)) && (
          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
@@ -2055,6 +2143,17 @@ const LayoutScatteredCards = ({ cards, playSound, cmsData, onPreviewProject }: a
       {isActive && card.isPricing && (
          <div className="mt-8 w-full">
             <PricingCalculator />
+         </div>
+      )}
+
+      {isActive && (card.isCostCalculator || card.id === 'cost_calculator') && (
+         <div className="mt-8 w-full">
+            <div className="bg-[#090a0f] border border-white/10 rounded-[2rem] shadow-2xl w-full p-2 md:p-4 my-8 relative z-[999] overflow-hidden"><WebsiteCostCalculator /></div>
+                     {(card.id === 'launchpad' || card.isLaunchpad) && (
+                        <div className="w-full mt-8">
+                           <UniversalLaunchpad allCards={cards || []} onSelect={(c: any) => window.dispatchEvent(new CustomEvent('selectCard', { detail: c.id }))} />
+                        </div>
+                     )}
          </div>
       )}
 
@@ -2184,6 +2283,17 @@ const LayoutEditorial = ({ cards, onPreviewProject }: any) => {
                   </div>
                )}
 
+               {(card.id === 'cost_calculator' || card.isCostCalculator) && (
+                  <div className="mt-8 font-sans w-full">
+                    <div className="bg-[#090a0f] border border-white/10 rounded-[2rem] shadow-2xl w-full p-2 md:p-4 my-8 relative z-[999] overflow-hidden"><WebsiteCostCalculator /></div>
+                     {(card.id === 'launchpad' || card.isLaunchpad) && (
+                        <div className="w-full mt-8">
+                           <UniversalLaunchpad allCards={cards || []} onSelect={(c: any) => window.dispatchEvent(new CustomEvent('selectCard', { detail: c.id }))} />
+                        </div>
+                     )}
+                  </div>
+               )}
+
                {(card.id === 'contact_form' || card.isContactForm) && (
                   <div className="mt-8 font-sans w-full max-w-md">
                     <UniversalContactForm 
@@ -2223,7 +2333,7 @@ const LayoutInfiniteCanvas = ({ cards, onPreviewProject }: any) => {
           const x = Math.sin(i * 1.5) * radius + 2000;
           const y = Math.cos(i * 1.5) * radius + 2000;
           return (
-            <motion.div drag dragMomentum={false} key={card.id} className="absolute w-[85vw] md:w-[450px] bg-white p-6 md:p-10 rounded-3xl shadow-xl border border-zinc-200 pointer-events-auto flex flex-col cursor-grab active:cursor-grabbing hover:z-50 hover:shadow-2xl transition-shadow" style={{ left: x, top: y, transform: 'translate(-50%, -50%)' }}>
+            <motion.div drag dragMomentum={false} key={card.id} className={`absolute w-[85vw] ${(card.id === 'cost_calculator' || card.isCostCalculator) ? 'md:w-[1000px]' : 'md:w-[450px]'} bg-white p-6 md:p-10 rounded-3xl shadow-xl border border-zinc-200 pointer-events-auto flex flex-col cursor-grab active:cursor-grabbing hover:z-50 hover:shadow-2xl transition-shadow`} style={{ left: x, top: y, transform: 'translate(-50%, -50%)' }}>
                <div className="w-16 h-16 bg-zinc-50 rounded-2xl flex items-center justify-center mb-6" style={{ color: card.colorHex }}>{renderIcon(card.iconName, card.icon)}</div>
                <div className="text-[10px] md:text-xs uppercase tracking-widest text-zinc-400 mb-2">{card.category}</div>
                <h2 className="text-2xl md:text-4xl font-black text-black mb-4">{card.title}</h2>
@@ -2255,6 +2365,17 @@ const LayoutInfiniteCanvas = ({ cards, onPreviewProject }: any) => {
                      ))}
                   </div>
                )}
+                
+               {(card.id === 'cost_calculator' || card.isCostCalculator) && (
+                  <div className="w-full mt-4 text-left">
+                     <div className="bg-[#090a0f] border border-white/10 rounded-[2rem] shadow-2xl w-full p-2 md:p-4 my-8 relative z-[999] overflow-hidden"><WebsiteCostCalculator /></div>
+                     {(card.id === 'launchpad' || card.isLaunchpad) && (
+                        <div className="w-full mt-8">
+                           <UniversalLaunchpad allCards={cards || []} onSelect={(c: any) => window.dispatchEvent(new CustomEvent('selectCard', { detail: c.id }))} />
+                        </div>
+                     )}
+                  </div>
+               )}
 
                {(card.id === 'contact_form' || card.isContactForm) && (
                   <UniversalContactForm 
@@ -2265,7 +2386,8 @@ const LayoutInfiniteCanvas = ({ cards, onPreviewProject }: any) => {
                )}
             </motion.div>
           )
-        })}
+        })
+            })
       </motion.div>
     </div>
   )
@@ -2281,7 +2403,7 @@ const LayoutDigitalGallery = ({ cards, onPreviewProject }: any) => {
             <p className="text-zinc-400 font-serif italic text-lg md:text-3xl leading-relaxed">"Do you have the courage to stand out from the rest, or do you want to use a template?"</p>
          </div>
          {cards.map((card: CardData) => (
-           <div key={card.id} className="shrink-0 w-[80vw] md:w-[500px] flex flex-col items-center group">
+           <div key={card.id} className={`shrink-0 w-[80vw] ${(card.id === 'cost_calculator' || card.isCostCalculator) ? 'md:w-[1000px]' : 'md:w-[500px]'} flex flex-col items-center group`}>
               <div className="w-full bg-[#111] border-[8px] md:border-[16px] border-[#1a1a1a] shadow-[10px_20px_50px_rgba(0,0,0,0.8)] flex flex-col relative overflow-hidden transition-transform duration-700 md:group-hover:scale-105">
                  
                  {!(card.id === 'contact_form' || card.isContactForm) ? (
@@ -2355,7 +2477,20 @@ const LayoutNeoBrutalism = ({ cards, onPreviewProject }: any) => {
                       <p className="font-bold text-base md:text-xl mb-6">{card.subtitle}</p>
                       <ServiceDetailsSection card={card} darkText={true} />
                       
-                      {(card.id === 'contact_form' || card.isContactForm) && (
+                      {(card.id === 'cost_calculator' || card.isCostCalculator) && (
+                        <div className="mt-8 w-full">
+                          <div className="bg-[#090a0f] border border-white/10 rounded-[2rem] shadow-2xl w-full p-2 md:p-4 my-8 relative z-[999] overflow-hidden"><WebsiteCostCalculator /></div>
+                     {(card.id === 'launchpad' || card.isLaunchpad) && (
+                        <div className="w-full mt-8">
+                           <UniversalLaunchpad allCards={cards || []} onSelect={(c: any) => window.dispatchEvent(new CustomEvent('selectCard', { detail: c.id }))} />
+                        </div>
+                     )}
+                        </div>
+                      )}
+
+
+
+                {(card.id === 'contact_form' || card.isContactForm) && (
                          <UniversalContactForm 
                             ctaText={card.cta} 
                             inputClass="p-4 w-full bg-white border-[4px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:bg-[#FF90E8] outline-none text-black font-bold uppercase rounded-none"
@@ -2413,9 +2548,9 @@ const LayoutPaperCraft = ({ cards, onPreviewProject }: any) => {
          </div>
       </div>
 
-      <div className="max-w-7xl mx-auto p-6 md:p-12 py-12 columns-1 md:columns-2 lg:columns-3 gap-8 md:gap-12 space-y-8 md:space-y-12">
+      <div className="max-w-7xl mx-auto p-6 md:p-12 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
         {cards.map((card: CardData, i: number) => (
-          <div key={card.id} className="break-inside-avoid relative p-6 md:p-10 bg-white shadow-[2px_4px_15px_rgba(0,0,0,0.05)] transform transition-transform hover:scale-105 hover:-rotate-1" style={{ rotate: `${(i % 3 - 1) * 2}deg`, borderRadius: '2px 15px 3px 20px / 15px 5px 20px 3px', border: '1px solid #e0dcd3' }}>
+          <div key={card.id} className={`relative p-6 md:p-10 ${(card.id === 'cost_calculator' || card.isCostCalculator) ? 'md:col-span-2 lg:col-span-3' : ''} bg-white shadow-[2px_4px_15px_rgba(0,0,0,0.05)] transform transition-transform hover:scale-105 hover:-rotate-1`} style={{ rotate: `${(i % 3 - 1) * 2}deg`, borderRadius: '2px 15px 3px 20px / 15px 5px 20px 3px', border: '1px solid #e0dcd3' }}>
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-12 md:w-16 h-5 md:h-6 bg-[#f0ecd6]/80 shadow-sm transform -rotate-3" />
             <div className="w-12 h-12 md:w-16 md:h-16 rounded-full border border-dashed border-[#dcd8c8] flex items-center justify-center mb-6" style={{ color: card.colorHex }}>{renderIcon(card.iconName, card.icon)}</div>
             <div className="text-[10px] uppercase tracking-widest text-[#a09c90] mb-2">{card.category}</div>
@@ -2441,6 +2576,17 @@ const LayoutPaperCraft = ({ cards, onPreviewProject }: any) => {
                         <div className="font-serif text-center text-xs text-[#2c2c2c] italic">{proj.title}</div>
                      </div>
                   ))}
+               </div>
+            )}
+
+            {(card.id === 'cost_calculator' || card.isCostCalculator) && (
+               <div className="mt-8 w-full">
+                  <div className="bg-[#090a0f] border border-white/10 rounded-[2rem] shadow-2xl w-full p-2 md:p-4 my-8 relative z-[999] overflow-hidden"><WebsiteCostCalculator /></div>
+                     {(card.id === 'launchpad' || card.isLaunchpad) && (
+                        <div className="w-full mt-8">
+                           <UniversalLaunchpad allCards={cards || []} onSelect={(c: any) => window.dispatchEvent(new CustomEvent('selectCard', { detail: c.id }))} />
+                        </div>
+                     )}
                </div>
             )}
 
@@ -2473,7 +2619,13 @@ const LayoutCinematic = ({ cards, onPreviewProject }: any) => {
            {/* Background shifts to project image if projects exist */}
            <AnimatePresence>
              {card.projects && card.projects[0] ? (
-                <motion.div initial={{ scale: 1.1, opacity: 0 }} whileInView={{ scale: 1, opacity: 0.4 }} transition={{ duration: 2 }} className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${card.projects[0].image})` }} />
+                <motion.div initial={{ scale: 1.1, opacity: 0 }} whileInView={{ scale: 1, opacity: 0.4 }} transition={{ duration: 2 }} className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${card.projects[0].image})
+            {(card.id === 'launchpad' || card.isLaunchpad) && (
+               <UniversalLaunchpad allCards={cards || []} onSelect={(c: any) => {
+                 // best effort select
+                 window.dispatchEvent(new CustomEvent('selectCard', { detail: c.id }))
+               }} />
+            )}` }} />
              ) : (
                 <motion.div initial={{ scale: 1.2, opacity: 0 }} whileInView={{ scale: 1, opacity: 0.2 }} transition={{ duration: 1.5 }} className="absolute inset-0 bg-gradient-to-r from-black to-zinc-900" />
              )}
@@ -2488,7 +2640,18 @@ const LayoutCinematic = ({ cards, onPreviewProject }: any) => {
                  <p className="text-lg md:text-2xl text-white/60 font-light mb-6 drop-shadow-md">{card.subtitle}</p>
                  <ServiceDetailsSection card={card} />
                  
-                 {card.id === 'contact_form' && (
+                  {(card.id === 'cost_calculator' || card.isCostCalculator) && (
+                     <div className="mt-8 w-full">
+                        <div className="bg-[#090a0f] border border-white/10 rounded-[2rem] shadow-2xl w-full p-2 md:p-4 my-8 relative z-[999] overflow-hidden"><WebsiteCostCalculator /></div>
+                     {(card.id === 'launchpad' || card.isLaunchpad) && (
+                        <div className="w-full mt-8">
+                           <UniversalLaunchpad allCards={cards || []} onSelect={(c: any) => window.dispatchEvent(new CustomEvent('selectCard', { detail: c.id }))} />
+                        </div>
+                     )}
+                     </div>
+                  )}
+
+                  {card.id === 'contact_form' && (
                     <UniversalContactForm 
                        ctaText={card.cta} 
                        inputClass="p-4 w-full bg-white/5 border border-white/20 rounded-none outline-none focus:bg-white/10 text-white placeholder:text-white/40 uppercase tracking-widest text-xs backdrop-blur-md"
@@ -2661,7 +2824,8 @@ const LayoutCreativeUniverse = ({ cards, playSound, onPreviewProject }: any) => 
             )}
           </motion.div>
         )
-      })}
+      })
+            })
 
       <AnimatePresence>
         {activeCard && (
@@ -2690,8 +2854,21 @@ const LayoutCreativeUniverse = ({ cards, playSound, onPreviewProject }: any) => 
                     <h2 className="text-2xl md:text-4xl font-black text-white mb-3 uppercase">{activeCard.title}</h2>
                     <p className="text-sm md:text-base text-white/70 mb-4">{activeCard.subtitle}</p>
                     
-                    <ServiceDetailsSection card={activeCard} />
+                    {!activeCard.isCostCalculator && activeCard.id !== 'cost_calculator' && (
+                     <ServiceDetailsSection card={activeCard} />
+                   )}
                     
+                    {(activeCard.id === 'cost_calculator' || activeCard.isCostCalculator) && (
+                       <div className="mt-6 w-full">
+                          <div className="bg-[#090a0f] border border-white/10 rounded-[2rem] shadow-2xl w-full p-2 md:p-4 my-8 relative z-[999] overflow-hidden"><WebsiteCostCalculator /></div>
+                     {(card.id === 'launchpad' || card.isLaunchpad) && (
+                        <div className="w-full mt-8">
+                           <UniversalLaunchpad allCards={cards || []} onSelect={(c: any) => window.dispatchEvent(new CustomEvent('selectCard', { detail: c.id }))} />
+                        </div>
+                     )}
+                       </div>
+                    )}
+
                     {activeCard.id === 'contact_form' && (
                        <UniversalContactForm 
                           ctaText={activeCard.cta} 
@@ -2749,6 +2926,9 @@ export default function AgencyClient({ initialCards }: { initialCards: CardData[
   const [cmsData, setCmsData] = useState<any>(null)
   const [showMenu, setShowMenu] = useState(false)
   const [audioCtx, setAudioCtx] = useState<AudioContext | null>(null)
+  const [volume, setVolume] = useState<number>(0.5)
+  const [isMuted, setIsMuted] = useState<boolean>(false)
+  const masterGainRef = useRef<any>(null)
   const [selectedInstrument, setSelectedInstrument] = useState<'odysseus' | 'piano' | 'cello' | 'guitar' | 'marimba' | 'synth'>('odysseus')
   const [showInstrumentMenu, setShowInstrumentMenu] = useState(false)
 
@@ -2765,7 +2945,7 @@ export default function AgencyClient({ initialCards }: { initialCards: CardData[
     261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99, 880.00, 1046.50, 1174.66, 1318.51
   ]
 
-  const playInstrumentSound = (ctx: AudioContext, noteIndex: number, inst: 'odysseus' | 'piano' | 'cello' | 'guitar' | 'marimba' | 'synth') => {
+  const playInstrumentSound = (ctx: AudioContext, destinationNode: AudioNode, noteIndex: number, inst: 'odysseus' | 'piano' | 'cello' | 'guitar' | 'marimba' | 'synth') => {
     try {
       const freq = PENTATONIC_SCALE[noteIndex % PENTATONIC_SCALE.length] || 440
       const now = ctx.currentTime
@@ -2810,7 +2990,7 @@ export default function AgencyClient({ initialCards }: { initialCards: CardData[
         osc2.connect(filter)
         osc3.connect(filter)
         filter.connect(gain)
-        gain.connect(ctx.destination)
+        gain.connect(destinationNode)
 
         osc1.start(now)
         osc2.start(now)
@@ -2836,7 +3016,7 @@ export default function AgencyClient({ initialCards }: { initialCards: CardData[
 
         osc1.connect(gain)
         osc2.connect(gain)
-        gain.connect(ctx.destination)
+        gain.connect(destinationNode)
 
         osc1.start(now)
         osc2.start(now)
@@ -2867,7 +3047,7 @@ export default function AgencyClient({ initialCards }: { initialCards: CardData[
 
         osc.connect(filter)
         filter.connect(gain)
-        gain.connect(ctx.destination)
+        gain.connect(destinationNode)
 
         osc.start(now)
         osc.stop(now + 0.8)
@@ -2895,7 +3075,7 @@ export default function AgencyClient({ initialCards }: { initialCards: CardData[
         osc1.connect(filter)
         osc2.connect(filter)
         filter.connect(gain)
-        gain.connect(ctx.destination)
+        gain.connect(destinationNode)
 
         osc1.start(now)
         osc2.start(now);
@@ -2917,7 +3097,7 @@ export default function AgencyClient({ initialCards }: { initialCards: CardData[
 
         osc1.connect(gain)
         osc2.connect(gain)
-        gain.connect(ctx.destination)
+        gain.connect(destinationNode)
 
         osc1.start(now)
         osc2.start(now)
@@ -2940,7 +3120,7 @@ export default function AgencyClient({ initialCards }: { initialCards: CardData[
 
         osc1.connect(gain)
         osc2.connect(gain)
-        gain.connect(ctx.destination)
+        gain.connect(destinationNode)
 
         osc1.start(now)
         osc2.start(now)
@@ -2957,11 +3137,31 @@ export default function AgencyClient({ initialCards }: { initialCards: CardData[
       setAudioCtx(ctx)
     }
     if (ctx && ctx.state === 'suspended') ctx.resume()
-    playInstrumentSound(ctx, noteIndex, selectedInstrument)
+
+    if (!masterGainRef.current) {
+      const gainNode = ctx.createGain()
+      gainNode.connect(ctx.destination)
+      masterGainRef.current = gainNode
+    }
+    masterGainRef.current.gain.value = isMuted ? 0 : volume
+
+    playInstrumentSound(ctx, masterGainRef.current, noteIndex, selectedInstrument)
   }
 
   const playSound = () => {
-    playDockSound(0)
+    let ctx = audioCtx
+    if (!ctx) {
+      ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+      setAudioCtx(ctx)
+    }
+    if (ctx && ctx.state === 'suspended') ctx.resume()
+    if (!masterGainRef.current) {
+      const gainNode = ctx.createGain()
+      gainNode.connect(ctx.destination)
+      masterGainRef.current = gainNode
+    }
+    masterGainRef.current.gain.value = isMuted ? 0 : volume
+    playInstrumentSound(ctx, masterGainRef.current, 0, selectedInstrument)
   }
 
   useEffect(() => {
@@ -3015,28 +3215,11 @@ export default function AgencyClient({ initialCards }: { initialCards: CardData[
     ? cmsData['agency-main-data']
     : []
 
-  const baseCards = INITIAL_CARDS.map((initialCard: CardData) => {
-    const cmsMatch = cmsCards.find((c: any) => c.id === initialCard.id) || {}
-    const isOldIntro = initialCard.id === 'intro' && (cmsMatch.category === 'Manifesto' || cmsMatch.title === 'The Digital Ecosystem')
-    const finalMatch = isOldIntro ? {} : cmsMatch
-    return {
-      ...initialCard,
-      ...finalMatch,
-      projects: (!isOldIntro && finalMatch.projects && finalMatch.projects.length > 0) ? finalMatch.projects : initialCard.projects,
-      features: (finalMatch.features && finalMatch.features.length > 0) ? finalMatch.features : initialCard.features,
-      deliverables: (finalMatch.deliverables && finalMatch.deliverables.length > 0) ? finalMatch.deliverables : initialCard.deliverables,
-      techStack: (finalMatch.techStack && finalMatch.techStack.length > 0) ? finalMatch.techStack : initialCard.techStack,
-      idealFor: finalMatch.idealFor || initialCard.idealFor,
-      turnaround: finalMatch.turnaround || initialCard.turnaround,
-    }
-  })
-
-  cmsCards.forEach((cmsCard: any) => {
-    if (!baseCards.some((c: CardData) => c.id === cmsCard.id)) {
-      baseCards.push(cmsCard)
-    }
-  })
-  let currentCards = [...baseCards];
+  let currentCards = [...initialCards];
+  
+  // Option B: 6-Icon Dock + Launchpad App Grid
+  const dockOrder = ['intro', 'portfolio', 'cost_calculator', 'grafty', 'ecosystem', 'contact_form', 'launchpad'];
+  currentCards = dockOrder.map(id => currentCards.find(c => c.id === id)).filter(Boolean) as CardData[];
   
   // Dynamic CMS Portfolio Integration: Only use cmsData.portfolio if a card has no explicit projects
   if (cmsData?.portfolio && cmsData.portfolio.length > 0) {
@@ -3056,29 +3239,7 @@ export default function AgencyClient({ initialCards }: { initialCards: CardData[
     })
   }
 
-  // Auto-inject the special cards if they are missing so changes reflect immediately
-  if (!currentCards.find(c => c.id === 'products' || c.isProducts)) {
-    const defaultProductCard = INITIAL_CARDS.find(c => c.id === 'products');
-    if (defaultProductCard) currentCards.push(defaultProductCard);
-  }
-  if (!currentCards.find(c => c.id === 'portfolio' || c.isPortfolio)) {
-    const defaultPortfolioCard = INITIAL_CARDS.find(c => c.id === 'portfolio');
-    if (defaultPortfolioCard) currentCards.push(defaultPortfolioCard);
-  }
-  if (!currentCards.find(c => c.id === 'academy' || c.isAcademy)) {
-    const defaultAcademyCard = INITIAL_CARDS.find(c => c.id === 'academy');
-    if (defaultAcademyCard) currentCards.push(defaultAcademyCard);
-  }
-  if (!currentCards.find(c => c.id === 'pricing' || c.isPricing)) {
-    const defaultPricingCard = INITIAL_CARDS.find(c => c.id === 'pricing');
-    if (defaultPricingCard) currentCards.push(defaultPricingCard);
-  }
-  if (!currentCards.find(c => c.id === 'legal' || c.isLegal)) {
-    const defaultLegalCard = INITIAL_CARDS.find(c => c.id === 'legal');
-    if (defaultLegalCard) currentCards.push(defaultLegalCard);
-  }
-
-
+  // (Auto-inject blocks removed to strictly enforce 7-icon dock)
 
   const handlePreviewProject = (proj: any) => {
     if (!proj) return
@@ -3235,6 +3396,7 @@ export default function AgencyClient({ initialCards }: { initialCards: CardData[
         {ActiveComponent && (
           <ActiveComponent 
             cards={currentCards} 
+            allCards={initialCards}
             playSound={playSound} 
             playDockSound={playDockSound}
             selectedInstrument={selectedInstrument}
@@ -3242,6 +3404,10 @@ export default function AgencyClient({ initialCards }: { initialCards: CardData[
             showInstrumentMenu={showInstrumentMenu}
             setShowInstrumentMenu={setShowInstrumentMenu}
             INSTRUMENTS={INSTRUMENTS}
+            volume={volume}
+            setVolume={setVolume}
+            isMuted={isMuted}
+            setIsMuted={setIsMuted}
             cmsData={cmsData} 
             onPreviewProject={handlePreviewProject}
           />
