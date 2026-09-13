@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ChevronLeft, Save, Plus, Trash2, Send, Zap, Loader2, Sparkles, Globe, Building2, Target, X, Bot, User } from "lucide-react"
+import { ChevronLeft, Save, Plus, Trash2, Send, Zap, Loader2, Globe, Building2, Target, X, Bot, User, FileText } from "lucide-react"
 import Link from "next/link"
 import { fetchApi, useApi } from "@/lib/useApi"
 import { toast } from "sonner"
@@ -319,10 +319,10 @@ export default function EditProposalPage() {
               <button 
                 type="button"
                 onClick={handleOpenAiModal}
-                className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white px-3.5 py-1.5 rounded-lg shadow-lg shadow-violet-500/25 transition-all"
+                className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider bg-slate-800 hover:bg-slate-700 text-slate-200 border border-white/10 px-3 py-1.5 rounded-lg transition-colors"
               >
-                <Sparkles className="w-3.5 h-3.5" />
-                AI Proposal Architect
+                <FileText className="w-3.5 h-3.5 text-slate-400" />
+                Generate Scope
               </button>
             </div>
               
@@ -511,9 +511,9 @@ export default function EditProposalPage() {
                     onChange={e => setAiBudgetTier(e.target.value)}
                     className="w-full bg-[#14141c] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-violet-500"
                   >
-                    <option value="startup">🚀 Startup MVP (₹35k – ₹60k)</option>
-                    <option value="growth">📈 Growth Engine (₹65k – ₹1,40k)</option>
-                    <option value="enterprise">🏢 Enterprise Bespoke (₹1,50k+)</option>
+                    <option value="startup">Startup MVP (₹35k – ₹60k)</option>
+                    <option value="growth">Growth Engine (₹65k – ₹1,40k)</option>
+                    <option value="enterprise">Enterprise Bespoke (₹1,50k+)</option>
                   </select>
                 </div>
               </div>
@@ -553,7 +553,7 @@ export default function EditProposalPage() {
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-3.5 h-3.5" />
+                    <FileText className="w-3.5 h-3.5" />
                     Generate Proposal & Milestones
                   </>
                 )}

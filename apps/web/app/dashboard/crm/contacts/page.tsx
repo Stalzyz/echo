@@ -19,7 +19,6 @@ import {
   CheckCircle2, 
   Edit3, 
   ShieldCheck, 
-  Sparkles,
   Users,
   LayoutGrid,
   List as ListIcon,

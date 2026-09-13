@@ -7,7 +7,6 @@ import {
   Save, 
   Eye, 
   Code, 
-  Sparkles, 
   CheckCircle, 
   Building2, 
   Users, 
@@ -22,6 +21,7 @@ import {
   Check
 } from "lucide-react"
 import { useApi, fetchApi } from "@/lib/useApi"
+import { useOrganization } from "@/context/OrganizationContext"
 import { toast } from "sonner"
 
 const CATEGORY_MAP: Record<string, { label: string; icon: any; color: string }> = {
@@ -82,16 +82,22 @@ const SAMPLE_VARIABLES: Record<string, string> = {
   attendanceLink: "https://academy.grekam.in/dashboard/attendance",
 }
 
-function buildPreviewEmailHtml(bodyHtml: string, subject: string) {
+function buildPreviewEmailHtml(bodyHtml: string, subject: string, org?: any) {
   let content = bodyHtml || ""
   Object.keys(SAMPLE_VARIABLES).forEach(k => {
     content = content.replace(new RegExp(`{{\\s*${k}\\s*}}`, "gi"), SAMPLE_VARIABLES[k])
   })
 
-  // Inline buttons
+  const primary = org?.primaryColor || "#2563eb"
+  const secondary = org?.secondaryColor || "#1e293b"
+  const companyName = org?.companyName || org?.name || "Grekam Visuals"
+  const logoUrl = org?.logoUrl
+  const initial = (companyName.trim()[0] || "G").toUpperCase()
+
+  // Inline buttons with organization primary color
   content = content.replace(
     /class=["']btn-primary["']/gi,
-    `style="display:inline-block;background-color:#4f46e5;color:#ffffff !important;text-decoration:none !important;font-weight:600;font-size:14px;padding:13px 26px;border-radius:8px;text-align:center;box-shadow:0 2px 4px rgba(79,70,229,0.2);"`
+    `style="display:inline-block;background-color:${primary};color:#ffffff !important;text-decoration:none !important;font-weight:600;font-size:14px;padding:13px 26px;border-radius:8px;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,0.1);"`
   )
   content = content.replace(
     /class=["']button-container["']/gi,
@@ -111,21 +117,25 @@ function buildPreviewEmailHtml(bodyHtml: string, subject: string) {
       <td align="center" valign="top">
         <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#ffffff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(15,23,42,0.06);">
           <tr>
-            <td style="background-color:#4f46e5;background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);padding:24px 30px;">
+            <td style="background-color:${primary};background:linear-gradient(135deg,${primary} 0%,${secondary} 100%);padding:24px 30px;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td valign="middle">
-                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-                      <tr>
-                        <td style="background-color:rgba(255,255,255,0.22);width:34px;height:34px;border-radius:8px;text-align:center;vertical-align:middle;">
-                          <span style="color:#ffffff;font-size:17px;font-weight:800;line-height:34px;display:inline-block;">G</span>
-                        </td>
-                        <td style="padding-left:12px;vertical-align:middle;">
-                          <div style="color:#ffffff;font-size:15px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;">Grekam Visuals</div>
-                          <div style="color:#e0e7ff;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;">Agency &amp; Academy Workspace</div>
-                        </td>
-                      </tr>
-                    </table>
+                    ${logoUrl ? `
+                      <img src="${logoUrl}" alt="${companyName}" style="max-height:36px;max-width:180px;display:block;border:0;" />
+                    ` : `
+                      <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                          <td style="background-color:rgba(255,255,255,0.22);width:34px;height:34px;border-radius:8px;text-align:center;vertical-align:middle;">
+                            <span style="color:#ffffff;font-size:17px;font-weight:800;line-height:34px;display:inline-block;">${initial}</span>
+                          </td>
+                          <td style="padding-left:12px;vertical-align:middle;">
+                            <div style="color:#ffffff;font-size:15px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;">${companyName}</div>
+                            <div style="color:#e0e7ff;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;">Workspace Notification</div>
+                          </td>
+                        </tr>
+                      </table>
+                    `}
                   </td>
                 </tr>
               </table>
@@ -138,8 +148,8 @@ function buildPreviewEmailHtml(bodyHtml: string, subject: string) {
           </tr>
           <tr>
             <td style="background-color:#f8fafc;border-top:1px solid #e2e8f0;padding:20px 30px;text-align:center;font-size:12px;line-height:1.6;color:#64748b;">
-              <p style="margin:0 0 4px 0;font-weight:600;color:#475569;">Grekam Visuals Pvt. Ltd. · Bangalore, India</p>
-              <p style="margin:0;color:#64748b;">Official notification sent from <a href="https://garage.grekam.in" style="color:#4f46e5;text-decoration:underline;font-weight:600;">garage.grekam.in</a></p>
+              <p style="margin:0 0 4px 0;font-weight:600;color:#475569;">${companyName}</p>
+              <p style="margin:0;color:#64748b;">Official notification sent from <a href="https://garage.grekam.in" style="color:${primary};text-decoration:underline;font-weight:600;">garage.grekam.in</a></p>
             </td>
           </tr>
         </table>
@@ -151,6 +161,7 @@ function buildPreviewEmailHtml(bodyHtml: string, subject: string) {
 }
 
 export default function EmailTemplatesSettingsPage() {
+  const org = useOrganization()
   const { data: response, isLoading, mutate } = useApi<any>("/settings/templates")
   const templates: any[] = response?.data || []
 
@@ -396,7 +407,7 @@ export default function EmailTemplatesSettingsPage() {
             {currentTemplate.variables && Array.isArray(currentTemplate.variables) && (
               <div className="bg-card/60 border border-border/50 rounded-xl p-4">
                 <div className="flex items-center gap-1.5 mb-2 text-xs font-semibold text-muted-foreground">
-                  <Sparkles className="w-3.5 h-3.5 text-indigo-400" /> Click to Insert Dynamic Variable Placeholders:
+                  <Code className="w-3.5 h-3.5 text-indigo-400" /> Click to Insert Dynamic Variable Placeholders:
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {currentTemplate.variables.map((v: string) => (
@@ -431,19 +442,26 @@ export default function EmailTemplatesSettingsPage() {
               </div>
 
               {activeTab === "preview" && (
-                <div className="flex items-center gap-2 bg-muted/40 p-1 rounded-lg border border-border/50">
-                  <button
-                    onClick={() => setPreviewDevice("desktop")}
-                    className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all ${previewDevice === "desktop" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
-                  >
-                    <Monitor className="w-3.5 h-3.5" /> Desktop
-                  </button>
-                  <button
-                    onClick={() => setPreviewDevice("mobile")}
-                    className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all ${previewDevice === "mobile" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
-                  >
-                    <Smartphone className="w-3.5 h-3.5" /> Mobile
-                  </button>
+                <div className="flex items-center gap-3">
+                  <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/[0.04] border border-white/[0.08] text-[11px] text-slate-300">
+                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: org?.primaryColor || '#2563eb' }} />
+                    <span>Branded with Org Theme:</span>
+                    <span className="font-mono text-slate-400">{org?.primaryColor || '#2563eb'}</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-muted/40 p-1 rounded-lg border border-border/50">
+                    <button
+                      onClick={() => setPreviewDevice("desktop")}
+                      className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all ${previewDevice === "desktop" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                    >
+                      <Monitor className="w-3.5 h-3.5" /> Desktop
+                    </button>
+                    <button
+                      onClick={() => setPreviewDevice("mobile")}
+                      className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all ${previewDevice === "mobile" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                    >
+                      <Smartphone className="w-3.5 h-3.5" /> Mobile
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -468,7 +486,7 @@ export default function EmailTemplatesSettingsPage() {
                   </div>
                   <div className="border border-border/60 rounded-b-xl overflow-hidden shadow-2xl bg-[#f1f5f9] h-[520px]">
                     <iframe
-                      srcDoc={buildPreviewEmailHtml(formData.bodyHtml, formData.subject)}
+                      srcDoc={buildPreviewEmailHtml(formData.bodyHtml, formData.subject, org)}
                       className="w-full h-full border-0"
                       title="Email Live Preview"
                     />

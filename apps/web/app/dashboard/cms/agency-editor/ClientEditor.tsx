@@ -34,6 +34,7 @@ type CardData = {
   isHrm?: boolean;
   isServices?: boolean;
   isPricing?: boolean;
+  isCostCalculator?: boolean;
   isLegal?: boolean;
   // Cinematic Poster Control Fields
   posterTitle1?: string;

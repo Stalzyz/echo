@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { fetchApi, useApi } from "@/lib/useApi";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Plus, Trash2, Save, Calculator, Users, Eye, Building2, BookmarkPlus } from "lucide-react";
+import { ChevronLeft, Plus, Trash2, Save, Calculator, Users, Eye, Building2, BookmarkPlus, Zap } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useCurrency } from "@/hooks/useCurrency"
@@ -268,8 +268,8 @@ export default function NewInvoicePage() {
                     value={docType}
                     onChange={e => handleDocTypeChange(e.target.value as "TAX" | "PROFORMA")}
                   >
-                    <option value="TAX" className="bg-slate-900 text-white">📄 Tax Invoice (INV-)</option>
-                    <option value="PROFORMA" className="bg-slate-900 text-amber-400">📋 Proforma Invoice (PI-)</option>
+                    <option value="TAX" className="bg-slate-900 text-white">Tax Invoice (INV-)</option>
+                    <option value="PROFORMA" className="bg-slate-900 text-amber-400">Proforma Invoice (PI-)</option>
                   </select>
                 </div>
                 <div>
@@ -402,7 +402,8 @@ export default function NewInvoicePage() {
                 {/* 👤 Contact Person Particulars */}
                 <div className="bg-black/20 p-4 rounded-xl border border-white/5 space-y-3">
                   <div className="flex items-center gap-2 text-xs font-bold text-emerald-400 font-mono uppercase tracking-wider">
-                    <span>👤 Contact Person (Attention To / SPOC)</span>
+                    <User className="w-4 h-4 text-emerald-400" />
+                    <span>Contact Person (Attention To / SPOC)</span>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div>
@@ -454,9 +455,11 @@ export default function NewInvoicePage() {
                 </button>
               </div>
 
-              {/* ⚡ Quick Presets */}
-              <div className="mb-5 flex flex-wrap gap-2 pt-1">
-                <span className="text-[10px] text-white/40 uppercase tracking-widest self-center mr-1">⚡ 1-Click Presets:</span>
+              {/* Quick Presets */}
+              <div className="mb-5 flex flex-wrap items-center gap-2 pt-1">
+                <span className="text-[10px] text-white/40 uppercase tracking-widest self-center mr-1 flex items-center gap-1.5 font-medium">
+                  <Zap className="w-3 h-3 text-amber-400" /> Presets:
+                </span>
                 {invoice.businessUnit === 'ACADEMY' ? (
                   <>
                     <button

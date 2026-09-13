@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Modal } from './modal';
-import { MessageSquare, Send, CheckCircle2, AlertCircle, Loader2, Phone, User, FileText, ExternalLink, Sparkles, CheckCheck, Upload, Image as ImageIcon, Paperclip, FileUp, X, HardDrive, Search } from 'lucide-react';
+import { MessageSquare, Send, CheckCircle2, AlertCircle, Loader2, Phone, User, FileText, ExternalLink, CheckCheck, Upload, Image as ImageIcon, Paperclip, FileUp, X, HardDrive, Search, RefreshCw } from 'lucide-react';
 import { fetchApi, useApi } from '@/lib/useApi';
 import { toast } from 'sonner';
 
@@ -513,7 +513,7 @@ export function WhatsAppModal({
                   className="text-[10px] font-mono text-emerald-400 hover:text-emerald-300 flex items-center gap-1 bg-emerald-500/10 hover:bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/30 transition-all"
                   title="Sync newly created templates from Meta Cloud API / Grafty workspace"
                 >
-                  <Sparkles className="w-3 h-3" /> Sync Meta Cloud Templates
+                  <RefreshCw className="w-3 h-3" /> Sync Meta Cloud Templates
                 </button>
               </div>
               <select
@@ -527,7 +527,7 @@ export function WhatsAppModal({
                   const isLocked = ['grafty_partnership_intro', 'ecommerce_webdevelopment', 'grafty_image_proposal'].includes(tName);
                   return (
                     <option key={t.id} value={t.id} className="bg-slate-900 text-white">
-                      {isVerified ? '⚡ [VERIFIED LIVE] ' : isLocked ? '⚠️ [META CONFIG LOCKED] ' : ''}[{t.category}] {t.name}
+                      {isVerified ? '[VERIFIED LIVE] ' : isLocked ? '[META CONFIG LOCKED] ' : ''}[{t.category}] {t.name}
                     </option>
                   );
                 })}
@@ -537,7 +537,7 @@ export function WhatsAppModal({
               )}
               {selectedTemplate && ['grafty_partnership_intro', 'ecommerce_webdevelopment', 'grafty_image_proposal'].includes(selectedTemplate.templateName || selectedTemplate.id) && (
                 <div className="mt-2 bg-amber-500/10 border border-amber-500/30 p-2.5 rounded-lg text-amber-200 text-xs flex items-center justify-between gap-2">
-                  <span className="text-[11px]">⚠️ This template has rigid parameters in Meta Manager (#132012). Recommended: <strong>Grafty Welcome</strong>.</span>
+                  <span className="text-[11px]">This template has rigid parameters in Meta Manager (#132012). Recommended: <strong>Grafty Welcome</strong>.</span>
                   <button
                     type="button"
                     onClick={() => setSelectedTemplateId('grafty_welcome')}
@@ -566,7 +566,7 @@ export function WhatsAppModal({
                       }}
                       className="px-3 py-1 bg-emerald-500 text-black font-bold rounded-lg text-[11px] hover:bg-emerald-400 transition-all flex items-center gap-1 shadow"
                     >
-                      <Sparkles className="w-3 h-3" /> Select "Grafty Welcome"
+                      <CheckCircle2 className="w-3 h-3" /> Select "Grafty Welcome"
                     </button>
                     <button
                       type="button"
@@ -829,7 +829,7 @@ export function WhatsAppModal({
             {selectedTemplate && selectedTemplate.variables.length > 0 && (
               <div className="space-y-3 bg-white/5 p-4 rounded-xl border border-white/10">
                 <p className="text-[10px] uppercase tracking-widest text-emerald-400 font-mono flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" /> Auto-Mapped Dynamic Variables
+                  <FileText className="w-3 h-3" /> Auto-Mapped Dynamic Variables
                 </p>
                 <div className="space-y-2.5">
                   {selectedTemplate.variables.map((v, idx) => (
@@ -900,7 +900,7 @@ export function WhatsAppModal({
                         />
                       ) : (
                         <div className="p-3 text-center">
-                          <Sparkles className="w-5 h-5 text-emerald-400 mx-auto mb-1" />
+                          <ImageIcon className="w-5 h-5 text-slate-400 mx-auto mb-1" />
                           <p className="text-[9px] text-white/50">Header Image Attachment</p>
                         </div>
                       )}

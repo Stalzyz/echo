@@ -1,20 +1,21 @@
 import { FastifyInstance } from 'fastify';
-import { sendEmail } from '../integrations/email.service';
+import { sendEmail, buildMasterEmailHtml, OrgEmailTheme } from '../integrations/email.service';
 
 export interface EmailRenderResult {
   subject: string;
   html: string;
 }
 
-import { buildMasterEmailHtml } from '../integrations/email.service';
-
 export function renderEmailTemplate(
   templateBody: string,
   subjectPattern: string,
-  data: Record<string, any>
+  data: Record<string, any>,
+  theme?: OrgEmailTheme
 ): EmailRenderResult {
   let renderedBody = templateBody || '';
   let renderedSubject = subjectPattern || '';
+
+  const primary = theme?.primaryColor || '#2563eb';
 
   // Replace all {{variable}} placeholders with data values
   Object.keys(data).forEach((key) => {
@@ -24,10 +25,10 @@ export function renderEmailTemplate(
     renderedSubject = renderedSubject.replace(regex, val);
   });
 
-  // Automatically inline button and paragraph styles for full client support (Gmail, Outlook, Apple Mail)
+  // Automatically inline button and paragraph styles with organization primary color
   renderedBody = renderedBody.replace(
     /class=["']btn-primary["']/gi,
-    `style="display:inline-block;background-color:#4f46e5;color:#ffffff !important;text-decoration:none !important;font-weight:600;font-size:14px;padding:13px 26px;border-radius:8px;text-align:center;box-shadow:0 2px 4px rgba(79,70,229,0.2);"`
+    `style="display:inline-block;background-color:${primary};color:#ffffff !important;text-decoration:none !important;font-weight:600;font-size:14px;padding:13px 26px;border-radius:8px;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,0.1);"`
   );
 
   renderedBody = renderedBody.replace(
@@ -36,7 +37,7 @@ export function renderEmailTemplate(
   );
 
   // Wrap inside the master client-safe responsive email layout
-  const html = buildMasterEmailHtml(renderedBody, renderedSubject);
+  const html = buildMasterEmailHtml(renderedBody, renderedSubject, '', theme);
 
   return {
     subject: renderedSubject,
@@ -62,10 +63,23 @@ export async function sendTemplatedEmail(
       return false;
     }
 
+    const org = await app.prisma.organization.findFirst({
+      select: { primaryColor: true, secondaryColor: true, accentColor: true, companyName: true, name: true, logoUrl: true }
+    });
+
+    const orgTheme: OrgEmailTheme | undefined = org ? {
+      primaryColor: org.primaryColor || '#2563eb',
+      secondaryColor: org.secondaryColor || '#1e293b',
+      accentColor: org.accentColor || '#38bdf8',
+      companyName: org.companyName || org.name || 'Grekam Visuals',
+      logoUrl: org.logoUrl || undefined
+    } : undefined;
+
     const { subject, html } = renderEmailTemplate(
       template.bodyHtml,
       template.subject,
-      options.data
+      options.data,
+      orgTheme
     );
 
     // Send email using real SMTP transport!

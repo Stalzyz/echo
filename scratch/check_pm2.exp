@@ -1,0 +1,12 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh -o StrictHostKeyChecking=no -o PubkeyAuthentication=no root@72.61.231.187
+expect "assword:"
+send "Photoshop09@\r"
+expect "# "
+send "cd /root/grekam-os/apps/web && ls -l .next/standalone/apps/web/server/app/agency/page.js\r"
+expect "# "
+send "pm2 describe grekam-os-web\r"
+expect "# "
+send "exit\r"
+expect eof

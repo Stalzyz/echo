@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Link2, Sparkles, CheckCircle2, Copy, Check, ExternalLink, Globe, FileText, Send, Award, ArrowUpRight, ShieldCheck, Zap, Layers, RefreshCw, ChevronRight } from "lucide-react"
+import { Link2, CheckCircle2, Copy, Check, ExternalLink, Globe, FileText, Send, Award, ArrowUpRight, ShieldCheck, Zap, Layers, RefreshCw, ChevronRight } from "lucide-react"
 import { toast } from "sonner"
 
 interface BacklinkDirectory {
@@ -127,7 +127,7 @@ Grekam Visuals Engineering Team`
         <div className="flex items-center gap-2 mt-6 border-b border-border/40 pb-0 overflow-x-auto custom-scrollbar">
           {[
             { id: "directory", label: "High-DR Directories", icon: Globe, count: HIGH_DR_DIRECTORIES.length },
-            { id: "pitch", label: "HARO / Journalist AI", icon: Sparkles },
+            { id: "pitch", label: "HARO / Journalist Pitch", icon: FileText },
             { id: "widget", label: "Embeddable Backlink Widget", icon: Layers },
             { id: "outreach", label: "Competitor Link Outreach", icon: Send },
           ].map(tab => {
@@ -251,8 +251,8 @@ Grekam Visuals Engineering Team`
           {activeTab === "pitch" && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
               <div className="lg:col-span-6 p-6 rounded-2xl bg-card border border-border/50 shadow-sm space-y-4">
-                <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-emerald-400" /> HARO / Journalist AI Response Engine
+                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-emerald-400" /> HARO / Journalist Response Engine
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   Journalists from Forbes, Business Insider, TechCrunch, and Substack seek quotes on HARO (Connectively), Featured, and Terkel daily. Use AI to generate expert quotes embedded with your backlink.
@@ -293,7 +293,7 @@ Grekam Visuals Engineering Team`
                     {isGeneratingPitch ? (
                       <RefreshCw className="w-4 h-4 animate-spin" />
                     ) : (
-                      <Sparkles className="w-4 h-4" />
+                      <FileText className="w-4 h-4" />
                     )}
                     <span>Generate Journalist Quote & Pitch</span>
                   </button>

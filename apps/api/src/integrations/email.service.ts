@@ -64,9 +64,26 @@ async function getTransporter(): Promise<{ transporter: nodemailer.Transporter; 
 
 // ─── Base HTML Template ─────────────────────────────────────────────────────
 
-// ─── Base HTML Template ─────────────────────────────────────────────────────
+export interface OrgEmailTheme {
+  primaryColor?: string;
+  secondaryColor?: string;
+  accentColor?: string;
+  companyName?: string;
+  logoUrl?: string;
+}
 
-export function buildMasterEmailHtml(content: string, title = 'Grekam Visuals', preheader = '') {
+export function buildMasterEmailHtml(
+  content: string, 
+  title = 'Grekam Visuals', 
+  preheader = '',
+  theme?: OrgEmailTheme
+) {
+  const primary = theme?.primaryColor || '#2563eb';
+  const secondary = theme?.secondaryColor || '#1e293b';
+  const companyName = theme?.companyName || 'Grekam Visuals';
+  const logoUrl = theme?.logoUrl;
+  const initial = (companyName.trim()[0] || 'G').toUpperCase();
+
   return `<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -85,22 +102,26 @@ export function buildMasterEmailHtml(content: string, title = 'Grekam Visuals', 
         <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#ffffff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(15,23,42,0.06);">
           <!-- Header Banner -->
           <tr>
-            <td style="background-color:#4f46e5;background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);padding:26px 32px;">
+            <td style="background-color:${primary};background:linear-gradient(135deg,${primary} 0%,${secondary} 100%);padding:26px 32px;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td valign="middle">
                     <a href="https://garage.grekam.in" style="text-decoration:none;display:inline-block;">
-                      <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-                        <tr>
-                          <td style="background-color:rgba(255,255,255,0.22);width:36px;height:36px;border-radius:8px;text-align:center;vertical-align:middle;">
-                            <span style="color:#ffffff;font-size:18px;font-weight:800;line-height:36px;display:inline-block;">G</span>
-                          </td>
-                          <td style="padding-left:12px;vertical-align:middle;">
-                            <div style="color:#ffffff;font-size:16px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;">Grekam Visuals</div>
-                            <div style="color:#e0e7ff;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;">Agency &amp; Academy Workspace</div>
-                          </td>
-                        </tr>
-                      </table>
+                      ${logoUrl ? `
+                        <img src="${logoUrl}" alt="${companyName}" style="max-height:38px;max-width:200px;display:block;border:0;outline:none;" />
+                      ` : `
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                          <tr>
+                            <td style="background-color:rgba(255,255,255,0.22);width:36px;height:36px;border-radius:8px;text-align:center;vertical-align:middle;">
+                              <span style="color:#ffffff;font-size:18px;font-weight:800;line-height:36px;display:inline-block;">${initial}</span>
+                            </td>
+                            <td style="padding-left:12px;vertical-align:middle;">
+                              <div style="color:#ffffff;font-size:16px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;">${companyName}</div>
+                              <div style="color:#e0e7ff;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;">Workspace Notification</div>
+                            </td>
+                          </tr>
+                        </table>
+                      `}
                     </a>
                   </td>
                 </tr>
@@ -116,8 +137,8 @@ export function buildMasterEmailHtml(content: string, title = 'Grekam Visuals', 
           <!-- Footer -->
           <tr>
             <td style="background-color:#f8fafc;border-top:1px solid #e2e8f0;padding:22px 32px;text-align:center;font-size:12px;line-height:1.6;color:#64748b;">
-              <p style="margin:0 0 4px 0;font-weight:600;color:#475569;">Grekam Visuals Pvt. Ltd. · Bangalore, India</p>
-              <p style="margin:0;color:#64748b;">Official notification sent from <a href="https://garage.grekam.in" style="color:#4f46e5;text-decoration:underline;font-weight:600;">garage.grekam.in</a></p>
+              <p style="margin:0 0 4px 0;font-weight:600;color:#475569;">${companyName}</p>
+              <p style="margin:0;color:#64748b;">Official notification sent from <a href="https://garage.grekam.in" style="color:${primary};text-decoration:underline;font-weight:600;">garage.grekam.in</a></p>
             </td>
           </tr>
         </table>
@@ -128,8 +149,8 @@ export function buildMasterEmailHtml(content: string, title = 'Grekam Visuals', 
 </html>`;
 }
 
-function baseTemplate(content: string, preheader = '') {
-  return buildMasterEmailHtml(content, 'Grekam Visuals', preheader);
+function baseTemplate(content: string, preheader = '', theme?: OrgEmailTheme) {
+  return buildMasterEmailHtml(content, theme?.companyName || 'Grekam Visuals', preheader, theme);
 }
 
 // ─── Email Templates ─────────────────────────────────────────────────────────
@@ -452,10 +473,28 @@ export async function sendEmail(
     finalCc.push(defaultCc);
   }
 
-  // Universal Auto-Wrap: Guarantee all outgoing emails have valid HTML structure, high-contrast card styling & branding
+  // Universal Auto-Wrap: Guarantee all outgoing emails have valid HTML structure, high-contrast card styling & organization branding
   let finalHtml = template.html;
+  let orgTheme: OrgEmailTheme | undefined;
+  try {
+    const org = await prisma.organization.findFirst({
+      select: { primaryColor: true, secondaryColor: true, accentColor: true, companyName: true, name: true, logoUrl: true }
+    });
+    if (org) {
+      orgTheme = {
+        primaryColor: org.primaryColor || '#2563eb',
+        secondaryColor: org.secondaryColor || '#1e293b',
+        accentColor: org.accentColor || '#38bdf8',
+        companyName: org.companyName || org.name || 'Grekam Visuals',
+        logoUrl: org.logoUrl || undefined,
+      };
+    }
+  } catch (e) {
+    console.warn('[EmailService] Could not load organization branding, using defaults');
+  }
+
   if (!finalHtml.trim().toLowerCase().startsWith('<!doctype html')) {
-    finalHtml = buildMasterEmailHtml(finalHtml, template.subject);
+    finalHtml = buildMasterEmailHtml(finalHtml, template.subject, '', orgTheme);
   }
 
   const info = await t.sendMail({ 

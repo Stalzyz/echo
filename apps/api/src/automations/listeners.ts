@@ -91,7 +91,7 @@ export function registerGlobalListeners() {
     if (!data.clientEmail) return;
     await EmailService.sendEmail(
       data.clientEmail,
-      `⚠️ Invoice #${data.invoiceNumber} is Overdue`,
+      `Invoice #${data.invoiceNumber} is Overdue`,
       `<h1>Payment Reminder</h1><p>Hi ${data.clientName}, your invoice <strong>#${data.invoiceNumber}</strong> for <strong>${data.amount}</strong> was due on ${new Date(data.dueDate).toLocaleDateString()}. Please make payment at your earliest convenience.</p>`
     );
     console.log(`[Autopilot] Overdue reminder sent to ${data.clientEmail}`);
@@ -218,7 +218,7 @@ export function registerGlobalListeners() {
     console.log('[Autopilot] 💰 Caught FEE_PAID:', data.studentName);
     const html = `
       <div style="font-family:sans-serif;max-width:600px;margin:auto;padding:32px;background:#f9f9f9;border-radius:12px;">
-        <h1 style="color:#16a34a;">✅ Payment Confirmed</h1>
+        <h1 style="color:#16a34a;">Payment Confirmed</h1>
         <p>Hi <strong>${data.studentName}</strong>,</p>
         <p>We have received your fee payment of <strong>${data.amount}</strong> for <strong>${data.batchName}</strong>.</p>
         <table style="width:100%;border-collapse:collapse;margin-top:16px;">
@@ -229,7 +229,7 @@ export function registerGlobalListeners() {
         <p style="color:#888;font-size:12px;">— Grekam Academy Team</p>
       </div>`;
     if (data.studentEmail) {
-      await EmailService.sendEmail(data.studentEmail, '✅ Fee Payment Confirmed - Grekam Academy', html);
+      await EmailService.sendEmail(data.studentEmail, 'Fee Payment Confirmed - Grekam Academy', html);
     }
     // WhatsApp receipt to student
     if (data.studentPhone) {
@@ -247,14 +247,14 @@ export function registerGlobalListeners() {
     console.log('[Autopilot] 🔔 Caught FEE_DUE_REMINDER:', data.studentName);
     const html = `
       <div style="font-family:sans-serif;max-width:600px;margin:auto;padding:32px;background:#f9f9f9;border-radius:12px;">
-        <h1 style="color:#d97706;">🔔 Upcoming Fee Reminder</h1>
+        <h1 style="color:#d97706;">Upcoming Fee Reminder</h1>
         <p>Hi <strong>${data.studentName}</strong>,</p>
         <p>This is a friendly reminder that your fee of <strong>${data.amount}</strong> for <strong>${data.batchName}</strong> is due on <strong>${data.dueDate}</strong>.</p>
         <p>Please make the payment on time to avoid any disruption to your classes.</p>
         <p style="color:#888;font-size:12px;">— Grekam Academy Team</p>
       </div>`;
     if (data.studentEmail) {
-      await EmailService.sendEmail(data.studentEmail, '🔔 Fee Due Reminder - Grekam Academy', html);
+      await EmailService.sendEmail(data.studentEmail, 'Fee Due Reminder - Grekam Academy', html);
     }
     if (data.studentPhone) {
       await whatsappService.sendTemplateMessage({
@@ -273,14 +273,14 @@ export function registerGlobalListeners() {
     const adminEmail = org?.supportEmail || 'admin@grekam.com';
     const html = `
       <div style="font-family:sans-serif;max-width:600px;margin:auto;padding:32px;background:#fff5f5;border-radius:12px;border:2px solid #fca5a5;">
-        <h1 style="color:#dc2626;">⚠️ Fee Overdue Notice</h1>
+        <h1 style="color:#dc2626;">Fee Overdue Notice</h1>
         <p>Hi <strong>${data.studentName}</strong>,</p>
         <p>Your fee of <strong>${data.amount}</strong> for <strong>${data.batchName}</strong> was due on <strong>${data.dueDate}</strong> and has not been received yet.</p>
         <p>Please contact us immediately at <strong>${adminEmail}</strong> or pay online to avoid any impact on your enrollment.</p>
         <p style="color:#888;font-size:12px;">— Grekam Academy Admin</p>
       </div>`;
     if (data.studentEmail) {
-      await EmailService.sendEmail(data.studentEmail, '⚠️ URGENT: Fee Overdue - Grekam Academy', html);
+      await EmailService.sendEmail(data.studentEmail, 'URGENT: Fee Overdue - Grekam Academy', html);
     }
     if (data.studentPhone) {
       await whatsappService.sendTemplateMessage({
@@ -340,7 +340,7 @@ export function registerGlobalListeners() {
       </div>`;
 
     if (data.studentEmail) {
-      await EmailService.sendEmail(data.studentEmail, `✉️ Fee Invoice: ${data.totalDue} due for ${data.batchName}`, html);
+      await EmailService.sendEmail(data.studentEmail, `Fee Invoice: ${data.totalDue} due for ${data.batchName}`, html);
     }
   });
 }

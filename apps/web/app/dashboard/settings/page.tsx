@@ -18,8 +18,7 @@ import {
   Globe, 
   GraduationCap, 
   Building2, 
-  Trash2, 
-  Sparkles 
+  Trash2 
 } from "lucide-react"
 import { toast } from "sonner"
 import { useOrganization } from "@/context/OrganizationContext"

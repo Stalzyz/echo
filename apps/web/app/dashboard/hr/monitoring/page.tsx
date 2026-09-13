@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Monitor, Keyboard, Activity, Camera, Play, Pause, RefreshCw, Zap, Trophy, Sparkles, AlertTriangle, CheckCircle2, X } from "lucide-react"
+import { Monitor, Keyboard, Activity, Camera, Play, Pause, RefreshCw, Zap, Trophy, AlertTriangle, CheckCircle2, X } from "lucide-react"
 import { useApi, fetchApi } from "@/lib/useApi"
 import Image from "next/image"
 import { format } from "date-fns"
@@ -149,8 +149,8 @@ export default function HRMonitoringDashboard() {
                   disabled={isGeneratingStandup || !selectedEmployeeId}
                   className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-xl text-white text-[10px] font-mono font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-md disabled:opacity-50"
                 >
-                  {isGeneratingStandup ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                  {isGeneratingStandup ? 'Building...' : 'AI EOD Standup'}
+                  {isGeneratingStandup ? <RefreshCw className="w-3 h-3 animate-spin" /> : <FileText className="w-3 h-3" />}
+                  {isGeneratingStandup ? 'Building...' : 'EOD Standup'}
                 </button>
 
                 <button

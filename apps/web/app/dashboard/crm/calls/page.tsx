@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { Mic, Play, Pause, BarChart2, Zap, TrendingUp, FileText, CheckCircle2, Sparkles, BookOpen, RefreshCw, X, Send, Calendar, Users, PhoneCall, Phone, UserCheck, Clock, Plus, Volume2 } from "lucide-react"
+import { Mic, Play, Pause, BarChart2, Zap, TrendingUp, FileText, CheckCircle2, BookOpen, RefreshCw, X, Send, Calendar, Users, PhoneCall, Phone, UserCheck, Clock, Plus, Volume2, Activity, ExternalLink, Loader2 } from "lucide-react"
 import { useApi, fetchApi } from "@/lib/useApi"
 import { toast } from "sonner"
 import { format } from "date-fns"
@@ -124,6 +124,7 @@ export default function CallIntelligenceDashboard() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
   const recordingTimerRef = useRef<any>(null)
+  const recordingSecondsRef = useRef<number>(0)
 
   const startLiveRecording = async () => {
     try {
@@ -153,12 +154,13 @@ export default function CallIntelligenceDashboard() {
             body: formData
           })
           if (res?.downloadUrl) {
+            const finalSecs = recordingSecondsRef.current > 0 ? recordingSecondsRef.current : 60
             setLogCallForm(prev => ({
               ...prev,
               recordingUrl: res.downloadUrl,
-              durationSeconds: recordingSeconds > 0 ? recordingSeconds : prev.durationSeconds
+              durationSeconds: finalSecs
             }))
-            toast.success(`Call audio recorded & saved automatically!`)
+            toast.success(`Call audio recorded & saved automatically! (${finalSecs}s)`)
           }
         } catch (err: any) {
           toast.error(err.message || "Failed to auto-upload recorded audio")
@@ -167,12 +169,17 @@ export default function CallIntelligenceDashboard() {
         }
       }
 
-      mediaRecorder.start()
+      mediaRecorder.start(1000)
       setIsRecordingLive(true)
       setRecordingSeconds(0)
+      recordingSecondsRef.current = 0
 
       recordingTimerRef.current = setInterval(() => {
-        setRecordingSeconds(prev => prev + 1)
+        setRecordingSeconds(prev => {
+          const next = prev + 1
+          recordingSecondsRef.current = next
+          return next
+        })
       }, 1000)
 
       toast.info("Live microphone recording started...")
@@ -512,7 +519,18 @@ export default function CallIntelligenceDashboard() {
                         <td className="px-3 py-2 text-muted-foreground truncate max-w-xs">{log.content}</td>
                         <td className="px-3 py-2 text-center" onClick={(e) => e.stopPropagation()}>
                           {log.recordingUrl ? (
-                            <audio controls src={log.recordingUrl} className="h-7 w-48 mx-auto" />
+                            <div className="flex items-center justify-center gap-1.5">
+                              <audio controls src={log.recordingUrl} className="h-7 w-44" preload="none" />
+                              <a 
+                                href={log.recordingUrl} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="p-1 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors shrink-0" 
+                                title="Open audio recording in new tab"
+                              >
+                                <ExternalLink className="w-3.5 h-3.5" />
+                              </a>
+                            </div>
                           ) : (
                             <span className="text-[10px] text-muted-foreground/60 italic flex items-center justify-center gap-1">
                               <Volume2 className="w-3 h-3 text-muted-foreground" /> No audio file
@@ -559,8 +577,8 @@ export default function CallIntelligenceDashboard() {
                 disabled={isAnalyzing}
                 className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-primary/90 transition-all shadow-sm disabled:opacity-50"
               >
-                {isAnalyzing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-                {isAnalyzing ? "Auditing with Gemini..." : "Run AI Audit"}
+                {isAnalyzing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Activity className="w-3.5 h-3.5" />}
+                {isAnalyzing ? "Auditing Call..." : "Run Audit"}
               </button>
             </div>
 
@@ -597,10 +615,10 @@ export default function CallIntelligenceDashboard() {
             
             {!analysisResult ? (
               <div className="flex-1 flex flex-col items-center justify-center p-6 text-center select-none text-muted-foreground">
-                <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-3 text-primary">
-                  <Sparkles className="w-7 h-7 animate-pulse text-emerald-400" />
+                <div className="w-12 h-12 rounded-xl bg-slate-800 border border-white/10 flex items-center justify-center mb-3 text-slate-400">
+                  <Activity className="w-5 h-5 text-slate-400" />
                 </div>
-                <h4 className="font-bold text-foreground text-sm mb-1">No Call Selected for AI Audit</h4>
+                <h4 className="font-semibold text-foreground text-sm mb-1">No Call Selected for Audit</h4>
                 <p className="text-xs text-muted-foreground max-w-xs leading-relaxed mb-4">
                   Select a logged call from the table above or paste a transcript to run Gemini AI analysis.
                 </p>
@@ -871,8 +889,8 @@ export default function CallIntelligenceDashboard() {
           <div className="bg-card border border-border/50 rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="flex items-center justify-between px-6 py-4 border-b border-border/50 bg-muted/20">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-violet-400" />
-                <h3 className="font-bold text-lg text-foreground">AI Sales Script Generator</h3>
+                <FileText className="w-5 h-5 text-slate-300" />
+                <h3 className="font-semibold text-base text-foreground">Sales Script Generator</h3>
               </div>
               <button onClick={() => setIsScriptModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-muted hover:bg-destructive/20 hover:text-destructive transition-colors">
                 <X className="w-4 h-4" />
@@ -916,8 +934,8 @@ export default function CallIntelligenceDashboard() {
                     disabled={isGeneratingScript}
                     className="w-full py-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold rounded-xl text-xs uppercase tracking-wider hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                   >
-                    {isGeneratingScript ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                    {isGeneratingScript ? "Building Custom Script..." : "Generate AI Sales Script"}
+                    {isGeneratingScript ? <RefreshCw className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
+                    {isGeneratingScript ? "Building Custom Script..." : "Generate Sales Script"}
                   </button>
                 </div>
               </form>

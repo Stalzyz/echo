@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { 
-  Trophy, Target, Megaphone, Sparkles, Flame, Heart, 
+  Trophy, Target, Megaphone, Lightbulb, Flame, Heart, 
   PartyPopper, Award, Plus, Send, Calendar, CheckCircle2,
   Zap, MessageCircle, Star, ShieldAlert, Pin, User
 } from "lucide-react"
@@ -111,7 +111,7 @@ const BADGES: Record<string, { label: string; icon: any; color: string }> = {
   PROJECT_HERO:     { label: "Project Hero",      icon: Trophy,      color: "text-amber-400 bg-amber-500/10 border-amber-500/30" },
   TOP_CLOSER:       { label: "Top Closer",        icon: Target,      color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30" },
   BUG_HUNTER:       { label: "Bug Hunter",        icon: Zap,         color: "text-cyan-400 bg-cyan-500/10 border-cyan-500/30" },
-  INNOVATOR:        { label: "Innovator",         icon: Sparkles,    color: "text-purple-400 bg-purple-500/10 border-purple-500/30" },
+  INNOVATOR:        { label: "Innovator",         icon: Lightbulb,   color: "text-purple-400 bg-purple-500/10 border-purple-500/30" },
   MILESTONE_MASTER: { label: "Milestone Master", icon: PartyPopper, color: "text-pink-400 bg-pink-500/10 border-pink-500/30" }
 }
 
@@ -441,7 +441,7 @@ export default function TeamHubDashboard() {
                       {/* Wishes & Congratulations Feed */}
                       <div className="bg-black/40 border border-white/10 rounded-2xl p-4 space-y-3">
                         <h5 className="text-[10px] font-mono uppercase tracking-widest text-white/40 font-bold flex items-center gap-1.5">
-                          <Sparkles className="w-3 h-3 text-pink-400" /> Staff Wishes & Kudos ({wishes.length})
+                          <Heart className="w-3 h-3 text-pink-400" /> Staff Wishes & Kudos ({wishes.length})
                         </h5>
 
                         {/* Existing Wishes */}
@@ -525,7 +525,7 @@ export default function TeamHubDashboard() {
                         <span className={`text-[10px] font-mono uppercase px-2.5 py-1 rounded-lg border font-bold ${
                           isCompleted ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30" : "bg-cyan-500/10 text-cyan-400 border-cyan-500/30"
                         }`}>
-                          {isCompleted ? "COMPLETED 🎉" : "ON TRACK"}
+                          {isCompleted ? "COMPLETED" : "ON TRACK"}
                         </span>
                       </div>
 
@@ -657,11 +657,11 @@ export default function TeamHubDashboard() {
                 onChange={e => setWinForm({ ...winForm, badge: e.target.value })}
                 className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white"
               >
-                <option value="PROJECT_HERO">🚀 Project Hero</option>
-                <option value="TOP_CLOSER">🎯 Top Closer</option>
-                <option value="BUG_HUNTER">🐛 Bug Hunter</option>
-                <option value="INNOVATOR">💡 Innovator</option>
-                <option value="MILESTONE_MASTER">🏆 Milestone Master</option>
+                <option value="PROJECT_HERO">Project Hero</option>
+                <option value="TOP_CLOSER">Top Closer</option>
+                <option value="BUG_HUNTER">Bug Hunter</option>
+                <option value="INNOVATOR">Innovator</option>
+                <option value="MILESTONE_MASTER">Milestone Master</option>
               </select>
             </div>
 
@@ -672,10 +672,10 @@ export default function TeamHubDashboard() {
                 onChange={e => setWinForm({ ...winForm, graffitiTheme: e.target.value })}
                 className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white"
               >
-                <option value="CYBERPUNK_NEON">⚡ Cyberpunk Neon</option>
-                <option value="GOLD_GLOW">✨ Gold Glow</option>
-                <option value="FIRE_STORM">🔥 Fire Storm</option>
-                <option value="RETRO_WAVE">🌆 Retro Wave</option>
+                <option value="CYBERPUNK_NEON">Cyberpunk Neon</option>
+                <option value="GOLD_GLOW">Gold Glow</option>
+                <option value="FIRE_STORM">Fire Storm</option>
+                <option value="RETRO_WAVE">Retro Wave</option>
               </select>
             </div>
           </div>
@@ -827,10 +827,10 @@ export default function TeamHubDashboard() {
                 onChange={e => setAnnouncementForm({ ...announcementForm, category: e.target.value })}
                 className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white"
               >
-                <option value="GENERAL">📢 General</option>
-                <option value="URGENT">⚠️ Urgent</option>
-                <option value="CELEBRATION">🎉 Celebration</option>
-                <option value="MILESTONE">🏁 Milestone</option>
+                <option value="GENERAL">General</option>
+                <option value="URGENT">Urgent</option>
+                <option value="CELEBRATION">Celebration</option>
+                <option value="MILESTONE">Milestone</option>
               </select>
             </div>
 

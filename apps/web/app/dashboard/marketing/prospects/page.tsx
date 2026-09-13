@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Sparkles, Search, UserPlus, Globe, CheckCircle2, Copy, AlertTriangle, MessageSquareShare, Mail, Phone } from "lucide-react"
+import { Search, UserPlus, Globe, CheckCircle2, Copy, AlertTriangle, MessageSquareShare, Mail, Phone, MapPin, Building2, Send } from "lucide-react"
 import { fetchApi } from "@/lib/useApi"
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api/v1"
@@ -133,7 +133,7 @@ export default function AIProspectingDashboard() {
               {analyzing ? (
                 <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Scraping & Enriching...</>
               ) : (
-                <><Sparkles className="w-4 h-4" /> Scrape & Enrich</>
+                <><Search className="w-4 h-4" /> Scrape & Enrich</>
               )}
             </button>
           </div>
@@ -160,8 +160,8 @@ export default function AIProspectingDashboard() {
                 <div className="flex items-center gap-3 mb-1">
                   <h2 className="text-2xl font-bold text-foreground">{prospect.name}</h2>
                   {prospect.scrapedLive && (
-                    <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-[11px] font-bold px-2.5 py-0.5 rounded-full">
-                      ⚡ Live Web Scraped
+                    <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[11px] font-medium px-2.5 py-0.5 rounded-full">
+                      Live Web Scraped
                     </span>
                   )}
                 </div>
@@ -170,8 +170,8 @@ export default function AIProspectingDashboard() {
                 
                 {/* Location, Industry, Scraped Emails & Phones */}
                 <div className="flex flex-wrap gap-2 mt-3 text-xs font-medium">
-                  {prospect.location && <span className="bg-muted px-2.5 py-1 rounded-lg text-muted-foreground border border-border/50">📍 {prospect.location}</span>}
-                  {prospect.industry && <span className="bg-muted px-2.5 py-1 rounded-lg text-muted-foreground border border-border/50">🏢 {prospect.industry}</span>}
+                  {prospect.location && <span className="bg-muted px-2.5 py-1 rounded-lg text-muted-foreground border border-border/50 flex items-center gap-1.5"><MapPin className="w-3 h-3 text-slate-400" />{prospect.location}</span>}
+                  {prospect.industry && <span className="bg-muted px-2.5 py-1 rounded-lg text-muted-foreground border border-border/50 flex items-center gap-1.5"><Building2 className="w-3 h-3 text-slate-400" />{prospect.industry}</span>}
                   
                   {/* Scraped Emails */}
                   {prospect.emails && prospect.emails.length > 0 ? (
@@ -211,15 +211,15 @@ export default function AIProspectingDashboard() {
                       : "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500/20"
                   }`}
                 >
-                  {addingToCrm ? "Saving..." : addedToCrm ? "✓ Added to CRM Leads" : <><UserPlus className="w-4 h-4" /> Add to CRM</>}
+                  {addingToCrm ? "Saving..." : addedToCrm ? "Added to CRM Leads" : <><UserPlus className="w-4 h-4" /> Add to CRM</>}
                 </button>
               </div>
             </div>
 
-            {/* AI Icebreakers */}
+            {/* Outreach Icebreakers */}
             <div className="p-6">
-              <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-primary" /> AI Generated Outreach Icebreakers
+              <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Send className="w-4 h-4 text-primary" /> Generated Outreach Icebreakers
               </h3>
               
               <div className="grid gap-4">

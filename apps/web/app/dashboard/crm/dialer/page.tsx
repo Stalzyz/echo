@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Phone, Mic, PhoneOff, User, Zap, Voicemail, FileText, CheckCircle2, ChevronRight, Volume2, Pause, Smartphone } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { Phone, Mic, PhoneOff, User, Zap, Voicemail, FileText, CheckCircle2, ChevronRight, Volume2, Pause, Smartphone, Loader2, ExternalLink } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useApi, fetchApi } from "@/lib/useApi"
 import { toast } from "sonner"
@@ -14,6 +14,22 @@ export default function PowerDialerDashboard() {
   const [sortBy, setSortBy] = useState<"score" | "name" | "recent">("score")
   const [routeThroughMobile, setRouteThroughMobile] = useState(false)
   const [enableCallRecording, setEnableCallRecording] = useState(true)
+  const [callDurationSeconds, setCallDurationSeconds] = useState(0)
+  const [recordedAudioUrl, setRecordedAudioUrl] = useState<string | null>(null)
+  const [isUploadingAudio, setIsUploadingAudio] = useState(false)
+  const [isMicMuted, setIsMicMuted] = useState(false)
+
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const audioChunksRef = useRef<Blob[]>([])
+  const callTimerRef = useRef<any>(null)
+  const durationSecondsRef = useRef<number>(0)
+  const audioStreamRef = useRef<MediaStream | null>(null)
+
+  const formatDuration = (totalSec: number) => {
+    const mins = Math.floor(totalSec / 60);
+    const secs = totalSec % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
   const { data: session } = useSession()
 
   // Fetch real leads from API
@@ -106,11 +122,16 @@ export default function PowerDialerDashboard() {
         method: "PATCH",
         body: JSON.stringify({ status: "WON" })
       })
-      await fetchApi(`/crm/leads/${activeLead.id}/activities`, {
+
+      const duration = durationSecondsRef.current || callDurationSeconds || 0
+      await fetchApi('/crm/telephony/recordings', {
         method: "POST",
         body: JSON.stringify({
-          type: "CALL",
-          content: `[Call Disposition] Outcome marked as: Meeting Booked. Google Calendar Invite sent.`
+          leadId: activeLead.id,
+          durationSeconds: duration,
+          disposition: "MEETING BOOKED",
+          recordingUrl: recordedAudioUrl || undefined,
+          notes: `${meetingSummary}. Calendar invite sent to ${attendeeEmail}.${callNotes ? ' Notes: ' + callNotes : ''}`
         })
       })
       
@@ -166,7 +187,64 @@ export default function PowerDialerDashboard() {
       return
     }
 
+    setRecordedAudioUrl(null)
+    setCallDurationSeconds(0)
+    durationSecondsRef.current = 0
+    audioChunksRef.current = []
+
     setCallState("dialing")
+
+    // Request microphone access and start MediaRecorder if auto call recording is enabled
+    if (enableCallRecording) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        audioStreamRef.current = stream
+        const recorder = new MediaRecorder(stream)
+        mediaRecorderRef.current = recorder
+        audioChunksRef.current = []
+
+        recorder.ondataavailable = (event) => {
+          if (event.data && event.data.size > 0) {
+            audioChunksRef.current.push(event.data)
+          }
+        }
+
+        recorder.onstop = async () => {
+          if (audioStreamRef.current) {
+            audioStreamRef.current.getTracks().forEach(t => t.stop())
+            audioStreamRef.current = null
+          }
+
+          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
+          if (audioBlob.size > 0) {
+            const file = new File([audioBlob], `call_${activeLead?.id || 'lead'}_${Date.now()}.webm`, { type: 'audio/webm' })
+            setIsUploadingAudio(true)
+            try {
+              const formData = new FormData()
+              formData.append('file', file)
+              const res = await fetchApi<any>('/storage/upload-local', {
+                method: 'POST',
+                body: formData
+              })
+              if (res?.downloadUrl) {
+                setRecordedAudioUrl(res.downloadUrl)
+                toast.success("Call audio recording captured and saved!")
+              }
+            } catch (err: any) {
+              console.error("Audio recording upload error:", err)
+              toast.error("Failed to upload call recording: " + (err.message || 'Network error'))
+            } finally {
+              setIsUploadingAudio(false)
+            }
+          }
+        }
+
+        recorder.start(1000)
+      } catch (err: any) {
+        console.warn("Microphone access not granted:", err)
+        toast.warning("Microphone access not granted. Proceeding without audio recording.")
+      }
+    }
 
     // Trigger device native tel: dialer / web softphone
     try {
@@ -198,25 +276,55 @@ export default function PowerDialerDashboard() {
 
     setTimeout(() => {
       setCallState("connected")
+      if (callTimerRef.current) clearInterval(callTimerRef.current)
+      callTimerRef.current = setInterval(() => {
+        durationSecondsRef.current += 1
+        setCallDurationSeconds(durationSecondsRef.current)
+      }, 1000)
     }, 2500)
   }
 
   const handleEndCall = () => {
+    if (callTimerRef.current) {
+      clearInterval(callTimerRef.current)
+      callTimerRef.current = null
+    }
+
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      try {
+        mediaRecorderRef.current.stop()
+      } catch (e) {
+        console.warn("Error stopping recorder", e)
+      }
+    }
+
     setCallState("wrapup")
   }
 
   const handleVoicemailDrop = async () => {
+    if (callTimerRef.current) {
+      clearInterval(callTimerRef.current)
+      callTimerRef.current = null
+    }
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      try { mediaRecorderRef.current.stop() } catch (e) {}
+    }
     setCallState("voicemail")
     if (activeLead) {
       try {
-        await fetchApi(`/crm/leads/${activeLead.id}/activities`, {
+        const duration = durationSecondsRef.current || 20
+        await fetchApi('/crm/telephony/recordings', {
           method: "POST",
           body: JSON.stringify({
-            type: "CALL",
-            content: "[Voicemail] Dropped pre-recorded voicemail"
+            leadId: activeLead.id,
+            durationSeconds: duration,
+            disposition: "LEFT VOICEMAIL",
+            recordingUrl: recordedAudioUrl || undefined,
+            notes: "[Voicemail] Dropped pre-recorded voicemail"
           })
         })
         toast.success("Voicemail logged to CRM")
+        mutate()
       } catch (err) {
         console.error(err)
       }
@@ -239,20 +347,28 @@ export default function PowerDialerDashboard() {
     else if (disposition === "Not Interested") newStatus = "LOST"
     else if (disposition === "Left Voicemail") newStatus = "CONTACTED"
 
-    if (newStatus && activeLead) {
+    if (activeLead) {
       try {
-        await fetchApi(`/crm/leads/${activeLead.id}`, {
-          method: "PATCH",
-          body: JSON.stringify({ status: newStatus })
-        })
-        await fetchApi(`/crm/leads/${activeLead.id}/activities`, {
+        if (newStatus) {
+          await fetchApi(`/crm/leads/${activeLead.id}`, {
+            method: "PATCH",
+            body: JSON.stringify({ status: newStatus })
+          })
+        }
+
+        const duration = durationSecondsRef.current || callDurationSeconds || 0
+        await fetchApi('/crm/telephony/recordings', {
           method: "POST",
           body: JSON.stringify({
-            type: "CALL",
-            content: `[Call Disposition] Outcome marked as: ${disposition}`
+            leadId: activeLead.id,
+            durationSeconds: duration,
+            disposition: disposition.toUpperCase(),
+            recordingUrl: recordedAudioUrl || undefined,
+            notes: callNotes ? `Notes: ${callNotes}` : undefined
           })
         })
-        toast.success(`Disposition logged: ${disposition}`)
+
+        toast.success(`Disposition and call activity logged: ${disposition}`)
         mutate()
       } catch (err: any) {
         toast.error("Failed to sync disposition status: " + err.message)
@@ -263,14 +379,19 @@ export default function PowerDialerDashboard() {
   const saveCallNotes = async () => {
     if (activeLead && callNotes.trim()) {
       try {
-        await fetchApi(`/crm/leads/${activeLead.id}/activities`, {
+        const duration = durationSecondsRef.current || callDurationSeconds || 0
+        await fetchApi('/crm/telephony/recordings', {
           method: "POST",
           body: JSON.stringify({
-            type: "CALL",
-            content: `[Call Notes] ${callNotes}`
+            leadId: activeLead.id,
+            durationSeconds: duration,
+            disposition: selectedDisposition ? selectedDisposition.toUpperCase() : "CONTACTED",
+            recordingUrl: recordedAudioUrl || undefined,
+            notes: callNotes
           })
         })
-        toast.success("Call notes saved!")
+        toast.success("Call notes and activity saved!")
+        mutate()
       } catch (err: any) {
         toast.error("Failed to save notes: " + err.message)
       }
@@ -279,13 +400,33 @@ export default function PowerDialerDashboard() {
 
   const handleNextLead = async () => {
     if (callState === "wrapup") {
-      await saveCallNotes()
+      if (callNotes.trim() && !selectedDisposition) {
+        await saveCallNotes()
+      }
+    }
+    if (callTimerRef.current) {
+      clearInterval(callTimerRef.current)
+      callTimerRef.current = null
+    }
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      try { mediaRecorderRef.current.stop() } catch (e) {}
+    }
+    if (audioStreamRef.current) {
+      audioStreamRef.current.getTracks().forEach(t => t.stop())
+      audioStreamRef.current = null
     }
     setCallNotes("")
     setSelectedDisposition(null)
+    setRecordedAudioUrl(null)
+    setCallDurationSeconds(0)
+    durationSecondsRef.current = 0
     if (queuePos + 1 < queue.length) {
       updateQueuePos(queuePos + 1)
       setCallState("idle")
+    } else {
+      updateQueuePos(0)
+      setCallState("idle")
+      toast.info("Completed current calling queue.")
     }
   }
 
@@ -470,22 +611,53 @@ export default function PowerDialerDashboard() {
               <p className="text-sm font-mono text-muted-foreground mb-8">{activeLead.phone}</p>
 
               {/* Status Display */}
-              <div className="h-12 mb-8 flex items-center justify-center">
+              <div className="h-14 mb-6 flex flex-col items-center justify-center">
                 {callState === "idle" && <span className="text-muted-foreground font-medium">Ready to dial</span>}
                 {callState === "dialing" && <span className="text-primary font-bold animate-pulse">Dialing...</span>}
-                {callState === "connected" && <span className="text-emerald-500 font-bold flex items-center gap-2"><Mic className="w-4 h-4 animate-pulse" /> 00:04 Connected</span>}
+                {callState === "connected" && (
+                  <div className="flex flex-col items-center gap-1.5">
+                    <span className="text-emerald-500 font-mono text-xl font-bold flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                      {formatDuration(callDurationSeconds)} Connected
+                    </span>
+                    {enableCallRecording && (
+                      <span className="text-[11px] text-rose-400 font-mono flex items-center gap-1.5 bg-rose-500/10 px-2.5 py-0.5 rounded-full border border-rose-500/20">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span>
+                        REC {isMicMuted ? "(Muted)" : "Active"}
+                      </span>
+                    )}
+                  </div>
+                )}
                 {callState === "voicemail" && <span className="text-amber-500 font-bold">Dropping Voicemail & Moving to Next...</span>}
-                {callState === "wrapup" && <span className="text-orange-500 font-bold">Call Ended. Wrap up notes.</span>}
+                {callState === "wrapup" && (
+                  <span className="text-orange-500 font-bold flex items-center gap-2">
+                    Call Ended ({formatDuration(callDurationSeconds)}). Select disposition.
+                  </span>
+                )}
               </div>
 
               {/* Action Buttons */}
               <div className="flex items-center justify-center gap-4">
                 {callState === "connected" || callState === "dialing" ? (
                   <>
-                    <button className="w-14 h-14 rounded-full bg-muted flex items-center justify-center text-foreground hover:bg-muted/80 transition-colors tooltip-trigger" title="Mute">
+                    <button 
+                      onClick={() => {
+                        if (audioStreamRef.current) {
+                          audioStreamRef.current.getAudioTracks().forEach(track => {
+                            track.enabled = !track.enabled;
+                          });
+                          setIsMicMuted(!isMicMuted);
+                          toast.info(isMicMuted ? "Microphone Unmuted" : "Microphone Muted");
+                        }
+                      }} 
+                      className={`w-14 h-14 rounded-full flex items-center justify-center transition-colors ${
+                        isMicMuted ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20" : "bg-muted text-foreground hover:bg-muted/80"
+                      }`} 
+                      title={isMicMuted ? "Unmute Microphone" : "Mute Microphone"}
+                    >
                       <Mic className="w-6 h-6" />
                     </button>
-                    <button onClick={handleEndCall} className="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center text-white hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20">
+                    <button onClick={handleEndCall} className="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center text-white hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20" title="End Call">
                       <PhoneOff className="w-6 h-6" />
                     </button>
                     <button onClick={handleVoicemailDrop} className="w-14 h-14 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 hover:bg-amber-500/20 transition-colors" title="1-Click Voicemail Drop">
@@ -554,9 +726,36 @@ export default function PowerDialerDashboard() {
               {/* Wrapup form if call ended */}
               {callState === "wrapup" && (
                 <div className="mt-8 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl animate-in slide-in-from-bottom-2">
-                  <div className="text-sm font-bold text-amber-500 mb-2 flex items-center gap-2">
-                    <FileText className="w-4 h-4" /> Quick Disposition
+                  <div className="text-sm font-bold text-amber-500 mb-2 flex items-center justify-between">
+                    <span className="flex items-center gap-2"><FileText className="w-4 h-4" /> Quick Disposition</span>
+                    <span className="text-xs font-mono text-muted-foreground">{formatDuration(callDurationSeconds)}</span>
                   </div>
+
+                  {/* Audio Recording Status & Player */}
+                  {recordedAudioUrl && (
+                    <div className="mb-3 p-3 bg-card border border-border/80 rounded-xl space-y-1.5 shadow-xs">
+                      <div className="text-xs font-bold text-foreground flex items-center justify-between">
+                        <span className="flex items-center gap-1.5 text-emerald-400">
+                          <Volume2 className="w-3.5 h-3.5" /> Call Recording Captured
+                        </span>
+                        <a 
+                          href={recordedAudioUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-[10px] text-muted-foreground hover:text-foreground flex items-center gap-1"
+                        >
+                          <ExternalLink className="w-3 h-3" /> View Audio
+                        </a>
+                      </div>
+                      <audio controls src={recordedAudioUrl} className="h-8 w-full" />
+                    </div>
+                  )}
+
+                  {isUploadingAudio && (
+                    <div className="mb-3 text-xs text-amber-400 flex items-center gap-2 bg-amber-500/10 p-2.5 rounded-lg border border-amber-500/20">
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-400" /> Saving call audio recording...
+                    </div>
+                  )}
                   <div className="flex flex-wrap gap-2 mb-3">
                     {["Meeting Booked", "Call Back Later", "Not Interested", "Left Voicemail"].map((disp) => {
                       const isActive = selectedDisposition === disp;

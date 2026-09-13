@@ -17,7 +17,6 @@ import {
   Edit3,
   FileSpreadsheet,
   Percent,
-  Sparkles,
   GraduationCap,
   Briefcase
 } from "lucide-react"

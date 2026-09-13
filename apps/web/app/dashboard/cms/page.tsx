@@ -108,6 +108,12 @@ export default function CMSDashboard() {
             Preview Site ↗
           </Link>
           <Link 
+            href="/dashboard/cms/calculator-settings"
+            className="flex-1 md:flex-none px-4 py-2.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold transition-all text-center border border-emerald-500/30 flex items-center justify-center gap-1.5"
+          >
+            Pricing Engine Settings
+          </Link>
+          <Link 
             href="/dashboard/cms/agency-editor"
             className="flex-1 md:flex-none px-6 py-2.5 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-xl text-xs font-bold transition-all shadow-[0_0_20px_rgba(168,85,247,0.4)] flex items-center justify-center gap-1.5"
           >

@@ -1733,8 +1733,8 @@ const LayoutCreativeOS = ({ cards, allCards, playSound, playDockSound, selectedI
                           {renderIcon(activeCard.iconName, activeCard.icon)}
                         </div>
                       </div>
-                      <h1 className="text-4xl md:text-6xl font-black mb-8 tracking-tighter leading-none">{activeCard.title}</h1>
-                      <p className="text-xl md:text-2xl text-white/50 max-w-prose mb-12 shrink-0 leading-relaxed font-light">{activeCard.subtitle}</p>
+                      <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight leading-tight">{activeCard.title}</h1>
+                      <p className="text-lg md:text-xl text-white/70 max-w-2xl mb-8 shrink-0 leading-relaxed font-normal">{activeCard.subtitle}</p>
                       
                       {!activeCard.isCostCalculator && activeCard.id !== 'cost_calculator' && (
                         <ServiceDetailsSection card={activeCard} />

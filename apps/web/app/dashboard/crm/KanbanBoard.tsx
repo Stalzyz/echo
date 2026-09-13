@@ -61,15 +61,15 @@ function LeadCard({
   const isStale = daysInactive >= 3 && lead.status !== 'WON' && lead.status !== 'LOST' && lead.status !== 'DROPPED';
   const isHighRisk = daysInactive >= 7 && lead.status !== 'WON' && lead.status !== 'LOST' && lead.status !== 'DROPPED';
 
-  // Calculate AI Intent / Action Badge
+  // Calculate Status Badge
   const getAiBadge = () => {
-    if (lead.status === 'WON') return { label: '🏆 Deal Won', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' };
-    if (lead.status === 'LOST' || lead.status === 'DROPPED') return { label: 'Closed', color: 'bg-white/5 text-white/40 border-white/10' };
-    if (lead.score >= 80 || lead.status === 'NEGOTIATION') return { label: '⚡ High Intent', color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' };
-    if (lead.status === 'PROPOSAL_SENT') return { label: '📄 Proposal Review', color: 'bg-blue-500/20 text-blue-300 border-blue-500/30' };
-    if (lead.status === 'QUALIFIED') return { label: '🎯 High Qualified', color: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30' };
-    if (isStale) return { label: '🟡 Follow-up Due', color: 'bg-amber-500/20 text-amber-300 border-amber-500/30' };
-    return { label: 'New Lead', color: 'bg-white/5 text-white/60 border-white/10' };
+    if (lead.status === 'WON') return { label: 'Deal Won', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' };
+    if (lead.status === 'LOST' || lead.status === 'DROPPED') return { label: 'Closed', color: 'bg-white/5 text-slate-400 border-white/10' };
+    if (lead.score >= 80 || lead.status === 'NEGOTIATION') return { label: 'High Intent', color: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' };
+    if (lead.status === 'PROPOSAL_SENT') return { label: 'Proposal Review', color: 'bg-blue-500/10 text-blue-300 border-blue-500/20' };
+    if (lead.status === 'QUALIFIED') return { label: 'Qualified', color: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20' };
+    if (isStale) return { label: 'Follow-up Due', color: 'bg-amber-500/10 text-amber-300 border-amber-500/20' };
+    return { label: 'New Lead', color: 'bg-white/5 text-slate-400 border-white/10' };
   };
 
   const aiBadge = getAiBadge();

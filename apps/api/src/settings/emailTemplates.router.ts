@@ -187,7 +187,7 @@ export const DEFAULT_TEMPLATES = [
     code: 'TASK_OVERDUE_ALERT',
     name: 'Task Overdue Alert',
     category: 'STAFF',
-    subject: '🚨 Overdue Alert: Task "{{taskTitle}}" is past due date',
+    subject: 'Overdue Alert: Task "{{taskTitle}}" is past due date',
     bodyHtml: `<p>Hello <strong>{{staffName}}</strong>,</p>
 <p>The following assigned task is currently overdue:</p>
 <p><strong>Task:</strong> {{taskTitle}}<br>
@@ -204,7 +204,7 @@ export const DEFAULT_TEMPLATES = [
     code: 'DAILY_STAFF_DIGEST',
     name: 'Daily Morning Staff Briefing',
     category: 'STAFF',
-    subject: '☀️ Daily Workspace Briefing for {{todayDate}}',
+    subject: 'Daily Workspace Briefing for {{todayDate}}',
     bodyHtml: `<p>Good morning <strong>{{staffName}}</strong>!</p>
 <p>Here is your daily task summary for today, {{todayDate}}:</p>
 <ul>
@@ -279,7 +279,7 @@ export const DEFAULT_TEMPLATES = [
     code: 'ATTENDANCE_WARNING_STUDENT',
     name: 'Student Low Attendance Alert',
     category: 'STUDENT',
-    subject: '⚠️ Academic Notice: Attendance Alert for {{courseName}} ({{attendancePercentage}}%)',
+    subject: 'Academic Notice: Attendance Alert for {{courseName}} ({{attendancePercentage}}%)',
     bodyHtml: `<p>Dear <strong>{{studentName}}</strong>,</p>
 <p>Your current attendance in <strong>{{courseName}}</strong> (Batch: {{batchName}}) is currently at <strong>{{attendancePercentage}}%</strong>, which is below the required 75% minimum threshold.</p>
 <p><strong>Classes Attended:</strong> {{attendedClasses}} / {{totalClasses}}</p>
@@ -427,7 +427,19 @@ export default async function emailTemplatesRouter(app: FastifyInstance) {
       attendanceLink: 'https://academy.grekam.in/dashboard/attendance',
     };
 
-    const rendered = renderEmailTemplate(template.bodyHtml, template.subject, sampleData);
+    const org = await app.prisma.organization.findFirst({
+      select: { primaryColor: true, secondaryColor: true, accentColor: true, companyName: true, name: true, logoUrl: true }
+    });
+
+    const orgTheme = org ? {
+      primaryColor: org.primaryColor || '#2563eb',
+      secondaryColor: org.secondaryColor || '#1e293b',
+      accentColor: org.accentColor || '#38bdf8',
+      companyName: org.companyName || org.name || 'Grekam Visuals',
+      logoUrl: org.logoUrl || undefined
+    } : undefined;
+
+    const rendered = renderEmailTemplate(template.bodyHtml, template.subject, sampleData, orgTheme);
 
     const targetRecipient = body.sendToEmail?.trim() || user.email;
     let sent = false;

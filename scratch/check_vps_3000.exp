@@ -1,0 +1,14 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh -o StrictHostKeyChecking=no -o PubkeyAuthentication=no root@72.61.231.187
+expect "assword:"
+send "Photoshop09@\r"
+expect "# "
+send "curl -s http://localhost:3000/agency | grep -o 'Odysseus Strings'\r"
+expect "# "
+send "curl -s http://localhost:3000/agency | grep -o 'Clash Display' | head -n 1\r"
+expect "# "
+send "curl -s http://localhost:3000/agency | grep -o 'Launchpad' | wc -l\r"
+expect "# "
+send "exit\r"
+expect eof

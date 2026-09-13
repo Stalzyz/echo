@@ -428,18 +428,18 @@ function parseTimeStringToDate(baseDate: Date, timeStr: string): Date {
                   <p>Hello <strong>${staffName}</strong>,</p>
                   <p>You have clocked out for today. Here is your daily summary report:</p>
                   
-                  <div style="background:#222;padding:16px;border-radius:8px;margin:16px 0;">
-                    <p style="margin:0 0 8px 0;">⏱️ <strong>Shift Duration Logged:</strong> ${hoursLoggedStr}</p>
-                    <p style="margin:0;">📅 <strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                  <div style="background:#18181b;padding:16px;border-radius:8px;margin:16px 0;border:1px solid rgba(255,255,255,0.08);">
+                    <p style="margin:0 0 8px 0;"><strong>Shift Duration Logged:</strong> ${hoursLoggedStr}</p>
+                    <p style="margin:0;"><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
                   </div>
 
-                  <h3 style="color:#10b981;margin-bottom:8px;">✅ Tasks Completed</h3>
+                  <h3 style="color:#10b981;font-size:14px;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">Completed Tasks</h3>
                   <ul style="padding-left:20px;color:#ccc;">${doneListHtml}</ul>
 
-                  <h3 style="color:#f59e0b;margin-bottom:8px;">⚠️ Pending Tasks (${pendingTasks.length})</h3>
+                  <h3 style="color:#f59e0b;font-size:14px;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">Pending Tasks (${pendingTasks.length})</h3>
                   <ul style="padding-left:20px;color:#ccc;">${pendingListHtml}</ul>
 
-                  <p style="color:#888;font-size:12px;margin-top:24px;border-top:1px solid #333;padding-top:12px;">Grekam OS Work Management System</p>
+                  <p style="color:#888;font-size:12px;margin-top:24px;border-top:1px solid #333;padding-top:12px;">Work Management System</p>
                 </div>
               `
             });
