@@ -2861,11 +2861,12 @@ const LayoutCreativeUniverse = ({ cards, playSound, onPreviewProject }: any) => 
                     {(activeCard.id === 'cost_calculator' || activeCard.isCostCalculator) && (
                        <div className="mt-6 w-full">
                           <div className="bg-[#090a0f] border border-white/10 rounded-[2rem] shadow-2xl w-full p-2 md:p-4 my-8 relative z-[999] overflow-hidden"><WebsiteCostCalculator /></div>
-                     {(card.id === 'launchpad' || card.isLaunchpad) && (
-                        <div className="w-full mt-8">
-                           <UniversalLaunchpad allCards={cards || []} onSelect={(c: any) => window.dispatchEvent(new CustomEvent('selectCard', { detail: c.id }))} />
-                        </div>
-                     )}
+                       </div>
+                    )}
+
+                    {(activeCard.id === 'launchpad' || activeCard.isLaunchpad) && (
+                       <div className="w-full mt-8">
+                          <UniversalLaunchpad allCards={cards || []} onSelect={(c: any) => window.dispatchEvent(new CustomEvent('selectCard', { detail: c.id }))} />
                        </div>
                     )}
 
