@@ -33,8 +33,10 @@ export type CardData = {
   isCrm?: boolean; 
   isHrm?: boolean; 
   isPricing?: boolean; 
+  isCostCalculator?: boolean;
   isServices?: boolean; 
   isLegal?: boolean; 
+  isLaunchpad?: boolean;
   // Cinematic Poster Control Fields
   posterTitle1?: string;
   posterTitle2?: string;
@@ -339,6 +341,16 @@ export const INITIAL_CARDS: CardData[] = [
     isPricing: true 
   },
   { 
+    id: "cost_calculator", 
+    category: "Cost Estimator", 
+    title: "Website Cost Calculator", 
+    subtitle: "Calculate your custom website development cost in 2–4 minutes with transparent live pricing in Indian Rupees (₹).", 
+    iconName: "Calculator", 
+    colorHex: "#10b981", 
+    cta: "Calculate Project Cost", 
+    isCostCalculator: true 
+  },
+  { 
     id: "crm", 
     category: "Systems", 
     title: "Bespoke CRM Operations", 
@@ -473,5 +485,15 @@ export const INITIAL_CARDS: CardData[] = [
     techStack: ["Legal Security", "Privacy Protection", "SLA Guarantees", "Full IP Transfer"],
     idealFor: "Clients, Business Partners, Investors & Legal Compliance",
     turnaround: "Instant 24/7 Access"
+  },
+  { 
+    id: "launchpad", 
+    category: "Ecosystem", 
+    title: "All Apps & Launchpad", 
+    subtitle: "Explore our complete digital ecosystem.", 
+    iconName: "LayoutGrid", 
+    colorHex: "#f3f4f6", 
+    cta: "Open Launchpad", 
+    isLaunchpad: true 
   },
 ]
