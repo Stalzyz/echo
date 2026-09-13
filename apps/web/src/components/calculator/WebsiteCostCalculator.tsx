@@ -49,7 +49,7 @@ export default function WebsiteCostCalculator({
   customConfig,
   onLeadSubmitted,
   className = '',
-  agencyPhone = '+919944747754',
+  agencyPhone = '+919789359407',
 }: WebsiteCostCalculatorProps) {
   const [config, setConfig] = useState<CalculatorConfig>(customConfig || DEFAULT_CALCULATOR_CONFIG);
   const [state, setState] = useState<CalculatorState>(INITIAL_CALCULATOR_STATE);
@@ -231,7 +231,7 @@ export default function WebsiteCostCalculator({
       {/* Header Consultation Banner */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 pb-6 mb-8 gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-semibold uppercase tracking-wider mb-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-sans font-semibold uppercase tracking-wider mb-2">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Interactive Website Cost Calculator</span>
           </div>
@@ -247,7 +247,7 @@ export default function WebsiteCostCalculator({
           <button
             type="button"
             onClick={handleRestart}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-mono text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-sans text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer"
             title="Reset all selections"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -258,7 +258,7 @@ export default function WebsiteCostCalculator({
 
       {/* Progress Step Indicator */}
       <div className="w-full mb-8">
-        <div className="flex items-center justify-between text-xs font-mono mb-2">
+        <div className="flex items-center justify-between text-xs font-sans mb-2">
           <span className="text-emerald-400 font-bold uppercase tracking-wider">
             Step {currentStepIndex + 1} of {steps.length} — {currentStep.label}
           </span>
@@ -287,7 +287,7 @@ export default function WebsiteCostCalculator({
                 key={s.id}
                 type="button"
                 onClick={() => setCurrentStepIndex(idx)}
-                className={`px-3 py-1.5 rounded-lg text-[11px] font-mono whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg text-[11px] font-sans whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
                   isCurrent
                     ? 'bg-white text-black font-bold shadow-md shadow-white/10'
                     : isCompleted
@@ -354,7 +354,7 @@ export default function WebsiteCostCalculator({
                           }`}
                         >
                           {w.badge && (
-                            <span className="absolute top-4 right-4 px-2 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase tracking-wider bg-emerald-400 text-black">
+                            <span className="absolute top-4 right-4 px-2 py-0.5 rounded-full text-[9px] font-sans font-bold uppercase tracking-wider bg-emerald-400 text-black">
                               {w.badge}
                             </span>
                           )}
@@ -365,14 +365,14 @@ export default function WebsiteCostCalculator({
                               </span>
                               <h4 className="font-bold text-base text-white">{w.title}</h4>
                             </div>
-                            <div className="text-xl font-black text-emerald-400 font-mono mb-3">
+                            <div className="text-xl font-black text-emerald-400 font-sans mb-3">
                               Starting ₹{w.startingPrice.toLocaleString('en-IN')}
                             </div>
                             <p className="text-xs text-zinc-400 leading-relaxed min-h-[36px]">
                               {w.description}
                             </p>
                           </div>
-                          <div className="text-[10px] font-mono text-zinc-500 mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
+                          <div className="text-[10px] font-sans text-zinc-500 mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
                             <span>Includes {w.includedPages} {w.includedPages === 1 ? 'Page' : 'Pages'}</span>
                             <span className="text-emerald-400/80 font-bold">{isSelected ? 'Selected' : 'Select'}</span>
                           </div>
@@ -407,7 +407,7 @@ export default function WebsiteCostCalculator({
                                 {p.description}
                               </p>
                             </div>
-                            <div className="text-[11px] font-mono text-emerald-400 font-bold">
+                            <div className="text-[11px] font-sans text-emerald-400 font-bold">
                               {p.ratePerPage === 0 ? 'Included in Base' : `+₹${p.ratePerPage.toLocaleString('en-IN')} / page`}
                             </div>
                           </div>
@@ -441,7 +441,7 @@ export default function WebsiteCostCalculator({
                           <div>
                             <div className="flex items-center justify-between mb-1">
                               <h4 className="font-bold text-base text-white">{d.title}</h4>
-                              <span className="text-xs font-mono font-bold text-emerald-400">
+                              <span className="text-xs font-sans font-bold text-emerald-400">
                                 {d.price === 0 ? 'Included (+₹0)' : `+₹${d.price.toLocaleString('en-IN')}`}
                               </span>
                             </div>
@@ -449,7 +449,7 @@ export default function WebsiteCostCalculator({
                               {d.description}
                             </p>
                           </div>
-                          <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-[10px] font-mono text-zinc-500">
+                          <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-[10px] font-sans text-zinc-500">
                             <span>{isSelected ? '✓ Active Selection' : 'Click to Select'}</span>
                           </div>
                         </div>
@@ -487,7 +487,7 @@ export default function WebsiteCostCalculator({
                                 <div className="text-xs font-bold text-white flex items-center gap-1.5">
                                   <span>{f.title}</span>
                                   {isIncludedInSite && (
-                                    <span className="text-[9px] font-mono px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 rounded font-semibold">
+                                    <span className="text-[9px] font-sans px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 rounded font-semibold">
                                       Package Included
                                     </span>
                                   )}
@@ -497,7 +497,7 @@ export default function WebsiteCostCalculator({
                                 </p>
                               </div>
                             </div>
-                            <div className="text-xs font-mono font-bold text-emerald-400 shrink-0">
+                            <div className="text-xs font-sans font-bold text-emerald-400 shrink-0">
                               {isIncludedInSite ? '₹0' : `+₹${f.price.toLocaleString('en-IN')}`}
                             </div>
                           </div>
@@ -536,7 +536,7 @@ export default function WebsiteCostCalculator({
                                 <div className="text-xs font-bold text-white flex items-center gap-1.5">
                                   <span>{ef.title}</span>
                                   {isBaseIncluded && (
-                                    <span className="text-[9px] font-mono px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 rounded font-semibold">
+                                    <span className="text-[9px] font-sans px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 rounded font-semibold">
                                       Store Core
                                     </span>
                                   )}
@@ -546,7 +546,7 @@ export default function WebsiteCostCalculator({
                                 </p>
                               </div>
                             </div>
-                            <div className="text-xs font-mono font-bold text-emerald-400 shrink-0">
+                            <div className="text-xs font-sans font-bold text-emerald-400 shrink-0">
                               {isBaseIncluded ? '₹0' : `+₹${ef.price.toLocaleString('en-IN')}`}
                             </div>
                           </div>
@@ -560,7 +560,7 @@ export default function WebsiteCostCalculator({
                 {currentStep.id === 'products' && (
                   <div className="space-y-6">
                     <div>
-                      <h4 className="text-xs font-mono uppercase tracking-widest text-zinc-400 font-bold mb-3">
+                      <h4 className="text-xs font-sans uppercase tracking-widest text-zinc-400 font-bold mb-3">
                         Catalogue Size
                       </h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -577,7 +577,7 @@ export default function WebsiteCostCalculator({
                               }`}
                             >
                               <div className="text-sm font-bold text-white mb-1">{pt.label}</div>
-                              <div className="text-xs font-mono text-emerald-400 font-bold">
+                              <div className="text-xs font-sans text-emerald-400 font-bold">
                                 {pt.price === 0 ? 'Included (+₹0)' : pt.isCustomQuote ? 'Custom Quote' : `+₹${pt.price.toLocaleString('en-IN')}`}
                               </div>
                             </div>
@@ -587,7 +587,7 @@ export default function WebsiteCostCalculator({
                     </div>
 
                     <div>
-                      <h4 className="text-xs font-mono uppercase tracking-widest text-zinc-400 font-bold mb-3">
+                      <h4 className="text-xs font-sans uppercase tracking-widest text-zinc-400 font-bold mb-3">
                         Do you need us to upload your products?
                       </h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -604,7 +604,7 @@ export default function WebsiteCostCalculator({
                               }`}
                             >
                               <div className="text-sm font-bold text-white mb-1">{ut.label}</div>
-                              <div className="text-xs font-mono text-emerald-400 font-bold">
+                              <div className="text-xs font-sans text-emerald-400 font-bold">
                                 {ut.price === 0 ? '₹0 (Self-Upload)' : ut.isCustomQuote ? 'Custom Quote' : `+₹${ut.price.toLocaleString('en-IN')}`}
                               </div>
                             </div>
@@ -646,7 +646,7 @@ export default function WebsiteCostCalculator({
                                 </p>
                               </div>
                             </div>
-                            <div className="text-xs font-mono font-bold text-emerald-400 shrink-0">
+                            <div className="text-xs font-sans font-bold text-emerald-400 shrink-0">
                               +₹{item.price.toLocaleString('en-IN')}
                             </div>
                           </div>
@@ -689,7 +689,7 @@ export default function WebsiteCostCalculator({
                           <div>
                             <div className="flex items-center justify-between mb-2">
                               <h4 className="font-bold text-base text-white">{s.title}</h4>
-                              <span className="text-xs font-mono font-bold text-emerald-400">
+                              <span className="text-xs font-sans font-bold text-emerald-400">
                                 {s.price === 0 ? 'Included (+₹0)' : `+₹${s.price.toLocaleString('en-IN')}${s.isMonthly ? '/mo' : ''}`}
                               </span>
                             </div>
@@ -702,7 +702,7 @@ export default function WebsiteCostCalculator({
                               ))}
                             </ul>
                           </div>
-                          <div className="text-[10px] font-mono text-zinc-500 pt-3 border-t border-white/5">
+                          <div className="text-[10px] font-sans text-zinc-500 pt-3 border-t border-white/5">
                             {s.isMonthly ? '★ Ongoing Monthly Service' : '✓ One-time Setup Included'}
                           </div>
                         </div>
@@ -715,7 +715,7 @@ export default function WebsiteCostCalculator({
                 {currentStep.id === 'content' && (
                   <div className="space-y-6">
                     <div>
-                      <h4 className="text-xs font-mono uppercase tracking-widest text-zinc-400 font-bold mb-3">
+                      <h4 className="text-xs font-sans uppercase tracking-widest text-zinc-400 font-bold mb-3">
                         Who will provide the website content?
                       </h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -733,7 +733,7 @@ export default function WebsiteCostCalculator({
                             >
                               <div className="text-sm font-bold text-white mb-1 flex items-center justify-between">
                                 <span>{c.title}</span>
-                                <span className="text-xs font-mono text-emerald-400 font-bold">
+                                <span className="text-xs font-sans text-emerald-400 font-bold">
                                   {c.price === 0 ? '₹0' : `+₹${c.price.toLocaleString('en-IN')}`}
                                 </span>
                               </div>
@@ -747,7 +747,7 @@ export default function WebsiteCostCalculator({
                     </div>
 
                     <div>
-                      <h4 className="text-xs font-mono uppercase tracking-widest text-zinc-400 font-bold mb-3">
+                      <h4 className="text-xs font-sans uppercase tracking-widest text-zinc-400 font-bold mb-3">
                         Who will provide photography & imagery?
                       </h4>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -764,7 +764,7 @@ export default function WebsiteCostCalculator({
                               }`}
                             >
                               <div className="text-sm font-bold text-white mb-1">{img.title}</div>
-                              <div className="text-xs font-mono text-emerald-400 font-bold">
+                              <div className="text-xs font-sans text-emerald-400 font-bold">
                                 {img.price === 0 && !img.isContactOnly ? '₹0' : img.isContactOnly ? 'Contact Us' : `+₹${img.price.toLocaleString('en-IN')}`}
                               </div>
                             </div>
@@ -793,7 +793,7 @@ export default function WebsiteCostCalculator({
                           <div>
                             <div className="flex items-center justify-between mb-2">
                               <h4 className="font-bold text-base text-white">{b.title}</h4>
-                              <span className="text-xs font-mono font-bold text-emerald-400">
+                              <span className="text-xs font-sans font-bold text-emerald-400">
                                 {b.price === 0 ? '₹0' : `+₹${b.price.toLocaleString('en-IN')}`}
                               </span>
                             </div>
@@ -811,7 +811,7 @@ export default function WebsiteCostCalculator({
                               </div>
                             )}
                           </div>
-                          <div className="text-[10px] font-mono text-zinc-500 pt-3 border-t border-white/5">
+                          <div className="text-[10px] font-sans text-zinc-500 pt-3 border-t border-white/5">
                             {isSelected ? '✓ Selected' : 'Choose Plan'}
                           </div>
                         </div>
@@ -838,7 +838,7 @@ export default function WebsiteCostCalculator({
                           <div>
                             <div className="flex items-center justify-between mb-2">
                               <h4 className="font-bold text-sm text-white">{m.title}</h4>
-                              <span className="text-xs font-mono font-bold text-emerald-400">
+                              <span className="text-xs font-sans font-bold text-emerald-400">
                                 {m.price === 0 ? '₹0' : m.isCustomQuote ? 'Custom' : `+₹${m.price.toLocaleString('en-IN')}`}
                               </span>
                             </div>
@@ -846,7 +846,7 @@ export default function WebsiteCostCalculator({
                               {m.description}
                             </p>
                           </div>
-                          <div className="text-[10px] font-mono text-zinc-500 pt-3 border-t border-white/5 mt-4">
+                          <div className="text-[10px] font-sans text-zinc-500 pt-3 border-t border-white/5 mt-4">
                             {isSelected ? '✓ Selected' : 'Select'}
                           </div>
                         </div>
@@ -873,7 +873,7 @@ export default function WebsiteCostCalculator({
                           <div>
                             <div className="flex items-center justify-between mb-2">
                               <h4 className="font-bold text-base text-white">{h.title}</h4>
-                              <span className="text-xs font-mono font-bold text-emerald-400">
+                              <span className="text-xs font-sans font-bold text-emerald-400">
                                 {h.price === 0 ? '₹0' : `+₹${h.price.toLocaleString('en-IN')}/year`}
                               </span>
                             </div>
@@ -881,7 +881,7 @@ export default function WebsiteCostCalculator({
                               {h.description}
                             </p>
                           </div>
-                          <div className="text-[10px] font-mono text-zinc-500 pt-3 border-t border-white/5 mt-4">
+                          <div className="text-[10px] font-sans text-zinc-500 pt-3 border-t border-white/5 mt-4">
                             ★ Billed Annually
                           </div>
                         </div>
@@ -907,7 +907,7 @@ export default function WebsiteCostCalculator({
                         >
                           <div>
                             <h4 className="font-bold text-sm text-white mb-1">{m.title}</h4>
-                            <div className="text-base font-black text-emerald-400 font-mono mb-3">
+                            <div className="text-base font-black text-emerald-400 font-sans mb-3">
                               {m.price === 0 ? '₹0 /mo' : `₹${m.price.toLocaleString('en-IN')} /mo`}
                             </div>
                             <ul className="space-y-1.5 my-3 border-t border-white/5 pt-3">
@@ -919,7 +919,7 @@ export default function WebsiteCostCalculator({
                               ))}
                             </ul>
                           </div>
-                          <div className="text-[10px] font-mono text-zinc-500 pt-3 border-t border-white/5 mt-2">
+                          <div className="text-[10px] font-sans text-zinc-500 pt-3 border-t border-white/5 mt-2">
                             {isSelected ? '✓ Active Plan' : 'Select'}
                           </div>
                         </div>
@@ -947,14 +947,14 @@ export default function WebsiteCostCalculator({
                             <div className="flex items-center justify-between mb-2">
                               <h4 className="font-bold text-base text-white">{d.title}</h4>
                             </div>
-                            <div className="text-xl font-black text-emerald-400 font-mono mb-2">
+                            <div className="text-xl font-black text-emerald-400 font-sans mb-2">
                               {d.multiplier === 1 ? 'Standard Price' : `+${Math.round((d.multiplier - 1) * 100)}% Sprint`}
                             </div>
                             <p className="text-xs text-zinc-400 leading-relaxed mt-2">
                               {d.description}
                             </p>
                           </div>
-                          <div className="text-[10px] font-mono text-zinc-500 pt-3 border-t border-white/5 mt-4">
+                          <div className="text-[10px] font-sans text-zinc-500 pt-3 border-t border-white/5 mt-4">
                             SLA subject to final scope review
                           </div>
                         </div>
@@ -970,7 +970,7 @@ export default function WebsiteCostCalculator({
                       <form onSubmit={handleSubmitLead} className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="text-xs font-mono text-zinc-400 block mb-1.5">Your Name *</label>
+                            <label className="text-xs font-sans text-zinc-400 block mb-1.5">Your Name *</label>
                             <input
                               required
                               type="text"
@@ -982,7 +982,7 @@ export default function WebsiteCostCalculator({
                           </div>
 
                           <div>
-                            <label className="text-xs font-mono text-zinc-400 block mb-1.5">Business / Brand Name *</label>
+                            <label className="text-xs font-sans text-zinc-400 block mb-1.5">Business / Brand Name *</label>
                             <input
                               required
                               type="text"
@@ -994,7 +994,7 @@ export default function WebsiteCostCalculator({
                           </div>
 
                           <div>
-                            <label className="text-xs font-mono text-zinc-400 block mb-1.5">Email Address</label>
+                            <label className="text-xs font-sans text-zinc-400 block mb-1.5">Email Address</label>
                             <input
                               type="email"
                               placeholder="rahul@example.com"
@@ -1005,7 +1005,7 @@ export default function WebsiteCostCalculator({
                           </div>
 
                           <div>
-                            <label className="text-xs font-mono text-zinc-400 block mb-1.5">WhatsApp / Phone Number *</label>
+                            <label className="text-xs font-sans text-zinc-400 block mb-1.5">WhatsApp / Phone Number *</label>
                             <input
                               required
                               type="tel"
@@ -1017,7 +1017,7 @@ export default function WebsiteCostCalculator({
                           </div>
 
                           <div>
-                            <label className="text-xs font-mono text-zinc-400 block mb-1.5">City / Location</label>
+                            <label className="text-xs font-sans text-zinc-400 block mb-1.5">City / Location</label>
                             <input
                               type="text"
                               placeholder="e.g. Bangalore / Chennai / Mumbai"
@@ -1028,7 +1028,7 @@ export default function WebsiteCostCalculator({
                           </div>
 
                           <div>
-                            <label className="text-xs font-mono text-zinc-400 block mb-1.5">Existing Website / Instagram (Optional)</label>
+                            <label className="text-xs font-sans text-zinc-400 block mb-1.5">Existing Website / Instagram (Optional)</label>
                             <input
                               type="text"
                               placeholder="https://..."
@@ -1040,7 +1040,7 @@ export default function WebsiteCostCalculator({
                         </div>
 
                         <div>
-                          <label className="text-xs font-mono text-zinc-400 block mb-1.5">Any specific operational requirements?</label>
+                          <label className="text-xs font-sans text-zinc-400 block mb-1.5">Any specific operational requirements?</label>
                           <textarea
                             rows={3}
                             placeholder="Tell us about any specific workflows, sample competitor sites you like, or expected launch timelines..."
@@ -1074,7 +1074,7 @@ export default function WebsiteCostCalculator({
                         <h3 className="text-2xl md:text-3xl font-black text-white mb-2">
                           Your Website Estimate Is Ready
                         </h3>
-                        <div className="text-3xl md:text-4xl font-black text-emerald-400 font-mono my-3">
+                        <div className="text-3xl md:text-4xl font-black text-emerald-400 font-sans my-3">
                           {estimate.isCustomProject
                             ? 'Starting from ₹2,50,000'
                             : `Estimated: ₹${estimate.oneTimeTotal.toLocaleString('en-IN')}`}
@@ -1114,7 +1114,7 @@ export default function WebsiteCostCalculator({
                   type="button"
                   disabled={currentStepIndex === 0}
                   onClick={handlePrev}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-sans font-bold uppercase tracking-wider transition-all cursor-pointer ${
                     currentStepIndex === 0
                       ? 'opacity-30 cursor-not-allowed text-zinc-500'
                       : 'bg-white/10 text-white hover:bg-white/20'
@@ -1124,7 +1124,7 @@ export default function WebsiteCostCalculator({
                   <span>Back</span>
                 </button>
 
-                <div className="text-xs text-zinc-500 font-mono hidden sm:block">
+                <div className="text-xs text-zinc-500 font-sans hidden sm:block">
                   Step {currentStepIndex + 1} of {steps.length}
                 </div>
 
@@ -1138,7 +1138,7 @@ export default function WebsiteCostCalculator({
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 ) : (
-                  <span className="text-xs font-mono text-emerald-400 font-bold">
+                  <span className="text-xs font-sans text-emerald-400 font-bold">
                     ✓ Final Step
                   </span>
                 )}
@@ -1159,7 +1159,7 @@ export default function WebsiteCostCalculator({
           <div className="bg-zinc-950/80 border border-white/15 rounded-3xl p-6 backdrop-blur-2xl shadow-2xl space-y-6">
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-400 font-bold block">
+                <span className="text-[10px] font-sans uppercase tracking-widest text-emerald-400 font-bold block">
                   LIVE ESTIMATE
                 </span>
                 <h3 className="text-lg font-bold text-white">Project Scope</h3>
@@ -1167,7 +1167,7 @@ export default function WebsiteCostCalculator({
 
               {/* GST Toggle Switch */}
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-mono text-zinc-400">GST (18%)</span>
+                <span className="text-[11px] font-sans text-zinc-400">GST (18%)</span>
                 <button
                   type="button"
                   onClick={() => setState(prev => ({ ...prev, includeGst: !prev.includeGst }))}
@@ -1211,13 +1211,13 @@ export default function WebsiteCostCalculator({
                     {state.selectedFeatures.slice(0, 5).map(fId => {
                       const f = config.features.find(x => x.id === fId);
                       return (
-                        <span key={fId} className="px-2 py-0.5 rounded bg-white/5 text-[10px] text-zinc-300 font-mono">
+                        <span key={fId} className="px-2 py-0.5 rounded bg-white/5 text-[10px] text-zinc-300 font-sans">
                           {f?.title || fId}
                         </span>
                       );
                     })}
                     {state.selectedFeatures.length > 5 && (
-                      <span className="px-2 py-0.5 rounded bg-white/5 text-[10px] text-emerald-400 font-mono font-bold">
+                      <span className="px-2 py-0.5 rounded bg-white/5 text-[10px] text-emerald-400 font-sans font-bold">
                         +{state.selectedFeatures.length - 5} more
                       </span>
                     )}
@@ -1229,11 +1229,11 @@ export default function WebsiteCostCalculator({
             {/* Recommended Package Card */}
             <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-400 font-bold">
+                <span className="text-[10px] font-sans uppercase tracking-widest text-emerald-400 font-bold">
                   [ BEST FOR YOU ]
                 </span>
                 {estimate.recommendedPackage.badge && (
-                  <span className="text-[9px] font-mono px-2 py-0.5 bg-emerald-400 text-black font-bold rounded-full">
+                  <span className="text-[9px] font-sans px-2 py-0.5 bg-emerald-400 text-black font-bold rounded-full">
                     {estimate.recommendedPackage.badge}
                   </span>
                 )}
@@ -1261,10 +1261,10 @@ export default function WebsiteCostCalculator({
 
             {/* One-Time Development Price Box */}
             <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 text-center relative overflow-hidden">
-              <span className="text-[11px] font-mono uppercase tracking-widest text-zinc-400 block mb-1">
+              <span className="text-[11px] font-sans uppercase tracking-widest text-zinc-400 block mb-1">
                 Estimated Project Cost
               </span>
-              <div className="text-3xl font-black text-white font-mono tracking-tight">
+              <div className="text-3xl font-black text-white font-sans tracking-tight">
                 {estimate.isCustomProject ? (
                   <span className="text-2xl text-emerald-400">Starting from ₹2,50,000</span>
                 ) : (
@@ -1279,13 +1279,13 @@ export default function WebsiteCostCalculator({
             {/* Optional Recurring Services Box */}
             {(estimate.yearlyHosting > 0 || estimate.monthlyMaintenance > 0 || estimate.monthlySeo > 0) && (
               <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 font-bold block mb-1">
+                <span className="text-[10px] font-sans uppercase tracking-widest text-zinc-400 font-bold block mb-1">
                   OPTIONAL RECURRING SERVICES
                 </span>
                 {estimate.yearlyHosting > 0 && (
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-zinc-400">Hosting & Domain:</span>
-                    <span className="font-mono font-bold text-zinc-200">
+                    <span className="font-sans font-bold text-zinc-200">
                       ₹{estimate.yearlyHosting.toLocaleString('en-IN')}/year
                     </span>
                   </div>
@@ -1293,7 +1293,7 @@ export default function WebsiteCostCalculator({
                 {estimate.monthlyMaintenance > 0 && (
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-zinc-400">Maintenance:</span>
-                    <span className="font-mono font-bold text-zinc-200">
+                    <span className="font-sans font-bold text-zinc-200">
                       ₹{estimate.monthlyMaintenance.toLocaleString('en-IN')}/month
                     </span>
                   </div>
@@ -1301,7 +1301,7 @@ export default function WebsiteCostCalculator({
                 {estimate.monthlySeo > 0 && (
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-zinc-400">SEO Retainer:</span>
-                    <span className="font-mono font-bold text-zinc-200">
+                    <span className="font-sans font-bold text-zinc-200">
                       ₹{estimate.monthlySeo.toLocaleString('en-IN')}/month
                     </span>
                   </div>
@@ -1326,10 +1326,10 @@ export default function WebsiteCostCalculator({
       {/* Mobile Sticky Bottom Estimate Bar */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 p-4 bg-zinc-950/95 border-t border-white/20 backdrop-blur-2xl shadow-2xl flex items-center justify-between">
         <div>
-          <span className="text-[9px] font-mono text-zinc-400 uppercase tracking-wider block">
+          <span className="text-[9px] font-sans text-zinc-400 uppercase tracking-wider block">
             Estimated Cost {state.includeGst ? '(Incl. GST)' : ''}
           </span>
-          <div className="text-xl font-black text-emerald-400 font-mono">
+          <div className="text-xl font-black text-emerald-400 font-sans">
             {estimate.isCustomProject ? '₹2,50,000+' : `₹${estimate.oneTimeTotal.toLocaleString('en-IN')}`}
           </div>
         </div>
@@ -1338,7 +1338,7 @@ export default function WebsiteCostCalculator({
           <button
             type="button"
             onClick={() => setShowMobileSummary(true)}
-            className="px-3 py-2 rounded-xl bg-white/10 text-white font-mono text-xs font-bold uppercase border border-white/10"
+            className="px-3 py-2 rounded-xl bg-white/10 text-white font-sans text-xs font-bold uppercase border border-white/10"
           >
             Breakdown
           </button>
@@ -1385,7 +1385,7 @@ export default function WebsiteCostCalculator({
 
               {/* GST Toggle Switch */}
               <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
-                <span className="text-xs font-mono text-zinc-300">Include GST (18%) in display:</span>
+                <span className="text-xs font-sans text-zinc-300">Include GST (18%) in display:</span>
                 <button
                   type="button"
                   onClick={() => setState(prev => ({ ...prev, includeGst: !prev.includeGst }))}
@@ -1406,7 +1406,7 @@ export default function WebsiteCostCalculator({
                 {estimate.breakdown.map((item, idx) => (
                   <div key={idx} className="flex items-center justify-between text-xs py-1 border-b border-white/5">
                     <span className="text-zinc-400">{item.category}: {item.title}</span>
-                    <span className="font-mono font-bold text-zinc-200">
+                    <span className="font-sans font-bold text-zinc-200">
                       {item.isIncluded ? 'Included' : item.isCustomQuote ? 'Custom' : `₹${item.cost.toLocaleString('en-IN')}`}
                     </span>
                   </div>
@@ -1415,7 +1415,7 @@ export default function WebsiteCostCalculator({
 
               <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-center my-2">
                 <span className="text-xs text-zinc-400 block mb-1">Total One-Time Development</span>
-                <div className="text-2xl font-black text-emerald-400 font-mono">
+                <div className="text-2xl font-black text-emerald-400 font-sans">
                   {estimate.isCustomProject ? 'Starting from ₹2,50,000' : `₹${estimate.oneTimeTotal.toLocaleString('en-IN')}`}
                 </div>
               </div>
