@@ -1509,6 +1509,15 @@ const UniversalLaunchpad = ({ allCards, onSelect }: any) => {
 const LayoutCreativeOS = ({ cards, allCards, playSound, playDockSound, selectedInstrument, setSelectedInstrument, INSTRUMENTS, cmsData, onPreviewProject, volume, setVolume, isMuted, setIsMuted }: any) => {
   const [activeCard, setActiveCard] = useState<CardData | null>(null)
   const mouseX = useMotionValue(Infinity)
+
+  const handleCardClick = (card: CardData) => {
+    if (card.isCostCalculator || card.id === 'cost_calculator') {
+      window.location.href = '/agency/calculator'
+      return
+    }
+    playSound()
+    setActiveCard(card)
+  }
   const [isMobile, setIsMobile] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -1576,7 +1585,7 @@ const LayoutCreativeOS = ({ cards, allCards, playSound, playDockSound, selectedI
                  mouseX={mouseX} 
                  isMobile={isMobile} 
                  playSound={() => playDockSound(index)} 
-                 onClick={() => setActiveCard(card)} 
+                 onClick={() => handleCardClick(card)} 
                />
              ))}
            </motion.div>
@@ -2778,6 +2787,15 @@ const LayoutSwissPrecision = ({ cards, onPreviewProject }: any) => {
 const LayoutCreativeUniverse = ({ cards, playSound, onPreviewProject }: any) => {
   const [activeCard, setActiveCard] = useState<CardData | null>(null)
   const [isMobile, setIsMobile] = useState(false)
+
+  const handleCardClick = (card: CardData) => {
+    if (card.isCostCalculator || card.id === 'cost_calculator') {
+      window.location.href = '/agency/calculator'
+      return
+    }
+    playSound()
+    setActiveCard(card)
+  }
   
   useEffect(() => { 
     const checkMobile = () => setIsMobile(window.innerWidth < 768)
@@ -2813,7 +2831,7 @@ const LayoutCreativeUniverse = ({ cards, playSound, onPreviewProject }: any) => 
             animate={{ x, y, opacity: activeCard && activeCard.id !== card.id ? 0.2 : 1 }} 
             transition={{ duration: 2, type: "spring" }}
             className="absolute w-16 h-16 md:w-24 md:h-24 group cursor-pointer z-20"
-            onClick={() => { playSound(); setActiveCard(card); }}
+            onClick={() => handleCardClick(card)}
           >
             <div className={`w-full h-full rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.1)] transition-transform ${activeCard?.id === card.id ? 'scale-125 md:scale-150 ring-4 ring-white/50 bg-white/20' : 'group-hover:scale-125'}`} style={{ color: card.colorHex }}>
                {renderIcon(card.iconName, card.icon)}
