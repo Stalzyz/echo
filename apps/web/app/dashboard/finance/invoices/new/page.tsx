@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { fetchApi, useApi } from "@/lib/useApi";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Plus, Trash2, Save, Calculator, Users, Eye, Building2, BookmarkPlus, Zap } from "lucide-react";
+import { ChevronLeft, Plus, Trash2, Save, Calculator, User, Users, Eye, Building2, BookmarkPlus, Zap } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useCurrency } from "@/hooks/useCurrency"
