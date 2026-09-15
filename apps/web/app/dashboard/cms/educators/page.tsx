@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { GraduationCap, ShieldCheck, ShieldAlert, Clock, UserCheck, XCircle } from "lucide-react"
+import { Clock, GraduationCap, ShieldAlert, ShieldCheck, UserCheck, XCircle } from "lucide-react"
 import Image from "next/image"
 
 export default function EducatorsAdminPage() {

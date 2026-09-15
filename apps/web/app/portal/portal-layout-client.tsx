@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react"
 import Link from "next/link"
-import { LogOut, Bell, Settings } from "lucide-react"
+import { Bell, LogOut, Settings } from "lucide-react"
 import { usePathname } from "next/navigation"
 
 export default function PortalLayoutClient({ children }: { children: React.ReactNode }) {

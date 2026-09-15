@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Plus, Edit } from "lucide-react"
+import { Edit, Plus } from "lucide-react"
 
 export default async function CoursesPage() {
   const lmsCourses = await prisma.lMSCourse.findMany({

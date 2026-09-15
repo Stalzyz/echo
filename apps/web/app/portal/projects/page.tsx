@@ -1,7 +1,7 @@
 "use client"
 
 import { useApi } from "@/lib/useApi"
-import { Briefcase, Loader2, ArrowRight } from "lucide-react"
+import { ArrowRight, Briefcase, Loader2 } from "lucide-react"
 import Link from "next/link"
 
 export default function PortalProjectsPage() {

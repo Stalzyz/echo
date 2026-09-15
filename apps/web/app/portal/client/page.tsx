@@ -1,6 +1,6 @@
 "use client"
 
-import { Briefcase, CreditCard, LifeBuoy, CheckCircle2, Clock, Loader2, ArrowRight } from "lucide-react"
+import { ArrowRight, Briefcase, CheckCircle2, Clock, CreditCard, LifeBuoy, Loader2 } from "lucide-react"
 import { useApi } from "@/lib/useApi"
 import { useSession } from "next-auth/react"
 import Link from "next/link"

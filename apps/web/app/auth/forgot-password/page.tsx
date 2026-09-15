@@ -2,7 +2,7 @@
 
 import { useActionState, useState, useEffect } from "react"
 import { useFormStatus } from "react-dom"
-import { AlertCircle, CheckCircle2, Mail, ArrowRight, ShieldAlert, ArrowLeft } from "lucide-react"
+import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, Mail, ShieldAlert } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 

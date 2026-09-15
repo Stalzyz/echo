@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
-import { LayoutList, KanbanSquare, CheckCircle, FileText, Settings, Plus, ChevronLeft, Loader2, GripVertical, CreditCard, Trash2, Send } from "lucide-react"
+import { CheckCircle, ChevronLeft, CreditCard, FileText, GripVertical, KanbanSquare, LayoutList, Loader2, Plus, Send, Settings, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { useApi, fetchApi } from "@/lib/useApi"
 import { FinanceTab } from "./FinanceTab"

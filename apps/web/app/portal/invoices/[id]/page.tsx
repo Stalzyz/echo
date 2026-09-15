@@ -1,7 +1,7 @@
 "use client"
 
 import { useParams } from "next/navigation"
-import { ChevronLeft, Download, Loader2, CreditCard, ShieldCheck, CheckCircle2, AlertCircle, X } from "lucide-react"
+import { AlertCircle, CheckCircle2, ChevronLeft, CreditCard, Download, Loader2, ShieldCheck } from "lucide-react"
 import Link from "next/link"
 import { useOrganization } from "@/context/OrganizationContext"
 import { useApi, fetchApi } from "@/lib/useApi"

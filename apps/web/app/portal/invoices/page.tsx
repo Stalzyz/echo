@@ -1,7 +1,7 @@
 "use client"
 
 import { useApi, fetchApi } from "@/lib/useApi"
-import { CreditCard, Download, FileText, Loader2, X, CheckCircle2, ShieldCheck, AlertCircle } from "lucide-react"
+import { AlertCircle, CheckCircle2, CreditCard, Download, FileText, Loader2, ShieldCheck } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import Link from "next/link"

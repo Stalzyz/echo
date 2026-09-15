@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/layout/sidebar"
 import { SessionProvider } from "next-auth/react"
 import { CommandPalette } from "@/components/ui/CommandPalette"
 import { TelemetryNotifier } from "@/components/TelemetryNotifier"
+import { GlobalClockWidget } from "@/components/hr/GlobalClockWidget"
 import { WebSocketProvider } from "@/components/providers/WebSocketProvider"
 
 import { CurrentUserProvider } from "@/context/CurrentUserContext"
@@ -39,6 +40,7 @@ export default async function DashboardLayout({
                 {children}
               </main>
               <div className="print:hidden">
+                <GlobalClockWidget />
                 <CommandPalette />
                 <TelemetryNotifier />
               </div>

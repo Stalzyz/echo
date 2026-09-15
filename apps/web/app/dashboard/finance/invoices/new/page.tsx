@@ -10,7 +10,7 @@ import { useCurrency } from "@/hooks/useCurrency"
 import { useOrganization } from "@/context/OrganizationContext"
 import { Modal } from "@/components/ui/modal"
 import { numberToWordsIN } from "@/lib/utils"
-import { Phone, Mail, Globe } from "lucide-react";
+import { Globe, Mail, Phone } from "lucide-react";
 import { toast } from "sonner";
 
 export default function NewInvoicePage() {

@@ -1,7 +1,7 @@
 "use client"
 
 import { useApi } from "@/lib/useApi"
-import { FileText, Loader2, ArrowRight, Clock, CheckCircle2 } from "lucide-react"
+import { ArrowRight, CheckCircle2, Clock, FileText, Loader2 } from "lucide-react"
 import Link from "next/link"
 
 function stripHtml(html: string): string {

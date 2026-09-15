@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Search, Filter, Send, Paperclip, MoreVertical, CircleDot, AlertCircle, Clock, CheckCircle2, Plus, X } from "lucide-react"
+import { AlertCircle, CheckCircle2, CircleDot, Clock, Filter, MessageSquare, MoreVertical, Paperclip, Plus, Search, Send } from "lucide-react"
 import { useApi, fetchApi } from "@/lib/useApi"
 import { format } from "date-fns"
 import { toast } from "sonner"
@@ -315,24 +315,5 @@ export default function SupportPage() {
         </div>
       )}
     </div>
-  )
-}
-
-function MessageSquare(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-    </svg>
   )
 }

@@ -2,20 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import {
-  Calculator,
-  Save,
-  RotateCcw,
-  CheckCircle2,
-  Sliders,
-  IndianRupee,
-  Layers,
-  ArrowLeft,
-  Percent,
-  AlertCircle,
-  ExternalLink,
-  ShieldCheck
-} from 'lucide-react';
+import { AlertCircle, ArrowLeft, Calculator, CheckCircle2, ExternalLink, IndianRupee, Layers, Percent, RotateCcw, Save, ShieldCheck, Sliders } from "lucide-react";
 import {
   CalculatorConfig,
   DEFAULT_CALCULATOR_CONFIG

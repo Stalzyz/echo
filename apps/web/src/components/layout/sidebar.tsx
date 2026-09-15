@@ -7,10 +7,7 @@ import { getNavItemsByRole, NavItem, Role } from "@/config/navigation"
 import { useOrganization } from "@/context/OrganizationContext"
 import { cn } from "@/lib/utils"
 import { useSession, signOut } from "next-auth/react"
-import { 
-  ChevronDown, ChevronRight, Menu, X, ShieldCheck, Moon, Sun, 
-  LayoutDashboard, BookOpen, Briefcase, MessageSquare, Layers, DollarSign, Bell, LogOut, User
-} from "lucide-react"
+import { Bell, BookOpen, Briefcase, ChevronDown, ChevronRight, DollarSign, Layers, LayoutDashboard, LogOut, Menu, MessageSquare, Moon, ShieldCheck, Sun, User } from "lucide-react"
 import dynamic from "next/dynamic"
 import Image from "next/image"
 

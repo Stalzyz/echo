@@ -4,12 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useSession, signOut } from "next-auth/react"
 import { useApi, fetchApi } from "@/lib/useApi"
-import {
-  Zap, LogOut, Briefcase, FileText, CheckCircle,
-  Clock, Download, MessageSquare, Bell, ChevronRight,
-  Package, Star, AlertCircle, ExternalLink, GraduationCap, PlayCircle,
-  CreditCard, Landmark, Eye, LifeBuoy, X, Loader2, Calendar, UploadCloud, Layers, Send
-} from "lucide-react"
+import { AlertCircle, Bell, Briefcase, Calendar, CheckCircle, ChevronRight, Clock, CreditCard, Download, ExternalLink, Eye, File, FileText, GraduationCap, Landmark, Layers, LifeBuoy, Loader2, LogOut, MessageSquare, Package, PlayCircle, Send, Star, UploadCloud, Zap } from "lucide-react"
 import { toast } from "sonner"
 import { useOrganization } from "@/context/OrganizationContext"
 import { AssetReviewer } from "@/components/portal/AssetReviewer"

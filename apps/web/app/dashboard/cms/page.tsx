@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Globe, LayoutTemplate, ArrowRight } from "lucide-react"
+import { ArrowRight, Globe, LayoutTemplate } from "lucide-react"
 
 export default function CMSDashboard() {
   const [pages, setPages] = useState<any[]>([])

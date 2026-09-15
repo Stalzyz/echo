@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { LayoutDashboard, Presentation, FolderLock, Receipt, LifeBuoy, MessageSquare, LogOut, Bell } from "lucide-react"
+import { Bell, FolderLock, LayoutDashboard, LifeBuoy, LogOut, MessageSquare, Presentation, Receipt } from "lucide-react"
 
 export default function WorkspaceLayout({
   children,

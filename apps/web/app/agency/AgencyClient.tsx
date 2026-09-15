@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from "react"
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue, animate } from "framer-motion"
 import Link from "next/link"
-import { X, Zap, Code2, Rocket, Palette, Fingerprint, Users, Volume2, VolumeX, TriangleAlert, Mail, Phone, MapPin, Send, ChevronDown, Orbit, CheckCircle2, CalendarDays, IndianRupee, Layers, Check, Monitor, Tablet, Smartphone, ExternalLink, RotateCw, Lock, Copy, Sparkles, Eye, Globe, GraduationCap, ArrowRight, Scale, Shield, CreditCard, RefreshCw, Truck, Pencil, Trash2, Wrench, ShoppingBag, Megaphone, MessageSquare, LayoutGrid, Briefcase, ShieldCheck, FileText, Waves, Sliders, Music, Radio, Disc, Calculator } from "lucide-react"
+import { ArrowRight, Briefcase, Calculator, CalendarDays, Check, CheckCircle2, ChevronDown, Code2, Copy, CreditCard, Disc, ExternalLink, Eye, FileText, Fingerprint, Globe, GraduationCap, IndianRupee, Layers, LayoutGrid, Lock, Mail, MapPin, Megaphone, MessageSquare, Monitor, Music, Orbit, Palette, Pencil, Phone, Radio, RefreshCw, Rocket, RotateCw, Scale, Send, Shield, ShieldCheck, ShoppingBag, Sliders, Smartphone, Sparkles, Tablet, Trash2, TriangleAlert, Truck, Users, Volume2, VolumeX, Waves, Wrench, Zap } from "lucide-react"
 import { useOrganization } from "@/context/OrganizationContext"
 import WebsiteCostCalculator from "@/components/calculator/WebsiteCostCalculator"
 import { CardData, ProjectData, PosterCardItem, INITIAL_CARDS, CINEMATIC_POSTERS_DATA, BRANDING_PROJECTS, DUMMY_PROJECTS } from "./agency-data"

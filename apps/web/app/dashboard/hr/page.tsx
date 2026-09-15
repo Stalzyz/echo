@@ -7,7 +7,7 @@ import { useApi, fetchApi } from "@/lib/useApi"
 import { toast } from "sonner"
 import { SlideOver } from "@/components/SlideOver"
 import { EmployeeActivity } from "./EmployeeActivity"
-import { CheckCircle2 } from "lucide-react"
+import { CheckCircle2, File } from "lucide-react"
 import { ClockWidget } from "@/components/hr/ClockWidget"
 
 const DEPARTMENTS = ["All Modules", "Design", "Development", "Management", "Marketing", "Finance"]

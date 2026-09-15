@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { signIn, getSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { AlertCircle, Fingerprint, Lock, Mail, ArrowRight, ShieldCheck } from "lucide-react"
+import { AlertCircle, ArrowRight, Fingerprint, Lock, Mail, ShieldCheck } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import { useOrganization } from "@/context/OrganizationContext"

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, Sparkles } from "lucide-react";
 import WebsiteCostCalculator from '@/components/calculator/WebsiteCostCalculator';
 
 export const dynamic = 'force-dynamic';

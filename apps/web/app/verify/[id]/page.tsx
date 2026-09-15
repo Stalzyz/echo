@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { ShieldCheck, Award, Calendar, User, Search, CheckCircle2, AlertTriangle } from "lucide-react"
+import { AlertTriangle, Award, Calendar, CheckCircle2, Search, ShieldCheck, User } from "lucide-react"
 import { useOrganization } from "@/context/OrganizationContext"
 
 export default function CertificateVerificationPage() {

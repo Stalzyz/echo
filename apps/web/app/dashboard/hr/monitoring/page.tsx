@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Monitor, Keyboard, Activity, Camera, Play, Pause, RefreshCw, Zap, Trophy, AlertTriangle, CheckCircle2, X } from "lucide-react"
+import { Activity, AlertTriangle, Camera, CheckCircle2, FileText, Keyboard, Monitor, Pause, Play, RefreshCw, Trophy, Zap } from "lucide-react"
 import { useApi, fetchApi } from "@/lib/useApi"
 import Image from "next/image"
 import { format } from "date-fns"
