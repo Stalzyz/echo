@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { AlertCircle, CheckCircle2, CircleDot, Clock, Filter, MessageSquare, MoreVertical, Paperclip, Plus, Search, Send } from "lucide-react"
+import { AlertCircle, CheckCircle2, CircleDot, Clock, Filter, MessageSquare, MoreVertical, Paperclip, Plus, Search, Send, X } from "lucide-react"
 import { useApi, fetchApi } from "@/lib/useApi"
 import { format } from "date-fns"
 import { toast } from "sonner"

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ArrowLeft, ChevronRight, CreditCard, Fingerprint, Mail, Pencil, Phone, RefreshCw, Scale, Shield, Trash2, Truck, Wrench } from "lucide-react"
+import { ArrowLeft, ChevronRight, CreditCard, Fingerprint, Icon, Mail, Pencil, Phone, RefreshCw, Scale, Shield, Trash2, Truck, Wrench } from "lucide-react"
 
 const POLICY_LINKS = [
   { href: "/legal/terms", label: "Terms & Conditions", icon: Scale },

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { AlertCircle, Bell, CheckCheck, CheckCircle2, Clock, CreditCard, ExternalLink, Info, Loader2, MessageSquare, Trophy } from "lucide-react"
+import { AlertCircle, Bell, CheckCheck, CheckCircle2, Clock, CreditCard, ExternalLink, Info, Loader2, MessageSquare, Trophy, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useCurrentUser } from "@/context/CurrentUserContext"
 import Link from "next/link"

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Bot, Building2, ChevronLeft, FileText, Globe, Loader2, Plus, Save, Send, Target, Trash2, User, Zap } from "lucide-react"
+import { Bot, Building2, ChevronLeft, FileText, Globe, Loader2, Plus, Save, Send, Target, Trash2, User, X, Zap } from "lucide-react"
 import Link from "next/link"
 import { fetchApi, useApi } from "@/lib/useApi"
 import { toast } from "sonner"

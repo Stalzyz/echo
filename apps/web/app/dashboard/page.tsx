@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { Activity, AlertCircle, ArrowRight, BookOpen, Briefcase, Calendar, CheckCircle, Clock, CreditCard, DollarSign, Download, ExternalLink, Eye, File, FileText, GraduationCap, Image, ImageIcon, Layers, Loader2, MessageSquare, PlayCircle, TrendingUp, UploadCloud, Users } from "lucide-react"
+import { Activity, AlertCircle, ArrowRight, BookOpen, Briefcase, Calendar, CheckCircle, Clock, CreditCard, DollarSign, Download, ExternalLink, Eye, File, FileText, GraduationCap, Image, ImageIcon, Layers, Loader2, MessageSquare, PlayCircle, TrendingUp, UploadCloud, Users, X } from "lucide-react"
 import { useApi, fetchApi } from "@/lib/useApi"
 import { useOrganization } from "@/context/OrganizationContext"
 import { useCurrency } from "@/hooks/useCurrency"

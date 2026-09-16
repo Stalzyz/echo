@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useApi, fetchApi } from "@/lib/useApi"
-import { ArrowUpRight, Calendar, CheckCircle2, ChevronLeft, Clock, Download, File, FileCheck, FileText, Layers, Loader2, MessageSquare, Send, UploadCloud } from "lucide-react"
+import { ArrowUpRight, Calendar, CheckCircle2, ChevronLeft, Clock, Download, File, FileCheck, FileText, Layers, Loader2, MessageSquare, Send, UploadCloud, X } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 import { format } from "date-fns"
