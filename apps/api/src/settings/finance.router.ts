@@ -19,6 +19,7 @@ const UpdateFinanceSettingsSchema = z.object({
   vatNumber:       z.string().nullable().optional().or(z.literal('')),
   fiscalYearStart: z.number().min(1).max(12).optional(),
   invoicePrefix:   z.string().nullable().optional().or(z.literal('')),
+  invoiceNextNumber: z.number().min(1).optional(),
 });
 
 export default async function financeSettingsRouter(app: FastifyInstance) {

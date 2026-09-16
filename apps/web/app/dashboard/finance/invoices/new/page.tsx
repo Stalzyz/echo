@@ -31,7 +31,7 @@ export default function NewInvoicePage() {
   const [isSavingCompany, setIsSavingCompany] = useState(false)
   
   const [invoice, setInvoice] = useState({
-    invoiceNumber: `INV-${new Date().getTime().toString().slice(-6)}`,
+    invoiceNumber: "",
     companyName: "",
     contactName: "",
     clientEmail: "",
@@ -47,25 +47,20 @@ export default function NewInvoicePage() {
     notes: "",
   });
 
+  useEffect(() => {
+    fetchApi(`/finance/invoices/next-number?type=${docType}`)
+      .then((res: any) => {
+        if (res?.invoiceNumber) {
+          setInvoice(prev => ({ ...prev, invoiceNumber: res.invoiceNumber }));
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch next invoice number:", err);
+      });
+  }, [docType]);
+
   const handleDocTypeChange = (type: "TAX" | "PROFORMA") => {
     setDocType(type);
-    setInvoice(prev => {
-      let currentNum = prev.invoiceNumber;
-      if (type === "PROFORMA") {
-        if (currentNum.startsWith("INV-")) {
-          currentNum = currentNum.replace(/^INV-/, "PI-");
-        } else if (!currentNum.startsWith("PI-")) {
-          currentNum = `PI-${currentNum}`;
-        }
-      } else {
-        if (currentNum.startsWith("PI-")) {
-          currentNum = currentNum.replace(/^PI-/, "INV-");
-        } else if (!currentNum.startsWith("INV-")) {
-          currentNum = `INV-${currentNum}`;
-        }
-      }
-      return { ...prev, invoiceNumber: currentNum };
-    });
   };
 
   const [items, setItems] = useState([

@@ -161,7 +161,7 @@ const InvoiceItemSchema = z.object({
 });
 
 const CreateInvoiceSchema = z.object({
-  invoiceNumber: z.string().min(1),
+  invoiceNumber: z.string().optional().or(z.literal('')),
   projectId: z.string().optional(),
   clientName: z.string().min(1),
   clientEmail: z.string().email().optional().or(z.literal('')),
@@ -293,15 +293,93 @@ export default async function invoicesRouter(app: FastifyInstance) {
     return reply.send(csv);
   });
 
+async function getNextSequentialInvoiceNumber(app: FastifyInstance, type: 'TAX' | 'PROFORMA' = 'TAX') {
+  let settings = await app.prisma.financeSettings.findFirst();
+  if (!settings) {
+    settings = await app.prisma.financeSettings.create({ data: {} });
+  }
+
+  const basePrefix = (settings.invoicePrefix || 'INV').trim();
+  const prefix = type === 'PROFORMA' ? 'PI' : basePrefix;
+
+  // Search existing invoices starting with prefix
+  const existingInvoices = await app.prisma.invoice.findMany({
+    where: {
+      invoiceNumber: {
+        startsWith: prefix,
+      },
+    },
+    select: { invoiceNumber: true },
+  });
+
+  let maxSequence = (settings.invoiceNextNumber || 1) - 1;
+
+  for (const inv of existingInvoices) {
+    const match = inv.invoiceNumber.match(/(\d+)$/);
+    if (match) {
+      const num = parseInt(match[1], 10);
+      if (!isNaN(num) && num > maxSequence) {
+        maxSequence = num;
+      }
+    }
+  }
+
+  const nextSeq = maxSequence + 1;
+  const formattedNumber = `${prefix}-${String(nextSeq).padStart(4, '0')}`;
+
+  return {
+    invoiceNumber: formattedNumber,
+    nextNumber: nextSeq,
+    prefix,
+    settingsId: settings.id,
+  };
+}
+
+  // GET /api/v1/finance/invoices/next-number
+  app.get('/invoices/next-number', async (req, reply) => {
+    const { type } = req.query as { type?: 'TAX' | 'PROFORMA' };
+    const docType = type === 'PROFORMA' ? 'PROFORMA' : 'TAX';
+    const result = await getNextSequentialInvoiceNumber(app, docType);
+    return result;
+  });
+
   // POST /api/v1/finance/invoices
   app.post('/invoices', async (req, reply) => {
     const body = CreateInvoiceSchema.parse(req.body);
     const orgSettings = await app.prisma.financeSettings.findFirst();
     const orgGst = orgSettings?.gstNumber;
+
+    let finalInvoiceNumber = body.invoiceNumber?.trim();
+    const isProforma = finalInvoiceNumber?.startsWith('PI-');
+
+    // Auto-generate strict sequential invoice number if omitted or matching random pattern
+    if (!finalInvoiceNumber || /^(INV|PI)-\d{5,}$/.test(finalInvoiceNumber)) {
+      const seqResult = await getNextSequentialInvoiceNumber(app, isProforma ? 'PROFORMA' : 'TAX');
+      finalInvoiceNumber = seqResult.invoiceNumber;
+      await app.prisma.financeSettings.update({
+        where: { id: seqResult.settingsId },
+        data: { invoiceNextNumber: seqResult.nextNumber + 1 },
+      }).catch(() => {});
+    } else {
+      const match = finalInvoiceNumber.match(/(\d+)$/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (!isNaN(num)) {
+          const settings = await app.prisma.financeSettings.findFirst();
+          if (settings && num >= (settings.invoiceNextNumber || 1)) {
+            await app.prisma.financeSettings.update({
+              where: { id: settings.id },
+              data: { invoiceNextNumber: num + 1 },
+            }).catch(() => {});
+          }
+        }
+      }
+    }
+
     const totals = calculateTaxesAndTotals(body.items, body.clientGst, orgGst || undefined, body.discountRate);
     const invoice = await app.prisma.invoice.create({
       data: {
-        invoiceNumber: body.invoiceNumber,
+        invoiceNumber: finalInvoiceNumber,
         projectId: body.projectId,
         clientName: body.clientName,
         clientEmail: body.clientEmail || null,

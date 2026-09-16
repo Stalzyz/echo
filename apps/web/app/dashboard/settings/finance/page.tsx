@@ -44,6 +44,7 @@ export default function FinanceSettingsPage() {
         vatNumber: settings.vatNumber ? settings.vatNumber.trim() : null,
         fiscalYearStart: Number(settings.fiscalYearStart) || 4,
         invoicePrefix: settings.invoicePrefix ? settings.invoicePrefix.trim() : "INV",
+        invoiceNextNumber: Number(settings.invoiceNextNumber) || 1,
       };
 
       const updated = await ApiClient.patch("/settings/finance", payload);
@@ -164,17 +165,29 @@ export default function FinanceSettingsPage() {
             <h2 className="text-base font-semibold text-zinc-100">Invoice Numbering & Fiscal Year</h2>
             <p className="text-xs text-zinc-400 mt-0.5">Prefix convention and start of accounting period.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-zinc-300">Invoice Prefix</label>
               <input
                 type="text"
                 value={settings.invoicePrefix || "INV"}
                 onChange={(e) => setSettings({ ...settings, invoicePrefix: e.target.value })}
-                className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-blue-500"
+                className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-blue-500 font-mono"
                 placeholder="INV"
               />
-              <p className="text-xs text-zinc-500">Preview: {settings.invoicePrefix || 'INV'}-{new Date().getFullYear()}-0001</p>
+              <p className="text-xs text-zinc-500">Preview: {(settings.invoicePrefix || 'INV').trim()}-{String(settings.invoiceNextNumber || 1).padStart(4, '0')}</p>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-zinc-300">Next Invoice Number Counter</label>
+              <input
+                type="number"
+                min="1"
+                value={settings.invoiceNextNumber || 1}
+                onChange={(e) => setSettings({ ...settings, invoiceNextNumber: parseInt(e.target.value) || 1 })}
+                className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-blue-500 font-mono"
+                placeholder="1"
+              />
+              <p className="text-xs text-zinc-500">Starts sequence at this number</p>
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-zinc-300">Fiscal Year Start</label>
