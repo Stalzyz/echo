@@ -5,7 +5,7 @@ import { Laptop, Briefcase, Users, Award, Cpu, BookOpen } from "lucide-react";
 
 const features = [
   {
-    icon: <Briefcase className="text-[#49abc9] w-8 h-8 max-w-6xl mx-auto bg-[#0A0A0A]/80 backdrop-blur-md rounded-[3rem] shadow-[0_0_80px_rgba(73,171,201,0.07)]  my-8 p-6 md:p-12" />,
+    icon: <Briefcase className="text-[#49abc9] w-8 h-8" />,
     title: "100% Placement Guarantee",
     description: "We don't just train you; we get you hired. Dedicated career support until you land your dream job."
   },

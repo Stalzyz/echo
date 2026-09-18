@@ -9,7 +9,7 @@ const partners = [
 
 export function TrustedBy() {
   return (
-    <section className="py-20 border-y border-border/50 bg-background/50 relative overflow-hidden max-w-6xl mx-auto bg-[#0A0A0A]/80 backdrop-blur-md rounded-[3rem] shadow-[0_0_80px_rgba(73,171,201,0.07)]  my-8 p-6 md:p-12">
+    <section className="py-20 border-y border-border/50 bg-background/50 relative overflow-hidden">
       <div className="container mx-auto px-4 md:px-6">
         <p className="text-justify md:text-center text-sm font-medium text-muted-foreground uppercase tracking-wider mb-8">
           Our Alumni Work At Top Companies

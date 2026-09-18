@@ -12,7 +12,7 @@ COPY . .
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm --filter @grekam/db db:generate
 ENV DATABASE_URL="postgresql://postgres:Photoshop09%40@172.17.0.1:5432/grekam_os?schema=public"
-RUN pnpm --filter @grekam/web build
+RUN pnpm --filter @grekam/academy-web build
 
 FROM base AS runner
 WORKDIR /app
@@ -22,12 +22,12 @@ ENV NEXT_TELEMETRY_DISABLED 1
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder /app/apps/web/public ./apps/web/public
-COPY --from=builder /app/apps/web/.next/standalone ./
-COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder /app/apps/academy-web/public ./apps/academy-web/public
+COPY --from=builder /app/apps/academy-web/.next/standalone ./
+COPY --from=builder /app/apps/academy-web/.next/static ./apps/academy-web/.next/static
 
 EXPOSE 3000
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
-CMD ["node", "apps/web/server.js"]
+CMD ["node", "apps/academy-web/server.js"]

@@ -1,7 +1,10 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { AlertCircle, Bell, CheckCheck, CheckCircle2, Clock, CreditCard, ExternalLink, Info, Loader2, MessageSquare, Trophy, X } from "lucide-react"
+import { 
+  Bell, CheckCircle2, Loader2, CreditCard, MessageSquare, 
+  Trophy, Clock, AlertCircle, Info, X, CheckCheck, ExternalLink
+} from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useCurrentUser } from "@/context/CurrentUserContext"
 import Link from "next/link"
@@ -10,36 +13,35 @@ import { formatDistanceToNow } from "date-fns"
 function getNotifIcon(type: string) {
   switch (type) {
     case "PAYMENT_RECEIVED":
-      return <CreditCard className="w-4 h-4 text-emerald-400" />
+      return <CreditCard className="w-4 h-4 text-emerald-600" />
     case "PAYMENT_OVERDUE":
-      return <AlertCircle className="w-4 h-4 text-red-400" />
+      return <AlertCircle className="w-4 h-4 text-rose-600" />
     case "NEW_MESSAGE":
-      return <MessageSquare className="w-4 h-4 text-blue-400" />
+      return <MessageSquare className="w-4 h-4 text-teal-600" />
     case "ASSIGNMENT_GRADED":
-      return <Trophy className="w-4 h-4 text-amber-400" />
+      return <Trophy className="w-4 h-4 text-amber-600" />
     case "DEADLINE_APPROACHING":
-      return <Clock className="w-4 h-4 text-orange-400" />
+      return <Clock className="w-4 h-4 text-amber-600" />
     case "TASK_ASSIGNED":
-      return <CheckCircle2 className="w-4 h-4 text-purple-400" />
+      return <CheckCircle2 className="w-4 h-4 text-teal-600" />
     case "LEAVE_APPROVED":
-      return <CheckCircle2 className="w-4 h-4 text-teal-400" />
+      return <CheckCircle2 className="w-4 h-4 text-teal-600" />
     case "MILESTONE_REACHED":
-      return <Trophy className="w-4 h-4 text-yellow-400" />
+      return <Trophy className="w-4 h-4 text-amber-600" />
     default:
-      return <Info className="w-4 h-4 text-white/50" />
+      return <Info className="w-4 h-4 text-slate-400" />
   }
 }
 
 function getNotifAccent(type: string) {
   switch (type) {
-    case "PAYMENT_RECEIVED":   return "border-emerald-500/30 bg-emerald-500/5"
-    case "PAYMENT_OVERDUE":    return "border-red-500/30 bg-red-500/5"
-    case "NEW_MESSAGE":        return "border-blue-500/30 bg-blue-500/5"
-    case "ASSIGNMENT_GRADED":  return "border-amber-500/30 bg-amber-500/5"
-    case "DEADLINE_APPROACHING": return "border-orange-500/30 bg-orange-500/5"
-    case "TASK_ASSIGNED":      return "border-purple-500/30 bg-purple-500/5"
-    case "MILESTONE_REACHED":  return "border-yellow-500/30 bg-yellow-500/5"
-    default:                   return "border-white/10 bg-white/5"
+    case "PAYMENT_RECEIVED":   return "border-emerald-200 bg-emerald-50/50"
+    case "PAYMENT_OVERDUE":    return "border-rose-200 bg-rose-50/50"
+    case "NEW_MESSAGE":        return "border-teal-200 bg-teal-50/50"
+    case "ASSIGNMENT_GRADED":  return "border-amber-200 bg-amber-50/50"
+    case "DEADLINE_APPROACHING": return "border-amber-200 bg-amber-50/50"
+    case "TASK_ASSIGNED":      return "border-teal-200 bg-teal-50/50"
+    default:                   return "border-slate-200 bg-slate-50"
   }
 }
 
@@ -55,7 +57,6 @@ export function NotificationMenu() {
     isLoading,
   } = useCurrentUser()
 
-  // Close on outside click
   useEffect(() => {
     function handler(e: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -74,55 +75,45 @@ export function NotificationMenu() {
 
   return (
     <div className="relative" ref={menuRef}>
-      {/* Bell Button */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
         aria-label={`Notifications${unreadCount > 0 ? ` — ${unreadCount} unread` : ''}`}
-        className="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 hover:bg-white/10 transition-colors relative"
+        className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 flex items-center justify-center shrink-0 transition-colors relative"
       >
-        <Bell className={`w-4 h-4 transition-colors ${isOpen ? 'text-blue-400' : 'text-white/80'}`} />
+        <Bell className={`w-4 h-4 transition-colors ${isOpen ? 'text-teal-600' : 'text-slate-600'}`} />
         
-        {/* Unread badge */}
         <AnimatePresence>
           {unreadCount > 0 && (
             <motion.span
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0 }}
-              className="absolute -top-1 -right-1 min-w-[16px] h-4 px-0.5 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-[9px] font-black text-white border-2 border-[#050505] shadow-[0_0_10px_rgba(236,72,153,0.5)]"
+              className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-teal-600 flex items-center justify-center text-[9px] font-black text-white border-2 border-white shadow-xs"
             >
               {unreadCount > 9 ? "9+" : unreadCount}
             </motion.span>
           )}
         </AnimatePresence>
-
-        {/* Pulse ring when there are unread */}
-        {unreadCount > 0 && (
-          <span className="absolute inset-0 rounded-xl ring-1 ring-pink-500/40 animate-ping pointer-events-none" />
-        )}
       </button>
 
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop */}
             <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
             
-            {/* Panel */}
             <motion.div 
               initial={{ opacity: 0, y: 8, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 8, scale: 0.97 }}
               transition={{ duration: 0.15, ease: "easeOut" }}
-              className="absolute left-0 top-11 w-96 bg-[#0a0a0a]/98 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] z-50 overflow-hidden"
+              className="absolute right-0 top-11 w-96 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 overflow-hidden text-slate-900"
             >
-              {/* Header */}
-              <div className="px-4 py-3.5 border-b border-white/10 flex items-center justify-between bg-gradient-to-r from-white/[0.03] to-transparent">
-                <div className="flex items-center gap-2.5">
-                  <Bell className="w-4 h-4 text-blue-400" />
-                  <h3 className="font-bold text-white text-sm">Notifications</h3>
+              <div className="px-4 py-3.5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div className="flex items-center gap-2">
+                  <Bell className="w-4 h-4 text-teal-600" />
+                  <h3 className="font-extrabold text-slate-900 text-sm">Notifications</h3>
                   {unreadCount > 0 && (
-                    <span className="px-2 py-0.5 rounded-full bg-pink-500/20 border border-pink-500/30 text-pink-400 text-[10px] font-black">
+                    <span className="px-2 py-0.5 rounded-md bg-teal-50 border border-teal-200 text-teal-800 text-[10px] font-extrabold">
                       {unreadCount} new
                     </span>
                   )}
@@ -131,37 +122,36 @@ export function NotificationMenu() {
                   {unreadCount > 0 && (
                     <button 
                       onClick={markAllNotificationsRead} 
-                      className="flex items-center gap-1.5 text-[10px] font-mono tracking-wider uppercase font-bold text-blue-400 hover:text-blue-300 transition-colors"
+                      className="flex items-center gap-1 text-[10px] font-bold text-teal-700 hover:text-teal-800 transition-colors uppercase tracking-wider"
                       title="Mark all as read"
                     >
-                      <CheckCheck className="w-3 h-3" />
+                      <CheckCheck className="w-3.5 h-3.5" />
                       All read
                     </button>
                   )}
                   <button 
                     onClick={() => setIsOpen(false)} 
-                    className="text-white/30 hover:text-white/80 transition-colors ml-1"
+                    className="text-slate-400 hover:text-slate-600 transition-colors p-1"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
               </div>
               
-              {/* Notification List */}
               <div className="max-h-[420px] overflow-y-auto custom-scrollbar">
                 {isLoading ? (
                   <div className="flex flex-col items-center justify-center py-12 gap-3">
-                    <Loader2 className="w-5 h-5 animate-spin text-white/30" />
-                    <span className="text-white/30 text-xs">Loading notifications...</span>
+                    <Loader2 className="w-5 h-5 animate-spin text-teal-600" />
+                    <span className="text-slate-500 text-xs font-medium">Loading notifications...</span>
                   </div>
                 ) : notifications.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-16 gap-3 text-white/30">
-                    <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
-                      <Bell className="w-5 h-5" />
+                  <div className="flex flex-col items-center justify-center py-16 gap-2 text-slate-400">
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center">
+                      <Bell className="w-5 h-5 text-slate-400" />
                     </div>
-                    <div className="text-center">
-                      <p className="text-sm font-medium">All caught up!</p>
-                      <p className="text-xs mt-1 text-white/20">No notifications yet.</p>
+                    <div className="text-center mt-1">
+                      <p className="text-xs font-bold text-slate-700">All caught up!</p>
+                      <p className="text-[11px] text-slate-400 font-medium">No new notifications.</p>
                     </div>
                   </div>
                 ) : (
@@ -171,39 +161,37 @@ export function NotificationMenu() {
                         <motion.div
                           key={notif.id}
                           initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: notif.isRead ? 0.55 : 1, x: 0 }}
-                          transition={{ delay: idx * 0.04 }}
+                          animate={{ opacity: notif.isRead ? 0.6 : 1, x: 0 }}
+                          transition={{ delay: idx * 0.03 }}
                           onClick={() => handleNotifClick(notif)}
                           className={`
                             group flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all duration-150
                             ${notif.isRead 
-                              ? 'border-white/5 bg-transparent hover:bg-white/3' 
-                              : `${getNotifAccent(notif.type)} hover:brightness-125`
+                              ? 'border-slate-100 bg-white hover:bg-slate-50' 
+                              : `${getNotifAccent(notif.type)} hover:brightness-95`
                             }
                           `}
                         >
-                          {/* Icon */}
-                          <div className="shrink-0 mt-0.5 w-7 h-7 rounded-lg bg-black/40 border border-white/10 flex items-center justify-center">
+                          <div className="shrink-0 mt-0.5 w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center shadow-xs">
                             {getNotifIcon(notif.type)}
                           </div>
 
-                          {/* Content */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2">
-                              <p className="text-xs font-bold text-white leading-tight line-clamp-1">
+                              <p className="text-xs font-bold text-slate-900 leading-tight line-clamp-1">
                                 {!notif.isRead && (
-                                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-400 mr-1.5 mb-0.5 align-middle" />
+                                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-teal-600 mr-1.5 mb-0.5 align-middle" />
                                 )}
                                 {notif.title}
                               </p>
-                              <span className="text-[9px] font-mono text-white/30 shrink-0 mt-0.5">
+                              <span className="text-[9px] font-mono font-medium text-slate-400 shrink-0">
                                 {notif.createdAt 
                                   ? formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true })
                                   : "now"
                                 }
                               </span>
                             </div>
-                            <p className="text-[11px] text-white/55 mt-1 leading-relaxed line-clamp-2">
+                            <p className="text-[11px] text-slate-600 mt-1 leading-relaxed line-clamp-2 font-medium">
                               {notif.body}
                             </p>
                           </div>
@@ -214,15 +202,14 @@ export function NotificationMenu() {
                 )}
               </div>
               
-              {/* Footer */}
-              <div className="p-3 border-t border-white/10 bg-black/30">
+              <div className="p-3 border-t border-slate-200 bg-slate-50">
                 <Link 
                   href="/dashboard/notifications"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-center gap-2 text-[10px] font-mono tracking-widest uppercase font-bold text-white/40 hover:text-white transition-colors"
+                  className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-600 hover:text-slate-900 transition-colors"
                 >
                   <span>View all notifications</span>
-                  <ExternalLink className="w-3 h-3" />
+                  <ExternalLink className="w-3 h-3 text-slate-400" />
                 </Link>
               </div>
             </motion.div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Users, GraduationCap, Building2, Quote } from "lucide-react";
+import { Users, GraduationCap, Building2, Quote, Sparkles } from "lucide-react";
 
 export function StudentExperience() {
   const framework = [
@@ -13,7 +13,7 @@ export function StudentExperience() {
   ];
 
   return (
-    <section className="py-32 relative overflow-hidden border-t border-[#1F1F1F] max-w-6xl mx-auto bg-[#0A0A0A]/80 backdrop-blur-md rounded-[3rem] shadow-[0_0_80px_rgba(73,171,201,0.07)]  my-8 p-6 md:p-12" id="experience">
+    <section className="py-32 relative overflow-hidden border-t border-[#1F1F1F]" id="experience">
       <div className="container mx-auto px-4 md:px-6 max-w-6xl space-y-40">
         
         {/* Section 11: Skill Framework */}
@@ -29,7 +29,7 @@ export function StudentExperience() {
             <div className="space-y-6">
               {framework.map((item, idx) => (
                 <div key={idx} className="flex gap-4">
-                  <div className="mt-1 text-[#49abc9] text-xs font-mono">{idx + 1}.</div>
+                  <div className="mt-1 text-[#49abc9]"><Sparkles size={20} /></div>
                   <div>
                     <h4 className="text-lg font-bold text-[#FAFAF8] mb-1">{item.title}</h4>
                     <p className="text-[#A1A1AA] text-sm leading-relaxed">{item.desc}</p>

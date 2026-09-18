@@ -1,56 +1,32 @@
 import type { Metadata } from "next"
-import { Barlow_Condensed, Inter, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google"
+import { Inter, Caveat, Space_Grotesk, Playfair_Display } from "next/font/google"
 import "./globals.css"
 import { SmoothScroll } from "@/components/SmoothScroll"
 import { OrganizationProvider } from "@/context/OrganizationContext"
-import { Toaster } from "sonner"
 
-const barlowCondensed = Barlow_Condensed({
-  subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  variable: "--font-barlow",
-  display: "swap",
-})
-
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  variable: "--font-inter",
-  display: "swap",
-})
-
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-jakarta",
-  display: "swap",
-})
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-mono-code",
-  display: "swap",
-})
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
+const caveat = Caveat({ subsets: ["latin"], variable: "--font-caveat" })
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space" })
+const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://grekam.in'),
+  metadataBase: new URL('https://academy.grekam.in'),
   title: {
-    default: 'Grekam OS — Enterprise Operating System',
-    template: '%s | Grekam OS'
+    default: 'Grekam Academy — Master Design & Tech',
+    template: '%s | Grekam Academy'
   },
-  description: 'Enterprise operational system and client portal for Grekam Visuals Agency and Grekam Academy.',
+  description: 'Learn design, visual arts, and digital technology from industry experts. Master professional tools with Grekam Academy.',
   openGraph: {
-    title: 'Grekam OS — Agency & Academy Enterprise operational platform',
-    description: 'Unified operational system for managing clients, CRM proposals, student LMS coursework, and finance payrolls.',
-    url: 'https://grekam.in',
-    siteName: 'Grekam OS',
+    title: 'Grekam Academy — Master Design & Technical Arts',
+    description: 'Learn design, visual arts, and digital technology from industry experts. Hands-on projects, certification, and career placement.',
+    url: 'https://academy.grekam.in',
+    siteName: 'Grekam Academy',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Grekam OS Dashboard Preview',
+        alt: 'Grekam Academy Course Preview',
       }
     ],
     locale: 'en_US',
@@ -58,8 +34,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Grekam OS',
-    description: 'Operational engine for creative teams.',
+    title: 'Grekam Academy',
+    description: 'Learn visual editing, color grading, and motion design.',
     images: ['/og-image.png'],
   },
   robots: {
@@ -83,42 +59,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
-      <head>
-        <link href="https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap" rel="stylesheet" />
-        <link 
-          rel="stylesheet" 
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" 
-          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" 
-          crossOrigin="anonymous" 
-          referrerPolicy="no-referrer" 
-        />
-      </head>
-      <body className={`min-h-screen bg-background font-sans antialiased ${barlowCondensed.variable} ${inter.variable} ${plusJakarta.variable} ${jetbrainsMono.variable}`}>
-        {/* Chunk-load self-healing: inline script runs synchronously before React hydrates */}
-        <script dangerouslySetInnerHTML={{ __html: `
-          (function() {
-            try {
-              window.addEventListener('error', function(e) {
-                var msg = (e && e.message ? e.message : '').toLowerCase();
-                var target = e && e.target ? (e.target.src || e.target.href || '') : '';
-                if (msg.indexOf('chunk') !== -1 || msg.indexOf('dynamically imported') !== -1 || target.indexOf('_next/static') !== -1) {
-                  var key = 'last_chunk_reload';
-                  var lastReload = parseInt(sessionStorage.getItem(key) || '0', 10);
-                  if (Date.now() - lastReload > 5000) {
-                    sessionStorage.setItem(key, Date.now().toString());
-                    window.location.href = window.location.pathname + '?_ts=' + Date.now();
-                  }
-                }
-              }, true);
-            } catch(e) {}
-          })();
-        `}} />
+    <html lang="en" className={`${inter.variable} ${caveat.variable} ${spaceGrotesk.variable} ${playfair.variable}`}>
+      <body className="min-h-screen bg-[#FAFAF8] text-[#1C1C1C] font-sans antialiased">
         <OrganizationProvider>
           <SmoothScroll>
             {children}
           </SmoothScroll>
-          <Toaster position="bottom-right" theme="dark" />
         </OrganizationProvider>
       </body>
     </html>

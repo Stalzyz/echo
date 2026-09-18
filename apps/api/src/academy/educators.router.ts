@@ -6,11 +6,19 @@ const CreateEducatorSchema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),
   email: z.string().email(),
+  phone: z.string().optional(),
   designation: z.string().optional(),
   company: z.string().optional(),
   yearsExperience: z.number().optional(),
   skills: z.array(z.string()).optional(),
   bio: z.string().optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  pincode: z.string().optional(),
+  dateOfBirth: z.string().optional(),
+  idProofType: z.string().optional(),
+  idProofNumber: z.string().optional(),
+  idProofUrl: z.string().optional(),
   deliveryMode: z.enum(['ONSITE', 'ONLINE']).optional(),
 });
 
@@ -29,10 +37,10 @@ export default async function educatorsRouter(app: FastifyInstance) {
     const body = CreateEducatorSchema.parse(req.body);
     
     let tempPassword = '';
+    const cleanDob = body.dateOfBirth && body.dateOfBirth.trim() !== '' ? new Date(body.dateOfBirth) : undefined;
     
     // Create User, then Educator
     const educator = await app.prisma.$transaction(async (tx) => {
-      // 1. Check if user exists or Create User
       let user = await tx.user.findUnique({ where: { email: body.email } });
       
       if (!user) {
@@ -43,17 +51,18 @@ export default async function educatorsRouter(app: FastifyInstance) {
             firstName: body.firstName,
             lastName: body.lastName,
             email: body.email,
+            phone: body.phone || undefined,
             role: 'EDUCATOR',
             passwordHash,
           }
         });
       }
 
-      // Check if educator profile already exists for this user
       const existingEducator = await tx.educator.findUnique({ where: { userId: user.id } });
       if (existingEducator) {
         return existingEducator;
       }
+
       return await tx.educator.create({
         data: {
           userId: user.id,
@@ -62,6 +71,13 @@ export default async function educatorsRouter(app: FastifyInstance) {
           yearsExperience: body.yearsExperience || 0,
           skills: body.skills || [],
           bio: body.bio || undefined,
+          address: body.address || undefined,
+          city: body.city || undefined,
+          pincode: body.pincode || undefined,
+          dateOfBirth: cleanDob && !isNaN(cleanDob.getTime()) ? cleanDob : undefined,
+          idProofType: body.idProofType || undefined,
+          idProofNumber: body.idProofNumber || undefined,
+          idProofUrl: body.idProofUrl || undefined,
           deliveryMode: body.deliveryMode || 'ONSITE',
         },
         include: { user: true }
@@ -86,19 +102,29 @@ export default async function educatorsRouter(app: FastifyInstance) {
       bio: z.string().optional(),
       firstName: z.string().optional(),
       lastName: z.string().optional(),
+      phone: z.string().optional(),
+      address: z.string().optional(),
+      city: z.string().optional(),
+      pincode: z.string().optional(),
+      dateOfBirth: z.string().optional(),
+      idProofType: z.string().optional(),
+      idProofNumber: z.string().optional(),
+      idProofUrl: z.string().optional(),
     });
     const body = schema.parse(req.body);
+    const cleanDob = body.dateOfBirth && body.dateOfBirth.trim() !== '' ? new Date(body.dateOfBirth) : undefined;
 
     const educator = await app.prisma.$transaction(async (tx) => {
       const existing = await tx.educator.findUnique({ where: { id }, include: { user: true } });
       if (!existing) throw new Error("Educator not found");
 
-      if (body.firstName || body.lastName) {
+      if (body.firstName || body.lastName || body.phone) {
         await tx.user.update({
           where: { id: existing.userId },
           data: {
             ...(body.firstName && { firstName: body.firstName }),
             ...(body.lastName && { lastName: body.lastName }),
+            ...(body.phone && { phone: body.phone }),
           }
         });
       }
@@ -111,6 +137,13 @@ export default async function educatorsRouter(app: FastifyInstance) {
           ...(body.yearsExperience !== undefined && { yearsExperience: body.yearsExperience }),
           ...(body.skills !== undefined && { skills: body.skills }),
           ...(body.bio !== undefined && { bio: body.bio }),
+          ...(body.address !== undefined && { address: body.address }),
+          ...(body.city !== undefined && { city: body.city }),
+          ...(body.pincode !== undefined && { pincode: body.pincode }),
+          ...(cleanDob && !isNaN(cleanDob.getTime()) && { dateOfBirth: cleanDob }),
+          ...(body.idProofType !== undefined && { idProofType: body.idProofType }),
+          ...(body.idProofNumber !== undefined && { idProofNumber: body.idProofNumber }),
+          ...(body.idProofUrl !== undefined && { idProofUrl: body.idProofUrl }),
         },
         include: { user: true }
       });

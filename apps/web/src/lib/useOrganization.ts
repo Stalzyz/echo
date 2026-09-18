@@ -12,10 +12,10 @@ export interface Organization {
 }
 
 export const ORG_FALLBACK: Organization = {
-  id: "default",
-  name: "Grekam Visuals",
+  id: "gecho-default",
+  name: "Gecho LMS",
   logoUrl: null,
-  primaryColor: "#2563eb",
+  primaryColor: "#0d9488",
 };
 
 /**

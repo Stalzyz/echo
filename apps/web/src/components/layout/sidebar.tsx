@@ -1,57 +1,39 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { useState } from "react"
 import { getNavItemsByRole, NavItem, Role } from "@/config/navigation"
-import { useOrganization } from "@/context/OrganizationContext"
 import { cn } from "@/lib/utils"
 import { useSession, signOut } from "next-auth/react"
-import { Bell, BookOpen, Briefcase, ChevronDown, ChevronRight, DollarSign, Layers, LayoutDashboard, LogOut, Menu, MessageSquare, Moon, ShieldCheck, Sun, User, X } from "lucide-react"
+import { 
+  ChevronDown, ChevronRight, Menu, X, ShieldCheck, 
+  LayoutDashboard, BookOpen, Briefcase, MessageSquare, Layers, DollarSign, Bell 
+} from "lucide-react"
 import dynamic from "next/dynamic"
 import Image from "next/image"
+import { useOrganization } from "@/context/OrganizationContext"
 
 const RealtimeIndicator = dynamic(() => import("@/components/RealtimeIndicator"), { ssr: false })
 
 import { NotificationMenu } from "./NotificationMenu"
 import { TimerWidget } from "./TimerWidget"
 
-function BrandLogo({ url, name, size = 32 }: { url?: string | null; name: string; size?: number }) {
-  const [hasError, setHasError] = useState(false)
-  
-  if (url && !hasError) {
-    return (
-      <div 
-        style={{ width: size, height: size }}
-        className="rounded-xl overflow-hidden shrink-0 border border-dash-border-strong bg-white/5 flex items-center justify-center p-0.5"
-      >
-        <img 
-          src={url} 
-          alt={name} 
-          onError={() => setHasError(true)} 
-          className="w-full h-full object-contain" 
-        />
-      </div>
-    )
-  }
-
-  return (
-    <div 
-      style={{ width: size, height: size }}
-      className="rounded-xl bg-dash-bg-elevated border border-dash-border-strong flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(255,255,255,0.05)]"
-    >
-      <ShieldCheck className="w-4 h-4 text-blue-400" strokeWidth={2} />
-    </div>
-  )
-}
-
 function OrgHeader() {
   const org = useOrganization()
 
   return (
-    <div className="flex h-16 items-center px-6 gap-3 relative z-10">
-      <BrandLogo url={org.logoUrl} name={org.name} size={32} />
-      <span className="text-lg font-bold tracking-tight">{org.name}</span>
+    <div className="flex h-16 items-center px-6 gap-3 relative z-10 border-b border-slate-200 bg-white">
+      {org.logoUrl ? (
+        <div className="w-8 h-8 rounded-xl overflow-hidden shrink-0 border border-slate-200">
+          <Image src={org.logoUrl} alt={org.name} width={32} height={32} className="object-cover w-full h-full" />
+        </div>
+      ) : (
+        <div className="w-8 h-8 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center shrink-0">
+          <ShieldCheck className="w-4 h-4 text-teal-700" strokeWidth={2} />
+        </div>
+      )}
+      <span className="text-base font-black tracking-tight text-slate-900">{org.name}</span>
       <div className="ml-auto flex items-center gap-2">
         <TimerWidget />
         <NotificationMenu />
@@ -61,10 +43,8 @@ function OrgHeader() {
   )
 }
 
-
-function NavGroup({ item, pathname, onClose }: { item: NavItem; pathname: string; onClose?: () => void }) {
+function NavGroup({ item, pathname }: { item: NavItem; pathname: string }) {
   const Icon = item.icon
-  const router = useRouter()
   const isGroupActive = pathname === item.href || pathname?.startsWith(`${item.href}/`)
   const [open, setOpen] = useState(isGroupActive)
 
@@ -72,68 +52,58 @@ function NavGroup({ item, pathname, onClose }: { item: NavItem; pathname: string
     return (
       <Link
         href={item.href}
-        onClick={onClose}
         className={cn(
-          "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors group",
+          "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition-all group",
           isGroupActive
-            ? "bg-white/[0.08] text-white font-medium shadow-sm"
-            : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
+            ? "bg-teal-50 text-teal-800 border border-teal-200/80 font-bold"
+            : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
         )}
       >
-        <Icon className={cn("h-4 w-4 shrink-0 transition-colors", isGroupActive ? "text-blue-400" : "text-zinc-500 group-hover:text-zinc-300")} />
+        <Icon className={cn("h-4 w-4 shrink-0 transition-colors", isGroupActive ? "text-teal-700" : "text-slate-400 group-hover:text-slate-600")} />
         {item.title}
       </Link>
     )
   }
 
   return (
-    <div className="mb-0.5">
-      {/* Group header — toggles open/close AND navigates */}
+    <div className="mb-1">
       <button
-        onClick={() => {
-          setOpen(!open)
-          if (item.href) {
-            router.push(item.href)
-            if (onClose) onClose()
-          }
-        }}
+        onClick={() => setOpen(o => !o)}
         className={cn(
-          "w-full flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors group",
+          "w-full flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition-all group",
           isGroupActive
-            ? "text-zinc-200 font-semibold"
-            : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
+            ? "text-slate-900 font-extrabold bg-slate-50"
+            : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
         )}
       >
-        <Icon className={cn("h-4 w-4 shrink-0 transition-colors", isGroupActive ? "text-blue-400" : "text-zinc-500 group-hover:text-zinc-300")} />
-        <span className="flex-1 text-left">{item.title}</span>
+        <Icon className={cn("h-4 w-4 shrink-0 transition-colors", isGroupActive ? "text-teal-700" : "text-slate-400 group-hover:text-slate-600")} />
+        <span className="flex-1 text-left tracking-tight">{item.title}</span>
         {open
-          ? <ChevronDown className="h-3.5 w-3.5 shrink-0 text-zinc-500 group-hover:text-zinc-300 transition-colors" />
-          : <ChevronRight className="h-3.5 w-3.5 shrink-0 text-zinc-500 group-hover:text-zinc-300 transition-colors" />
+          ? <ChevronDown className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+          : <ChevronRight className="h-3.5 w-3.5 shrink-0 text-slate-400" />
         }
       </button>
 
-      {/* Sub items */}
       <div className={cn(
         "grid transition-all duration-200 ease-in-out",
-        open ? "grid-rows-[1fr] opacity-100 mt-0.5" : "grid-rows-[0fr] opacity-0"
+        open ? "grid-rows-[1fr] opacity-100 mt-1" : "grid-rows-[0fr] opacity-0"
       )}>
         <div className="overflow-hidden">
-          <div className="ml-5 pl-2.5 border-l border-white/[0.08] space-y-0.5 py-0.5">
+          <div className="ml-5 pl-3 border-l border-slate-200 space-y-1">
             {item.children!.map(child => {
               const isChildActive = pathname === child.href
               return (
                 <Link
                   key={child.href}
                   href={child.href}
-                  onClick={onClose}
                   className={cn(
-                    "flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors group",
+                    "flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition-all group",
                     isChildActive
-                      ? "bg-white/[0.08] text-white font-medium"
-                      : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
+                      ? "bg-teal-50 text-teal-800 font-bold border border-teal-200/60"
+                      : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
                   )}
                 >
-                  <span className={cn("w-1.5 h-1.5 rounded-full transition-colors", isChildActive ? "bg-blue-400" : "bg-zinc-600/50 group-hover:bg-zinc-500")} />
+                  <span className={cn("w-1.5 h-1.5 rounded-full transition-all", isChildActive ? "bg-teal-600" : "bg-slate-300 group-hover:bg-slate-500")} />
                   {child.title}
                 </Link>
               )
@@ -161,10 +131,7 @@ export function Sidebar() {
   if (rawRole === "Intern") rawRole = "INTERN"
   
   const role = rawRole as Role
-  
-  // Retrieve custom permissions from next-auth session if available
   const customPermissions = (session?.user as any)?.permissions || []
-  
   const navItems = getNavItemsByRole(role, customPermissions)
 
   const getBottomTabs = (role: Role) => {
@@ -191,7 +158,7 @@ export function Sidebar() {
           { title: "Chat", href: "/dashboard/chat", icon: MessageSquare },
           { title: "Alerts", href: "/dashboard/notifications", icon: Bell },
         ]
-      default: // SUPER_ADMIN, MANAGER, STAFF
+      default:
         return [
           { title: "Home", href: "/dashboard", icon: LayoutDashboard },
           { title: "CRM", href: "/dashboard/crm", icon: Layers },
@@ -202,37 +169,32 @@ export function Sidebar() {
   }
 
   const sidebarContent = (
-    <div className="flex flex-1 w-full flex-col min-h-0 overflow-hidden bg-dash-bg-base text-dash-text-primary font-sans relative">
-      
-      {/* Header / Logo — Dynamic Whitelabel */}
+    <div className="flex flex-1 w-full flex-col min-h-0 overflow-hidden bg-white text-slate-900 font-sans relative">
       <OrgHeader />
 
-      {/* Role badge */}
-      <div className="px-5 py-2 relative z-10">
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/[0.04] border border-white/[0.08] text-[11px] font-medium text-zinc-400 capitalize">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-          {role.toLowerCase().replace('_', ' ')}
-        </span>
+      <div className="px-6 py-4 relative z-10 border-b border-slate-100 bg-slate-50/50">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-slate-200 w-fit shadow-xs">
+          <div className="w-2.5 h-2.5 rounded-full bg-teal-600" />
+          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600">
+            {role} ACCESS
+          </span>
+        </div>
       </div>
 
-      {/* Nav items */}
-      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-3 space-y-0.5 pb-6 relative z-10">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-3 space-y-1 py-4 relative z-10">
         {navItems.map(item => (
-          <NavGroup key={item.href} item={item} pathname={pathname} onClose={() => setMobileOpen(false)} />
+          <NavGroup key={item.href} item={item} pathname={pathname} />
         ))}
       </div>
 
-      {/* User footer */}
-      <div className="p-3 relative z-10 border-t border-white/[0.08] bg-dash-bg-base">
-        <div className="flex items-center gap-3">
-          <div onClick={() => signOut()} className="flex-1 flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/[0.04] transition-colors cursor-pointer border border-transparent hover:border-white/[0.08]" title="Click to logout">
-            <div className="h-9 w-9 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center text-zinc-200 font-medium text-sm shrink-0">
-              {session?.user?.name?.charAt(0) || "U"}
-            </div>
-            <div className="flex flex-col min-w-0">
-              <span className="text-xs font-medium leading-none truncate text-zinc-200">{session?.user?.name || "User"}</span>
-              <span className="text-[11px] text-zinc-500 mt-1 truncate">{session?.user?.email}</span>
-            </div>
+      <div className="p-4 relative z-10 border-t border-slate-200 bg-slate-50">
+        <div onClick={() => signOut()} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-200/60 transition-colors cursor-pointer border border-slate-200 bg-white shadow-xs" title="Click to logout">
+          <div className="h-10 w-10 rounded-full bg-teal-100 border border-teal-200 flex items-center justify-center text-teal-800 font-bold text-sm shrink-0">
+            {session?.user?.name?.charAt(0) || "S"}
+          </div>
+          <div className="flex flex-col min-w-0">
+            <span className="text-sm font-bold leading-none truncate text-slate-900">{session?.user?.name || "Stalin Kumar"}</span>
+            <span className="text-xs text-slate-500 mt-1 truncate font-mono">{session?.user?.email || "admin@gecholms.com"}</span>
           </div>
         </div>
       </div>
@@ -241,16 +203,22 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Desktop sidebar */}
-      <div className="print:hidden hidden md:flex h-screen w-72 flex-col border-r border-dash-border-strong shrink-0 bg-dash-bg-base relative z-20 shadow-[4px_0_24px_rgba(0,0,0,0.5)] overflow-hidden">
+      <div className="hidden md:flex h-screen w-72 flex-col border-r border-slate-200 shrink-0 bg-white relative z-20 shadow-xs overflow-hidden">
         {sidebarContent}
       </div>
 
-      {/* Mobile Top Header Bar */}
-      <div className="print:hidden md:hidden fixed top-0 left-0 right-0 h-16 bg-dash-bg-surface/90 backdrop-blur-md border-b border-dash-border-strong z-40 flex items-center justify-between px-5">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-40 flex items-center justify-between px-5 shadow-xs">
         <div className="flex items-center gap-2.5">
-          <BrandLogo url={org.logoUrl} name={org.name} size={28} />
-          <span className="text-xs font-bold tracking-wider uppercase text-dash-text-primary/90 truncate max-w-[120px]">{org.name}</span>
+          {org.logoUrl ? (
+            <div className="w-7 h-7 rounded-lg overflow-hidden shrink-0 border border-slate-200 relative">
+              <Image src={org.logoUrl} alt={org.name} fill className="object-cover" />
+            </div>
+          ) : (
+            <div className="w-7 h-7 rounded-lg bg-teal-50 border border-teal-200 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-4 h-4 text-teal-700" />
+            </div>
+          )}
+          <span className="text-xs font-bold tracking-tight text-slate-900 truncate max-w-[120px]">{org.name}</span>
         </div>
         <div className="flex items-center gap-2.5">
           <NotificationMenu />
@@ -258,8 +226,7 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Mobile Bottom Tab Bar */}
-      <div className="print:hidden md:hidden fixed bottom-0 left-0 right-0 h-16 bg-dash-bg-surface/90 backdrop-blur-md border-t border-dash-border-strong z-40 flex items-center justify-around px-2 shadow-[0_-4px_20px_rgba(0,0,0,0.3)]">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-slate-200 z-40 flex items-center justify-around px-2 shadow-sm">
         {getBottomTabs(role).map(tab => {
           const TabIcon = tab.icon
           const isTabActive = pathname === tab.href || (tab.href !== "/dashboard" && pathname?.startsWith(`${tab.href}/`))
@@ -269,37 +236,34 @@ export function Sidebar() {
               href={tab.href}
               className={cn(
                 "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors relative",
-                isTabActive ? "text-blue-400 font-bold" : "text-dash-text-primary/40"
+                isTabActive ? "text-teal-600 font-bold" : "text-slate-500"
               )}
             >
               <TabIcon className="w-5 h-5" />
-              <span className="text-[8px] uppercase tracking-wider font-bold">{tab.title}</span>
-              {isTabActive && <span className="absolute bottom-1 w-5 h-0.5 bg-blue-400 rounded-full" />}
+              <span className="text-[9px] uppercase tracking-wider font-bold">{tab.title}</span>
+              {isTabActive && <span className="absolute bottom-1 w-5 h-0.5 bg-teal-600 rounded-full" />}
             </Link>
           )
         })}
         <button
           onClick={() => setMobileOpen(true)}
-          className="flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors text-dash-text-primary/40 hover:text-dash-text-primary"
+          className="flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors text-slate-500 hover:text-slate-900"
         >
           <Menu className="w-5 h-5" />
-          <span className="text-[8px] uppercase tracking-wider font-bold">Menu</span>
+          <span className="text-[9px] uppercase tracking-wider font-bold">Menu</span>
         </button>
       </div>
 
-      {/* Mobile drawer overlay */}
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-50 flex">
-          {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"
             onClick={() => setMobileOpen(false)}
           />
-          {/* Drawer */}
-          <div className="relative w-[85%] max-w-sm h-full flex flex-col shadow-2xl border-r border-dash-border-strong overflow-hidden bg-dash-bg-base">
+          <div className="relative w-[85%] max-w-sm h-full flex flex-col shadow-2xl border-r border-slate-200 overflow-hidden bg-white">
             <button
               onClick={() => setMobileOpen(false)}
-              className="absolute top-5 right-5 z-20 p-2 rounded-full bg-dash-bg-elevated/80 hover:bg-dash-border-strong text-dash-text-primary/70 transition-colors backdrop-blur-md"
+              className="absolute top-4 right-4 z-20 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -310,4 +274,3 @@ export function Sidebar() {
     </>
   )
 }
- 

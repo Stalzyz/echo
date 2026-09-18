@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export function FinalCTA() {
   return (
-    <section className="flex items-center justify-center  relative overflow-hidden border-t border-[#1F1F1F] max-w-6xl mx-auto bg-[#0A0A0A]/80 backdrop-blur-md rounded-[3rem] shadow-[0_0_80px_rgba(73,171,201,0.07)]  my-8 p-6 md:p-12" id="cta">
+    <section className="min-h-screen flex items-center justify-center bg-[#000000] relative overflow-hidden border-t border-[#1F1F1F]" id="cta">
       {/* Subtle vignette/paper effect */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-transparent to-white/[0.03]" />
       
@@ -44,7 +44,7 @@ export function FinalCTA() {
           </div>
 
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/auth/login">
+            <Link href="/contact">
               <button className="group relative bg-[#FAFAF8] text-[#050505] px-8 py-4 rounded-full font-medium overflow-hidden transition-transform hover:scale-105 active:scale-95 shadow-xl shadow-black/10">
                 <span className="relative z-10 flex items-center gap-2 font-sans tracking-wide">
                   Start Your Creative Journey

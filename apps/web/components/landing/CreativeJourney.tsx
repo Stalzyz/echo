@@ -11,6 +11,9 @@ const journeySteps = [
   { icon: X, label: "Fail" },
   { icon: TrendingUp, label: "Improve" },
   { icon: Wrench, label: "Build" },
+  { icon: ImageIcon, label: "Portfolio" },
+  { icon: Briefcase, label: "Internship" },
+  { icon: Target, label: "Placement" },
   { icon: Star, label: "Career" }
 ];
 
@@ -25,7 +28,7 @@ export function CreativeJourney() {
   const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   return (
-    <section className="pb-32 relative overflow-hidden transition-colors duration-700 max-w-6xl mx-auto bg-[#0A0A0A]/80 backdrop-blur-md rounded-[3rem] shadow-[0_0_80px_rgba(73,171,201,0.07)]  my-8 p-6 md:p-12" id="journey">
+    <section className="pb-32 relative overflow-hidden transition-colors duration-700" id="journey">
       <div className="container mx-auto px-4 relative z-10 flex flex-col items-center max-w-md">
         
         {/* Journey Header */}
@@ -49,7 +52,7 @@ export function CreativeJourney() {
           />
 
           {/* Timeline Nodes */}
-          <div className="space-y-12 relative z-10">
+          <div className="space-y-24 relative z-10">
             {journeySteps.map((step, index) => {
               const Icon = step.icon;
               return (

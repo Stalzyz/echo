@@ -24,7 +24,7 @@ export default async function storageRouter(app: FastifyInstance) {
     },
   });
 
-  const BUCKET_NAME = process.env.R2_BUCKET_NAME || 'grekam-os-assets';
+  const BUCKET_NAME = process.env.R2_BUCKET_NAME || 'echo';
 
   // Mock PUT endpoint for local development without S3, now saves locally!
   app.put('/mock-upload/*', async (req, reply) => {

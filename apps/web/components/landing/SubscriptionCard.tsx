@@ -10,7 +10,7 @@ export function SubscriptionCard() {
   ];
 
   return (
-    <section className="py-32 relative overflow-hidden border-t border-[#1F1F1F] max-w-6xl mx-auto bg-[#0A0A0A]/80 backdrop-blur-md rounded-[3rem] shadow-[0_0_80px_rgba(73,171,201,0.07)]  my-8 p-6 md:p-12" id="pricing">
+    <section className="py-32 relative overflow-hidden border-t border-[#1F1F1F]" id="pricing">
       <div className="container mx-auto px-4 md:px-6 max-w-4xl">
         <div className="bg-gradient-to-br from-[#0A0A0A] to-[#000000] border border-[#1F1F1F] rounded-[40px] p-10 md:p-16 relative overflow-hidden shadow-2xl">
           <div className="absolute top-0 right-0 w-64 h-64 bg-[#49abc9]/10 rounded-full blur-3xl" />

@@ -5,15 +5,15 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: ['GPTBot', 'PerplexityBot', 'Google-Extended', 'ClaudeBot', 'anthropic-ai'],
-        allow: ['/', '/gallery', '/agency', '/contact'],
+        allow: ['/', '/gallery', '/academy/courses', '/student/*'],
         disallow: ['/dashboard/', '/portal/', '/api/v1/auth/'],
       },
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/dashboard/', '/portal/', '/verify/', '/workspace/'],
+        disallow: ['/dashboard/', '/portal/', '/scanner/', '/kiosk/'],
       }
     ],
-    sitemap: 'https://grekam.in/sitemap.xml',
+    sitemap: 'https://academy.grekam.in/sitemap.xml',
   };
 }

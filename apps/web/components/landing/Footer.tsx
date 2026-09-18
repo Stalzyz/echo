@@ -5,7 +5,7 @@ import { FaTwitter, FaInstagram, FaLinkedinIn, FaYoutube } from "react-icons/fa"
 
 export function Footer() {
   return (
-    <footer className="text-[#A1A1AA] py-20 border-t border-[#1F1F1F] max-w-6xl mx-auto bg-[#0A0A0A]/80 backdrop-blur-md rounded-[3rem] shadow-[0_0_80px_rgba(73,171,201,0.07)]  my-8 p-6 md:p-12">
+    <footer className="bg-[#000000] text-[#A1A1AA] py-20 border-t border-[#1F1F1F]">
       <div className="container mx-auto px-4 md:px-6 max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           
@@ -60,6 +60,7 @@ export function Footer() {
             </ul>
             <h4 className="text-[#FAFAF8] font-bold mb-6">Student Resources</h4>
             <ul className="space-y-3 text-sm">
+              <li><a href="https://grekam.in/academy" target="_blank" rel="noopener noreferrer" className="hover:text-[#49abc9] transition-colors text-white font-bold">Curriculum Wiki</a></li>
               <li><Link href="#platform" className="hover:text-[#49abc9] transition-colors">Portfolio Hub</Link></li>
               <li><Link href="#faq" className="hover:text-[#49abc9] transition-colors">FAQs</Link></li>
               <li><Link href="#pricing" className="hover:text-[#49abc9] transition-colors">Payment Plans</Link></li>

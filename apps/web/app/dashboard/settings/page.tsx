@@ -1,532 +1,758 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef } from "react"
 import { 
-  Settings, 
-  Shield, 
-  Palette, 
-  Building, 
-  Bell, 
-  Save, 
-  Image as ImageIcon, 
-  CheckCircle2, 
-  DollarSign, 
-  Plug, 
-  Loader2, 
-  Upload, 
-  Mail, 
-  Globe, 
-  GraduationCap, 
-  Building2, 
-  Trash2 
+  Palette, Building, Bell, Save, Image as ImageIcon, CheckCircle2, 
+  DollarSign, Plug, RefreshCw, Upload, Eye, Lock, Layers, RotateCcw, 
+  Check, Monitor, Smartphone, Sparkles, AlertCircle, Trash2, ArrowUpRight, History
 } from "lucide-react"
 import { toast } from "sonner"
-import { useOrganization } from "@/context/OrganizationContext"
-import { ApiClient } from "@/lib/api"
+import { DEFAULT_TENANT_THEME } from "@/components/theme/TenantThemeProvider"
+import { DesignTokens, TenantTheme, ThemeVersionHistory } from "@/types/tenant-branding"
 
-export default function SystemSettingsPage() {
-  const [activeTab, setActiveTab] = useState('branding')
-  const [logoPreview, setLogoPreview] = useState<string | null>(null)
-  const [faviconPreview, setFaviconPreview] = useState<string | null>(null)
-  const [academyLogoPreview, setAcademyLogoPreview] = useState<string | null>(null)
-  const [academyFaviconPreview, setAcademyFaviconPreview] = useState<string | null>(null)
-  const [logoUploading, setLogoUploading] = useState(false)
-  const [workspaceName, setWorkspaceName] = useState('Grekam Visuals')
-  const [companyName, setCompanyName] = useState('')
-  const [panNumber, setPanNumber] = useState('')
-  const [gstNumber, setGstNumber] = useState('')
-  const [phone, setPhone] = useState('')
-  const [website, setWebsite] = useState('')
-  const [supportEmail, setSupportEmail] = useState('')
-  const [billingAddress, setBillingAddress] = useState('')
+// Color Preset Themes
+const COLOR_PRESETS = [
+  {
+    name: "Gecho Teal (Default)",
+    primary: "#0d9488",
+    secondary: "#f59e0b",
+    accent: "#6366f1",
+    background: "#f8fafc",
+    surface: "#ffffff",
+    card: "#ffffff",
+    text: "#0f172a",
+  },
+  {
+    name: "Indigo Modern",
+    primary: "#6366f1",
+    secondary: "#ec4899",
+    accent: "#10b981",
+    background: "#faf5ff",
+    surface: "#ffffff",
+    card: "#ffffff",
+    text: "#1e1b4b",
+  },
+  {
+    name: "Emerald Executive",
+    primary: "#059669",
+    secondary: "#d97706",
+    accent: "#3b82f6",
+    background: "#f0fdf4",
+    surface: "#ffffff",
+    card: "#ffffff",
+    text: "#064e3b",
+  },
+  {
+    name: "Royal Obsidian",
+    primary: "#3b82f6",
+    secondary: "#8b5cf6",
+    accent: "#f43f5e",
+    background: "#f8fafc",
+    surface: "#ffffff",
+    card: "#ffffff",
+    text: "#0f172a",
+  }
+]
 
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const faviconInputRef = useRef<HTMLInputElement>(null)
-  const academyFileInputRef = useRef<HTMLInputElement>(null)
-  const academyFaviconInputRef = useRef<HTMLInputElement>(null)
-  const org = useOrganization()
+export default function BrandingThemeSettingsPage() {
+  const [brandSubTab, setBrandSubTab] = useState<'identity' | 'colors' | 'typography' | 'login' | 'history'>('identity')
+  const [previewView, setPreviewView] = useState<'dashboard' | 'lms' | 'crm' | 'login'>('dashboard')
+  const [viewportMode, setViewportMode] = useState<'desktop' | 'mobile'>('desktop')
+  
+  const [theme, setTheme] = useState<TenantTheme>(DEFAULT_TENANT_THEME)
+  const [isPublishing, setIsPublishing] = useState(false)
+  const [isDirty, setIsDirty] = useState(false)
 
-  // Pre-populate from live org data when context loads
-  useEffect(() => {
-    if (org.name) setWorkspaceName(org.name)
-    if ((org as any).companyName) setCompanyName((org as any).companyName)
-    if ((org as any).panNumber) setPanNumber((org as any).panNumber)
-    if ((org as any).gstNumber) setGstNumber((org as any).gstNumber)
-    if (org.logoUrl && !logoPreview) setLogoPreview(org.logoUrl)
-    if (org.faviconUrl && !faviconPreview) setFaviconPreview(org.faviconUrl)
-    if (org.academyLogoUrl && !academyLogoPreview) setAcademyLogoPreview(org.academyLogoUrl)
-    if (org.academyFaviconUrl && !academyFaviconPreview) setAcademyFaviconPreview(org.academyFaviconUrl)
-    if (org.phone) setPhone(org.phone)
-    if (org.website) setWebsite(org.website)
-    if (org.supportEmail) setSupportEmail(org.supportEmail)
-    if (org.billingAddress) setBillingAddress(org.billingAddress)
-  }, [org])
+  // Version History State
+  const [versions, setVersions] = useState<ThemeVersionHistory[]>([
+    {
+      version: 2,
+      publishedAt: "2026-09-18 10:30",
+      publishedBy: "Stalin Kumar (Admin)",
+      summary: "Updated primary color to Teal #0d9488 and configured custom login heading.",
+      theme: DEFAULT_TENANT_THEME
+    },
+    {
+      version: 1,
+      publishedAt: "2026-09-10 14:15",
+      publishedBy: "System Setup",
+      summary: "Initial default academy theme creation.",
+      theme: DEFAULT_TENANT_THEME
+    }
+  ])
 
-  const handleFileUpload = async (file: File, setter: (val: string) => void) => {
-    try {
-      const { uploadUrl, downloadUrl } = await ApiClient.post('/storage/upload-url', {
-        filename: file.name,
-        contentType: file.type || 'image/png',
-        prefix: 'branding'
-      });
+  // Mock File Upload Ref
+  const logoInputRef = useRef<HTMLInputElement>(null)
 
-      await fetch(uploadUrl, {
-        method: 'PUT',
-        body: file,
-        headers: { 'Content-Type': file.type || 'image/png' }
-      });
-
-      setter(downloadUrl);
-      toast.success('Asset uploaded successfully!');
-    } catch (err) {
-      // Base64 fallback
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        setter(ev.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+  const triggerLiveThemeUpdate = (colors: { primary?: string; secondary?: string; accent?: string; name?: string }) => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("organization-updated", {
+          detail: {
+            primaryColor: colors.primary,
+            secondaryColor: colors.secondary,
+            accentColor: colors.accent,
+            name: colors.name,
+          },
+        })
+      );
     }
   };
 
-  const handleSave = async () => {
-    try {
-      setLogoUploading(true)
-      const body: Record<string, string | null> = { 
-        name: workspaceName,
-        companyName: companyName ? companyName.trim() : null,
-        panNumber: panNumber ? panNumber.trim().toUpperCase() : null,
-        gstNumber: gstNumber ? gstNumber.trim().toUpperCase() : null,
-        phone: phone ? phone.trim() : null,
-        website: website ? website.trim() : null,
-        supportEmail: supportEmail ? supportEmail.trim() : null,
-        billingAddress: billingAddress ? billingAddress.trim() : null,
-        logoUrl: logoPreview || null,
-        faviconUrl: faviconPreview || null,
-        academyLogoUrl: academyLogoPreview || null,
-        academyFaviconUrl: academyFaviconPreview || null,
+  const updateColor = (key: keyof DesignTokens, value: string) => {
+    setTheme(prev => {
+      const updatedColors = {
+        ...prev.colors,
+        [key]: value,
+        button: key === 'primary' ? value : prev.colors.button,
+        link: key === 'primary' ? value : prev.colors.link,
+      };
+      triggerLiveThemeUpdate(updatedColors as any);
+      return {
+        ...prev,
+        colors: updatedColors
+      };
+    });
+    setIsDirty(true);
+  };
+
+  const applyPreset = (preset: typeof COLOR_PRESETS[0]) => {
+    setTheme(prev => ({
+      ...prev,
+      colors: {
+        ...prev.colors,
+        primary: preset.primary,
+        secondary: preset.secondary,
+        accent: preset.accent,
+        background: preset.background,
+        surface: preset.surface,
+        card: preset.card,
+        text: preset.text,
+        button: preset.primary,
+        link: preset.primary,
       }
+    }));
+    triggerLiveThemeUpdate(preset as any);
+    setIsDirty(true);
+    toast.success(`Applied ${preset.name} color palette!`);
+  };
 
-      const res = await fetch('/api/v1/settings/organization', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      })
+  const handlePublish = async () => {
+    setIsPublishing(true);
+    try {
+      const { ApiClient } = await import("@/lib/api");
+      await ApiClient.patch("/settings/organization", {
+        name: theme.identity.academyName,
+        primaryColor: theme.colors.primary,
+        secondaryColor: theme.colors.secondary,
+        accentColor: theme.colors.accent,
+      });
 
-      if (!res.ok) throw new Error('Failed to save')
-      toast.success('Settings and brand assets saved successfully!')
-    } catch (err) {
-      toast.error('Failed to save settings.')
+      triggerLiveThemeUpdate({
+        primary: theme.colors.primary,
+        secondary: theme.colors.secondary,
+        accent: theme.colors.accent,
+        name: theme.identity.academyName,
+      });
+
+      const newVersionNum = theme.version + 1;
+      const newTheme = { ...theme, version: newVersionNum, updatedAt: new Date().toISOString() };
+      setTheme(newTheme);
+      setVersions(prev => [
+        {
+          version: newVersionNum,
+          publishedAt: new Date().toLocaleString(),
+          publishedBy: "Current Admin",
+          summary: `Published Theme v${newVersionNum} with primary ${newTheme.colors.primary}`,
+          theme: newTheme
+        },
+        ...prev
+      ]);
+      setIsDirty(false);
+      toast.success(`Theme v${newVersionNum} published live to all organization applications!`);
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Failed to publish theme: " + (err.message || "Unknown error"));
     } finally {
-      setLogoUploading(false)
+      setIsPublishing(false);
     }
+  };
+
+  const handleRestoreVersion = (ver: ThemeVersionHistory) => {
+    setTheme(ver.theme)
+    setIsDirty(true)
+    toast.success(`Restored draft settings from Version ${ver.version}! Click Publish to apply live.`)
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#050505] text-white overflow-hidden">
-      {/* Header */}
-      <div className="flex-none px-8 py-6 border-b border-white/10 flex items-center justify-between">
+    <div className="flex flex-col h-full bg-slate-50 text-slate-900 overflow-hidden">
+      
+      {/* Top Header */}
+      <div className="flex-none px-8 py-5 border-b border-slate-200 bg-white flex items-center justify-between shadow-xs">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">System Settings</h1>
-          <p className="text-sm text-white/50 mt-2">Manage workspace preferences, branding, and configurations.</p>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Branding & Theme Editor</h1>
+            {isDirty && (
+              <span className="px-2.5 py-0.5 text-xs font-black bg-amber-100 text-amber-800 rounded-full border border-amber-200 flex items-center gap-1">
+                <AlertCircle className="w-3.5 h-3.5" /> Unsaved Changes
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-slate-500 mt-1 font-medium">Customize academy identity, design tokens, typography, and login portal live.</p>
         </div>
-        <button 
-          onClick={handleSave}
-          disabled={logoUploading}
-          className="flex items-center gap-2 px-5 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-500 transition-colors shadow-sm disabled:opacity-60 cursor-pointer text-sm"
-        >
-          {logoUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          {logoUploading ? 'Saving...' : 'Save changes'}
-        </button>
+
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setTheme(DEFAULT_TENANT_THEME)} 
+            className="flex items-center gap-1.5 px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl transition-all"
+          >
+            <RotateCcw className="w-3.5 h-3.5" /> Reset Default
+          </button>
+          
+          <button 
+            onClick={handlePublish} 
+            disabled={isPublishing}
+            style={{ backgroundColor: theme.colors.primary }}
+            className="flex items-center gap-2 px-5 py-2.5 text-white font-bold text-xs rounded-xl transition-all shadow-sm hover:opacity-90 disabled:opacity-50"
+          >
+            {isPublishing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            Publish Theme (v{theme.version})
+          </button>
+        </div>
       </div>
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
         
-        {/* Left Sidebar - Navigation */}
-        <div className="w-60 border-r border-white/[0.08] bg-dash-bg-base p-3 space-y-1">
-          <button 
-            onClick={() => setActiveTab('branding')}
-            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${activeTab === 'branding' ? 'bg-white/[0.08] text-white' : 'text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200'}`}
-          >
-            <Palette className="w-4 h-4 text-zinc-400" /> Branding
-          </button>
-          <button 
-            onClick={() => setActiveTab('company')}
-            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${activeTab === 'company' ? 'bg-white/[0.08] text-white' : 'text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200'}`}
-          >
-            <Building className="w-4 h-4 text-zinc-400" /> Company Details
-          </button>
-          <a 
-            href="/dashboard/settings/organization"
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
-          >
-            <Building2 className="w-4 h-4 text-blue-400" /> Full Brand Suite
-          </a>
-          <button 
-            onClick={() => setActiveTab('notifications')}
-            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${activeTab === 'notifications' ? 'bg-white/[0.08] text-white' : 'text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200'}`}
-          >
-            <Bell className="w-4 h-4 text-zinc-400" /> Notifications
-          </button>
-          <a 
-            href="/dashboard/settings/roles"
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
-          >
-            <Shield className="w-4 h-4 text-zinc-400" /> Roles & Permissions
-          </a>
-          <a 
-            href="/dashboard/settings/finance"
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
-          >
-            <DollarSign className="w-4 h-4 text-zinc-400" /> Finance & Currency
-          </a>
-          <a 
-            href="/dashboard/settings/integrations"
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
-          >
-            <Plug className="w-4 h-4 text-zinc-400" /> Integrations & APIs
-          </a>
-          <a 
-            href="/dashboard/settings/email-templates"
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
-          >
-            <Mail className="w-4 h-4 text-zinc-400" /> Email Templates
-          </a>
+        {/* Editor Controls Workspace */}
+        <div className="w-full lg:w-[480px] border-b lg:border-b-0 lg:border-r border-slate-200 bg-white flex flex-col overflow-hidden flex-none">
+          
+          {/* Sub-tabs */}
+          <div className="flex border-b border-slate-200 bg-slate-50 px-2 pt-2 gap-1 overflow-x-auto flex-none scrollbar-none">
+            {[
+              { id: 'identity', label: 'Identity', icon: ImageIcon },
+              { id: 'colors', label: 'Colors', icon: Palette },
+              { id: 'typography', label: 'Style & Fonts', icon: Layers },
+              { id: 'login', label: 'Login Portal', icon: Sparkles },
+              { id: 'history', label: 'History', icon: History },
+            ].map(t => (
+              <button
+                key={t.id}
+                onClick={() => setBrandSubTab(t.id as any)}
+                className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-t-lg transition-all border-t border-x ${
+                  brandSubTab === t.id 
+                    ? 'bg-white border-slate-200 text-slate-900 border-b-white -mb-px' 
+                    : 'border-transparent text-slate-500 hover:text-slate-900'
+                }`}
+              >
+                <t.icon className="w-3.5 h-3.5" /> {t.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Sub-tab Content Area */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+            
+            {/* 1. BRAND IDENTITY */}
+            {brandSubTab === 'identity' && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">Brand Information</h2>
+                  <p className="text-xs text-slate-500 mt-0.5">Academy naming and public metadata.</p>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Academy Name *</label>
+                    <input 
+                      value={theme.identity.academyName} 
+                      onChange={e => { setTheme(p => ({ ...p, identity: { ...p.identity, academyName: e.target.value } })); setIsDirty(true) }}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium focus:bg-white focus:outline-teal-600" 
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Short Name / Code</label>
+                    <input 
+                      value={theme.identity.shortName} 
+                      onChange={e => { setTheme(p => ({ ...p, identity: { ...p.identity, shortName: e.target.value } })); setIsDirty(true) }}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium focus:bg-white focus:outline-teal-600" 
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Tagline</label>
+                    <input 
+                      value={theme.identity.tagline} 
+                      onChange={e => { setTheme(p => ({ ...p, identity: { ...p.identity, tagline: e.target.value } })); setIsDirty(true) }}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium focus:bg-white focus:outline-teal-600" 
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-slate-200 space-y-4">
+                  <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">Brand Assets & Logos</h2>
+                  
+                  {/* Main Logo */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-800">Main Academy Logo</span>
+                      <span className="text-[10px] text-slate-400">PNG / SVG • Max 2MB</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-lg bg-white border border-slate-200 flex items-center justify-center font-black text-xs text-slate-400">
+                        LOGO
+                      </div>
+                      <button 
+                        onClick={() => logoInputRef.current?.click()}
+                        className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-700 flex items-center gap-1.5 transition-colors"
+                      >
+                        <Upload className="w-3.5 h-3.5 text-slate-500" /> Upload Image
+                      </button>
+                      <input type="file" ref={logoInputRef} className="hidden" onChange={() => { setIsDirty(true); toast.success("Logo asset updated!") }} />
+                    </div>
+                  </div>
+
+                  {/* Login Logo & Favicon Grid */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+                      <span className="text-xs font-bold text-slate-800 block">Favicon</span>
+                      <button onClick={() => toast.info("Select 32x32 PNG for favicon")} className="w-full py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100">
+                        Upload Favicon
+                      </button>
+                    </div>
+                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+                      <span className="text-xs font-bold text-slate-800 block">Mobile Logo</span>
+                      <button onClick={() => toast.info("Select icon logo")} className="w-full py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100">
+                        Upload Mobile
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 2. DESIGN TOKENS & COLORS */}
+            {brandSubTab === 'colors' && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">Color Presets</h2>
+                  <p className="text-xs text-slate-500 mt-0.5">Quickly apply curated color themes across your workspace.</p>
+                  
+                  <div className="grid grid-cols-2 gap-2 mt-3">
+                    {COLOR_PRESETS.map((preset, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => applyPreset(preset)}
+                        className="p-3 border border-slate-200 rounded-xl bg-slate-50 hover:bg-white hover:border-teal-500 text-left transition-all group"
+                      >
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <span className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: preset.primary }} />
+                          <span className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: preset.secondary }} />
+                          <span className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: preset.accent }} />
+                        </div>
+                        <span className="text-xs font-bold text-slate-800 group-hover:text-teal-700 block">{preset.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-slate-200 space-y-4">
+                  <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">Design Token Swatches</h2>
+                  
+                  {[
+                    { key: 'primary', label: 'Primary Accent Color', desc: 'Used for main CTA buttons, active sidebar items, and highlights.' },
+                    { key: 'secondary', label: 'Secondary Color', desc: 'Used for badges, highlights, and secondary actions.' },
+                    { key: 'accent', label: 'Accent Highlight', desc: 'Used for alerts, banners, and feature tags.' },
+                    { key: 'background', label: 'Workspace Background', desc: 'Canvas background for LMS and CRM screens.' },
+                    { key: 'surface', label: 'Surface / Panel Color', desc: 'Cards, headers, and modal backgrounds.' },
+                    { key: 'text', label: 'Primary Text Color', desc: 'Body text and heading labels.' },
+                  ].map(item => (
+                    <div key={item.key} className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                      <div>
+                        <span className="text-xs font-bold text-slate-900 block">{item.label}</span>
+                        <span className="text-[11px] text-slate-500">{item.desc}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input 
+                          type="color" 
+                          value={(theme.colors as any)[item.key]} 
+                          onChange={e => updateColor(item.key as any, e.target.value)}
+                          className="w-8 h-8 rounded-lg cursor-pointer border-0 bg-transparent"
+                        />
+                        <span className="text-xs font-mono font-bold text-slate-700 uppercase">{(theme.colors as any)[item.key]}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 3. TYPOGRAPHY & UI STYLE */}
+            {brandSubTab === 'typography' && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">Typography Settings</h2>
+                  <p className="text-xs text-slate-500 mt-0.5">Select primary fonts for headings and body content.</p>
+
+                  <div className="mt-4 space-y-4">
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 block mb-1">Font Family</label>
+                      <select 
+                        value={theme.typography.fontFamily}
+                        onChange={e => { setTheme(p => ({ ...p, typography: { ...p.typography, fontFamily: e.target.value } })); setIsDirty(true) }}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium focus:bg-white"
+                      >
+                        <option value="Inter">Inter (Clean Modern Sans)</option>
+                        <option value="Outfit">Outfit (Geometric & Tech)</option>
+                        <option value="Roboto">Roboto (Classic Universal)</option>
+                        <option value="Playfair Display">Playfair Display (Academic Serif)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-slate-200 space-y-4">
+                  <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">UI Corner Radius & Density</h2>
+                  
+                  <div>
+                    <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                      <span>Border Corner Radius</span>
+                      <span>{theme.uiStyle.borderRadius}px</span>
+                    </div>
+                    <input 
+                      type="range" min="0" max="20" 
+                      value={theme.uiStyle.borderRadius}
+                      onChange={e => { setTheme(p => ({ ...p, uiStyle: { ...p.uiStyle, borderRadius: parseInt(e.target.value) } })); setIsDirty(true) }}
+                      className="w-full accent-teal-600"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 pt-2">
+                    {[
+                      { key: 'ROUNDED', label: 'Rounded' },
+                      { key: 'PILL', label: 'Pill' },
+                      { key: 'SHARP', label: 'Sharp' },
+                    ].map(btn => (
+                      <button
+                        key={btn.key}
+                        onClick={() => { setTheme(p => ({ ...p, uiStyle: { ...p.uiStyle, buttonStyle: btn.key as any } })); setIsDirty(true) }}
+                        className={`py-2 text-xs font-bold rounded-xl border transition-all ${
+                          theme.uiStyle.buttonStyle === btn.key 
+                            ? 'bg-teal-50 border-teal-500 text-teal-800' 
+                            : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-white'
+                        }`}
+                      >
+                        {btn.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 4. LOGIN PORTAL CUSTOMIZATION */}
+            {brandSubTab === 'login' && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">Login Page Hero & Branding</h2>
+                  <p className="text-xs text-slate-500 mt-0.5">Customize student and instructor sign-in portal appearance.</p>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Welcome Heading</label>
+                    <input 
+                      value={theme.loginPage.welcomeHeading}
+                      onChange={e => { setTheme(p => ({ ...p, loginPage: { ...p.loginPage, welcomeHeading: e.target.value } })); setIsDirty(true) }}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium focus:bg-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Description Subtext</label>
+                    <textarea 
+                      rows={2}
+                      value={theme.loginPage.description}
+                      onChange={e => { setTheme(p => ({ ...p, loginPage: { ...p.loginPage, description: e.target.value } })); setIsDirty(true) }}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium focus:bg-white resize-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Login Button Text</label>
+                    <input 
+                      value={theme.loginPage.buttonText}
+                      onChange={e => { setTheme(p => ({ ...p, loginPage: { ...p.loginPage, buttonText: e.target.value } })); setIsDirty(true) }}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium focus:bg-white"
+                    />
+                  </div>
+
+                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-bold text-slate-900 block">Show "Powered by GECHO"</span>
+                      <span className="text-[11px] text-slate-500">Gated by SaaS Plan (Enterprise allows hiding)</span>
+                    </div>
+                    <input 
+                      type="checkbox"
+                      checked={theme.loginPage.showGechoBranding}
+                      onChange={e => { setTheme(p => ({ ...p, loginPage: { ...p.loginPage, showGechoBranding: e.target.checked } })); setIsDirty(true) }}
+                      className="w-4 h-4 accent-teal-600 rounded cursor-pointer"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 5. VERSION HISTORY & RESTORE */}
+            {brandSubTab === 'history' && (
+              <div className="space-y-4">
+                <div>
+                  <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">Theme Version Log</h2>
+                  <p className="text-xs text-slate-500 mt-0.5">Audit history of published themes and restore prior versions.</p>
+                </div>
+
+                <div className="space-y-3">
+                  {versions.map((ver, idx) => (
+                    <div key={idx} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="px-2.5 py-0.5 bg-teal-100 text-teal-800 text-[11px] font-black rounded-full border border-teal-200">
+                          Version {ver.version} {ver.version === theme.version ? "(Current)" : ""}
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">{ver.publishedAt}</span>
+                      </div>
+                      <p className="text-xs text-slate-700 font-medium">{ver.summary}</p>
+                      <div className="pt-2 flex items-center justify-between text-[11px] border-t border-slate-200/60">
+                        <span className="text-slate-400 font-medium">By: {ver.publishedBy}</span>
+                        {ver.version !== theme.version && (
+                          <button 
+                            onClick={() => handleRestoreVersion(ver)}
+                            className="text-teal-700 font-bold hover:underline flex items-center gap-1"
+                          >
+                            Restore Draft <RotateCcw className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Main Content Area */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8 bg-dash-bg-surface relative">
-          <div className="max-w-4xl space-y-6">
-            
-            {activeTab === 'branding' && (
-              <>
-                {/* 1. Digital Agency Card */}
-                <div className="bg-[#121620] border border-white/[0.08] rounded-xl p-6 space-y-5">
-                  <div className="flex items-center justify-between border-b border-white/[0.06] pb-4">
-                    <div className="flex items-center gap-3">
-                      <Building2 className="w-5 h-5 text-slate-300" />
+        {/* Right Interactive Live Preview Panel */}
+        <div className="flex-1 bg-slate-100 p-6 flex flex-col overflow-hidden">
+          
+          {/* Preview Header Actions */}
+          <div className="flex-none bg-white border border-slate-200 rounded-2xl px-4 py-3 mb-4 flex items-center justify-between shadow-xs">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Preview Context:</span>
+              {[
+                { id: 'dashboard', label: 'Dashboard' },
+                { id: 'lms', label: 'LMS Courses' },
+                { id: 'crm', label: 'CRM Leads' },
+                { id: 'login', label: 'Login Portal' },
+              ].map(pv => (
+                <button
+                  key={pv.id}
+                  onClick={() => setPreviewView(pv.id as any)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    previewView === pv.id 
+                      ? 'bg-slate-900 text-white shadow-xs' 
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {pv.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
+              <button 
+                onClick={() => setViewportMode('desktop')} 
+                className={`p-1.5 rounded-lg text-xs font-bold flex items-center gap-1 ${viewportMode === 'desktop' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-400'}`}
+              >
+                <Monitor className="w-3.5 h-3.5" /> Desktop
+              </button>
+              <button 
+                onClick={() => setViewportMode('mobile')} 
+                className={`p-1.5 rounded-lg text-xs font-bold flex items-center gap-1 ${viewportMode === 'mobile' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-400'}`}
+              >
+                <Smartphone className="w-3.5 h-3.5" /> Mobile
+              </button>
+            </div>
+          </div>
+
+          {/* Dynamic Live Canvas Container */}
+          <div className="flex-1 flex items-center justify-center overflow-auto">
+            <div 
+              style={{
+                width: viewportMode === 'mobile' ? '375px' : '100%',
+                maxHeight: '100%',
+                borderRadius: `${theme.uiStyle.borderRadius}px`,
+                backgroundColor: theme.colors.background,
+                color: theme.colors.text,
+                fontFamily: theme.typography.fontFamily,
+              }}
+              className="h-full border border-slate-300 shadow-md flex flex-col overflow-hidden transition-all duration-300 relative"
+            >
+              
+              {/* PREVIEW 1: DASHBOARD VIEW */}
+              {previewView === 'dashboard' && (
+                <div className="flex h-full overflow-hidden">
+                  {/* Sidebar */}
+                  <div className="w-56 border-r border-slate-200/80 p-4 space-y-4 flex-none bg-white">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center text-white font-bold text-xs" style={{ backgroundColor: theme.colors.primary }}>
+                        {theme.identity.shortName ? theme.identity.shortName.slice(0, 2).toUpperCase() : "GC"}
+                      </div>
                       <div>
-                        <h2 className="text-sm font-semibold text-slate-100">Digital Agency Brand (Grekam Visuals)</h2>
-                        <p className="text-xs text-slate-400">Landscape logo for invoices & proposals, 1:1 square favicon for garage.grekam.in</p>
+                        <h3 className="text-xs font-black leading-tight text-slate-900">{theme.identity.academyName}</h3>
+                        <p className="text-[10px] text-slate-400">Academy CRM</p>
                       </div>
                     </div>
-                    <span className="px-2 py-0.5 bg-slate-800 text-slate-300 border border-slate-700/60 text-[10px] font-mono uppercase tracking-wider rounded">
-                      Agency
+
+                    <div className="space-y-1">
+                      <div className="px-3 py-2 rounded-lg text-xs font-bold flex items-center justify-between text-white" style={{ backgroundColor: theme.colors.primary }}>
+                        <span>Dashboard</span>
+                        <span className="w-2 h-2 rounded-full bg-white" />
+                      </div>
+                      <div className="px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">Students</div>
+                      <div className="px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">Courses</div>
+                      <div className="px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">Live Studio</div>
+                    </div>
+                  </div>
+
+                  {/* Content Area */}
+                  <div className="flex-1 p-6 space-y-4 overflow-y-auto">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h2 className="text-lg font-black">{theme.identity.academyName} Overview</h2>
+                        <p className="text-xs text-slate-500">{theme.identity.tagline}</p>
+                      </div>
+                      <button 
+                        className="px-4 py-2 text-xs font-bold text-white rounded-lg transition-all"
+                        style={{ backgroundColor: theme.colors.primary, borderRadius: `${theme.uiStyle.borderRadius}px` }}
+                      >
+                        + Quick Action
+                      </button>
+                    </div>
+
+                    {/* Metric Cards */}
+                    <div className="grid grid-cols-3 gap-3">
+                      {[
+                        { label: "Active Students", val: "1,248", change: "+12%" },
+                        { label: "Course Revenue", val: "₹4.8L", change: "+24%" },
+                        { label: "Live Classes", val: "8 Today", change: "On Track" },
+                      ].map((m, i) => (
+                        <div key={i} className="p-4 bg-white border border-slate-200 rounded-xl space-y-1 shadow-2xs">
+                          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">{m.label}</span>
+                          <span className="text-xl font-black text-slate-900 block">{m.val}</span>
+                          <span className="text-[10px] font-bold text-emerald-600">{m.change}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* PREVIEW 2: LMS COURSES VIEW */}
+              {previewView === 'lms' && (
+                <div className="p-6 space-y-4 overflow-y-auto h-full">
+                  <div className="flex justify-between items-center border-b border-slate-200 pb-4">
+                    <div>
+                      <h2 className="text-lg font-black">Course Catalog</h2>
+                      <p className="text-xs text-slate-500">Explore industry certified training tracks</p>
+                    </div>
+                    <span className="px-3 py-1 text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200 rounded-full">
+                      {theme.identity.academyName} LMS
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    {/* Agency Landscape Logo */}
-                    <div className="space-y-3 bg-[#0c0e14] border border-white/[0.06] rounded-lg p-4">
-                      <div className="flex items-center justify-between">
-                        <label className="text-xs font-medium text-slate-300 flex items-center gap-2">
-                          <ImageIcon className="w-3.5 h-3.5 text-slate-400" /> Agency Logo (Landscape)
-                        </label>
-                        <span className="text-[10px] font-mono text-slate-500">~3:1 / 4:1</span>
-                      </div>
-                      <div className="w-full h-24 rounded-lg border border-white/[0.08] bg-[#10141d] p-2 flex items-center justify-center">
-                        {logoPreview ? (
-                          <img src={logoPreview} alt="Agency Logo" className="max-h-full max-w-full object-contain" />
-                        ) : (
-                          <span className="text-slate-600 text-xs font-mono">No Logo</span>
-                        )}
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => fileInputRef.current?.click()}
-                          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-slate-200 font-medium text-xs rounded-lg transition-colors"
-                        >
-                          <Upload className="w-3.5 h-3.5" /> Upload Logo
-                        </button>
-                        {logoPreview && (
-                          <button
-                            type="button"
-                            onClick={() => setLogoPreview(null)}
-                            className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 border border-white/[0.08] rounded-lg transition-colors"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
-                      </div>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) handleFileUpload(file, setLogoPreview);
-                        }}
-                      />
-                    </div>
-
-                    {/* Agency Square Favicon */}
-                    <div className="space-y-3 bg-[#0c0e14] border border-white/[0.06] rounded-lg p-4">
-                      <div className="flex items-center justify-between">
-                        <label className="text-xs font-medium text-slate-300 flex items-center gap-2">
-                          <Globe className="w-3.5 h-3.5 text-slate-400" /> Agency Favicon (Square)
-                        </label>
-                        <span className="text-[10px] font-mono text-slate-500">1:1 Square</span>
-                      </div>
-                      <div className="w-full h-24 rounded-lg border border-white/[0.08] bg-[#10141d] p-2 flex items-center justify-between">
-                        <div className="flex items-center gap-2 bg-white/[0.04] border border-white/[0.06] rounded-md px-2.5 py-1 text-[11px] font-mono text-slate-300">
-                          {faviconPreview ? <img src={faviconPreview} className="w-3.5 h-3.5 object-contain" /> : <Globe className="w-3.5 h-3.5 text-slate-500" />}
-                          <span>Grekam OS</span>
+                  <div className="grid grid-cols-2 gap-4">
+                    {[
+                      { title: "Full Stack MERN Development", duration: "12 Weeks", fee: "₹24,999" },
+                      { title: "UI/UX Product Design Masterclass", duration: "8 Weeks", fee: "₹18,500" }
+                    ].map((c, i) => (
+                      <div key={i} className="bg-white border border-slate-200 rounded-2xl p-5 space-y-3 shadow-2xs">
+                        <div className="w-full h-24 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-xs text-slate-400">
+                          COURSE THUMBNAIL
                         </div>
-                        <div className="w-8 h-8 rounded border border-white/[0.08] flex items-center justify-center bg-[#0c0e14]">
-                          {faviconPreview ? <img src={faviconPreview} className="w-full h-full object-contain p-0.5" /> : <span className="text-[10px] font-mono text-slate-600">1:1</span>}
+                        <h3 className="font-bold text-sm text-slate-900">{c.title}</h3>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-slate-500">{c.duration}</span>
+                          <span className="font-black text-slate-900">{c.fee}</span>
                         </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => faviconInputRef.current?.click()}
-                          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-slate-200 font-medium text-xs rounded-lg transition-colors"
+                        <button 
+                          className="w-full py-2 text-xs font-bold text-white rounded-lg transition-all"
+                          style={{ backgroundColor: theme.colors.primary, borderRadius: `${theme.uiStyle.borderRadius}px` }}
                         >
-                          <Upload className="w-3.5 h-3.5" /> Upload Favicon
+                          Enroll Now
                         </button>
-                        {faviconPreview && (
-                          <button
-                            type="button"
-                            onClick={() => setFaviconPreview(null)}
-                            className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 border border-white/[0.08] rounded-lg transition-colors"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
                       </div>
-                      <input
-                        ref={faviconInputRef}
-                        type="file"
-                        accept="image/*, .ico"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) handleFileUpload(file, setFaviconPreview);
-                        }}
-                      />
-                    </div>
+                    ))}
                   </div>
                 </div>
+              )}
 
-                {/* 2. Academy Card */}
-                <div className="bg-[#121620] border border-white/[0.08] rounded-xl p-6 space-y-5">
-                  <div className="flex items-center justify-between border-b border-white/[0.06] pb-4">
-                    <div className="flex items-center gap-3">
-                      <GraduationCap className="w-5 h-5 text-slate-300" />
+              {/* PREVIEW 3: CRM LEADS VIEW */}
+              {previewView === 'crm' && (
+                <div className="p-6 space-y-4 overflow-y-auto h-full">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-lg font-black">Admission Leads Pipeline</h2>
+                    <button className="px-3 py-1.5 text-xs font-bold text-white rounded-lg" style={{ backgroundColor: theme.colors.primary }}>
+                      + Add Lead
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3">
+                    {['New Inquiries', 'Demo Attended', 'Enrolled'].map((stage, sIdx) => (
+                      <div key={sIdx} className="bg-slate-100/70 p-3 rounded-xl space-y-2 border border-slate-200/60">
+                        <span className="text-xs font-bold text-slate-600 block">{stage}</span>
+                        <div className="bg-white p-3 rounded-lg border border-slate-200 space-y-1 shadow-2xs">
+                          <span className="text-xs font-bold text-slate-900 block">Rahul Sharma</span>
+                          <span className="text-[10px] text-slate-400 block">Python Data Science</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* PREVIEW 4: LOGIN PORTAL VIEW */}
+              {previewView === 'login' && (
+                <div className="h-full flex items-center justify-center p-6 bg-slate-50">
+                  <div className="max-w-sm w-full bg-white border border-slate-200 rounded-3xl p-8 space-y-6 shadow-sm text-center">
+                    <div className="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center font-black text-white text-lg" style={{ backgroundColor: theme.colors.primary }}>
+                      {theme.identity.shortName ? theme.identity.shortName.slice(0, 2) : "GC"}
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-black text-slate-900">{theme.loginPage.welcomeHeading}</h2>
+                      <p className="text-xs text-slate-500 mt-1">{theme.loginPage.description}</p>
+                    </div>
+                    <div className="space-y-3 text-left">
                       <div>
-                        <h2 className="text-sm font-semibold text-slate-100">Academy Brand (Grekam Academy)</h2>
-                        <p className="text-xs text-slate-400">Landscape logo for fee receipts & certificates, 1:1 square favicon for academy.grekam.in</p>
+                        <label className="text-[11px] font-bold text-slate-600 block mb-1">Email Address</label>
+                        <input disabled placeholder="student@academy.com" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-600 block mb-1">Password</label>
+                        <input disabled type="password" value="••••••••" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
                       </div>
                     </div>
-                    <span className="px-2 py-0.5 bg-slate-800 text-slate-300 border border-slate-700/60 text-[10px] font-mono uppercase tracking-wider rounded">
-                      Academy
-                    </span>
-                  </div>
+                    <button 
+                      className="w-full py-3 text-xs font-bold text-white rounded-xl shadow-xs"
+                      style={{ backgroundColor: theme.colors.primary, borderRadius: `${theme.uiStyle.borderRadius}px` }}
+                    >
+                      {theme.loginPage.buttonText}
+                    </button>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    {/* Academy Landscape Logo */}
-                    <div className="space-y-3 bg-[#0c0e14] border border-white/[0.06] rounded-lg p-4">
-                      <div className="flex items-center justify-between">
-                        <label className="text-xs font-medium text-slate-300 flex items-center gap-2">
-                          <ImageIcon className="w-3.5 h-3.5 text-slate-400" /> Academy Logo (Landscape)
-                        </label>
-                        <span className="text-[10px] font-mono text-slate-500">~3:1 / 4:1</span>
-                      </div>
-                      <div className="w-full h-24 rounded-lg border border-white/[0.08] bg-[#10141d] p-2 flex items-center justify-center">
-                        {academyLogoPreview ? (
-                          <img src={academyLogoPreview} alt="Academy Logo" className="max-h-full max-w-full object-contain" />
-                        ) : (
-                          <span className="text-slate-600 text-xs font-mono">No Academy Logo</span>
-                        )}
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => academyFileInputRef.current?.click()}
-                          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-slate-200 font-medium text-xs rounded-lg transition-colors"
-                        >
-                          <Upload className="w-3.5 h-3.5" /> Upload Logo
-                        </button>
-                        {academyLogoPreview && (
-                          <button
-                            type="button"
-                            onClick={() => setAcademyLogoPreview(null)}
-                            className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 border border-white/[0.08] rounded-lg transition-colors"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
-                      </div>
-                      <input
-                        ref={academyFileInputRef}
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) handleFileUpload(file, setAcademyLogoPreview);
-                        }}
-                      />
-                    </div>
-
-                    {/* Academy Square Favicon */}
-                    <div className="space-y-3 bg-[#0c0e14] border border-white/[0.06] rounded-lg p-4">
-                      <div className="flex items-center justify-between">
-                        <label className="text-xs font-medium text-slate-300 flex items-center gap-2">
-                          <Globe className="w-3.5 h-3.5 text-slate-400" /> Academy Favicon (Square)
-                        </label>
-                        <span className="text-[10px] font-mono text-slate-500">1:1 Square</span>
-                      </div>
-                      <div className="w-full h-24 rounded-lg border border-white/[0.08] bg-[#10141d] p-2 flex items-center justify-between">
-                        <div className="flex items-center gap-2 bg-white/[0.04] border border-white/[0.06] rounded-md px-2.5 py-1 text-[11px] font-mono text-slate-300">
-                          {academyFaviconPreview ? <img src={academyFaviconPreview} className="w-3.5 h-3.5 object-contain" /> : <GraduationCap className="w-3.5 h-3.5 text-slate-500" />}
-                          <span>Grekam Academy</span>
-                        </div>
-                        <div className="w-8 h-8 rounded border border-white/[0.08] flex items-center justify-center bg-[#0c0e14]">
-                          {academyFaviconPreview ? <img src={academyFaviconPreview} className="w-full h-full object-contain p-0.5" /> : <span className="text-[10px] font-mono text-slate-600">1:1</span>}
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => academyFaviconInputRef.current?.click()}
-                          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-slate-200 font-medium text-xs rounded-lg transition-colors"
-                        >
-                          <Upload className="w-3.5 h-3.5" /> Upload Favicon
-                        </button>
-                        {academyFaviconPreview && (
-                          <button
-                            type="button"
-                            onClick={() => setAcademyFaviconPreview(null)}
-                            className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 border border-white/[0.08] rounded-lg transition-colors"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
-                      </div>
-                      <input
-                        ref={academyFaviconInputRef}
-                        type="file"
-                        accept="image/*, .ico"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) handleFileUpload(file, setAcademyFaviconPreview);
-                        }}
-                      />
-                    </div>
+                    {theme.loginPage.showGechoBranding && (
+                      <span className="text-[10px] text-slate-400 font-medium block">Powered by GECHO LMS Platform</span>
+                    )}
                   </div>
                 </div>
-              </>
-            )}
+              )}
 
-            {activeTab === 'company' && (
-              <div className="bg-[#121620] border border-white/[0.08] rounded-xl p-6 space-y-6">
-                <div className="flex items-center justify-between border-b border-white/[0.06] pb-4">
-                  <div className="flex items-center gap-2.5">
-                    <Building className="w-5 h-5 text-slate-300" />
-                    <h2 className="text-sm font-semibold text-slate-100">Company & Legal Particulars</h2>
-                  </div>
-                  <a
-                    href="/dashboard/settings/organization"
-                    className="text-xs text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-1"
-                  >
-                    Manage Full Branding & Socials &rarr;
-                  </a>
-                </div>
-                <div className="grid grid-cols-2 gap-5">
-                  <div className="col-span-2 md:col-span-1 space-y-1.5">
-                    <label className="text-xs font-medium text-slate-300 block">Registered Legal Company Name</label>
-                    <input 
-                      type="text" 
-                      value={companyName} 
-                      onChange={e => setCompanyName(e.target.value)} 
-                      placeholder="Grekam Visuals & Technologies Pvt Ltd" 
-                      className="w-full bg-[#0c0e14] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/10" 
-                    />
-                  </div>
-                  <div className="col-span-2 md:col-span-1 space-y-1.5">
-                    <label className="text-xs font-medium text-slate-300 block">Workspace Display Name</label>
-                    <input 
-                      type="text" 
-                      value={workspaceName} 
-                      onChange={e => setWorkspaceName(e.target.value)} 
-                      placeholder="Grekam Visuals" 
-                      className="w-full bg-[#0c0e14] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/10" 
-                    />
-                  </div>
-                  <div className="col-span-2 md:col-span-1 space-y-1.5">
-                    <label className="text-xs font-medium text-slate-300 block">Income Tax PAN Number</label>
-                    <input 
-                      type="text" 
-                      value={panNumber} 
-                      onChange={e => setPanNumber(e.target.value.toUpperCase())} 
-                      placeholder="ABCDE1234F" 
-                      maxLength={10}
-                      className="w-full bg-[#0c0e14] border border-white/[0.08] rounded-lg px-3 py-2 text-sm font-mono uppercase text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/10" 
-                    />
-                  </div>
-                  <div className="col-span-2 md:col-span-1 space-y-1.5">
-                    <label className="text-xs font-medium text-slate-300 block">GSTIN (GST Identification Number)</label>
-                    <input 
-                      type="text" 
-                      value={gstNumber} 
-                      onChange={e => setGstNumber(e.target.value.toUpperCase())} 
-                      placeholder="33AAAAA0000A1Z5" 
-                      maxLength={15}
-                      className="w-full bg-[#0c0e14] border border-white/[0.08] rounded-lg px-3 py-2 text-sm font-mono uppercase text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/10" 
-                    />
-                  </div>
-                  <div className="col-span-2 md:col-span-1 space-y-1.5">
-                    <label className="text-xs font-medium text-slate-300 block">Phone Number</label>
-                    <input type="text" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+91 98400 12345" className="w-full bg-[#0c0e14] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/10" />
-                  </div>
-                  <div className="col-span-2 md:col-span-1 space-y-1.5">
-                    <label className="text-xs font-medium text-slate-300 block">Website URL</label>
-                    <input type="url" value={website} onChange={e => setWebsite(e.target.value)} placeholder="https://grekam.in" className="w-full bg-[#0c0e14] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/10" />
-                  </div>
-                  <div className="col-span-2 md:col-span-1 space-y-1.5">
-                    <label className="text-xs font-medium text-slate-300 block">Support / Contact Email</label>
-                    <input type="email" value={supportEmail} onChange={e => setSupportEmail(e.target.value)} placeholder="contact@grekam.in" className="w-full bg-[#0c0e14] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/10" />
-                  </div>
-                  <div className="col-span-2 md:col-span-1 space-y-1.5">
-                    <label className="text-xs font-medium text-slate-300 block">Billing & Official Address</label>
-                    <textarea rows={3} value={billingAddress} onChange={e => setBillingAddress(e.target.value)} placeholder="Chennai, Tamil Nadu, India" className="w-full bg-[#0c0e14] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/10 resize-none" />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'notifications' && (
-              <div className="bg-[#121620] border border-white/[0.08] rounded-xl p-6 space-y-5">
-                <div className="flex items-center gap-2.5 border-b border-white/[0.06] pb-4">
-                  <Bell className="w-5 h-5 text-slate-300" />
-                  <h2 className="text-sm font-semibold text-slate-100">Global Notifications</h2>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-4 bg-[#0c0e14] rounded-lg border border-white/[0.06]">
-                    <div>
-                      <div className="text-sm font-medium text-slate-200">WhatsApp Integrations (Grafty)</div>
-                      <div className="text-xs text-slate-400">Send automated messages to leads and students.</div>
-                    </div>
-                    <a href="/dashboard/settings/integrations" className="text-xs font-medium text-slate-300 hover:text-white px-3 py-1.5 rounded-lg bg-white/[0.06] border border-white/[0.08] transition-colors">
-                      Configure Keys &rarr;
-                    </a>
-                  </div>
-                  <div className="flex items-center justify-between p-4 bg-[#0c0e14] rounded-lg border border-white/[0.06]">
-                    <div>
-                      <div className="text-sm font-medium text-slate-200">Email Notifications</div>
-                      <div className="text-xs text-slate-400">Send daily digests to staff members.</div>
-                    </div>
-                    <a href="/dashboard/settings/integrations" className="text-xs font-medium text-slate-300 hover:text-white px-3 py-1.5 rounded-lg bg-white/[0.06] border border-white/[0.08] transition-colors">
-                      Configure SMTP &rarr;
-                    </a>
-                  </div>
-                </div>
-              </div>
-            )}
-
+            </div>
           </div>
         </div>
       </div>

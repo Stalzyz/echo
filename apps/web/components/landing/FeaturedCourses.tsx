@@ -1,112 +1,55 @@
-import { prisma } from "../../src/lib/prisma";
-import { FeaturedCourseCard } from "./FeaturedCourseCard";
+"use client";
+
+import { useState, useEffect } from "react";
+import { getCourses } from "../../app/actions/courses";
+import { EditorialCourseSpread } from "../editorial/EditorialCourseSpread";
 
 const defaultCourses = [
-  {
-    title: "Graphic Designing",
-    bgColor: "bg-[#f5f0eb]",
-    imgGradient: "from-[#e67e22]/20 to-[#f39c12]/20",
-  },
-  {
-    title: "UI/UX Designing",
-    bgColor: "bg-[#eaf4fc]",
-    imgGradient: "from-[#3498db]/20 to-[#2980b9]/20",
-  },
-  {
-    title: "2D Animations",
-    bgColor: "bg-[#fceef5]",
-    imgGradient: "from-[#e74c3c]/20 to-[#c0392b]/20",
-  },
-  {
-    title: "Web Designing & Development",
-    bgColor: "bg-[#eefcf5]",
-    imgGradient: "from-[#2ecc71]/20 to-[#27ae60]/20",
-  },
-  {
-    title: "AI Based UI/UX",
-    bgColor: "bg-[#f4eefc]",
-    imgGradient: "from-[#9b59b6]/20 to-[#8e44ad]/20",
-  },
-  {
-    title: "AI Based Web Development",
-    bgColor: "bg-[#eefafc]",
-    imgGradient: "from-[#1abc9c]/20 to-[#16a085]/20",
-  },
+  { title: "Graphic Design", code: "PGDM-2026", coverImage: null },
+  { title: "UI/UX Design", code: "PUXMP-2026", coverImage: null },
+  { title: "Web Design", code: "PWDM-2026", coverImage: null },
+  { title: "Full Stack Development", code: "PFSD-2026", coverImage: null },
+  { title: "Digital Marketing", code: "PDMM-2026", coverImage: null },
+  { title: "Motion Graphics", code: "PMGM-2026", coverImage: null },
+  { title: "Video Editing", code: "PVEM-2026", coverImage: null },
+  { title: "3D & Animation", code: "P3DA-2026", coverImage: null }
 ];
 
-const colorPalette = [
-  { bgColor: "bg-[#f5f0eb]", imgGradient: "from-[#e67e22]/20 to-[#f39c12]/20" },
-  { bgColor: "bg-[#eaf4fc]", imgGradient: "from-[#3498db]/20 to-[#2980b9]/20" },
-  { bgColor: "bg-[#fceef5]", imgGradient: "from-[#e74c3c]/20 to-[#c0392b]/20" },
-  { bgColor: "bg-[#eefcf5]", imgGradient: "from-[#2ecc71]/20 to-[#27ae60]/20" },
-  { bgColor: "bg-[#f4eefc]", imgGradient: "from-[#9b59b6]/20 to-[#8e44ad]/20" },
-  { bgColor: "bg-[#eefafc]", imgGradient: "from-[#1abc9c]/20 to-[#16a085]/20" },
-];
+export function FeaturedCourses() {
+  const [courses, setCourses] = useState<any[]>(defaultCourses);
 
-function getSlugFromCode(code: string | undefined): string | undefined {
-  if (!code) return undefined;
-  switch (code) {
-    case 'PUXMP-2026': return 'ui_ux_design';
-    case 'PDMM-2026': return 'digital_marketing';
-    case 'PVFX-2026': return 'vfx_compositing';
-    case 'PGDM-2026':
-    case 'PGDMP-2026': return 'graphic_design';
-    case 'PVEM-2026': return 'video_editing_ai';
-    case 'P3DA-2026': return '3d_animation';
-    case 'PMGM-2026': return 'motion_graphics';
-    case 'PFSD-2026': return 'fullstack_web_dev';
-    case 'PWDM-2026':
-    case 'PWD-2026': return 'wordpress_web_design';
-    default: return undefined;
-  }
-}
-
-export async function FeaturedCourses() {
-  let dbCourses: any[] = [];
-  try {
-    dbCourses = await prisma.course.findMany({
-      where: { isPublished: true },
-      select: { id: true, name: true, code: true }
-    });
-  } catch (error) {
-    console.warn("Could not fetch courses from database during build, using fallbacks.");
-  }
-
-  const coursesToDisplay = dbCourses.length > 0 
-    ? dbCourses.map((c) => ({ title: c.name, slug: getSlugFromCode(c.code) }))
-    : [
-        { title: "Graphic Design", slug: "graphic_design" },
-        { title: "UI/UX Design", slug: "ui_ux_design" },
-        { title: "Web Design", slug: "fullstack_web_dev" },
-        { title: "Full Stack Development", slug: "fullstack_web_dev" },
-        { title: "Digital Marketing", slug: "digital_marketing" },
-        { title: "Motion Graphics", slug: "motion_graphics" },
-        { title: "Video Editing", slug: "video_editing_ai" },
-        { title: "3D & Animation", slug: "3d_animation" }
-      ];
+  useEffect(() => {
+    async function load() {
+      const data = await getCourses();
+      if (data && data.length > 0) {
+        setCourses(data);
+      }
+    }
+    load();
+  }, []);
 
   return (
-    <section className="py-32 max-w-6xl mx-auto bg-[#0A0A0A]/80 backdrop-blur-md rounded-[3rem] shadow-[0_0_80px_rgba(73,171,201,0.07)]  my-8 p-6 md:p-12" id="courses">
+    <section className="pt-32 pb-48 bg-[#0d0d0d] border-y border-white/10 text-white" id="courses">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center max-w-4xl mx-auto mb-20">
-          <h2 className="text-4xl md:text-6xl font-bold mb-6 text-[#FAFAF8] tracking-tight font-sans">
-            Learn Skills That <span className="text-[#71717A]">Build Careers.</span>
+        <div className="text-center max-w-4xl mx-auto mb-20 relative">
+          <svg className="absolute -top-10 left-[10%] w-24 h-24 opacity-40 pointer-events-none" viewBox="0 0 100 100">
+            <path d="M10,90 Q50,10 90,90 M30,50 L70,50" stroke="#FAFAF8" strokeWidth="2" fill="none" strokeLinecap="round" />
+            <text x="35" y="80" fill="#FAFAF8" fontSize="12" fontFamily="monospace" transform="rotate(-15 35 80)">Learn</text>
+          </svg>
+
+          <h2 className="text-4xl md:text-6xl font-black mb-6 text-[#FAFAF8] tracking-tight font-editorial-display uppercase relative inline-block">
+            Master Your Craft.
+            <svg className="absolute -bottom-4 left-0 w-full h-4" viewBox="0 0 100 20" preserveAspectRatio="none">
+              <path d="M0 10 Q50 20 100 5 M10 15 Q50 25 90 10" stroke="#ffffff" strokeWidth="2" fill="transparent" strokeLinecap="round" opacity="0.3" />
+            </svg>
           </h2>
-          <p className="text-xl text-[#A1A1AA] font-sans">
-            Master the tools, techniques, and workflows used by top creative professionals and tech companies.
+          <p className="text-xl text-[#A1A1AA] font-editorial-body italic mt-8">
+            Don't just watch tutorials. Build real projects, get mentored, and launch your career.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-          {coursesToDisplay.map((course, i) => (
-            <FeaturedCourseCard 
-              key={i}
-              index={i}
-              title={course.title}
-              slug={course.slug}
-            />
-          ))}
-        </div>
+        <EditorialCourseSpread courses={courses} />
+
       </div>
     </section>
   );

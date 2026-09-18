@@ -1,16 +1,11 @@
 import type { NextConfig } from "next";
 
-const API_INTERNAL = process.env.API_INTERNAL_URL || 'http://localhost:4000/api/v1';
+const API_INTERNAL = process.env.API_INTERNAL_URL || 'http://localhost:4400/api/v1';
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  compress: true, // Enable gzip/brotli compression on all responses
-  allowedDevOrigins: ['192.168.0.220', 'localhost', '127.0.0.1'],
-
-  // Image optimization — allow CDN and self-hosted image origins
   images: {
     formats: ['image/avif', 'image/webp'],
-    minimumCacheTTL: 60 * 60 * 24 * 7, // 7 days browser-side image cache
     remotePatterns: [
       { protocol: 'https', hostname: '**.r2.cloudflarestorage.com' },
       { protocol: 'https', hostname: '**.cloudflarestorage.com' },
@@ -23,128 +18,54 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
   },
-
-  experimental: {
-    serverActions: {
-      allowedOrigins: ['academy.grekam.in', 'grekam.in', 'www.grekam.in', 'garage.grekam.in', 'localhost:3000', '127.0.0.1:3000'],
-    },
-  },
-
-  async headers() {
-    return [
-      {
-        // Dashboard & Portal pages — NEVER cache HTML/data to prevent stale chunk errors on deployment
-        source: '/dashboard/:path*',
-        headers: [
-          { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0' },
-          { key: 'Pragma', value: 'no-cache' },
-          { key: 'Expires', value: '0' },
-        ],
-      },
-      {
-        source: '/dashboard',
-        headers: [
-          { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0' },
-          { key: 'Pragma', value: 'no-cache' },
-          { key: 'Expires', value: '0' },
-        ],
-      },
-      {
-        // Portal pages — NEVER cache HTML to prevent stale chunk errors on deployment
-        source: '/portal/:path*',
-        headers: [
-          { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0' },
-          { key: 'Pragma', value: 'no-cache' },
-          { key: 'Expires', value: '0' },
-        ],
-      },
-      {
-        source: '/portal',
-        headers: [
-          { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0' },
-          { key: 'Pragma', value: 'no-cache' },
-          { key: 'Expires', value: '0' },
-        ],
-      },
-      {
-        // Static assets — aggressive long-term caching with cross-origin access
-        source: '/_next/static/:path*',
-        headers: [
-          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
-          { key: 'Access-Control-Allow-Origin', value: '*' },
-        ],
-      },
-      {
-        // Uploaded media / public files
-        source: '/public/:path*',
-        headers: [
-          { key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=3600' },
-          { key: 'Access-Control-Allow-Origin', value: '*' },
-        ],
-      },
-      {
-        // Fonts — long-lived cache with cross-origin access
-        source: '/_next/static/media/:path*',
-        headers: [
-          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
-          { key: 'Access-Control-Allow-Origin', value: '*' },
-        ],
-      },
-      {
-        // Security headers applied globally (except preview-proxy iframe route)
-        source: '/((?!api/preview-proxy).*)',
-        headers: [
-          { key: 'X-Frame-Options', value: 'DENY' },
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          { key: 'Permissions-Policy', value: 'camera=(self), microphone=(), geolocation=()' },
-        ],
-      },
-      {
-        // Live Preview Proxy — explicitly allow embedding in showcase iframes
-        source: '/api/preview-proxy',
-        headers: [
-          { key: 'Content-Security-Policy', value: "frame-ancestors *" },
-          { key: 'Access-Control-Allow-Origin', value: '*' },
-          { key: 'Access-Control-Allow-Methods', value: 'GET, OPTIONS' },
-        ],
-      },
-    ];
-  },
-
+  allowedDevOrigins: ['192.168.0.220', 'localhost', '127.0.0.1'],
   async rewrites() {
     return [
-      {
-        source: '/',
-        has: [
-          {
-            type: 'host',
-            value: 'agency.grekam.in',
-          },
-        ],
-        destination: '/agency',
-      },
-      {
-        source: '/',
-        has: [
-          {
-            type: 'host',
-            value: 'www.agency.grekam.in',
-          },
-        ],
-        destination: '/agency',
-      },
       {
         source: '/api/v1/:path*',
         destination: `${API_INTERNAL}/:path*`,
       },
     ];
   },
-
+  async redirects() {
+    return [
+      {
+        source: '/login',
+        destination: '/auth/login',
+        permanent: true,
+      },
+      {
+        source: '/register',
+        destination: '/academy/register',
+        permanent: true,
+      },
+    ];
+  },
+  async headers() {
+    return [
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+        ],
+      },
+      {
+        source: '/_next/static/media/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+        ],
+      },
+      {
+        source: '/public/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+        ],
+      },
+    ];
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
 };
 
 export default nextConfig;
-

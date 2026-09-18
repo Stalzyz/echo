@@ -11,7 +11,7 @@ export function PlatformFeatures() {
   ];
 
   return (
-    <section className="py-32 relative overflow-hidden border-t border-[#1F1F1F] max-w-6xl mx-auto bg-[#0A0A0A]/80 backdrop-blur-md rounded-[3rem] shadow-[0_0_80px_rgba(73,171,201,0.07)]  my-8 p-6 md:p-12" id="platform">
+    <section className="py-32 relative overflow-hidden border-t border-[#1F1F1F]" id="platform">
       <div className="container mx-auto px-4 md:px-6 max-w-6xl space-y-40">
         
         {/* Section 08 & 26: LMS Platform & Dashboard */}
@@ -20,7 +20,7 @@ export function PlatformFeatures() {
             <div className="absolute -inset-4 bg-[#49abc9]/10 rounded-[3rem] blur-3xl" />
             
             {/* The Mockup container mimicking layout.tsx */}
-            <div className="relative bg-[#050505] rounded-[2.5rem] p-2 shadow-2xl overflow-hidden ">
+            <div className="relative bg-[#050505] rounded-[2.5rem] p-2 shadow-2xl overflow-hidden border border-white/5">
               <div className="bg-[#0a0a0a]/90 backdrop-blur-3xl rounded-[2rem] border-t border-l border-white/10 p-6 h-full shadow-2xl">
                 
                 {/* Mock Dashboard UI Header */}
@@ -30,7 +30,7 @@ export function PlatformFeatures() {
                     <div className="w-3 h-3 rounded-full bg-[#f1c40f]" />
                     <div className="w-3 h-3 rounded-full bg-[#2ecc71]" />
                   </div>
-                  <div className="text-[#A1A1AA] text-xs font-medium bg-black/50 px-4 py-1.5 rounded-full flex-1 text-center font-mono ">
+                  <div className="text-[#A1A1AA] text-xs font-medium bg-black/50 px-4 py-1.5 rounded-full flex-1 text-center font-mono border border-white/5">
                     lms.grekam.in/dashboard
                   </div>
                 </div>

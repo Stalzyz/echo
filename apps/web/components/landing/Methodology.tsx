@@ -24,7 +24,7 @@ export function Methodology() {
   ];
 
   return (
-    <section className="py-32 relative overflow-hidden border-t border-[#1F1F1F] max-w-6xl mx-auto bg-[#0A0A0A]/80 backdrop-blur-md rounded-[3rem] shadow-[0_0_80px_rgba(73,171,201,0.07)]  my-8 p-6 md:p-12" id="methodology">
+    <section className="py-32 relative overflow-hidden border-t border-[#1F1F1F]" id="methodology">
       <div className="container mx-auto px-4 md:px-6 max-w-6xl space-y-40">
         
         {/* Section 04: Our Learning Methodology */}

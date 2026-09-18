@@ -44,7 +44,6 @@ export default function FinanceSettingsPage() {
         vatNumber: settings.vatNumber ? settings.vatNumber.trim() : null,
         fiscalYearStart: Number(settings.fiscalYearStart) || 4,
         invoicePrefix: settings.invoicePrefix ? settings.invoicePrefix.trim() : "INV",
-        invoiceNextNumber: Number(settings.invoiceNextNumber) || 1,
       };
 
       const updated = await ApiClient.patch("/settings/finance", payload);
@@ -60,74 +59,56 @@ export default function FinanceSettingsPage() {
     }
   };
 
-  if (!settings) return <div className="p-12 flex flex-col items-center justify-center min-h-[350px]"><Loader2 className="w-6 h-6 animate-spin text-zinc-400 mb-2" /><p className="text-xs text-zinc-500">Loading settings...</p></div>;
+  if (!settings) return <div className="p-8 flex justify-center bg-slate-50 min-h-screen"><Loader2 className="animate-spin text-teal-600" /></div>;
 
   return (
-    <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/[0.08] pb-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-zinc-100 tracking-tight">
-            Finance & Currency
-          </h1>
-          <p className="text-sm text-zinc-400 mt-1">Configure currency, tax model, and invoice numbering for your OS instance.</p>
-        </div>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-lg font-medium text-sm transition-colors disabled:opacity-50 cursor-pointer shadow-sm shrink-0"
-        >
-          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> :
-           saved ? <><CheckCircle className="w-4 h-4 text-emerald-300" /> Saved</> :
-           'Save changes'}
-        </button>
+    <div className="p-8 max-w-4xl bg-slate-50 text-slate-900 min-h-screen">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
+          <DollarSign className="w-7 h-7 text-teal-600" /> Finance & Currency
+        </h1>
+        <p className="text-slate-500 mt-2">Configure currency, tax model, and invoice numbering for your Gecho LMS instance.</p>
       </div>
 
       <div className="space-y-6">
-        <div className="bg-[#121620] border border-white/[0.08] rounded-xl p-6 space-y-4">
-          <div className="border-b border-white/[0.06] pb-3">
-            <h2 className="text-base font-semibold text-zinc-100">Base Currency</h2>
-            <p className="text-xs text-zinc-400 mt-0.5">Primary accounting and reporting currency across invoices and payouts.</p>
-          </div>
+        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+          <h2 className="text-base font-semibold text-slate-900 mb-5">Currency</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-zinc-300">Currency</label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-600">Base Currency</label>
               <select
                 value={settings.baseCurrency}
                 onChange={(e) => handleCurrencyChange(e.target.value)}
-                className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-blue-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-900 focus:outline-none focus:border-teal-500"
               >
                 {currencies.map(c => (
                   <option key={c.code} value={c.code}>{c.symbol} — {c.name} ({c.code})</option>
                 ))}
               </select>
             </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-zinc-300">Currency Symbol</label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-600">Currency Symbol</label>
               <input
                 type="text"
                 value={settings.currencySymbol || ""}
                 onChange={(e) => setSettings({ ...settings, currencySymbol: e.target.value })}
-                className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-blue-500 font-mono"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-900 focus:outline-none focus:border-teal-500 font-mono"
               />
             </div>
           </div>
         </div>
 
-        <div className="bg-[#121620] border border-white/[0.08] rounded-xl p-6 space-y-4">
-          <div className="border-b border-white/[0.06] pb-3">
-            <h2 className="text-base font-semibold text-zinc-100">Tax Model</h2>
-            <p className="text-xs text-zinc-400 mt-0.5">Determines tax calculation engines on customer estimates and invoices.</p>
-          </div>
-          <div className="grid grid-cols-3 gap-3 mb-2">
+        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+          <h2 className="text-base font-semibold text-slate-900 mb-5">Tax Model</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
             {TAX_MODELS.map(m => (
               <button
                 key={m}
-                type="button"
                 onClick={() => setSettings({ ...settings, taxModel: m })}
-                className={`p-3 rounded-lg border text-sm font-medium transition-colors cursor-pointer ${
+                className={`p-4 rounded-xl border text-sm font-medium transition-all ${
                   settings.taxModel === m
-                    ? 'border-blue-500/60 bg-blue-500/10 text-blue-400'
-                    : 'border-white/[0.08] bg-[#0b0d13] text-zinc-400 hover:border-white/[0.15] hover:text-zinc-200'
+                    ? 'border-teal-500 bg-teal-50 text-teal-700 font-bold'
+                    : 'border-slate-200 text-slate-600 hover:border-slate-300'
                 }`}
               >
                 {m}
@@ -135,71 +116,68 @@ export default function FinanceSettingsPage() {
             ))}
           </div>
           {settings.taxModel === 'GST' && (
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-zinc-300">GST Number (GSTIN)</label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-600">GST Number (GSTIN)</label>
               <input
                 type="text"
                 value={settings.gstNumber || ""}
                 onChange={(e) => setSettings({ ...settings, gstNumber: e.target.value })}
-                className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-blue-500 font-mono uppercase"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-900 focus:outline-none focus:border-teal-500 font-mono uppercase"
                 placeholder="22AAAAA0000A1Z5"
               />
             </div>
           )}
           {settings.taxModel === 'VAT' && (
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-zinc-300">VAT Number</label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-600">VAT Number</label>
               <input
                 type="text"
                 value={settings.vatNumber || ""}
                 onChange={(e) => setSettings({ ...settings, vatNumber: e.target.value })}
-                className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-blue-500 font-mono"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-900 focus:outline-none focus:border-teal-500 font-mono"
                 placeholder="GB123456789"
               />
             </div>
           )}
         </div>
 
-        <div className="bg-[#121620] border border-white/[0.08] rounded-xl p-6 space-y-4">
-          <div className="border-b border-white/[0.06] pb-3">
-            <h2 className="text-base font-semibold text-zinc-100">Invoice Numbering & Fiscal Year</h2>
-            <p className="text-xs text-zinc-400 mt-0.5">Prefix convention and start of accounting period.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-zinc-300">Invoice Prefix</label>
+        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+          <h2 className="text-base font-semibold text-slate-900 mb-5">Invoice Numbering</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-600">Invoice Prefix</label>
               <input
                 type="text"
                 value={settings.invoicePrefix || "INV"}
                 onChange={(e) => setSettings({ ...settings, invoicePrefix: e.target.value })}
-                className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-blue-500 font-mono"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-900 focus:outline-none focus:border-teal-500"
                 placeholder="INV"
               />
-              <p className="text-xs text-zinc-500">Preview: {(settings.invoicePrefix || 'INV').trim()}-{String(settings.invoiceNextNumber || 1).padStart(4, '0')}</p>
+              <p className="text-xs text-slate-400">Preview: {settings.invoicePrefix || 'INV'}-{new Date().getFullYear()}-0001</p>
             </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-zinc-300">Next Invoice Number Counter</label>
-              <input
-                type="number"
-                min="1"
-                value={settings.invoiceNextNumber || 1}
-                onChange={(e) => setSettings({ ...settings, invoiceNextNumber: parseInt(e.target.value) || 1 })}
-                className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-blue-500 font-mono"
-                placeholder="1"
-              />
-              <p className="text-xs text-zinc-500">Starts sequence at this number</p>
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-zinc-300">Fiscal Year Start</label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-600">Fiscal Year Start</label>
               <select
                 value={settings.fiscalYearStart}
                 onChange={(e) => setSettings({ ...settings, fiscalYearStart: parseInt(e.target.value) })}
-                className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-blue-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-900 focus:outline-none focus:border-teal-500"
               >
                 {MONTHS.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
               </select>
             </div>
           </div>
+        </div>
+
+        <div className="flex justify-end">
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 shadow-sm"
+          >
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> :
+             saved ? <><CheckCircle className="w-4 h-4" /> Saved!</> :
+             'Save Changes'}
+          </button>
         </div>
       </div>
     </div>

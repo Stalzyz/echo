@@ -1,8 +1,18 @@
 import { MetadataRoute } from 'next';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://grekam.in';
-  
+  const baseUrl = 'https://academy.grekam.in';
+
+  // The courses catalog uses static slug keys in COURSE_DATA
+  const courseSlugs = ['ui-ux-design', 'fullstack-engineering'];
+
+  const courseUrls = courseSlugs.map((slug) => ({
+    url: `${baseUrl}/academy/courses/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }));
+
   return [
     {
       url: baseUrl,
@@ -14,7 +24,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${baseUrl}/gallery`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
-      priority: 0.8,
+      priority: 0.7,
     },
     {
       url: `${baseUrl}/contact`,
@@ -22,5 +32,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.5,
     },
+    ...courseUrls,
   ];
 }

@@ -16,7 +16,7 @@ export function Faq() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section className="py-32 relative overflow-hidden border-t border-[#1F1F1F] max-w-6xl mx-auto bg-[#0A0A0A]/80 backdrop-blur-md rounded-[3rem] shadow-[0_0_80px_rgba(73,171,201,0.07)]  my-8 p-6 md:p-12" id="faq">
+    <section className="py-32 relative overflow-hidden border-t border-[#1F1F1F]" id="faq">
       <div className="container mx-auto px-4 md:px-6 max-w-4xl">
         <div className="text-center mb-16">
           <h3 className="text-xl font-handwriting text-[#49abc9] mb-4">Frequently Asked Questions</h3>

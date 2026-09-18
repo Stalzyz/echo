@@ -50,7 +50,7 @@ export function LearningModes() {
   const [activeMode, setActiveMode] = useState(modes[0].id);
 
   return (
-    <section className="py-24 bg-background/50 border-y border-border/50 max-w-6xl mx-auto bg-[#0A0A0A]/80 backdrop-blur-md rounded-[3rem] shadow-[0_0_80px_rgba(73,171,201,0.07)]  my-8 p-6 md:p-12" id="methodology">
+    <section className="py-24 bg-background/50 border-y border-border/50" id="methodology">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <motion.h2 

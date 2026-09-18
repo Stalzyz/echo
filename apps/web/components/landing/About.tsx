@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export function About() {
   return (
-    <section className="py-32 relative overflow-hidden max-w-6xl mx-auto bg-[#0A0A0A]/80 backdrop-blur-md rounded-[3rem] shadow-[0_0_80px_rgba(73,171,201,0.07)]  my-8 p-6 md:p-12" id="about">
+    <section className="py-32 relative overflow-hidden" id="about">
       <div className="container mx-auto px-4 md:px-6 max-w-5xl space-y-40">
         
         {/* Section 02: About Grekam Academy */}

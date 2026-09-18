@@ -9,48 +9,34 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
   useEffect(() => {
-    // Disable Lenis inside dashboard, academy, portal, or on touch/mobile devices
-    const isMobile = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0 || window.innerWidth < 768)
-    const isExcludedRoute = pathname?.startsWith('/dashboard') || pathname?.startsWith('/academy') || pathname?.startsWith('/portal')
+    // Initialize Lenis
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Custom easing for premium feel
+      orientation: "vertical",
+      gestureOrientation: "vertical",
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 2,
+    })
+    lenisRef.current = lenis
 
-    if (isMobile || isExcludedRoute) {
-      if (lenisRef.current) {
-        lenisRef.current.destroy()
-        lenisRef.current = null
-      }
-      return
+    function raf(time: number) {
+      lenis.raf(time)
+      requestAnimationFrame(raf)
     }
 
-    try {
-      if (!lenisRef.current) {
-        const lenis = new Lenis({
-          duration: 1.2,
-          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-          orientation: "vertical",
-          gestureOrientation: "vertical",
-          smoothWheel: true,
-          wheelMultiplier: 1,
-          touchMultiplier: 2,
-        })
-        lenisRef.current = lenis
+    requestAnimationFrame(raf)
 
-        let rafId: number;
-        function raf(time: number) {
-          lenis.raf(time)
-          rafId = requestAnimationFrame(raf)
-        }
-        rafId = requestAnimationFrame(raf)
+    return () => {
+      lenis.destroy()
+    }
+  }, [])
 
-        return () => {
-          cancelAnimationFrame(rafId)
-          lenis.destroy()
-          lenisRef.current = null
-        }
-      } else {
-        lenisRef.current.scrollTo(0, { immediate: true })
-      }
-    } catch (err) {
-      console.warn("Lenis smooth scroll failed to initialize:", err)
+  // Reset scroll on route change
+  useEffect(() => {
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { immediate: true })
     }
   }, [pathname])
 

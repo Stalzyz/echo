@@ -122,7 +122,7 @@ export default async function filesRoutes(app: FastifyInstance) {
             secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || '',
           },
         });
-        const BUCKET_NAME = process.env.R2_BUCKET_NAME || 'grekamos';
+        const BUCKET_NAME = process.env.R2_BUCKET_NAME || 'echo';
         let key = '';
         if (file.fileUrl.includes('/storage/asset/')) {
           key = file.fileUrl.split('/storage/asset/')[1]?.split('?')[0];

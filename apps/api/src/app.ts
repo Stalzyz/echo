@@ -272,11 +272,15 @@ export async function buildApp(opts: any = {}): Promise<any> {
   const googleRouter = (await import('./integrations/google.router')).default;
   await app.register(googleRouter, { prefix: '/api/v1/google' });
 
-  // Auth (2FA & Me)
+  // Auth (2FA, Me, OTP, Google OAuth)
   const twoFaRouter = (await import('./auth/two-fa.router')).default;
   await app.register(twoFaRouter, { prefix: '/api/v1/auth' });
   const meRouter = (await import('./auth/me.router')).default;
   await app.register(meRouter, { prefix: '/api/v1/auth' });
+  const otpRouter = (await import('./auth/otp.router')).default;
+  await app.register(otpRouter, { prefix: '/api/v1/auth' });
+  const googleAuthRouter = (await import('./auth/google.router')).default;
+  await app.register(googleAuthRouter, { prefix: '/api/v1/auth' });
 
   // AI Integration
   const aiMentorRouter = (await import('./ai/mentor.router')).default;
@@ -330,7 +334,7 @@ if (require.main === module) {
   const start = async () => {
     try {
       const app = await buildApp();
-      await app.listen({ port: Number(process.env.PORT) || 4000, host: '0.0.0.0' });
+      await app.listen({ port: Number(process.env.PORT) || 4400, host: '0.0.0.0' });
       app.log.info(`Server listening on ${app.server.address()}`);
     } catch (err) {
       console.error(err);

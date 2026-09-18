@@ -27,13 +27,7 @@ export function TimerWidget() {
   }
 
   const handleToggle = () => {
-    if (isRunning) {
-      // Pause
-      setIsRunning(false)
-    } else {
-      // Start
-      setIsRunning(true)
-    }
+    setIsRunning(!isRunning)
   }
 
   const handleReset = () => {
@@ -42,23 +36,23 @@ export function TimerWidget() {
   }
 
   return (
-    <div className="flex items-center gap-2 bg-black/40 border border-white/10 rounded-xl p-1.5 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
-      <div className="flex items-center gap-2 px-2">
-        <Clock className={`w-3 h-3 ${isRunning ? 'text-emerald-400 animate-pulse' : 'text-white/40'}`} />
-        <span className={`text-[10px] font-mono font-bold tracking-wider ${isRunning ? 'text-emerald-400' : 'text-white/60'}`}>
+    <div className="flex items-center gap-2 bg-slate-100 border border-slate-200 rounded-xl p-1 shadow-xs">
+      <div className="flex items-center gap-1.5 px-2">
+        <Clock className={`w-3.5 h-3.5 ${isRunning ? 'text-teal-600 animate-pulse' : 'text-slate-400'}`} />
+        <span className={`text-xs font-mono font-bold ${isRunning ? 'text-teal-700' : 'text-slate-600'}`}>
           {formatTime(seconds)}
         </span>
       </div>
       <button 
         onClick={handleToggle}
-        className={`w-7 h-7 flex items-center justify-center rounded-lg transition-colors ${isRunning ? 'bg-amber-500/20 text-amber-500 hover:bg-amber-500/30' : 'bg-emerald-500/20 text-emerald-500 hover:bg-emerald-500/30'}`}
+        className={`w-6 h-6 flex items-center justify-center rounded-lg transition-colors ${isRunning ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : 'bg-teal-100 text-teal-800 hover:bg-teal-200'}`}
       >
         {isRunning ? <Square className="w-3 h-3 fill-current" /> : <Play className="w-3 h-3 fill-current ml-0.5" />}
       </button>
       {seconds > 0 && !isRunning && (
         <button 
           onClick={handleReset}
-          className="w-7 h-7 flex items-center justify-center rounded-lg bg-red-500/20 text-red-500 hover:bg-red-500/30 transition-colors"
+          className="w-6 h-6 flex items-center justify-center rounded-lg bg-rose-100 text-rose-700 hover:bg-rose-200 transition-colors"
           title="Reset Timer"
         >
           <Square className="w-3 h-3" />

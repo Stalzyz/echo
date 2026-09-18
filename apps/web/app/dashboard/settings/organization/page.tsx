@@ -1,41 +1,18 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { ApiClient } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { 
-  Loader2, 
-  Palette, 
-  Image as ImageIcon, 
-  Check, 
-  Building2, 
-  GraduationCap, 
-  Upload, 
-  Trash2, 
-  Globe, 
-  CreditCard,
-  ExternalLink,
-  Share2,
-  FileBadge2,
-  Eye
-} from "lucide-react";
-import { 
-  FaTwitter, 
-  FaInstagram, 
-  FaLinkedinIn, 
-  FaYoutube, 
-  FaFacebookF, 
-  FaWhatsapp 
-} from "react-icons/fa";
+import { Loader2, Palette, Image as ImageIcon, CheckCircle, BookOpen, Sparkles, Check, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
-const PRESET_PALETTES = [
-  { name: "Indigo", primary: "#4f46e5", secondary: "#6366f1", accent: "#10b981" },
-  { name: "Blue", primary: "#2563eb", secondary: "#3b82f6", accent: "#06b6d4" },
-  { name: "Emerald", primary: "#059669", secondary: "#10b981", accent: "#34d399" },
-  { name: "Rose", primary: "#e11d48", secondary: "#f43f5e", accent: "#f59e0b" },
-  { name: "Purple", primary: "#7c3aed", secondary: "#8b5cf6", accent: "#ec4899" },
-  { name: "Slate", primary: "#334155", secondary: "#475569", accent: "#38bdf8" },
+const THEME_PRESETS = [
+  { name: "Gecho Teal", primary: "#0d9488", secondary: "#f59e0b", accent: "#10b981" },
+  { name: "Royal Indigo", primary: "#4f46e5", secondary: "#ec4899", accent: "#3b82f6" },
+  { name: "Violet Studio", primary: "#7c3aed", secondary: "#f59e0b", accent: "#06b6d4" },
+  { name: "Emerald Learn", primary: "#059669", secondary: "#d97706", accent: "#3b82f6" },
+  { name: "Sunset Amber", primary: "#d97706", secondary: "#7c3aed", accent: "#10b981" },
+  { name: "Crimson Red", primary: "#dc2626", secondary: "#f59e0b", accent: "#6366f1" },
 ];
 
 export default function OrganizationSettingsPage() {
@@ -44,867 +21,406 @@ export default function OrganizationSettingsPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  // Uploading states
-  const [uploadingState, setUploadingState] = useState<{ [key: string]: boolean }>({});
-
-  const agencyLogoInputRef = useRef<HTMLInputElement>(null);
-  const agencyFaviconInputRef = useRef<HTMLInputElement>(null);
-  const academyLogoInputRef = useRef<HTMLInputElement>(null);
-  const academyFaviconInputRef = useRef<HTMLInputElement>(null);
-
   useEffect(() => {
     ApiClient.get("/settings/organization")
       .then((data) => {
-        setOrg(data || {});
+        setOrg(data);
         setLoading(false);
       })
-      .catch((err) => {
-        console.error(err);
-        toast.error("Failed to load organization settings");
-        setLoading(false);
-      });
+      .catch(console.error);
   }, []);
 
-  const handleUploadFile = async (file: File, field: 'logoUrl' | 'faviconUrl' | 'academyLogoUrl' | 'academyFaviconUrl') => {
-    setUploadingState((prev) => ({ ...prev, [field]: true }));
-
-    try {
-      const { uploadUrl, downloadUrl } = await ApiClient.post('/storage/upload-url', {
-        filename: file.name,
-        contentType: file.type || 'image/png',
-        prefix: 'branding'
-      });
-
-      await fetch(uploadUrl, {
-        method: 'PUT',
-        body: file,
-        headers: { 'Content-Type': file.type || 'image/png' }
-      });
-
-      setOrg((prev: any) => ({ ...prev, [field]: downloadUrl }));
-      await ApiClient.patch('/settings/organization', { [field]: downloadUrl }).catch(() => {});
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(new Event("organization-updated"));
-      }
-      toast.success(`${field.includes('Favicon') ? 'Favicon' : 'Logo'} uploaded`);
-    } catch (err: any) {
-      console.warn('Upload-url failed, falling back to data URI encoding...', err);
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const dataUri = e.target?.result as string;
-        setOrg((prev: any) => ({ ...prev, [field]: dataUri }));
-        await ApiClient.patch('/settings/organization', { [field]: dataUri }).catch(() => {});
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(new Event("organization-updated"));
-        }
-        toast.success(`${field.includes('Favicon') ? 'Favicon' : 'Logo'} updated`);
-      };
-      reader.readAsDataURL(file);
-    } finally {
-      setUploadingState((prev) => ({ ...prev, [field]: false }));
+  const triggerLiveThemeUpdate = (updatedOrg: any) => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("organization-updated", {
+          detail: {
+            primaryColor: updatedOrg.primaryColor,
+            secondaryColor: updatedOrg.secondaryColor,
+            accentColor: updatedOrg.accentColor,
+            name: updatedOrg.name,
+          },
+        })
+      );
     }
+  };
+
+  const handleColorChange = (field: string, val: string) => {
+    const updated = { ...org, [field]: val };
+    setOrg(updated);
+    triggerLiveThemeUpdate(updated);
+  };
+
+  const applyPreset = (preset: typeof THEME_PRESETS[0]) => {
+    const updated = {
+      ...org,
+      primaryColor: preset.primary,
+      secondaryColor: preset.secondary,
+      accentColor: preset.accent,
+    };
+    setOrg(updated);
+    triggerLiveThemeUpdate(updated);
+    toast.success(`Applied ${preset.name} color theme!`);
   };
 
   const handleSave = async () => {
     setSaving(true);
     try {
       const payload: any = {
-        name: org.name || "Grekam Visuals",
-        companyName: org.companyName ? org.companyName.trim() : null,
-        panNumber: org.panNumber ? org.panNumber.trim().toUpperCase() : null,
-        gstNumber: org.gstNumber ? org.gstNumber.trim().toUpperCase() : null,
-        logoUrl: org.logoUrl || null,
-        faviconUrl: org.faviconUrl || null,
-        academyLogoUrl: org.academyLogoUrl || null,
-        academyFaviconUrl: org.academyFaviconUrl || null,
-        primaryColor: org.primaryColor || "#4f46e5",
-        secondaryColor: org.secondaryColor || "#7c3aed",
+        name: org.name || "",
+        primaryColor: org.primaryColor || "#0d9488",
+        secondaryColor: org.secondaryColor || "#f59e0b",
         accentColor: org.accentColor || "#10b981",
-        darkModeDefault: org.darkModeDefault ?? true,
-        supportEmail: org.supportEmail ? org.supportEmail.trim() : null,
-        billingAddress: org.billingAddress ? org.billingAddress.trim() : null,
-        website: org.website ? org.website.trim() : null,
-        phone: org.phone ? org.phone.trim() : null,
-        instagramUrl: org.instagramUrl ? org.instagramUrl.trim() : null,
-        youtubeUrl: org.youtubeUrl ? org.youtubeUrl.trim() : null,
-        linkedinUrl: org.linkedinUrl ? org.linkedinUrl.trim() : null,
-        twitterUrl: org.twitterUrl ? org.twitterUrl.trim() : null,
-        facebookUrl: org.facebookUrl ? org.facebookUrl.trim() : null,
-        whatsappNumber: org.whatsappNumber ? org.whatsappNumber.trim() : null,
-        openAiKey: org.openAiKey || null,
-        bankName: org.bankName ? org.bankName.trim() : null,
-        accountName: org.accountName ? org.accountName.trim() : null,
-        accountNumber: org.accountNumber ? org.accountNumber.trim() : (org.bankAccountNo || null),
-        ifscCode: org.ifscCode ? org.ifscCode.trim().toUpperCase() : (org.bankIfsc || null),
-        swiftCode: org.swiftCode ? org.swiftCode.trim().toUpperCase() : null,
-        bankBranch: org.bankBranch ? org.bankBranch.trim() : null,
       };
+      if (org.logoUrl) payload.logoUrl = org.logoUrl;
+      if (org.faviconUrl) payload.faviconUrl = org.faviconUrl;
+      if (org.supportEmail) payload.supportEmail = org.supportEmail;
+      if (org.billingAddress) payload.billingAddress = org.billingAddress;
+      if (org.darkModeDefault !== undefined) payload.darkModeDefault = org.darkModeDefault;
+      if (org.openAiKey !== undefined) payload.openAiKey = org.openAiKey;
+      if (org.resendApiKey !== undefined) payload.resendApiKey = org.resendApiKey;
 
       const updated = await ApiClient.patch("/settings/organization", payload);
       setOrg(updated);
       setSaved(true);
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(new Event("organization-updated"));
-      }
-      toast.success("Settings saved successfully");
+      triggerLiveThemeUpdate(updated);
+      toast.success("Organization theme settings published live!");
       setTimeout(() => setSaved(false), 3000);
     } catch (err: any) {
       console.error(err);
-      toast.error(err?.response?.data?.message || err?.message || "Failed to save settings");
+      toast.error(err.message || "Failed to save settings");
     } finally {
       setSaving(false);
     }
   };
 
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingFavicon, setUploadingFavicon] = useState(false);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: "logoUrl" | "faviconUrl") => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (field === "logoUrl") setUploadingLogo(true);
+    else setUploadingFavicon(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await ApiClient.post("/storage/upload-local", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (res.downloadUrl) {
+        setOrg({ ...org, [field]: res.downloadUrl });
+        toast.success("Image uploaded successfully!");
+      } else {
+        throw new Error("No download URL returned");
+      }
+    } catch (err: any) {
+      console.error("Upload failed", err);
+      toast.error("Upload failed. Please check console.");
+    } finally {
+      if (field === "logoUrl") setUploadingLogo(false);
+      else setUploadingFavicon(false);
+    }
+  };
+
   if (loading) {
     return (
-      <div className="p-12 flex flex-col items-center justify-center min-h-[350px]">
-        <Loader2 className="w-6 h-6 animate-spin text-zinc-400 mb-2" />
-        <p className="text-xs text-zinc-500">Loading settings...</p>
+      <div className="p-12 flex justify-center items-center">
+        <Loader2 className="animate-spin text-primary w-8 h-8" />
       </div>
     );
   }
 
+  const primaryCol = org?.primaryColor || "#0d9488";
+  const secondaryCol = org?.secondaryColor || "#f59e0b";
+  const accentCol = org?.accentColor || "#10b981";
+
   return (
-    <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/[0.08] pb-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-zinc-100 tracking-tight">
-            Organization & Branding
-          </h1>
-          <p className="text-sm text-zinc-400 mt-1">
-            Manage your legal entity, brand assets, tax details, and public channels.
-          </p>
-        </div>
-        <Button 
-          onClick={handleSave} 
-          disabled={saving}
-          className="bg-blue-600 hover:bg-blue-500 text-white font-medium px-5 py-2 rounded-lg transition-colors shrink-0 flex items-center gap-2 cursor-pointer shadow-sm"
-        >
-          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <Check className="w-4 h-4 text-emerald-300" /> : null}
-          {saving ? "Saving..." : saved ? "Saved" : "Save changes"}
-        </Button>
-      </div>
-
-      {/* ── 1. LEGAL ENTITY & TAX PARTICULARS ── */}
-      <div className="bg-[#121620] border border-white/[0.08] rounded-xl p-6 space-y-6">
-        <div className="border-b border-white/[0.06] pb-4">
-          <h2 className="text-base font-semibold text-zinc-100 flex items-center gap-2">
-            <FileBadge2 className="w-4 h-4 text-zinc-400" /> Company & Legal Identity
-          </h2>
-          <p className="text-xs text-zinc-400 mt-0.5">Corporate identifiers used across invoices, contracts, and filings.</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-zinc-300">Registered Legal Company Name</label>
-            <input
-              type="text"
-              value={org?.companyName || ""}
-              onChange={(e) => setOrg({ ...org, companyName: e.target.value })}
-              className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
-              placeholder="e.g. Grekam Visuals and Technologies Pvt Ltd"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-zinc-300">Display Name</label>
-            <input
-              type="text"
-              value={org?.name || ""}
-              onChange={(e) => setOrg({ ...org, name: e.target.value })}
-              className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
-              placeholder="e.g. Grekam Visuals"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-medium text-zinc-300">Income Tax PAN</label>
-              <span className="text-[11px] text-zinc-500">10-character code</span>
-            </div>
-            <input
-              type="text"
-              value={org?.panNumber || ""}
-              onChange={(e) => setOrg({ ...org, panNumber: e.target.value.toUpperCase() })}
-              className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm font-mono uppercase text-zinc-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
-              placeholder="ABCDE1234F"
-              maxLength={10}
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-medium text-zinc-300">GSTIN</label>
-              <span className="text-[11px] text-zinc-500">Auto-synced with Finance</span>
-            </div>
-            <input
-              type="text"
-              value={org?.gstNumber || ""}
-              onChange={(e) => setOrg({ ...org, gstNumber: e.target.value.toUpperCase() })}
-              className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm font-mono uppercase text-zinc-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
-              placeholder="33AAAAA0000A1Z5"
-              maxLength={15}
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-zinc-300">Official Support Email</label>
-            <input
-              type="email"
-              value={org?.supportEmail || ""}
-              onChange={(e) => setOrg({ ...org, supportEmail: e.target.value })}
-              className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
-              placeholder="contact@grekam.in"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-zinc-300">Official Website</label>
-            <div className="relative flex items-center">
-              <input
-                type="text"
-                value={org?.website || ""}
-                onChange={(e) => setOrg({ ...org, website: e.target.value })}
-                className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-blue-500 pr-9"
-                placeholder="https://grekam.in"
-              />
-              {org?.website && (
-                <a
-                  href={org.website.startsWith("http") ? org.website : `https://${org.website}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute right-3 text-zinc-400 hover:text-zinc-200 transition-colors"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-zinc-300">Contact Phone</label>
-            <input
-              type="text"
-              value={org?.phone || ""}
-              onChange={(e) => setOrg({ ...org, phone: e.target.value })}
-              className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-blue-500"
-              placeholder="+91 98400 12345"
-            />
-          </div>
-
-          <div className="space-y-1.5 md:col-span-2">
-            <label className="text-xs font-medium text-zinc-300">Registered Billing Address</label>
-            <textarea
-              value={org?.billingAddress || ""}
-              onChange={(e) => setOrg({ ...org, billingAddress: e.target.value })}
-              className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-blue-500 min-h-[75px] resize-none"
-              placeholder="No. 42 Anna Salai, Chennai, Tamil Nadu 600002"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* ── 2. BRAND COLOR THEME ── */}
-      <div className="bg-[#121620] border border-white/[0.08] rounded-xl p-6 space-y-6">
-        <div className="border-b border-white/[0.06] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+    <div className="flex-1 overflow-y-auto h-full bg-slate-50 text-slate-900 custom-scrollbar">
+      <div className="p-8 max-w-5xl mx-auto space-y-8">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-slate-200 pb-6">
           <div>
-            <h2 className="text-base font-semibold text-zinc-100 flex items-center gap-2">
-              <Palette className="w-4 h-4 text-zinc-400" /> Brand Color Palette
-            </h2>
-            <p className="text-xs text-zinc-400 mt-0.5">Applied to invoice headers, badges, and interface accents.</p>
-          </div>
-        </div>
-
-        {/* Curated Presets */}
-        <div className="space-y-2">
-          <label className="text-xs font-medium text-zinc-400">Palette Presets</label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-            {PRESET_PALETTES.map((palette) => {
-              const isSelected = 
-                org?.primaryColor?.toLowerCase() === palette.primary.toLowerCase() &&
-                org?.secondaryColor?.toLowerCase() === palette.secondary.toLowerCase() &&
-                org?.accentColor?.toLowerCase() === palette.accent.toLowerCase();
-
-              return (
-                <button
-                  key={palette.name}
-                  type="button"
-                  onClick={() => setOrg({
-                    ...org,
-                    primaryColor: palette.primary,
-                    secondaryColor: palette.secondary,
-                    accentColor: palette.accent,
-                  })}
-                  className={`p-2.5 rounded-lg border text-left transition-colors flex items-center justify-between cursor-pointer ${
-                    isSelected 
-                      ? 'border-blue-500/60 bg-blue-500/10' 
-                      : 'border-white/[0.06] bg-[#0b0d13] hover:border-white/[0.15]'
-                  }`}
-                >
-                  <span className="text-xs font-medium text-zinc-300">{palette.name}</span>
-                  <div className="flex items-center gap-1">
-                    <span className="w-3 h-3 rounded-full border border-white/20" style={{ backgroundColor: palette.primary }} />
-                    <span className="w-3 h-3 rounded-full border border-white/20" style={{ backgroundColor: palette.accent }} />
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Individual Color Inputs */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-[#0b0d13] border border-white/[0.06] rounded-lg p-3.5 space-y-2">
-            <label className="text-xs font-medium text-zinc-300 block">Primary Color</label>
-            <div className="flex items-center gap-2">
-              <input
-                type="color"
-                value={org?.primaryColor || "#4f46e5"}
-                onChange={(e) => setOrg({ ...org, primaryColor: e.target.value })}
-                className="w-8 h-8 rounded border border-white/10 cursor-pointer bg-transparent p-0 overflow-hidden"
-              />
-              <input
-                type="text"
-                value={org?.primaryColor || "#4f46e5"}
-                onChange={(e) => setOrg({ ...org, primaryColor: e.target.value })}
-                className="w-full bg-black/40 border border-white/[0.08] rounded-md px-2.5 py-1.5 text-xs font-mono text-zinc-200 uppercase focus:outline-none focus:border-blue-500"
-                maxLength={7}
-              />
-            </div>
-          </div>
-
-          <div className="bg-[#0b0d13] border border-white/[0.06] rounded-lg p-3.5 space-y-2">
-            <label className="text-xs font-medium text-zinc-300 block">Secondary Color</label>
-            <div className="flex items-center gap-2">
-              <input
-                type="color"
-                value={org?.secondaryColor || "#7c3aed"}
-                onChange={(e) => setOrg({ ...org, secondaryColor: e.target.value })}
-                className="w-8 h-8 rounded border border-white/10 cursor-pointer bg-transparent p-0 overflow-hidden"
-              />
-              <input
-                type="text"
-                value={org?.secondaryColor || "#7c3aed"}
-                onChange={(e) => setOrg({ ...org, secondaryColor: e.target.value })}
-                className="w-full bg-black/40 border border-white/[0.08] rounded-md px-2.5 py-1.5 text-xs font-mono text-zinc-200 uppercase focus:outline-none focus:border-blue-500"
-                maxLength={7}
-              />
-            </div>
-          </div>
-
-          <div className="bg-[#0b0d13] border border-white/[0.06] rounded-lg p-3.5 space-y-2">
-            <label className="text-xs font-medium text-zinc-300 block">Accent Highlight</label>
-            <div className="flex items-center gap-2">
-              <input
-                type="color"
-                value={org?.accentColor || "#10b981"}
-                onChange={(e) => setOrg({ ...org, accentColor: e.target.value })}
-                className="w-8 h-8 rounded border border-white/10 cursor-pointer bg-transparent p-0 overflow-hidden"
-              />
-              <input
-                type="text"
-                value={org?.accentColor || "#10b981"}
-                onChange={(e) => setOrg({ ...org, accentColor: e.target.value })}
-                className="w-full bg-black/40 border border-white/[0.08] rounded-md px-2.5 py-1.5 text-xs font-mono text-zinc-200 uppercase focus:outline-none focus:border-blue-500"
-                maxLength={7}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Clean Live Component Simulation */}
-        <div className="border border-white/[0.06] bg-[#0b0d13] rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span 
-                className="px-2 py-0.5 rounded text-[11px] font-medium"
-                style={{ 
-                  backgroundColor: `${org?.accentColor || '#10b981'}1a`,
-                  color: org?.accentColor || '#10b981'
-                }}
-              >
-                ● Active
-              </span>
-              <span className="text-xs text-zinc-400">Invoice #INV-2026-001</span>
-            </div>
-            <p className="text-sm font-medium text-zinc-200">
-              {org?.companyName || org?.name || "Grekam Visuals and Technologies Pvt Ltd"}
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Organization Theme & Whitelabel</h1>
+            <p className="text-xs text-slate-500 mt-1 font-medium">
+              Configure unified color palettes, brand assets, and platform identity for your organization.
             </p>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              type="button"
-              className="px-3.5 py-1.5 rounded-md text-xs font-medium text-white shadow-sm"
-              style={{ backgroundColor: org?.primaryColor || '#4f46e5' }}
+          <Button
+            onClick={handleSave}
+            disabled={saving}
+            style={{ backgroundColor: primaryCol }}
+            className="text-white font-bold text-xs rounded-xl shadow-sm px-6 py-2.5 transition-all hover:opacity-90"
+          >
+            {saving ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : saved ? (
+              <>
+                <CheckCircle className="w-4 h-4 mr-2" /> Saved!
+              </>
+            ) : (
+              "Publish Theme Settings"
+            )}
+          </Button>
+        </div>
+
+        <div className="space-y-8">
+          
+          {/* Theme & Color Palettes Card */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <h2 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                <Palette className="w-4 h-4 text-primary" style={{ color: primaryCol }} /> Unified Color Theme
+              </h2>
+              <span className="text-[11px] font-bold text-slate-400">Live Global Sync Enabled</span>
+            </div>
+
+            {/* Presets */}
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-3 uppercase tracking-wider">
+                Select Theme Preset
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {THEME_PRESETS.map((p) => {
+                  const isSelected = org?.primaryColor === p.primary;
+                  return (
+                    <button
+                      key={p.name}
+                      onClick={() => applyPreset(p)}
+                      className={`p-3 rounded-xl border text-left transition-all flex items-center justify-between ${
+                        isSelected
+                          ? "bg-slate-50 font-bold border-2"
+                          : "border-slate-200 bg-white hover:bg-slate-50"
+                      }`}
+                      style={{ borderColor: isSelected ? p.primary : undefined }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1">
+                          <span className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: p.primary }} />
+                          <span className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: p.secondary }} />
+                          <span className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: p.accent }} />
+                        </div>
+                        <span className="text-xs font-bold text-slate-800">{p.name}</span>
+                      </div>
+                      {isSelected && <Check className="w-4 h-4" style={{ color: p.primary }} />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Custom Inputs */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+              
+              <div className="space-y-2 bg-slate-50 border border-slate-200 rounded-xl p-4">
+                <label className="text-xs font-bold text-slate-800 block">Primary Color</label>
+                <p className="text-[11px] text-slate-500">Buttons, active tabs, header elements, links</p>
+                <div className="flex items-center space-x-3 pt-1">
+                  <input
+                    type="color"
+                    value={primaryCol}
+                    onChange={(e) => handleColorChange("primaryColor", e.target.value)}
+                    className="w-10 h-10 rounded-xl cursor-pointer border border-slate-200 bg-transparent shrink-0"
+                  />
+                  <input
+                    type="text"
+                    value={primaryCol}
+                    onChange={(e) => handleColorChange("primaryColor", e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-slate-900 font-mono text-xs focus:outline-none focus:ring-2"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2 bg-slate-50 border border-slate-200 rounded-xl p-4">
+                <label className="text-xs font-bold text-slate-800 block">Secondary Color</label>
+                <p className="text-[11px] text-slate-500">Highlights, badges, secondary callouts</p>
+                <div className="flex items-center space-x-3 pt-1">
+                  <input
+                    type="color"
+                    value={secondaryCol}
+                    onChange={(e) => handleColorChange("secondaryColor", e.target.value)}
+                    className="w-10 h-10 rounded-xl cursor-pointer border border-slate-200 bg-transparent shrink-0"
+                  />
+                  <input
+                    type="text"
+                    value={secondaryCol}
+                    onChange={(e) => handleColorChange("secondaryColor", e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-slate-900 font-mono text-xs focus:outline-none focus:ring-2"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2 bg-slate-50 border border-slate-200 rounded-xl p-4">
+                <label className="text-xs font-bold text-slate-800 block">Accent Color</label>
+                <p className="text-[11px] text-slate-500">Status tags, progress bars, chart indicators</p>
+                <div className="flex items-center space-x-3 pt-1">
+                  <input
+                    type="color"
+                    value={accentCol}
+                    onChange={(e) => handleColorChange("accentColor", e.target.value)}
+                    className="w-10 h-10 rounded-xl cursor-pointer border border-slate-200 bg-transparent shrink-0"
+                  />
+                  <input
+                    type="text"
+                    value={accentCol}
+                    onChange={(e) => handleColorChange("accentColor", e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-slate-900 font-mono text-xs focus:outline-none focus:ring-2"
+                  />
+                </div>
+              </div>
+
+            </div>
+
+            {/* Live Interactive Preview Box */}
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black uppercase tracking-wider text-slate-700">Live Application UI Preview</span>
+                <span className="text-[10px] font-bold text-slate-400">Updates live when colors change</span>
+              </div>
+
+              <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg text-white font-bold flex items-center justify-center text-xs" style={{ backgroundColor: primaryCol }}>
+                      {org?.name?.slice(0, 1) || "G"}
+                    </div>
+                    <span className="font-bold text-sm text-slate-900">{org?.name || "Gecho LMS"}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold" style={{ backgroundColor: `${secondaryCol}20`, color: secondaryCol }}>
+                      PRO SAAS
+                    </span>
+                    <button className="px-3 py-1.5 text-white text-xs font-bold rounded-lg shadow-xs" style={{ backgroundColor: primaryCol }}>
+                      Action Button
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 text-xs border-b border-slate-100 pb-3">
+                  <span className="px-3 py-1 rounded-lg font-bold text-white shadow-2xs" style={{ backgroundColor: primaryCol }}>
+                    Active Tab
+                  </span>
+                  <span className="px-3 py-1 text-slate-500 font-medium hover:bg-slate-100 rounded-lg">
+                    Inactive Tab
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="p-3 border rounded-xl" style={{ backgroundColor: `${primaryCol}08`, borderColor: `${primaryCol}30` }}>
+                    <span className="font-bold block" style={{ color: primaryCol }}>Primary Component Highlight</span>
+                    <span className="text-slate-500 text-[11px]">Sub-text themed dynamically</span>
+                  </div>
+                  <div className="p-3 border rounded-xl" style={{ backgroundColor: `${accentCol}10`, borderColor: `${accentCol}40` }}>
+                    <span className="font-bold block" style={{ color: accentCol }}>Accent Feature Tag</span>
+                    <span className="text-slate-500 text-[11px]">Accent color highlight</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Branding & Info */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6">
+            <h2 className="text-sm font-black uppercase tracking-wider text-slate-900 border-b border-slate-100 pb-4">
+              Organization Metadata
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-700">OS / Academy Display Name</label>
+                <input
+                  type="text"
+                  value={org?.name || ""}
+                  onChange={(e) => setOrg({ ...org, name: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-medium text-slate-900 focus:bg-white focus:outline-none"
+                  placeholder="e.g. Grekam Academy"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-700">Support Email</label>
+                <input
+                  type="email"
+                  value={org?.supportEmail || ""}
+                  onChange={(e) => setOrg({ ...org, supportEmail: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-medium text-slate-900 focus:bg-white focus:outline-none"
+                  placeholder="contact@grekam.in"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Assets Upload */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6">
+            <h2 className="text-sm font-black uppercase tracking-wider text-slate-900 border-b border-slate-100 pb-4 flex items-center gap-2">
+              <ImageIcon className="w-4 h-4 text-purple-600" /> Logotype & Favicon Assets
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-700">Main Logo URL</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={org?.logoUrl || ""}
+                    onChange={(e) => setOrg({ ...org, logoUrl: e.target.value })}
+                    className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-medium text-slate-900 focus:bg-white focus:outline-none"
+                    placeholder="https://cdn.example.com/logo.png"
+                  />
+                  <label className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl cursor-pointer flex items-center justify-center text-xs font-bold min-w-[90px] transition-colors">
+                    {uploadingLogo ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Upload"}
+                    <input type="file" className="hidden" accept="image/*" onChange={(e) => handleUpload(e, "logoUrl")} />
+                  </label>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-700">Favicon Icon URL</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={org?.faviconUrl || ""}
+                    onChange={(e) => setOrg({ ...org, faviconUrl: e.target.value })}
+                    className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-medium text-slate-900 focus:bg-white focus:outline-none"
+                    placeholder="https://cdn.example.com/favicon.ico"
+                  />
+                  <label className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl cursor-pointer flex items-center justify-center text-xs font-bold min-w-[90px] transition-colors">
+                    {uploadingFavicon ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Upload"}
+                    <input type="file" className="hidden" accept="image/*, .ico" onChange={(e) => handleUpload(e, "faviconUrl")} />
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-2">
+            <Button
+              onClick={handleSave}
+              disabled={saving}
+              style={{ backgroundColor: primaryCol }}
+              className="text-white font-bold text-xs rounded-xl shadow-sm px-8 py-3 transition-all hover:opacity-90"
             >
-              Primary
-            </button>
-            <button
-              type="button"
-              className="px-3.5 py-1.5 rounded-md text-xs font-medium border border-white/[0.1] text-zinc-300 hover:bg-white/[0.04]"
-            >
-              Secondary
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* ── 3. OFFICIAL SOCIAL MEDIA CHANNELS ── */}
-      <div className="bg-[#121620] border border-white/[0.08] rounded-xl p-6 space-y-5">
-        <div className="border-b border-white/[0.06] pb-4">
-          <h2 className="text-base font-semibold text-zinc-100 flex items-center gap-2">
-            <Share2 className="w-4 h-4 text-zinc-400" /> Social Media & Channels
-          </h2>
-          <p className="text-xs text-zinc-400 mt-0.5">Displayed in email footers, proposals, and client portals.</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Instagram */}
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-zinc-400">Instagram</label>
-            <div className="relative flex items-center">
-              <FaInstagram className="w-4 h-4 text-zinc-500 absolute left-3 pointer-events-none" />
-              <input
-                type="text"
-                value={org?.instagramUrl || ""}
-                onChange={(e) => setOrg({ ...org, instagramUrl: e.target.value })}
-                className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg pl-9 pr-9 py-2 text-xs text-zinc-200 focus:outline-none focus:border-blue-500"
-                placeholder="https://instagram.com/grekamvisuals"
-              />
-              {org?.instagramUrl && (
-                <a
-                  href={org.instagramUrl.startsWith("http") ? org.instagramUrl : `https://${org.instagramUrl}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute right-3 text-zinc-500 hover:text-zinc-300"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              )}
-            </div>
-          </div>
-
-          {/* YouTube */}
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-zinc-400">YouTube</label>
-            <div className="relative flex items-center">
-              <FaYoutube className="w-4 h-4 text-zinc-500 absolute left-3 pointer-events-none" />
-              <input
-                type="text"
-                value={org?.youtubeUrl || ""}
-                onChange={(e) => setOrg({ ...org, youtubeUrl: e.target.value })}
-                className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg pl-9 pr-9 py-2 text-xs text-zinc-200 focus:outline-none focus:border-blue-500"
-                placeholder="https://youtube.com/@grekamvisuals"
-              />
-              {org?.youtubeUrl && (
-                <a
-                  href={org.youtubeUrl.startsWith("http") ? org.youtubeUrl : `https://${org.youtubeUrl}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute right-3 text-zinc-500 hover:text-zinc-300"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              )}
-            </div>
-          </div>
-
-          {/* LinkedIn */}
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-zinc-400">LinkedIn</label>
-            <div className="relative flex items-center">
-              <FaLinkedinIn className="w-4 h-4 text-zinc-500 absolute left-3 pointer-events-none" />
-              <input
-                type="text"
-                value={org?.linkedinUrl || ""}
-                onChange={(e) => setOrg({ ...org, linkedinUrl: e.target.value })}
-                className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg pl-9 pr-9 py-2 text-xs text-zinc-200 focus:outline-none focus:border-blue-500"
-                placeholder="https://linkedin.com/company/grekam"
-              />
-              {org?.linkedinUrl && (
-                <a
-                  href={org.linkedinUrl.startsWith("http") ? org.linkedinUrl : `https://${org.linkedinUrl}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute right-3 text-zinc-500 hover:text-zinc-300"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              )}
-            </div>
-          </div>
-
-          {/* X / Twitter */}
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-zinc-400">X (Twitter)</label>
-            <div className="relative flex items-center">
-              <FaTwitter className="w-4 h-4 text-zinc-500 absolute left-3 pointer-events-none" />
-              <input
-                type="text"
-                value={org?.twitterUrl || ""}
-                onChange={(e) => setOrg({ ...org, twitterUrl: e.target.value })}
-                className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg pl-9 pr-9 py-2 text-xs text-zinc-200 focus:outline-none focus:border-blue-500"
-                placeholder="https://x.com/grekamvisuals"
-              />
-              {org?.twitterUrl && (
-                <a
-                  href={org.twitterUrl.startsWith("http") ? org.twitterUrl : `https://${org.twitterUrl}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute right-3 text-zinc-500 hover:text-zinc-300"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              )}
-            </div>
-          </div>
-
-          {/* Facebook */}
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-zinc-400">Facebook</label>
-            <div className="relative flex items-center">
-              <FaFacebookF className="w-4 h-4 text-zinc-500 absolute left-3 pointer-events-none" />
-              <input
-                type="text"
-                value={org?.facebookUrl || ""}
-                onChange={(e) => setOrg({ ...org, facebookUrl: e.target.value })}
-                className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg pl-9 pr-9 py-2 text-xs text-zinc-200 focus:outline-none focus:border-blue-500"
-                placeholder="https://facebook.com/grekamvisuals"
-              />
-              {org?.facebookUrl && (
-                <a
-                  href={org.facebookUrl.startsWith("http") ? org.facebookUrl : `https://${org.facebookUrl}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute right-3 text-zinc-500 hover:text-zinc-300"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              )}
-            </div>
-          </div>
-
-          {/* WhatsApp */}
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-zinc-400">WhatsApp Business</label>
-            <div className="relative flex items-center">
-              <FaWhatsapp className="w-4 h-4 text-zinc-500 absolute left-3 pointer-events-none" />
-              <input
-                type="text"
-                value={org?.whatsappNumber || ""}
-                onChange={(e) => setOrg({ ...org, whatsappNumber: e.target.value })}
-                className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg pl-9 pr-9 py-2 text-xs text-zinc-200 focus:outline-none focus:border-blue-500"
-                placeholder="+91 98400 12345"
-              />
-              {org?.whatsappNumber && (
-                <a
-                  href={
-                    org.whatsappNumber.startsWith("http") 
-                      ? org.whatsappNumber 
-                      : `https://wa.me/${org.whatsappNumber.replace(/[^0-9]/g, '')}`
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute right-3 text-zinc-500 hover:text-zinc-300"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── 4. BRAND ASSETS (AGENCY & ACADEMY) ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Agency Assets */}
-        <div className="bg-[#121620] border border-white/[0.08] rounded-xl p-6 space-y-4">
-          <div className="border-b border-white/[0.06] pb-3">
-            <h3 className="text-sm font-semibold text-zinc-100 flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-zinc-400" /> Agency Brand (Grekam Visuals)
-            </h3>
-            <p className="text-xs text-zinc-400 mt-0.5">Used on invoices, proposals, and agency portal.</p>
-          </div>
-
-          {/* Logo */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs text-zinc-400 font-medium">
-              <span>Landscape Logo</span>
-              <span className="text-[11px] text-zinc-500">~3:1 ratio</span>
-            </div>
-            <div className="h-20 rounded-lg border border-dashed border-white/[0.12] bg-[#0b0d13] flex items-center justify-center p-2">
-              {org?.logoUrl ? (
-                <img src={org.logoUrl} alt="Logo" className="max-h-full max-w-full object-contain" />
+              {saving ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : saved ? (
+                <>
+                  <CheckCircle className="w-4 h-4 mr-2" /> Saved & Synced!
+                </>
               ) : (
-                <span className="text-xs text-zinc-500">No logo uploaded</span>
+                "Save Organization Theme Settings"
               )}
-            </div>
-            <div className="flex gap-2">
-              <input 
-                type="file" 
-                ref={agencyLogoInputRef} 
-                accept="image/*" 
-                className="hidden" 
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleUploadFile(file, 'logoUrl');
-                }} 
-              />
-              <button
-                type="button"
-                onClick={() => agencyLogoInputRef.current?.click()}
-                disabled={uploadingState['logoUrl']}
-                className="flex-1 py-1.5 px-3 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs font-medium text-zinc-200 rounded-md transition-colors"
-              >
-                {uploadingState['logoUrl'] ? "Uploading..." : "Upload logo"}
-              </button>
-              {org?.logoUrl && (
-                <button
-                  type="button"
-                  onClick={() => setOrg({ ...org, logoUrl: "" })}
-                  className="p-1.5 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 border border-white/[0.08] rounded-md transition-colors"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
+            </Button>
           </div>
 
-          {/* Favicon */}
-          <div className="space-y-2 pt-2 border-t border-white/[0.06]">
-            <div className="flex items-center justify-between text-xs text-zinc-400 font-medium">
-              <span>Square Favicon</span>
-              <span className="text-[11px] text-zinc-500">1:1 square</span>
-            </div>
-            <div className="h-14 rounded-lg border border-dashed border-white/[0.12] bg-[#0b0d13] flex items-center justify-center p-2">
-              {org?.faviconUrl ? (
-                <img src={org.faviconUrl} alt="Favicon" className="max-h-full max-w-full object-contain" />
-              ) : (
-                <Globe className="w-4 h-4 text-zinc-500" />
-              )}
-            </div>
-            <div className="flex gap-2">
-              <input 
-                type="file" 
-                ref={agencyFaviconInputRef} 
-                accept="image/*, .ico" 
-                className="hidden" 
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleUploadFile(file, 'faviconUrl');
-                }} 
-              />
-              <button
-                type="button"
-                onClick={() => agencyFaviconInputRef.current?.click()}
-                disabled={uploadingState['faviconUrl']}
-                className="flex-1 py-1.5 px-3 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs font-medium text-zinc-200 rounded-md transition-colors"
-              >
-                {uploadingState['faviconUrl'] ? "Uploading..." : "Upload favicon"}
-              </button>
-              {org?.faviconUrl && (
-                <button
-                  type="button"
-                  onClick={() => setOrg({ ...org, faviconUrl: "" })}
-                  className="p-1.5 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 border border-white/[0.08] rounded-md transition-colors"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-          </div>
         </div>
-
-        {/* Academy Assets */}
-        <div className="bg-[#121620] border border-white/[0.08] rounded-xl p-6 space-y-4">
-          <div className="border-b border-white/[0.06] pb-3">
-            <h3 className="text-sm font-semibold text-zinc-100 flex items-center gap-2">
-              <GraduationCap className="w-4 h-4 text-zinc-400" /> Academy Brand (Grekam Academy)
-            </h3>
-            <p className="text-xs text-zinc-400 mt-0.5">Used on fee receipts, certificates, and student LMS.</p>
-          </div>
-
-          {/* Logo */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs text-zinc-400 font-medium">
-              <span>Landscape Logo</span>
-              <span className="text-[11px] text-zinc-500">~3:1 ratio</span>
-            </div>
-            <div className="h-20 rounded-lg border border-dashed border-white/[0.12] bg-[#0b0d13] flex items-center justify-center p-2">
-              {org?.academyLogoUrl ? (
-                <img src={org.academyLogoUrl} alt="Academy Logo" className="max-h-full max-w-full object-contain" />
-              ) : (
-                <span className="text-xs text-zinc-500">No logo uploaded</span>
-              )}
-            </div>
-            <div className="flex gap-2">
-              <input 
-                type="file" 
-                ref={academyLogoInputRef} 
-                accept="image/*" 
-                className="hidden" 
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleUploadFile(file, 'academyLogoUrl');
-                }} 
-              />
-              <button
-                type="button"
-                onClick={() => academyLogoInputRef.current?.click()}
-                disabled={uploadingState['academyLogoUrl']}
-                className="flex-1 py-1.5 px-3 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs font-medium text-zinc-200 rounded-md transition-colors"
-              >
-                {uploadingState['academyLogoUrl'] ? "Uploading..." : "Upload logo"}
-              </button>
-              {org?.academyLogoUrl && (
-                <button
-                  type="button"
-                  onClick={() => setOrg({ ...org, academyLogoUrl: "" })}
-                  className="p-1.5 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 border border-white/[0.08] rounded-md transition-colors"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Favicon */}
-          <div className="space-y-2 pt-2 border-t border-white/[0.06]">
-            <div className="flex items-center justify-between text-xs text-zinc-400 font-medium">
-              <span>Square Favicon</span>
-              <span className="text-[11px] text-zinc-500">1:1 square</span>
-            </div>
-            <div className="h-14 rounded-lg border border-dashed border-white/[0.12] bg-[#0b0d13] flex items-center justify-center p-2">
-              {org?.academyFaviconUrl ? (
-                <img src={org.academyFaviconUrl} alt="Academy Favicon" className="max-h-full max-w-full object-contain" />
-              ) : (
-                <GraduationCap className="w-4 h-4 text-zinc-500" />
-              )}
-            </div>
-            <div className="flex gap-2">
-              <input 
-                type="file" 
-                ref={academyFaviconInputRef} 
-                accept="image/*, .ico" 
-                className="hidden" 
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleUploadFile(file, 'academyFaviconUrl');
-                }} 
-              />
-              <button
-                type="button"
-                onClick={() => academyFaviconInputRef.current?.click()}
-                disabled={uploadingState['academyFaviconUrl']}
-                className="flex-1 py-1.5 px-3 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs font-medium text-zinc-200 rounded-md transition-colors"
-              >
-                {uploadingState['academyFaviconUrl'] ? "Uploading..." : "Upload favicon"}
-              </button>
-              {org?.academyFaviconUrl && (
-                <button
-                  type="button"
-                  onClick={() => setOrg({ ...org, academyFaviconUrl: "" })}
-                  className="p-1.5 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 border border-white/[0.08] rounded-md transition-colors"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── 5. BANK SETTLEMENT & UPI DETAILS ── */}
-      <div className="bg-[#121620] border border-white/[0.08] rounded-xl p-6 space-y-5">
-        <div className="border-b border-white/[0.06] pb-4">
-          <h2 className="text-base font-semibold text-zinc-100 flex items-center gap-2">
-            <CreditCard className="w-4 h-4 text-zinc-400" /> Bank Settlement Details
-          </h2>
-          <p className="text-xs text-zinc-400 mt-0.5">Printed on invoice footers for direct NEFT/RTGS/IMPS wire payments.</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-zinc-300">Bank Name</label>
-            <input
-              type="text"
-              value={org?.bankName || ""}
-              onChange={(e) => setOrg({ ...org, bankName: e.target.value })}
-              className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-blue-500"
-              placeholder="e.g. HDFC Bank"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-zinc-300">Account Holder Name</label>
-            <input
-              type="text"
-              value={org?.accountName || ""}
-              onChange={(e) => setOrg({ ...org, accountName: e.target.value })}
-              className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-blue-500"
-              placeholder="Grekam Visuals and Technologies Pvt Ltd"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-zinc-300">Account Number</label>
-            <input
-              type="text"
-              value={org?.accountNumber || org?.bankAccountNo || ""}
-              onChange={(e) => setOrg({ ...org, accountNumber: e.target.value, bankAccountNo: e.target.value })}
-              className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 font-mono focus:outline-none focus:border-blue-500"
-              placeholder="50200012345678"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-zinc-300">IFSC Code</label>
-            <input
-              type="text"
-              value={org?.ifscCode || org?.bankIfsc || ""}
-              onChange={(e) => setOrg({ ...org, ifscCode: e.target.value.toUpperCase(), bankIfsc: e.target.value.toUpperCase() })}
-              className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 font-mono uppercase focus:outline-none focus:border-blue-500"
-              placeholder="HDFC0001234"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-zinc-300">Branch Name</label>
-            <input
-              type="text"
-              value={org?.bankBranch || ""}
-              onChange={(e) => setOrg({ ...org, bankBranch: e.target.value })}
-              className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-blue-500"
-              placeholder="Anna Salai Branch, Chennai"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-zinc-300">SWIFT / BIC (Optional for International Wire)</label>
-            <input
-              type="text"
-              value={org?.swiftCode || ""}
-              onChange={(e) => setOrg({ ...org, swiftCode: e.target.value.toUpperCase() })}
-              className="w-full bg-[#0b0d13] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-zinc-100 font-mono uppercase focus:outline-none focus:border-blue-500"
-              placeholder="HDFCINBBXXX"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Save Button Bar */}
-      <div className="flex items-center justify-end pt-2">
-        <Button 
-          onClick={handleSave} 
-          disabled={saving}
-          className="bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-2.5 rounded-lg transition-colors cursor-pointer shadow-sm"
-        >
-          {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : saved ? <Check className="w-4 h-4 mr-2" /> : null}
-          {saving ? "Saving..." : saved ? "Saved" : "Save changes"}
-        </Button>
       </div>
     </div>
   );
 }
+

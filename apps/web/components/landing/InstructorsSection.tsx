@@ -1,82 +1,74 @@
-"use client"
+"use client";
 
-import Image from "next/image"
+import { useState, useEffect } from "react";
+import { getEducators } from "../../app/actions/courses";
+import Image from "next/image";
 
-interface Instructor {
-  id: string
-  name: string
-  avatarUrl: string | null
-  designation: string | null
-  company: string | null
-  bio: string | null
-}
+export function InstructorsSection() {
+  const [educators, setEducators] = useState<any[]>([]);
 
-export function InstructorsSection({ instructors }: { instructors: Instructor[] }) {
-  if (!instructors || instructors.length === 0) return null
+  useEffect(() => {
+    async function load() {
+      const data = await getEducators();
+      setEducators(data || []);
+    }
+    load();
+  }, []);
+
+  if (!educators || educators.length === 0) return null;
 
   return (
-    <section className="py-32 relative bg-[#050505]">
-      <div className="max-w-7xl mx-auto px-6">
-        
-        <div className="mb-16 md:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
-          <div className="max-w-2xl">
-            <h2 className="text-[10px] font-mono tracking-[0.4em] text-[#8b6a3a] uppercase mb-4">Meet the Mentors</h2>
-            <h3 className="text-4xl md:text-6xl font-black uppercase tracking-tight font-sans text-white">
-              Learn from <br className="hidden md:block"/> Industry Experts.
-            </h3>
-          </div>
-          <div className="max-w-md text-white/50 text-sm leading-relaxed">
-            Our educators aren't just teachers; they are active practitioners shaping the creative and tech industries globally.
-          </div>
+    <section className="py-24 bg-background">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="text-3xl md:text-5xl font-black mb-6 text-foreground tracking-tight font-sans">
+            Learn from Industry Experts
+          </h2>
+          <p className="text-xl text-muted-foreground font-handwriting">
+            Our mentors don't just teach. They work at top companies and bring real-world experience to the classroom.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {instructors.map((instructor) => (
-            <div 
-              key={instructor.id} 
-              className="group relative bg-[#0a0a0a] border border-white/5 rounded-2xl overflow-hidden hover:border-white/20 transition-all duration-500 flex flex-col"
-            >
-              {/* Image Header */}
-              <div className="h-[280px] md:h-[320px] w-full relative overflow-hidden bg-white/5">
-                {instructor.avatarUrl ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {educators.map((educator) => (
+            <div key={educator.id} className="group relative bg-[#0d0d0d] border border-white/10 rounded-3xl overflow-hidden hover:shadow-[0_8px_30px_rgba(16,185,129,0.2)] transition-all duration-500">
+              <div className="aspect-[4/5] relative bg-white/5">
+                {educator.user.avatarUrl ? (
                   <Image
-                    src={instructor.avatarUrl}
-                    alt={instructor.name}
+                    src={educator.user.avatarUrl}
+                    alt={`${educator.user.firstName} ${educator.user.lastName}`}
                     fill
-                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center bg-[#111] text-white/20 text-6xl font-sans font-black uppercase">
-                    {instructor.name.charAt(0)}
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-emerald-500/20 to-teal-900/40 text-emerald-500">
+                    <span className="text-6xl font-black">{educator.user.firstName[0]}</span>
                   </div>
                 )}
-                
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500" />
-                
-                <div className="absolute bottom-6 left-6 right-6">
-                  <h4 className="text-2xl font-bold text-white mb-1">{instructor.name}</h4>
-                  <p className="text-[#8b6a3a] font-mono text-xs tracking-widest uppercase">
-                    {instructor.designation || "Educator"} {instructor.company && `at ${instructor.company}`}
-                  </p>
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
               </div>
-
-              {/* Bio Content */}
-              <div className="p-6 md:p-8 flex-1 flex flex-col">
-                <p className="text-white/60 text-sm leading-relaxed line-clamp-4">
-                  {instructor.bio || "An industry veteran dedicated to teaching the next generation of creative professionals."}
+              
+              <div className="absolute bottom-0 left-0 w-full p-6">
+                <h3 className="text-2xl font-bold text-white mb-1">
+                  {educator.user.firstName} {educator.user.lastName}
+                </h3>
+                <p className="text-emerald-400 font-medium text-sm mb-3">
+                  {educator.designation} {educator.company ? `at ${educator.company}` : ''}
                 </p>
-                
-                <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between text-xs font-mono uppercase tracking-widest text-white/40 group-hover:text-white/70 transition-colors">
-                  <span>View Profile</span>
-                  <span className="group-hover:translate-x-2 transition-transform duration-300">→</span>
-                </div>
+                {educator.skills && educator.skills.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {educator.skills.slice(0, 3).map((skill: string) => (
+                      <span key={skill} className="text-xs px-2.5 py-1 rounded-full bg-white/10 text-white/80 backdrop-blur-md border border-white/5">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           ))}
         </div>
       </div>
     </section>
-  )
+  );
 }

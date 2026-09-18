@@ -162,6 +162,26 @@ export default async function metaRouter(app: FastifyInstance) {
  * Process Facebook/Instagram Lead Ads via Graph API
  */
 async function fetchAndProcessLead(app: FastifyInstance, leadgenId: string, formId: string, pageId: string) {
+  // Deduplication check
+  const eventId = `leadgen_${leadgenId}`;
+  const existingLog = await app.prisma.webhookLog.findUnique({
+    where: { eventId }
+  });
+  if (existingLog) {
+    app.log.info(`Skipping duplicate Meta Leadgen event: ${leadgenId}`);
+    return;
+  }
+
+  await app.prisma.webhookLog.create({
+    data: {
+      provider: 'META_LEAD',
+      eventId,
+      eventType: 'leadgen',
+      status: 'PROCESSED',
+      payload: { leadgenId, formId, pageId },
+    }
+  });
+
   const ACCESS_TOKEN = process.env.META_ACCESS_TOKEN;
   if (!ACCESS_TOKEN) {
     app.log.error('META_ACCESS_TOKEN is not configured');
@@ -366,6 +386,27 @@ async function processIncomingWhatsAppReply(
 ) {
   const fromPhone = msg.from;
   if (!fromPhone) return;
+
+  if (msg.id) {
+    const eventId = `wa_msg_${msg.id}`;
+    const existingLog = await app.prisma.webhookLog.findUnique({
+      where: { eventId }
+    });
+    if (existingLog) {
+      app.log.info(`Skipping duplicate WhatsApp message event: ${msg.id}`);
+      return;
+    }
+
+    await app.prisma.webhookLog.create({
+      data: {
+        provider: 'WHATSAPP',
+        eventId,
+        eventType: msg.type || 'message',
+        status: 'PROCESSED',
+        payload: { from: msg.from, id: msg.id },
+      }
+    });
+  }
 
   const textContent =
     msg.text?.body ||

@@ -4,9 +4,7 @@ import { z } from 'zod';
 import { createNotification } from '../notifications/notifications.service';
 import { EventBus, SystemEvents } from '../automations/event-bus';
 import { sendEmail, EmailTemplates } from '../integrations/email.service';
-
-// In a real app, you would import PrismaClient from your db setup
-// import prisma from '../../lib/prisma';
+import { sendSuccess, sendError } from '../utils/response';
 
 interface RazorpayWebhookBody {
   event: string;
@@ -62,12 +60,37 @@ export async function handleRazorpayWebhook(req: FastifyRequest<{ Body: Razorpay
 
       if (expectedSignature !== signature) {
         app.log.warn('Razorpay signature mismatch');
-        return reply.code(400).send({ error: 'Invalid signature' });
+        return sendError(reply, 'Invalid HMAC signature', 'INVALID_SIGNATURE', 400);
       }
     }
 
     const event = req.body.event;
-    app.log.info({ event }, 'Received verified Razorpay webhook');
+    const headerEventId = req.headers['x-razorpay-event-id'] as string;
+    const entityId = req.body.payload.payment?.entity?.id || req.body.payload.order?.entity?.id || req.body.payload.subscription?.entity?.id;
+    const eventId = headerEventId || (entityId ? `${event}_${entityId}` : `evt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`);
+
+    // 2. Strict Idempotency Check
+    const existingLog = await app.prisma.webhookLog.findUnique({
+      where: { eventId }
+    });
+
+    if (existingLog) {
+      app.log.info({ eventId, event }, 'Skipping duplicate Razorpay webhook event');
+      return sendSuccess(reply, { status: 'skipped_duplicate', eventId });
+    }
+
+    // 3. Record Webhook Audit Log Entry
+    await app.prisma.webhookLog.create({
+      data: {
+        provider: 'RAZORPAY',
+        eventId,
+        eventType: event,
+        status: 'PROCESSED',
+        payload: req.body as any,
+      }
+    });
+
+    app.log.info({ event, eventId }, 'Received verified Razorpay webhook');
 
     switch (event) {
       case 'payment.captured': {

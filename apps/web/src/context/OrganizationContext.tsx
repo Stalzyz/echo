@@ -10,41 +10,36 @@ export interface Organization {
   faviconUrl?: string | null;
   academyFaviconUrl?: string | null;
   primaryColor: string;
+  secondaryColor?: string | null;
+  accentColor?: string | null;
   darkModeDefault: boolean;
   supportEmail?: string | null;
   billingAddress?: string | null;
   website?: string | null;
   phone?: string | null;
-  bankName?: string | null;
-  bankAccountNo?: string | null;
-  bankIfsc?: string | null;
-  bankBranch?: string | null;
 }
 
 const defaultOrg: Organization = {
-  id: "",
-  name: "Grekam Visuals",
-  logoUrl: "/visuals-logo.png",
-  academyLogoUrl: "/academy-logo.png",
+  id: "gecho-saas-org",
+  name: "Gecho LMS",
+  logoUrl: "/gecho-logo.png",
+  academyLogoUrl: "/gecho-logo.png",
   faviconUrl: "/favicon.ico",
   academyFaviconUrl: "/favicon.ico",
-  primaryColor: "#2DA16D",
-  darkModeDefault: true,
-  supportEmail: "greeksacademy@gmail.com",
-  billingAddress: "Coimbatore, Tamil Nadu, India",
-  website: "https://grekam.in",
+  primaryColor: "#0d9488",
+  secondaryColor: "#f59e0b",
+  accentColor: "#10b981",
+  darkModeDefault: false,
+  supportEmail: "support@gecholms.com",
+  billingAddress: "SaaS Cloud Infrastructure",
+  website: "https://gecholms.com",
   phone: null,
-  bankName: null,
-  bankAccountNo: null,
-  bankIfsc: null,
-  bankBranch: null,
 };
 
 const OrganizationContext = createContext<Organization>(defaultOrg);
 
 export function useOrganization() {
-  const ctx = useContext(OrganizationContext);
-  return ctx || defaultOrg;
+  return useContext(OrganizationContext);
 }
 
 export function OrganizationProvider({ children }: { children: ReactNode }) {
@@ -53,9 +48,29 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api/v1";
 
+    const applyThemeVariables = (targetOrg: Organization) => {
+      if (typeof document === "undefined") return;
+      const root = document.documentElement;
+
+      const primary = targetOrg.primaryColor || "#0d9488";
+      const secondary = targetOrg.secondaryColor || "#f59e0b";
+      const accent = targetOrg.accentColor || "#10b981";
+
+      root.style.setProperty("--org-primary", primary);
+      root.style.setProperty("--primary", primary);
+      root.style.setProperty("--secondary", secondary);
+      root.style.setProperty("--accent", accent);
+      root.style.setProperty("--ring", primary);
+      root.style.setProperty("--sidebar-primary", primary);
+      root.style.setProperty("--sidebar-ring", primary);
+      root.style.setProperty("--chart-1", primary);
+      root.style.setProperty("--chart-2", secondary);
+      root.style.setProperty("--chart-3", accent);
+    };
+
     const fetchOrg = () => {
       fetch(`${API_BASE}/settings/organization`)
-        .then((r) => r.ok ? r.json() : null)
+        .then((r) => (r.ok ? r.json() : null))
         .then((data) => {
           if (data) {
             const orgData = data.data || data;
@@ -65,30 +80,28 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
               logoUrl: orgData.logoUrl || "/visuals-logo.png",
               academyLogoUrl: orgData.academyLogoUrl || "/academy-logo.png",
               faviconUrl: orgData.faviconUrl || "/favicon.ico",
-              primaryColor: orgData.primaryColor || "#2DA16D",
+              primaryColor: orgData.primaryColor || "#0d9488",
+              secondaryColor: orgData.secondaryColor || "#f59e0b",
+              accentColor: orgData.accentColor || "#10b981",
             };
             setOrg(finalOrg);
+            applyThemeVariables(finalOrg);
 
-            // Inject primary color as CSS variable globally
-            if (typeof document !== "undefined") {
-              const root = document.documentElement;
-              root.style.setProperty("--org-primary", finalOrg.primaryColor || "#2DA16D");
+            // Update page title
+            if (orgData.name) {
+              document.title = `${orgData.name} Academy`;
+            }
 
-              // Update page title if set
-              if (orgData.name) {
-                document.title = orgData.name;
+            // Update Academy Favicon dynamically in browser tab
+            const activeFavicon = orgData.academyFaviconUrl || orgData.faviconUrl;
+            if (activeFavicon && typeof document !== "undefined") {
+              let link = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
+              if (!link) {
+                link = document.createElement("link");
+                link.rel = "icon";
+                document.getElementsByTagName("head")[0].appendChild(link);
               }
-
-              // Update Agency Favicon dynamically in browser tab
-              if (orgData.faviconUrl) {
-                let link = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
-                if (!link) {
-                  link = document.createElement('link');
-                  link.rel = 'icon';
-                  document.getElementsByTagName('head')[0].appendChild(link);
-                }
-                link.href = orgData.faviconUrl;
-              }
+              link.href = activeFavicon;
             }
           }
         })
@@ -97,7 +110,21 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
 
     fetchOrg();
 
-    const handleUpdate = () => fetchOrg();
+    const handleUpdate = (e?: Event) => {
+      if (e && (e as CustomEvent).detail) {
+        // Optimistic update if event contains details
+        const customData = (e as CustomEvent).detail;
+        if (customData.primaryColor) {
+          setOrg((prev) => {
+            const updated = { ...prev, ...customData };
+            applyThemeVariables(updated);
+            return updated;
+          });
+        }
+      }
+      fetchOrg();
+    };
+
     window.addEventListener("organization-updated", handleUpdate);
     return () => window.removeEventListener("organization-updated", handleUpdate);
   }, []);
