@@ -31,6 +31,12 @@ import {
   Percent,
   Building2,
   Globe,
+  CreditCard,
+  RefreshCw,
+  Receipt,
+  Palette,
+  Cpu,
+  BarChart3,
 } from "lucide-react";
 
 interface SidebarItem {
@@ -43,38 +49,19 @@ interface SidebarItem {
 
 const superAdminSidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
   {
-    groupName: "Super Admin Portal",
+    groupName: "GECHO Super Admin",
     items: [
-      {
-        title: "Vendors & Academies",
-        href: "/dashboard/super-admin/vendors",
-        icon: Building2,
-      },
-      {
-        title: "Whitelabel & Domains",
-        href: "/dashboard/super-admin/whitelabel",
-        icon: Globe,
-      },
-      {
-        title: "SaaS Packages",
-        href: "/dashboard/super-admin/packages",
-        icon: Layers,
-      },
-      {
-        title: "Invoices & Billing",
-        href: "/dashboard/super-admin/invoices",
-        icon: DollarSign,
-      },
-    ],
-  },
-  {
-    groupName: "System",
-    items: [
-      {
-        title: "Platform Settings",
-        href: "/dashboard/settings",
-        icon: Settings,
-      },
+      { title: "Dashboard", href: "/dashboard/super-admin", icon: LayoutDashboard },
+      { title: "Academies", href: "/dashboard/super-admin/academies", icon: Building2 },
+      { title: "Users", href: "/dashboard/super-admin/users", icon: Users },
+      { title: "Plans & Billing", href: "/dashboard/super-admin/plans", icon: CreditCard },
+      { title: "Subscriptions", href: "/dashboard/super-admin/subscriptions", icon: RefreshCw },
+      { title: "Payments", href: "/dashboard/super-admin/payments", icon: Receipt },
+      { title: "Courses", href: "/dashboard/super-admin/courses", icon: BookOpen },
+      { title: "Branding", href: "/dashboard/super-admin/branding", icon: Palette },
+      { title: "Integrations", href: "/dashboard/super-admin/integrations", icon: Cpu },
+      { title: "Reports", href: "/dashboard/super-admin/reports", icon: BarChart3 },
+      { title: "Settings", href: "/dashboard/super-admin/settings", icon: Settings },
     ],
   },
 ];

@@ -66,54 +66,54 @@ export function TopNav() {
             {pathname?.startsWith("/dashboard/super-admin") ? (
               <>
                 <Link
-                  href="/dashboard/super-admin/vendors"
+                  href="/dashboard/super-admin"
                   className={cn(
                     "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
-                    pathname === "/dashboard/super-admin/vendors"
+                    pathname === "/dashboard/super-admin"
                       ? "bg-teal-50 text-teal-800 border border-teal-200/80 shadow-2xs"
                       : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
                   )}
                 >
-                  Vendors & Academies
+                  Dashboard
                 </Link>
                 <Link
-                  href="/dashboard/super-admin/whitelabel"
+                  href="/dashboard/super-admin/academies"
                   className={cn(
                     "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
-                    pathname === "/dashboard/super-admin/whitelabel"
+                    pathname?.startsWith("/dashboard/super-admin/academies") || pathname?.startsWith("/dashboard/super-admin/vendors")
                       ? "bg-teal-50 text-teal-800 border border-teal-200/80 shadow-2xs"
                       : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
                   )}
                 >
-                  Whitelabel & Domains
+                  Academies
                 </Link>
                 <Link
-                  href="/dashboard/super-admin/packages"
+                  href="/dashboard/super-admin/plans"
                   className={cn(
                     "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
-                    pathname === "/dashboard/super-admin/packages"
+                    pathname?.startsWith("/dashboard/super-admin/plans") || pathname?.startsWith("/dashboard/super-admin/packages")
                       ? "bg-teal-50 text-teal-800 border border-teal-200/80 shadow-2xs"
                       : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
                   )}
                 >
-                  SaaS Packages
+                  Plans & Billing
                 </Link>
                 <Link
-                  href="/dashboard/super-admin/invoices"
+                  href="/dashboard/super-admin/branding"
                   className={cn(
                     "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
-                    pathname === "/dashboard/super-admin/invoices"
+                    pathname?.startsWith("/dashboard/super-admin/branding") || pathname?.startsWith("/dashboard/super-admin/whitelabel")
                       ? "bg-teal-50 text-teal-800 border border-teal-200/80 shadow-2xs"
                       : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
                   )}
                 >
-                  Invoices & Billing
+                  Branding
                 </Link>
                 <Link
-                  href="/dashboard/settings"
+                  href="/dashboard/super-admin/settings"
                   className={cn(
                     "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
-                    pathname?.startsWith("/dashboard/settings")
+                    pathname?.startsWith("/dashboard/super-admin/settings")
                       ? "bg-teal-50 text-teal-800 border border-teal-200/80 shadow-2xs"
                       : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
                   )}
