@@ -248,20 +248,20 @@ export default function IntegrationsDashboard() {
                 const Icon = meta.icon
                 const serviceKeys = grouped[service]
                 return (
-                  <div key={service} className={`bg-card border rounded-2xl p-5 shadow-sm transition-all hover:border-primary/30 ${serviceKeys.length > 0 ? 'border-primary/20' : 'border-border/50'}`}>
+                  <div key={service} className={`bg-white border rounded-xl p-5 shadow-xs transition-all hover:border-slate-300 ${serviceKeys.length > 0 ? 'border-slate-300' : 'border-slate-200'}`}>
                     <div className="flex items-start gap-4">
-                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border ${meta.bg} ${meta.color} ${meta.border}`}>
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border border-slate-200 bg-slate-50 text-slate-700">
                         <Icon className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
-                          <h3 className="font-bold text-foreground">{meta.label}</h3>
+                          <h3 className="font-bold text-slate-900 text-sm tracking-tight">{meta.label}</h3>
                           {serviceKeys.length > 0 ? (
-                            <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
-                              <CheckCircle2 className="w-3.5 h-3.5" /> {serviceKeys.length} key{serviceKeys.length > 1 ? "s" : ""} configured
+                            <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                              <CheckCircle2 className="w-3.5 h-3.5" /> {serviceKeys.length} key{serviceKeys.length > 1 ? "s" : ""} active
                             </span>
                           ) : (
-                            <span className="text-xs font-bold text-muted-foreground bg-muted px-2.5 py-1 rounded-full border border-border/50">Not configured</span>
+                            <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200">Not configured</span>
                           )}
                         </div>
                         <p className="text-xs text-muted-foreground mb-3">{meta.desc}</p>

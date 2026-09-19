@@ -405,25 +405,43 @@ export default function WhatsAppPage() {
 
               {/* Upload Dropzone */}
               {imageSource === "local" && (
-                <div className="border-2 border-dashed border-teal-400/80 bg-teal-50/40 hover:bg-teal-50 rounded-2xl p-6 text-center transition-all cursor-pointer group relative">
+                <div className="border border-dashed border-teal-500/60 bg-teal-50/20 hover:bg-teal-50/50 rounded-xl p-5 text-center transition-all cursor-pointer group relative">
                   <input 
                     type="file" 
                     accept="image/*,.pdf" 
                     className="absolute inset-0 opacity-0 cursor-pointer"
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const file = e.target.files?.[0]
                       if (file) {
                         setUploadedImageName(file.name)
-                        const url = URL.createObjectURL(file)
-                        setCustomImageUrl(url)
-                        toast.success(`Attached ${file.name} to WhatsApp message!`)
+                        const localPreviewUrl = URL.createObjectURL(file)
+                        setCustomImageUrl(localPreviewUrl)
+                        
+                        try {
+                          const formData = new FormData()
+                          formData.append('file', file)
+                          const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api/v1'
+                          const res = await fetch(`${API_BASE}/storage/upload-local`, {
+                            method: 'POST',
+                            body: formData
+                          }).then(r => r.json())
+
+                          if (res.downloadUrl) {
+                            setCustomImageUrl(res.downloadUrl)
+                            toast.success(`Uploaded ${file.name} to persistent storage!`)
+                          } else {
+                            toast.success(`Attached ${file.name} to WhatsApp message!`)
+                          }
+                        } catch {
+                          toast.success(`Attached ${file.name} to WhatsApp message!`)
+                        }
                       }
                     }}
                   />
-                  <div className="w-10 h-10 rounded-xl bg-teal-100 border border-teal-300 flex items-center justify-center text-teal-700 mx-auto mb-2 group-hover:scale-110 transition-transform">
-                    <Upload className="w-5 h-5" />
+                  <div className="w-9 h-9 rounded-lg bg-teal-100/80 border border-teal-200 flex items-center justify-center text-teal-700 mx-auto mb-2">
+                    <Upload className="w-4 h-4" />
                   </div>
-                  <h4 className="text-xs font-black text-slate-900">
+                  <h4 className="text-xs font-bold text-slate-900">
                     {uploadedImageName ? `Attached: ${uploadedImageName}` : "Click to Choose IMAGE from Local Drive"}
                   </h4>
                   <p className="text-[10px] text-slate-400 font-medium mt-0.5">PNG, JPG, WEBP, or PDF up to 50MB</p>

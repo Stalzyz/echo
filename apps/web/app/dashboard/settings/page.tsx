@@ -81,8 +81,43 @@ export default function BrandingThemeSettingsPage() {
     }
   ])
 
-  // Mock File Upload Ref
+  // File Upload Refs & Handler
   const logoInputRef = useRef<HTMLInputElement>(null)
+  const faviconInputRef = useRef<HTMLInputElement>(null)
+  const mobileLogoInputRef = useRef<HTMLInputElement>(null)
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false)
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetKey: 'mainLogoUrl' | 'faviconUrl' | 'mobileLogoUrl') => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setIsUploadingLogo(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      const res = await fetch('/api/v1/storage/upload-local', {
+        method: 'POST',
+        body: formData,
+      })
+      const data = await res.json()
+      if (data.downloadUrl) {
+        setTheme(prev => ({
+          ...prev,
+          identity: {
+            ...prev.identity,
+            [targetKey]: data.downloadUrl
+          }
+        }))
+        setIsDirty(true)
+        toast.success(`Logo asset uploaded successfully!`)
+      } else {
+        toast.error(data.error || "Upload failed")
+      }
+    } catch (err: any) {
+      toast.error("File upload error: " + err.message)
+    } finally {
+      setIsUploadingLogo(false)
+    }
+  }
 
   const triggerLiveThemeUpdate = (colors: { primary?: string; secondary?: string; accent?: string; name?: string }) => {
     if (typeof window !== "undefined") {
@@ -297,16 +332,28 @@ export default function BrandingThemeSettingsPage() {
                       <span className="text-[10px] text-slate-400">PNG / SVG • Max 2MB</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-lg bg-white border border-slate-200 flex items-center justify-center font-black text-xs text-slate-400">
-                        LOGO
+                      <div className="w-12 h-12 rounded-lg bg-white border border-slate-200 flex items-center justify-center overflow-hidden font-black text-xs text-slate-400">
+                        {theme.identity.mainLogoUrl ? (
+                          <img src={theme.identity.mainLogoUrl} alt="Logo" className="w-full h-full object-contain p-1" />
+                        ) : (
+                          "LOGO"
+                        )}
                       </div>
                       <button 
                         onClick={() => logoInputRef.current?.click()}
-                        className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-700 flex items-center gap-1.5 transition-colors"
+                        disabled={isUploadingLogo}
+                        className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-700 flex items-center gap-1.5 transition-colors disabled:opacity-50"
                       >
-                        <Upload className="w-3.5 h-3.5 text-slate-500" /> Upload Image
+                        {isUploadingLogo ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5 text-slate-500" />}
+                        {isUploadingLogo ? "Uploading..." : "Upload Image"}
                       </button>
-                      <input type="file" ref={logoInputRef} className="hidden" onChange={() => { setIsDirty(true); toast.success("Logo asset updated!") }} />
+                      <input 
+                        type="file" 
+                        ref={logoInputRef} 
+                        accept="image/*"
+                        className="hidden" 
+                        onChange={e => handleFileUpload(e, 'mainLogoUrl')} 
+                      />
                     </div>
                   </div>
 
@@ -314,15 +361,37 @@ export default function BrandingThemeSettingsPage() {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
                       <span className="text-xs font-bold text-slate-800 block">Favicon</span>
-                      <button onClick={() => toast.info("Select 32x32 PNG for favicon")} className="w-full py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100">
-                        Upload Favicon
+                      <button 
+                        onClick={() => faviconInputRef.current?.click()} 
+                        className="w-full py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1.5"
+                      >
+                        <Upload className="w-3 h-3 text-slate-400" />
+                        {theme.identity.faviconUrl ? "Change Favicon" : "Upload Favicon"}
                       </button>
+                      <input 
+                        type="file" 
+                        ref={faviconInputRef} 
+                        accept="image/*"
+                        className="hidden" 
+                        onChange={e => handleFileUpload(e, 'faviconUrl')} 
+                      />
                     </div>
                     <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
                       <span className="text-xs font-bold text-slate-800 block">Mobile Logo</span>
-                      <button onClick={() => toast.info("Select icon logo")} className="w-full py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100">
-                        Upload Mobile
+                      <button 
+                        onClick={() => mobileLogoInputRef.current?.click()} 
+                        className="w-full py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1.5"
+                      >
+                        <Upload className="w-3 h-3 text-slate-400" />
+                        {theme.identity.mobileLogoUrl ? "Change Mobile" : "Upload Mobile"}
                       </button>
+                      <input 
+                        type="file" 
+                        ref={mobileLogoInputRef} 
+                        accept="image/*"
+                        className="hidden" 
+                        onChange={e => handleFileUpload(e, 'mobileLogoUrl')} 
+                      />
                     </div>
                   </div>
                 </div>
