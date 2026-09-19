@@ -24,13 +24,13 @@ export const DEFAULT_DESIGN_TOKENS: DesignTokens = {
 
 export const DEFAULT_TENANT_THEME: TenantTheme = {
   id: "theme-default",
-  tenantId: "tenant-gecho",
-  name: "Gecho Academy Default",
+  tenantId: "tenant-echo",
+  name: "Echo Academy Default",
   isPublished: true,
   version: 1,
   identity: {
-    academyName: "Gecho Academy",
-    shortName: "Gecho",
+    academyName: "Echo Academy",
+    shortName: "Echo",
     tagline: "Empowering Next-Gen Learners & Educators",
     mainLogoUrl: "",
     faviconUrl: "",
@@ -60,7 +60,7 @@ export const DEFAULT_TENANT_THEME: TenantTheme = {
   },
   loginPage: {
     backgroundColor: "#f8fafc",
-    welcomeHeading: "Welcome to Gecho LMS",
+    welcomeHeading: "Welcome to Echo LMS",
     description: "Sign in to access your courses, live studio, and CRM.",
     buttonText: "Sign In to Academy",
     showGechoBranding: true,

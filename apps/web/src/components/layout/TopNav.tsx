@@ -17,7 +17,7 @@ const RealtimeIndicator = dynamic(() => import("@/components/RealtimeIndicator")
 
 function OrgHeader() {
   const org = useOrganization()
-  const orgName = org?.name && !org.name.includes("Grekam") ? org.name : "Gecho LMS"
+  const orgName = org?.name && !org.name.includes("Grekam") ? org.name : "Echo LMS"
 
   return (
     <div className="flex items-center gap-3 shrink-0">

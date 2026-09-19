@@ -30,7 +30,7 @@ export function Sidebar() {
               <Layers className="w-5 h-5" strokeWidth={2.5} />
             </div>
             <div>
-              <span className="text-lg font-black tracking-tight text-slate-900">Gecho <span className="text-teal-600">Admin</span></span>
+              <span className="text-lg font-black tracking-tight text-slate-900">Echo <span className="text-teal-600">Admin</span></span>
               <span className="block text-[9px] text-teal-700 font-bold uppercase tracking-wider">Super Admin • Port 4400</span>
             </div>
           </Link>

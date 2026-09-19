@@ -275,7 +275,7 @@ export function AppSidebar() {
     setOpenGroups((prev) => ({ ...prev, [title]: !prev[title] }));
   };
 
-  const orgName = org?.name && !org.name.includes("Grekam") ? org.name : "Gecho LMS";
+  const orgName = org?.name && !org.name.includes("Grekam") ? org.name : "Echo LMS";
 
   return (
     <aside
@@ -408,7 +408,7 @@ export function AppSidebar() {
         <div className="p-4 border-t border-slate-200 bg-slate-50 shrink-0">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[11px] font-bold text-slate-600">Gecho OS Engine v2.5</span>
+            <span className="text-[11px] font-bold text-slate-600">Echo OS Engine v2.5</span>
           </div>
         </div>
       ) : (

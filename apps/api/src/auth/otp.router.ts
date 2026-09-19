@@ -27,7 +27,7 @@ export default async function otpRouter(app: FastifyInstance) {
           name: 'Student',
           event: 'OTP_VERIFICATION',
           templateName: 'grafty_welcome',
-          variables: ['Learner', `Your Gecho LMS verification code is: ${code} (valid for 5 mins)`],
+          variables: ['Learner', `Your Echo LMS verification code is: ${code} (valid for 5 mins)`],
           headerType: 'NONE'
         });
         return { success: true, message: 'Verification OTP sent via WhatsApp', channel: 'whatsapp' };

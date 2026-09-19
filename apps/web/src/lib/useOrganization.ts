@@ -12,8 +12,8 @@ export interface Organization {
 }
 
 export const ORG_FALLBACK: Organization = {
-  id: "gecho-default",
-  name: "Gecho LMS",
+  id: "echo-default",
+  name: "Echo LMS",
   logoUrl: null,
   primaryColor: "#0d9488",
 };

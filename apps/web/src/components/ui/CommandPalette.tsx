@@ -62,7 +62,7 @@ export function CommandPalette() {
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search Gecho LMS... (e.g. Courses, Students, Analytics)"
+            placeholder="Search Echo LMS... (e.g. Courses, Students, Analytics)"
             className="flex-1 h-14 bg-transparent focus:outline-none text-foreground placeholder:text-muted-foreground"
           />
           <kbd className="hidden sm:inline-flex items-center gap-1 bg-muted px-2 py-0.5 rounded text-[10px] font-bold text-muted-foreground uppercase border border-border/50 shadow-sm">
@@ -107,7 +107,7 @@ export function CommandPalette() {
             <span className="flex items-center gap-1"><kbd className="bg-muted px-1.5 py-0.5 rounded border border-border/50">↑</kbd><kbd className="bg-muted px-1.5 py-0.5 rounded border border-border/50">↓</kbd> to navigate</span>
             <span className="flex items-center gap-1"><kbd className="bg-muted px-1.5 py-0.5 rounded border border-border/50">↵</kbd> to select</span>
           </div>
-          <span className="font-bold flex items-center gap-1"><Zap className="w-3 h-3 text-primary" /> Gecho LMS Search</span>
+          <span className="font-bold flex items-center gap-1"><Zap className="w-3 h-3 text-primary" /> Echo LMS Search</span>
         </div>
       </div>
     </div>

@@ -3,8 +3,8 @@ import { Sidebar } from "./Sidebar"
 import { Toaster } from "sonner"
 
 export const metadata = {
-  title: "Gecho LMS • Super Admin Platform Suite",
-  description: "Enterprise SaaS Super Admin Control Portal for Gecho LMS",
+  title: "Echo LMS • Super Admin Platform Suite",
+  description: "Enterprise SaaS Super Admin Control Portal for Echo LMS",
 }
 
 export default function RootLayout({

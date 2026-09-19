@@ -20,19 +20,19 @@ export interface Organization {
 }
 
 const defaultOrg: Organization = {
-  id: "gecho-saas-org",
-  name: "Gecho LMS",
-  logoUrl: "/gecho-logo.png",
-  academyLogoUrl: "/gecho-logo.png",
+  id: "echo-saas-org",
+  name: "Echo LMS",
+  logoUrl: "/echo-logo.png",
+  academyLogoUrl: "/echo-logo.png",
   faviconUrl: "/favicon.ico",
   academyFaviconUrl: "/favicon.ico",
   primaryColor: "#0d9488",
   secondaryColor: "#f59e0b",
   accentColor: "#10b981",
   darkModeDefault: false,
-  supportEmail: "support@gecholms.com",
+  supportEmail: "support@echolms.com",
   billingAddress: "SaaS Cloud Infrastructure",
-  website: "https://gecholms.com",
+  website: "https://echolms.com",
   phone: null,
 };
 
