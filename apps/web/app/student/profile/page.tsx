@@ -6,8 +6,8 @@ import Link from "next/link"
 import {
   User, Mail, Phone, MapPin, Calendar, Briefcase, 
   GraduationCap, Award, Shield, CheckCircle2, Edit3, 
-  Globe, Github, Linkedin, ExternalLink, Zap, Star,
-  BookOpen, Clock, FileText, ArrowLeft, QRCode
+  Globe, ExternalLink, Zap, Star, BookOpen, Clock, 
+  FileText, ArrowLeft, Code, Share2
 } from "lucide-react"
 
 export default function StudentProfilePage() {
@@ -20,7 +20,7 @@ export default function StudentProfilePage() {
     phone: "+91 98765 43210",
     role: "STUDENT",
     studentId: "ECHO-2026-8942",
-    enrollmentType: "Remote Learner", // Remote, Campus, Hybrid
+    enrollmentType: "Remote Learner",
     batch: "Full-Stack Web Dev - Cohort 12",
     joinedDate: "January 2026",
     bio: "Passionate full-stack developer focusing on Next.js, TypeScript, and distributed cloud architecture.",
@@ -241,7 +241,7 @@ export default function StudentProfilePage() {
                   className="p-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-between text-xs font-semibold text-slate-800 transition-all"
                 >
                   <div className="flex items-center gap-2">
-                    <Github className="w-4 h-4 text-slate-700" /> GitHub Profile
+                    <Code className="w-4 h-4 text-slate-700" /> GitHub Repository Profile
                   </div>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
                 </a>
@@ -253,7 +253,7 @@ export default function StudentProfilePage() {
                   className="p-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-between text-xs font-semibold text-slate-800 transition-all"
                 >
                   <div className="flex items-center gap-2">
-                    <Linkedin className="w-4 h-4 text-blue-600" /> LinkedIn Profile
+                    <Share2 className="w-4 h-4 text-blue-600" /> LinkedIn Professional Profile
                   </div>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
                 </a>
@@ -265,7 +265,7 @@ export default function StudentProfilePage() {
                   className="p-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-between text-xs font-semibold text-slate-800 transition-all"
                 >
                   <div className="flex items-center gap-2">
-                    <Globe className="w-4 h-4 text-teal-600" /> Personal Portfolio
+                    <Globe className="w-4 h-4 text-teal-600" /> Personal Portfolio Website
                   </div>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
                 </a>
