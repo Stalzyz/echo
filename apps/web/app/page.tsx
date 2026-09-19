@@ -8,6 +8,7 @@ import {
   Globe, Shield, Zap, Video, Check, Laptop, Layers, Calendar, Clock, Lock, User
 } from "lucide-react"
 import { toast } from "sonner"
+import { UnifiedLoginPortal } from "@/components/auth/UnifiedLoginPortal"
 
 export default function PublicHomePage() {
   const [activeWorkflow, setActiveWorkflow] = useState<"lead" | "payment" | "inactive" | "completion">("lead")
@@ -40,6 +41,7 @@ export default function PublicHomePage() {
           </Link>
 
           <nav className="hidden lg:flex items-center gap-8 text-xs font-bold text-slate-600">
+            <a href="#login-portal" className="text-teal-700 font-black">All-In-One Login</a>
             <a href="#features" className="hover:text-teal-700 transition-colors">Features</a>
             <a href="#journey" className="hover:text-teal-700 transition-colors">Student Journey</a>
             <a href="#automation" className="hover:text-teal-700 transition-colors">Automation</a>
@@ -49,12 +51,12 @@ export default function PublicHomePage() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <Link 
-              href="/dashboard" 
+            <a 
+              href="#login-portal" 
               className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all"
             >
-              Go to Dashboard →
-            </Link>
+              Sign In Portal →
+            </a>
 
             <button 
               onClick={() => setIsDemoModalOpen(true)}
@@ -66,48 +68,31 @@ export default function PublicHomePage() {
         </div>
       </header>
 
-      {/* 2. HERO SECTION */}
-      <section className="relative pt-16 pb-24 border-b border-slate-200 bg-gradient-to-b from-white to-slate-50">
-        <div className="max-w-5xl mx-auto px-6 text-center space-y-8">
+      {/* 2. HERO SECTION WITH ALL-IN-ONE UNIFIED LOGIN PORTAL */}
+      <section className="relative pt-12 pb-20 border-b border-slate-200 bg-gradient-to-b from-white via-slate-50 to-slate-100">
+        <div className="max-w-6xl mx-auto px-6 space-y-8">
           
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-bold shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-teal-600 animate-pulse" />
-            Echo • THE OPERATING SYSTEM FOR EDUCATION BUSINESSES
-          </div>
-
-          <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.15]">
-            Run Your Entire Academy <br />
-            <span className="text-teal-600 underline decoration-teal-300 decoration-wavy">From One Platform.</span>
-          </h1>
-
-          <p className="text-base md:text-xl font-bold text-slate-700 max-w-3xl mx-auto leading-relaxed">
-            LMS + CRM + Automation + Live Learning + Payments + Analytics
-          </p>
-
-          <p className="text-sm md:text-base text-slate-500 max-w-2xl mx-auto font-medium">
-            Capture leads. Convert admissions. Deliver courses. Run live classes. Automate communication. Collect payments. Track your entire business.
-          </p>
-
-          <div className="pt-2">
-            <div className="inline-block p-4 bg-teal-50 border border-teal-200 rounded-2xl text-teal-900 font-black text-sm md:text-base shadow-2xs">
-              ✨ One platform from the first enquiry to the final certificate.
+          <div className="text-center space-y-4 max-w-4xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-bold shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-teal-600 animate-pulse" />
+              Echo • UNIFIED SINGLE WINDOW PLATFORM
             </div>
+
+            <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-[1.15]">
+              Run Your Entire Academy <br />
+              <span className="text-teal-600 underline decoration-teal-300 decoration-wavy">From One Unified Platform.</span>
+            </h1>
+
+            <p className="text-xs sm:text-sm font-bold text-slate-600 max-w-2xl mx-auto">
+              Single-window access for Students, Educators, Academy Admins & Super Admins.
+            </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <button 
-              onClick={() => setIsDemoModalOpen(true)}
-              className="w-full sm:w-auto px-8 py-4 bg-teal-600 hover:bg-teal-700 text-white font-black text-sm rounded-2xl transition-all shadow-md flex items-center justify-center gap-2"
-            >
-              <Sparkles className="w-4 h-4" /> Book a Free Demo
-            </button>
-            <a 
-              href="#journey"
-              className="w-full sm:w-auto px-8 py-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-800 font-bold text-sm rounded-2xl transition-all shadow-2xs flex items-center justify-center gap-2"
-            >
-              See How Echo Works <ArrowRight className="w-4 h-4 text-slate-400" />
-            </a>
+          {/* SINGLE WINDOW UNIFIED LOGIN CARD EMBEDDED IN HERO */}
+          <div id="login-portal" className="pt-4 max-w-2xl mx-auto">
+            <UnifiedLoginPortal defaultRole="student" isStandalonePage={false} />
           </div>
+
         </div>
       </section>
 
