@@ -41,8 +41,8 @@ export default function PublicHomePage() {
           </Link>
 
           <nav className="hidden lg:flex items-center gap-8 text-xs font-bold text-slate-600">
-            <a href="#login-portal" className="text-teal-700 font-black">All-In-One Login</a>
             <a href="#features" className="hover:text-teal-700 transition-colors">Features</a>
+            <a href="#solutions" className="hover:text-teal-700 transition-colors">Solutions</a>
             <a href="#journey" className="hover:text-teal-700 transition-colors">Student Journey</a>
             <a href="#automation" className="hover:text-teal-700 transition-colors">Automation</a>
             <a href="#live-classes" className="hover:text-teal-700 transition-colors">Live Learning</a>
@@ -51,18 +51,18 @@ export default function PublicHomePage() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <a 
-              href="#login-portal" 
-              className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all"
+            <Link 
+              href="/auth/login" 
+              className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5"
             >
-              Sign In Portal →
-            </a>
+              Academy Login →
+            </Link>
 
             <button 
               onClick={() => setIsDemoModalOpen(true)}
               className="px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-2"
             >
-              <Sparkles className="w-4 h-4" /> Book a Free Demo
+              <Sparkles className="w-4 h-4" /> Get Started
             </button>
           </div>
         </div>
