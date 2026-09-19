@@ -29,6 +29,8 @@ import {
   Sparkles,
   ShieldAlert,
   Percent,
+  Building2,
+  Globe,
 } from "lucide-react";
 
 interface SidebarItem {
@@ -38,6 +40,44 @@ interface SidebarItem {
   badge?: string;
   children?: { title: string; href: string; icon?: React.ElementType }[];
 }
+
+const superAdminSidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
+  {
+    groupName: "Super Admin Portal",
+    items: [
+      {
+        title: "Vendors & Academies",
+        href: "/dashboard/super-admin/vendors",
+        icon: Building2,
+      },
+      {
+        title: "Whitelabel & Domains",
+        href: "/dashboard/super-admin/whitelabel",
+        icon: Globe,
+      },
+      {
+        title: "SaaS Packages",
+        href: "/dashboard/super-admin/packages",
+        icon: Layers,
+      },
+      {
+        title: "Invoices & Billing",
+        href: "/dashboard/super-admin/invoices",
+        icon: DollarSign,
+      },
+    ],
+  },
+  {
+    groupName: "System",
+    items: [
+      {
+        title: "Platform Settings",
+        href: "/dashboard/settings",
+        icon: Settings,
+      },
+    ],
+  },
+];
 
 const sidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
   {
@@ -316,7 +356,7 @@ export function AppSidebar() {
 
       {/* Sidebar Navigation */}
       <div id="sidebar-scroll-container" className="flex-1 overflow-y-auto p-3 space-y-6 custom-scrollbar">
-        {sidebarGroups.map((group, idx) => {
+        {(pathname?.startsWith("/dashboard/super-admin") ? superAdminSidebarGroups : sidebarGroups).map((group, idx) => {
           const groupId = `sidebar-group-${group.groupName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
           return (
             <div key={idx} id={groupId} className="space-y-1 scroll-mt-4">

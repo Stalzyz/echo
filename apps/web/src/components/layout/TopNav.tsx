@@ -63,54 +63,116 @@ export function TopNav() {
         {/* Left: Top Navigation Header Tabs */}
         <div className="flex items-center gap-2">
           <nav className="hidden lg:flex items-center gap-1">
-            <Link
-              href="/dashboard"
-              onClick={() => window.dispatchEvent(new CustomEvent('anchor-sidebar', { detail: 'Main' }))}
-              className={cn(
-                "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
-                pathname === "/dashboard"
-                  ? "bg-teal-50 text-teal-800 border border-teal-200/80 shadow-2xs"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
-              )}
-            >
-              Dashboard
-            </Link>
-            <Link
-              href="/dashboard/academy/admissions"
-              onClick={() => window.dispatchEvent(new CustomEvent('anchor-sidebar', { detail: 'Academy Admin' }))}
-              className={cn(
-                "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
-                pathname?.startsWith("/dashboard/academy")
-                  ? "bg-teal-50 text-teal-800 border border-teal-200/80 shadow-2xs"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
-              )}
-            >
-              Academy Admin
-            </Link>
-            <Link
-              href="/dashboard/studio"
-              onClick={() => window.dispatchEvent(new CustomEvent('anchor-sidebar', { detail: 'Teaching Studio' }))}
-              className={cn(
-                "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
-                pathname?.startsWith("/dashboard/studio")
-                  ? "bg-teal-50 text-teal-800 border border-teal-200/80 shadow-2xs"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
-              )}
-            >
-              Teaching Studio
-            </Link>
-            <Link
-              href="/dashboard/settings"
-              onClick={() => window.dispatchEvent(new CustomEvent('anchor-sidebar', { detail: 'Settings' }))}
-              className={cn(
-                "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
-                pathname?.startsWith("/dashboard/settings")
-                  ? "bg-teal-50 text-teal-800 border border-teal-200/80 shadow-2xs"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
-              )}
-            >
-              Settings
-            </Link>
+            {pathname?.startsWith("/dashboard/super-admin") ? (
+              <>
+                <Link
+                  href="/dashboard/super-admin/vendors"
+                  className={cn(
+                    "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
+                    pathname === "/dashboard/super-admin/vendors"
+                      ? "bg-teal-50 text-teal-800 border border-teal-200/80 shadow-2xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
+                  )}
+                >
+                  Vendors & Academies
+                </Link>
+                <Link
+                  href="/dashboard/super-admin/whitelabel"
+                  className={cn(
+                    "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
+                    pathname === "/dashboard/super-admin/whitelabel"
+                      ? "bg-teal-50 text-teal-800 border border-teal-200/80 shadow-2xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
+                  )}
+                >
+                  Whitelabel & Domains
+                </Link>
+                <Link
+                  href="/dashboard/super-admin/packages"
+                  className={cn(
+                    "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
+                    pathname === "/dashboard/super-admin/packages"
+                      ? "bg-teal-50 text-teal-800 border border-teal-200/80 shadow-2xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
+                  )}
+                >
+                  SaaS Packages
+                </Link>
+                <Link
+                  href="/dashboard/super-admin/invoices"
+                  className={cn(
+                    "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
+                    pathname === "/dashboard/super-admin/invoices"
+                      ? "bg-teal-50 text-teal-800 border border-teal-200/80 shadow-2xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
+                  )}
+                >
+                  Invoices & Billing
+                </Link>
+                <Link
+                  href="/dashboard/settings"
+                  className={cn(
+                    "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
+                    pathname?.startsWith("/dashboard/settings")
+                      ? "bg-teal-50 text-teal-800 border border-teal-200/80 shadow-2xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
+                  )}
+                >
+                  Settings
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/dashboard"
+                  onClick={() => window.dispatchEvent(new CustomEvent('anchor-sidebar', { detail: 'Main' }))}
+                  className={cn(
+                    "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
+                    pathname === "/dashboard"
+                      ? "bg-teal-50 text-teal-800 border border-teal-200/80 shadow-2xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
+                  )}
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href="/dashboard/academy/admissions"
+                  onClick={() => window.dispatchEvent(new CustomEvent('anchor-sidebar', { detail: 'Academy Admin' }))}
+                  className={cn(
+                    "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
+                    pathname?.startsWith("/dashboard/academy")
+                      ? "bg-teal-50 text-teal-800 border border-teal-200/80 shadow-2xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
+                  )}
+                >
+                  Academy Admin
+                </Link>
+                <Link
+                  href="/dashboard/studio"
+                  onClick={() => window.dispatchEvent(new CustomEvent('anchor-sidebar', { detail: 'Teaching Studio' }))}
+                  className={cn(
+                    "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
+                    pathname?.startsWith("/dashboard/studio")
+                      ? "bg-teal-50 text-teal-800 border border-teal-200/80 shadow-2xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
+                  )}
+                >
+                  Teaching Studio
+                </Link>
+                <Link
+                  href="/dashboard/settings"
+                  onClick={() => window.dispatchEvent(new CustomEvent('anchor-sidebar', { detail: 'Settings' }))}
+                  className={cn(
+                    "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
+                    pathname?.startsWith("/dashboard/settings")
+                      ? "bg-teal-50 text-teal-800 border border-teal-200/80 shadow-2xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
+                  )}
+                >
+                  Settings
+                </Link>
+              </>
+            )}
           </nav>
         </div>
 
