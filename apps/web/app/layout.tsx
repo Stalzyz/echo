@@ -59,8 +59,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${caveat.variable} ${spaceGrotesk.variable} ${playfair.variable}`}>
-      <body className="min-h-screen bg-[#FAFAF8] text-[#1C1C1C] font-sans antialiased">
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${caveat.variable} ${spaceGrotesk.variable} ${playfair.variable}`}>
+      <body suppressHydrationWarning className="min-h-screen bg-[#FAFAF8] text-[#1C1C1C] font-sans antialiased">
         <OrganizationProvider>
           <SmoothScroll>
             {children}
