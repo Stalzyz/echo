@@ -83,7 +83,9 @@ export async function fetchApi<T>(endpoint: string, options?: RequestInit): Prom
     ...(options?.headers as Record<string, string> || {})
   };
   
-  if (options?.body || (options?.method && !['GET', 'DELETE'].includes(options.method.toUpperCase()))) {
+  const method = (options?.method || 'GET').toUpperCase();
+
+  if (options?.body || !['GET', 'DELETE'].includes(method)) {
     headers['Content-Type'] = headers['Content-Type'] || 'application/json';
   }
 
@@ -95,15 +97,21 @@ export async function fetchApi<T>(endpoint: string, options?: RequestInit): Prom
   });
 
   if (!response.ok) {
-    let errorBody;
+    let errorBody: any;
     try { errorBody = await response.json(); } catch {}
 
+    const errorMessage = errorBody?.message || errorBody?.error || `Error ${response.status}: ${response.statusText}`;
+
+    // For non-GET requests (POST, PATCH, PUT, DELETE), always throw so caller can catch and report failure
+    if (method !== 'GET') {
+      throw new Error(errorMessage);
+    }
+
     if (response.status === 404 || response.status === 401) {
-      // Don't throw for expected auth/missing endpoints to prevent Next.js dev overlay
       if (errorBody) return errorBody as unknown as T;
       return null as unknown as T;
     }
-    throw new Error(errorBody?.message || errorBody?.error || `Error ${response.status}: ${response.statusText}`);
+    throw new Error(errorMessage);
   }
 
   if (response.status === 204) {
