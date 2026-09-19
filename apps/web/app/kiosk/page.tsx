@@ -79,7 +79,7 @@ export default function KioskPage() {
             <CheckCircle2 className="w-10 h-10 text-emerald-600" />
           </div>
           <h1 className="text-3xl font-black mb-3 text-slate-900">You're Registered!</h1>
-          <p className="text-slate-500 text-base mb-8">Welcome to Gecho LMS. A counsellor will be with you shortly.</p>
+          <p className="text-slate-500 text-base mb-8">Welcome to Echo LMS. A counsellor will be with you shortly.</p>
           
           <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8 mb-8">
             <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">Your Token Number</p>
@@ -110,7 +110,7 @@ export default function KioskPage() {
               <GraduationCap className="w-7 h-7 text-white" />
             </div>
             <div className="text-left">
-              <div className="text-slate-900 font-black text-xl">Gecho LMS</div>
+              <div className="text-slate-900 font-black text-xl">Echo LMS</div>
               <div className="text-teal-600 text-xs font-semibold">Welcome! Please register your visit.</div>
             </div>
           </div>
@@ -165,16 +165,10 @@ export default function KioskPage() {
 
           {/* Interest Area */}
           <div>
-            <label className="text-xs text-slate-400 font-bold uppercase tracking-widest block mb-3">Which course interests you? *</label>
-            <div className="flex flex-wrap gap-2">
-              {INTERESTS.map(i => (
-                <button key={i} type="button" onClick={() => setForm(p => ({...p, interestArea: i}))}
-                  className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all
-                    ${form.interestArea === i ? "bg-teal-50 border-teal-500 text-teal-700" : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"}`}>
-                  {i}
-                </button>
-              ))}
-            </div>
+            <label className="text-xs text-slate-400 font-bold uppercase tracking-widest block mb-2">Which course interests you? *</label>
+            <input required placeholder="Enter course name (e.g. Full Stack Web Development, Graphic Design...)"
+              className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-500 transition-colors"
+              value={form.interestArea} onChange={e => setForm(p => ({...p, interestArea: e.target.value}))} />
           </div>
 
           {/* Source */}

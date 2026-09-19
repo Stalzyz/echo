@@ -8,7 +8,11 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null)
   const pathname = usePathname()
 
+  const isDashboard = pathname?.startsWith("/dashboard")
+
   useEffect(() => {
+    if (isDashboard) return
+
     // Initialize Lenis
     const lenis = new Lenis({
       duration: 1.2,
@@ -31,14 +35,14 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     return () => {
       lenis.destroy()
     }
-  }, [])
+  }, [isDashboard])
 
   // Reset scroll on route change
   useEffect(() => {
-    if (lenisRef.current) {
+    if (!isDashboard && lenisRef.current) {
       lenisRef.current.scrollTo(0, { immediate: true })
     }
-  }, [pathname])
+  }, [pathname, isDashboard])
 
   return <>{children}</>
 }

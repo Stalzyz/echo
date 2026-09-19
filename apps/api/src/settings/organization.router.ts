@@ -49,8 +49,8 @@ export default async function organizationRouter(app: FastifyInstance) {
           academyLogoUrl: "/academy-logo.png",
           faviconUrl: "/favicon.ico",
           academyFaviconUrl: "/favicon.ico",
-          primaryColor: "#4f46e5",
-          secondaryColor: "#7c3aed",
+          primaryColor: "#0d9488",
+          secondaryColor: "#f59e0b",
           accentColor: "#10b981",
           darkModeDefault: true,
           supportEmail: "contact@grekam.in",
@@ -71,8 +71,8 @@ export default async function organizationRouter(app: FastifyInstance) {
       academyLogoUrl: org.academyLogoUrl || "/academy-logo.png",
       faviconUrl: org.faviconUrl || "/favicon.ico",
       academyFaviconUrl: org.academyFaviconUrl || "/favicon.ico",
-      primaryColor: org.primaryColor || "#4f46e5",
-      secondaryColor: org.secondaryColor || "#7c3aed",
+      primaryColor: org.primaryColor || "#0d9488",
+      secondaryColor: org.secondaryColor || "#f59e0b",
       accentColor: org.accentColor || "#10b981",
     };
   });
