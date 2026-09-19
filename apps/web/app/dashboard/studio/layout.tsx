@@ -23,8 +23,11 @@ export default async function EducatorLayout({
 
   return (
     <SessionProvider session={session}>
-      <div className="w-full bg-slate-50 text-slate-900 font-sans p-4 md:p-8">
-        {children}
+      <div className="flex min-h-screen bg-slate-50 text-slate-900 font-sans">
+        <EducatorSidebar />
+        <div className="flex-1 min-w-0 overflow-y-auto">
+          {children}
+        </div>
       </div>
     </SessionProvider>
   )
