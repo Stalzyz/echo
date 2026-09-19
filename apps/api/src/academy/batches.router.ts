@@ -6,8 +6,8 @@ const CreateBatchSchema = z.object({
   name: z.string().min(1),
   type: z.enum(['MORNING', 'EVENING', 'WEEKEND', 'ONLINE']),
   capacity: z.number().int().positive().default(20),
-  startDate: z.string().datetime(),
-  endDate: z.string().datetime(),
+  startDate: z.string().min(1),
+  endDate: z.string().min(1),
   educatorId: z.string().optional(),
 });
 
@@ -73,8 +73,8 @@ export default async function batchesRouter(app: FastifyInstance) {
       courseFee: z.number().min(0),
       batchName: z.string().min(1),
       batchType: z.enum(['MORNING', 'EVENING', 'WEEKEND', 'ONLINE']),
-      startDate: z.string().datetime(),
-      endDate: z.string().datetime(),
+      startDate: z.string().min(1),
+      endDate: z.string().min(1),
       capacity: z.number().int().positive().default(20)
     });
     const body = schema.parse(req.body);

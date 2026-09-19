@@ -33,7 +33,9 @@ export default function OnsiteCoursesPage() {
         body: JSON.stringify({
           ...createForm,
           courseFee: parseFloat(createForm.courseFee),
-          capacity: parseInt(createForm.capacity)
+          capacity: parseInt(createForm.capacity),
+          startDate: createForm.startDate ? new Date(createForm.startDate).toISOString() : new Date().toISOString(),
+          endDate: createForm.endDate ? new Date(createForm.endDate).toISOString() : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
         })
       })
       toast.success("Course & Batch created successfully!")
