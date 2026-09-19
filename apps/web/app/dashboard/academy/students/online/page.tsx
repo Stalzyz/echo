@@ -34,10 +34,15 @@ export default function StudentDirectory() {
     id: "", 
     firstName: "", 
     lastName: "", 
+    email: "",
     phone: "", 
-    batchId: "", 
+    dateOfBirth: "",
     city: "", 
-    address: "" 
+    address: "",
+    pincode: "",
+    idProofType: "Aadhaar Card",
+    idProofNumber: "",
+    batchId: "" 
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -59,6 +64,7 @@ export default function StudentDirectory() {
     city: s.city || 'N/A',
     address: s.address || '',
     pincode: s.pincode || '',
+    dateOfBirth: s.dateOfBirth ? s.dateOfBirth.split('T')[0] : '',
     idProofType: s.idProofType || '',
     idProofNumber: s.idProofNumber || '',
     batch: s.enrollments?.[0]?.batch?.name || 'Unassigned',
@@ -112,9 +118,14 @@ export default function StudentDirectory() {
         body: JSON.stringify({
           firstName: editForm.firstName,
           lastName: editForm.lastName,
+          email: editForm.email,
           phone: editForm.phone,
           city: editForm.city,
           address: editForm.address,
+          pincode: editForm.pincode,
+          dateOfBirth: editForm.dateOfBirth,
+          idProofType: editForm.idProofType,
+          idProofNumber: editForm.idProofNumber,
           batchId: editForm.batchId || undefined
         })
       })
@@ -148,9 +159,14 @@ export default function StudentDirectory() {
       id: student.id,
       firstName: student.firstName,
       lastName: student.lastName,
+      email: student.email,
       phone: student.phone !== 'N/A' ? student.phone : '',
       city: student.city !== 'N/A' ? student.city : '',
       address: student.address || '',
+      pincode: student.pincode || '',
+      dateOfBirth: student.dateOfBirth || '',
+      idProofType: student.idProofType || 'Aadhaar Card',
+      idProofNumber: student.idProofNumber || '',
       batchId: student.batchId || ''
     })
     setIsEditModalOpen(true)
@@ -368,32 +384,71 @@ export default function StudentDirectory() {
 
       {/* Edit Student Modal */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg p-6 shadow-2xl text-slate-900">
-            <div className="flex justify-between items-center pb-4 border-b border-slate-200 mb-4">
-              <h3 className="text-lg font-black text-slate-900">Edit Remote Student</h3>
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-xl p-6 shadow-2xl text-slate-900 max-h-[90vh] flex flex-col my-auto">
+            <div className="flex justify-between items-center pb-4 border-b border-slate-200 mb-4 shrink-0">
+              <h3 className="text-lg font-black text-slate-900">Edit Remote Student Profile</h3>
               <button onClick={() => setIsEditModalOpen(false)}><X className="w-5 h-5 text-slate-400 hover:text-slate-600" /></button>
             </div>
-            <form onSubmit={handleEditSubmit} className="space-y-4">
+            <form onSubmit={handleEditSubmit} className="space-y-4 overflow-y-auto custom-scrollbar p-1 flex-1">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">First Name</label>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">First Name *</label>
                   <input required value={editForm.firstName} onChange={e => setEditForm({ ...editForm, firstName: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm" />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Last Name</label>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Last Name *</label>
                   <input required value={editForm.lastName} onChange={e => setEditForm({ ...editForm, lastName: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Email *</label>
+                  <input required type="email" value={editForm.email} onChange={e => setEditForm({ ...editForm, email: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm" />
+                </div>
+                <div>
                   <label className="text-xs font-bold text-slate-700 block mb-1">Phone Number</label>
                   <input value={editForm.phone} onChange={e => setEditForm({ ...editForm, phone: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Date of Birth</label>
+                  <input type="date" value={editForm.dateOfBirth} onChange={e => setEditForm({ ...editForm, dateOfBirth: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm" />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-slate-700 block mb-1">City / Location</label>
                   <input value={editForm.city} onChange={e => setEditForm({ ...editForm, city: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div className="col-span-2">
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Full Address</label>
+                  <input value={editForm.address} onChange={e => setEditForm({ ...editForm, address: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Pincode</label>
+                  <input value={editForm.pincode} onChange={e => setEditForm({ ...editForm, pincode: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">ID Proof Type</label>
+                  <select value={editForm.idProofType} onChange={e => setEditForm({ ...editForm, idProofType: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm font-semibold">
+                    <option value="Aadhaar Card">Aadhaar Card</option>
+                    <option value="PAN Card">PAN Card</option>
+                    <option value="Passport">Passport</option>
+                    <option value="Driving License">Driving License</option>
+                    <option value="Student ID">Student ID</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">ID Proof Number</label>
+                  <input value={editForm.idProofNumber} onChange={e => setEditForm({ ...editForm, idProofNumber: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm" />
                 </div>
               </div>
 
@@ -407,13 +462,88 @@ export default function StudentDirectory() {
                 </select>
               </div>
 
-              <div className="pt-4 border-t border-slate-200 flex justify-end gap-3">
+              <div className="pt-4 border-t border-slate-200 flex justify-end gap-3 shrink-0">
                 <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold">Cancel</button>
                 <button type="submit" disabled={isSubmitting} className="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold">
                   {isSubmitting ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Virtual Student Overview Drawer */}
+      {activeStudent && (
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-end p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-6 h-full max-h-[92vh] overflow-y-auto animate-in slide-in-from-right duration-200">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-lg font-black text-teal-800">
+                  {activeStudent.name.charAt(0)}
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-slate-900">{activeStudent.name}</h3>
+                  <p className="text-xs font-mono font-bold text-teal-700 uppercase">{activeStudent.code}</p>
+                </div>
+              </div>
+              <button onClick={() => setActiveStudent(null)} className="text-slate-400 hover:text-slate-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Enrollment Details</span>
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 text-xs text-slate-700">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 font-medium">Delivery Mode:</span>
+                  <span className="font-extrabold text-teal-800 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded">Remote / Online</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 font-medium">Assigned Batch:</span>
+                  <span className="font-bold text-slate-900">{activeStudent.batch}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 font-medium">Status:</span>
+                  <span className="font-bold text-emerald-700">{activeStudent.status}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 font-medium">Email:</span>
+                  <span className="font-bold text-slate-900">{activeStudent.email}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 font-medium">Phone:</span>
+                  <span className="font-bold text-slate-900">{activeStudent.phone}</span>
+                </div>
+                {activeStudent.city && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400 font-medium">Location:</span>
+                    <span className="font-bold text-slate-900">{activeStudent.city}</span>
+                  </div>
+                )}
+                {activeStudent.idProofNumber && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400 font-medium">{activeStudent.idProofType || 'ID Proof'}:</span>
+                    <span className="font-mono font-bold text-slate-900">{activeStudent.idProofNumber}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-slate-100 space-y-3">
+              <Link 
+                href={`/dashboard/academy/students/${activeStudent.id}/passport`}
+                className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 shadow-xs"
+              >
+                <ShieldCheck className="w-4 h-4" /> View Full Student Passport
+              </Link>
+              <button 
+                onClick={() => { const st = activeStudent; setActiveStudent(null); openEditModal(st); }}
+                className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 border border-slate-200"
+              >
+                <Edit3 className="w-4 h-4 text-teal-600" /> Edit Student Info
+              </button>
+            </div>
           </div>
         </div>
       )}

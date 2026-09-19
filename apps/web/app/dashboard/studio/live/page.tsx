@@ -57,9 +57,33 @@ export default function OnsiteLiveSessionsPage() {
               <p className="text-sm text-slate-500 mt-2">Manage ongoing live sessions and demo classes.</p>
             </div>
           </div>
-          <button onClick={() => setIsScheduleOpen(true)} className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 py-3 rounded-xl transition-colors shadow-sm">
-            <Plus className="w-4 h-4" /> Schedule Session
-          </button>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={async () => {
+                toast.success("Launching instant Google Meet live studio room...")
+                window.open("https://meet.google.com/new", "_blank")
+                try {
+                  await fetchApi("/academy/demo-sessions", {
+                    method: "POST",
+                    body: JSON.stringify({
+                      title: "Instant Live Class Studio Session",
+                      scheduledAt: new Date().toISOString(),
+                      durationMins: 60,
+                      capacity: 50,
+                      venue: "Google Meet | https://meet.google.com/new"
+                    })
+                  })
+                  mutate()
+                } catch {}
+              }}
+              className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold px-5 py-3 rounded-xl transition-colors shadow-xs"
+            >
+              <Video className="w-4 h-4 text-teal-400" /> Go Live Now
+            </button>
+            <button onClick={() => setIsScheduleOpen(true)} className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold px-5 py-3 rounded-xl transition-colors shadow-xs">
+              <Plus className="w-4 h-4" /> Schedule Session
+            </button>
+          </div>
         </div>
       </div>
 

@@ -338,9 +338,9 @@ export default function EmiSchedulePage() {
 
       {/* EMI Rules Control System Modal */}
       {isRulesOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 space-y-6 shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl max-h-[90vh] flex flex-col my-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 shrink-0">
               <div className="flex items-center gap-2">
                 <Settings className="w-5 h-5 text-teal-600" />
                 <h2 className="text-lg font-black text-slate-900">EMI Rules & Control System</h2>
@@ -348,48 +348,118 @@ export default function EmiSchedulePage() {
               <button onClick={() => setIsRulesOpen(false)}><X className="w-5 h-5 text-slate-400 hover:text-slate-700" /></button>
             </div>
 
-            <div className="space-y-4">
-              <p className="text-xs text-slate-500">Select or configure fee rules for installment payments.</p>
+            <div className="space-y-4 overflow-y-auto custom-scrollbar p-1 flex-1">
+              <p className="text-xs text-slate-500 font-medium">Configure and customize active fee rules for student installment plans.</p>
               
               <div className="space-y-3">
                 {rules.map((rule) => (
                   <div 
                     key={rule.id}
-                    onClick={() => setActiveRuleId(rule.id)}
-                    className={`p-4 rounded-2xl border cursor-pointer transition-all ${
+                    className={`p-4 rounded-2xl border transition-all ${
                       activeRuleId === rule.id 
-                        ? "bg-teal-50/80 border-teal-400 shadow-sm" 
+                        ? "bg-teal-50/80 border-teal-400 shadow-xs" 
                         : "bg-slate-50 border-slate-200 hover:border-slate-300"
                     }`}
                   >
                     <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-extrabold text-sm text-slate-900">{rule.name}</h4>
-                      {activeRuleId === rule.id && (
-                        <span className="px-2 py-0.5 bg-teal-600 text-white text-[10px] font-bold rounded-md">ACTIVE RULE</span>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-3 gap-2 text-[11px] text-slate-600 mt-2 pt-2 border-t border-slate-200/60">
                       <div>
-                        <span className="text-slate-400 block">Surcharge:</span>
-                        <span className="font-bold">{rule.mode === "ZERO_COST" ? "0% (Zero Extra)" : `${rule.surchargePercent}% Extra`}</span>
+                        <h4 className="font-extrabold text-sm text-slate-900">{rule.name}</h4>
+                        <span className="text-[10px] text-slate-500 font-semibold">{rule.mode === "ZERO_COST" ? "Zero Extra Charge (0% Interest)" : `Custom Surcharge (${rule.surchargePercent}%)`}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {activeRuleId === rule.id ? (
+                          <span className="px-2 py-0.5 bg-teal-600 text-white text-[10px] font-bold rounded-md">ACTIVE</span>
+                        ) : (
+                          <button onClick={() => { setActiveRuleId(rule.id); toast.success(`Activated rule: ${rule.name}`); }} className="px-2 py-0.5 bg-slate-200 hover:bg-teal-600 hover:text-white text-slate-700 text-[10px] font-bold rounded-md transition-colors">
+                            Set Active
+                          </button>
+                        )}
+                        {rules.length > 1 && (
+                          <button onClick={() => { setRules(rules.filter(r => r.id !== rule.id)); if(activeRuleId === rule.id) setActiveRuleId(rules.find(r => r.id !== rule.id)?.id || ''); }} className="p-1 text-slate-400 hover:text-rose-600">
+                            <X className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-[11px] text-slate-600 mt-3 pt-2.5 border-t border-slate-200/80">
+                      <div>
+                        <span className="text-slate-400 block">Surcharge Rate:</span>
+                        <span className="font-bold text-slate-900">{rule.mode === "ZERO_COST" ? "0%" : `${rule.surchargePercent}%`}</span>
                       </div>
                       <div>
                         <span className="text-slate-400 block">Min Down Payment:</span>
-                        <span className="font-bold">{rule.minDownPaymentPercent}%</span>
+                        <span className="font-bold text-slate-900">{rule.minDownPaymentPercent}%</span>
                       </div>
                       <div>
-                        <span className="text-slate-400 block">Late Fee:</span>
-                        <span className="font-bold">₹{rule.lateFeePenalty} / mo</span>
+                        <span className="text-slate-400 block">Late Fee / Mo:</span>
+                        <span className="font-bold text-slate-900">₹{rule.lateFeePenalty}</span>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
+
+              {/* Add Custom Rule Section */}
+              <div className="pt-3 border-t border-slate-200 space-y-3">
+                <span className="text-xs font-black uppercase tracking-wider text-slate-700 block">Add Custom EMI Rule</span>
+                <div className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                  <input id="newRuleName" placeholder="Rule Name (e.g. Festival 3% Offer)" className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium" />
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-400 block mb-1">Type</label>
+                      <select id="newRuleMode" className="w-full bg-white border border-slate-200 rounded-xl px-2 py-2 text-xs font-bold">
+                        <option value="ZERO_COST">0% Extra</option>
+                        <option value="SURCHARGE">% Surcharge</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-400 block mb-1">Surcharge %</label>
+                      <input id="newRuleSurcharge" type="number" defaultValue={5} className="w-full bg-white border border-slate-200 rounded-xl px-2 py-2 text-xs font-bold" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-400 block mb-1">Down Pay %</label>
+                      <input id="newRuleDown" type="number" defaultValue={25} className="w-full bg-white border border-slate-200 rounded-xl px-2 py-2 text-xs font-bold" />
+                    </div>
+                  </div>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      const nameEl = document.getElementById("newRuleName") as HTMLInputElement
+                      const modeEl = document.getElementById("newRuleMode") as HTMLSelectElement
+                      const surEl = document.getElementById("newRuleSurcharge") as HTMLInputElement
+                      const downEl = document.getElementById("newRuleDown") as HTMLInputElement
+                      
+                      const name = nameEl?.value || "Custom EMI Rule"
+                      const mode = (modeEl?.value || "SURCHARGE") as any
+                      const surchargePercent = parseInt(surEl?.value || "0")
+                      const minDownPaymentPercent = parseInt(downEl?.value || "25")
+
+                      const newRule: EmiRule = {
+                        id: `rule_${Date.now()}`,
+                        name,
+                        mode,
+                        surchargePercent: mode === "ZERO_COST" ? 0 : surchargePercent,
+                        minDownPaymentPercent,
+                        lateFeePenalty: 250,
+                        isActive: true
+                      }
+
+                      setRules([...rules, newRule])
+                      setActiveRuleId(newRule.id)
+                      if (nameEl) nameEl.value = ""
+                      toast.success(`Custom EMI rule "${name}" created and set active!`)
+                    }}
+                    className="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors"
+                  >
+                    + Add & Set Active Rule
+                  </button>
+                </div>
+              </div>
             </div>
 
-            <div className="pt-2 flex justify-end gap-2">
+            <div className="pt-2 flex justify-end gap-2 shrink-0 border-t border-slate-100">
               <button onClick={() => setIsRulesOpen(false)} className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl shadow-xs">
-                Apply Active Rule
+                Done & Apply Rule
               </button>
             </div>
           </div>

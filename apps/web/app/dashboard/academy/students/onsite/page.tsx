@@ -36,9 +36,12 @@ export default function StudentDirectory() {
     lastName: "",
     email: "",
     phone: "",
+    dateOfBirth: "",
     city: "",
     address: "",
     pincode: "",
+    idProofType: "Aadhaar Card",
+    idProofNumber: "",
     batchId: ""
   })
 
@@ -61,6 +64,7 @@ export default function StudentDirectory() {
     city: s.city || 'N/A',
     address: s.address || '',
     pincode: s.pincode || '',
+    dateOfBirth: s.dateOfBirth ? s.dateOfBirth.split('T')[0] : '',
     idProofType: s.idProofType || '',
     idProofNumber: s.idProofNumber || '',
     batch: s.enrollments?.[0]?.batch?.name || 'Unassigned',
@@ -114,10 +118,14 @@ export default function StudentDirectory() {
         body: JSON.stringify({
           firstName: editForm.firstName,
           lastName: editForm.lastName,
+          email: editForm.email,
           phone: editForm.phone,
           city: editForm.city,
           address: editForm.address,
           pincode: editForm.pincode,
+          dateOfBirth: editForm.dateOfBirth,
+          idProofType: editForm.idProofType,
+          idProofNumber: editForm.idProofNumber,
           batchId: editForm.batchId || undefined
         })
       })
@@ -156,6 +164,9 @@ export default function StudentDirectory() {
       city: student.city !== 'N/A' ? student.city : '',
       address: student.address || '',
       pincode: student.pincode || '',
+      dateOfBirth: student.dateOfBirth || '',
+      idProofType: student.idProofType || 'Aadhaar Card',
+      idProofNumber: student.idProofNumber || '',
       batchId: student.batchId || ''
     })
     setIsEditModalOpen(true)
@@ -373,32 +384,71 @@ export default function StudentDirectory() {
 
       {/* Edit Student Modal */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg p-6 shadow-2xl text-slate-900">
-            <div className="flex justify-between items-center pb-4 border-b border-slate-200 mb-4">
-              <h3 className="text-lg font-black text-slate-900">Edit Student Enrollment</h3>
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-xl p-6 shadow-2xl text-slate-900 max-h-[90vh] flex flex-col my-auto">
+            <div className="flex justify-between items-center pb-4 border-b border-slate-200 mb-4 shrink-0">
+              <h3 className="text-lg font-black text-slate-900">Edit Campus Student Profile</h3>
               <button onClick={() => setIsEditModalOpen(false)}><X className="w-5 h-5 text-slate-400 hover:text-slate-600" /></button>
             </div>
-            <form onSubmit={handleEditSubmit} className="space-y-4">
+            <form onSubmit={handleEditSubmit} className="space-y-4 overflow-y-auto custom-scrollbar p-1 flex-1">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">First Name</label>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">First Name *</label>
                   <input required value={editForm.firstName} onChange={e => setEditForm({ ...editForm, firstName: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm" />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Last Name</label>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Last Name *</label>
                   <input required value={editForm.lastName} onChange={e => setEditForm({ ...editForm, lastName: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Email *</label>
+                  <input required type="email" value={editForm.email} onChange={e => setEditForm({ ...editForm, email: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm" />
+                </div>
+                <div>
                   <label className="text-xs font-bold text-slate-700 block mb-1">Phone Number</label>
                   <input value={editForm.phone} onChange={e => setEditForm({ ...editForm, phone: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Date of Birth</label>
+                  <input type="date" value={editForm.dateOfBirth} onChange={e => setEditForm({ ...editForm, dateOfBirth: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm" />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-slate-700 block mb-1">City / Place</label>
                   <input value={editForm.city} onChange={e => setEditForm({ ...editForm, city: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div className="col-span-2">
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Full Address</label>
+                  <input value={editForm.address} onChange={e => setEditForm({ ...editForm, address: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Pincode</label>
+                  <input value={editForm.pincode} onChange={e => setEditForm({ ...editForm, pincode: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">ID Proof Type</label>
+                  <select value={editForm.idProofType} onChange={e => setEditForm({ ...editForm, idProofType: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm font-semibold">
+                    <option value="Aadhaar Card">Aadhaar Card</option>
+                    <option value="PAN Card">PAN Card</option>
+                    <option value="Passport">Passport</option>
+                    <option value="Driving License">Driving License</option>
+                    <option value="Student ID">Student ID</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">ID Proof Number</label>
+                  <input value={editForm.idProofNumber} onChange={e => setEditForm({ ...editForm, idProofNumber: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm" />
                 </div>
               </div>
 
@@ -412,7 +462,7 @@ export default function StudentDirectory() {
                 </select>
               </div>
 
-              <div className="pt-4 border-t border-slate-200 flex justify-end gap-3">
+              <div className="pt-4 border-t border-slate-200 flex justify-end gap-3 shrink-0">
                 <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold">Cancel</button>
                 <button type="submit" disabled={isSubmitting} className="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold">
                   {isSubmitting ? "Saving..." : "Save Changes"}

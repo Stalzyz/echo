@@ -10,11 +10,30 @@ export default function OnlineEducatorsPage() {
   const educators = educatorsData?.filter(e => e.deliveryMode === 'ONLINE') || []
   
   const [isSlideOverOpen, setIsSlideOverOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
     email: "",
+    phone: "",
+    designation: "",
+    company: "",
+    yearsExperience: 0,
+    skills: "",
+    bio: "",
+    address: "",
+    city: "",
+    pincode: "",
+    dateOfBirth: "",
+    idProofType: "Aadhaar Card",
+    idProofNumber: ""
+  })
+
+  const [editForm, setEditForm] = useState({
+    id: "",
+    firstName: "",
+    lastName: "",
     phone: "",
     designation: "",
     company: "",
@@ -67,6 +86,60 @@ export default function OnlineEducatorsPage() {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const handleEditEducator = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    try {
+      await fetchApi(`/academy/educators/${editForm.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          firstName: editForm.firstName,
+          lastName: editForm.lastName,
+          phone: editForm.phone,
+          designation: editForm.designation,
+          company: editForm.company,
+          yearsExperience: Number(editForm.yearsExperience),
+          skills: editForm.skills ? editForm.skills.split(',').map(s => s.trim()).filter(Boolean) : [],
+          bio: editForm.bio,
+          address: editForm.address,
+          city: editForm.city,
+          pincode: editForm.pincode,
+          dateOfBirth: editForm.dateOfBirth,
+          idProofType: editForm.idProofType,
+          idProofNumber: editForm.idProofNumber
+        })
+      })
+      toast.success("Educator details updated successfully!")
+      setIsEditModalOpen(false)
+      mutate()
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update educator")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const openEditModal = (educator: any) => {
+    setEditForm({
+      id: educator.id,
+      firstName: educator.user?.firstName || '',
+      lastName: educator.user?.lastName || '',
+      phone: educator.user?.phone || '',
+      designation: educator.designation || '',
+      company: educator.company || '',
+      yearsExperience: educator.yearsExperience || 0,
+      skills: educator.skills ? educator.skills.join(', ') : '',
+      bio: educator.bio || '',
+      address: educator.address || '',
+      city: educator.city || '',
+      pincode: educator.pincode || '',
+      dateOfBirth: educator.dateOfBirth ? educator.dateOfBirth.split('T')[0] : '',
+      idProofType: educator.idProofType || 'Aadhaar Card',
+      idProofNumber: educator.idProofNumber || ''
+    })
+    setIsEditModalOpen(true)
   }
 
   const handleDeleteEducator = async (id: string, name: string) => {
@@ -152,10 +225,16 @@ export default function OnlineEducatorsPage() {
 
               <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
                 <button
-                  onClick={() => handleDeleteEducator(educator.id, `${educator.user.firstName} ${educator.user.lastName}`)}
-                  className="w-full py-2 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 rounded-xl text-xs font-bold transition-colors"
+                  onClick={() => openEditModal(educator)}
+                  className="w-1/2 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1"
                 >
-                  Delete Remote Educator
+                  Edit Profile
+                </button>
+                <button
+                  onClick={() => handleDeleteEducator(educator.id, `${educator.user.firstName} ${educator.user.lastName}`)}
+                  className="w-1/2 py-2 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 rounded-xl text-xs font-bold transition-colors"
+                >
+                  Delete
                 </button>
               </div>
             </div>
@@ -283,6 +362,109 @@ export default function OnlineEducatorsPage() {
                 {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Educator"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Educator Modal */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-xl w-full p-6 shadow-2xl text-slate-900 max-h-[90vh] flex flex-col my-auto space-y-4">
+            <div className="flex justify-between items-center pb-4 border-b border-slate-200 shrink-0">
+              <h3 className="text-lg font-black text-slate-900">Edit Remote Faculty Details</h3>
+              <button onClick={() => setIsEditModalOpen(false)}><X className="w-5 h-5 text-slate-400 hover:text-slate-600" /></button>
+            </div>
+            
+            <form onSubmit={handleEditEducator} className="space-y-4 overflow-y-auto custom-scrollbar p-1 flex-1">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">First Name *</label>
+                  <input required value={editForm.firstName} onChange={e => setEditForm({ ...editForm, firstName: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Last Name *</label>
+                  <input required value={editForm.lastName} onChange={e => setEditForm({ ...editForm, lastName: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Phone Number</label>
+                  <input value={editForm.phone} onChange={e => setEditForm({ ...editForm, phone: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Designation / Title</label>
+                  <input value={editForm.designation} onChange={e => setEditForm({ ...editForm, designation: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Current Company</label>
+                  <input value={editForm.company} onChange={e => setEditForm({ ...editForm, company: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Years of Experience</label>
+                  <input type="number" min="0" value={editForm.yearsExperience} onChange={e => setEditForm({ ...editForm, yearsExperience: parseInt(e.target.value) || 0 })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">City / Location</label>
+                  <input value={editForm.city} onChange={e => setEditForm({ ...editForm, city: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Date of Birth</label>
+                  <input type="date" value={editForm.dateOfBirth} onChange={e => setEditForm({ ...editForm, dateOfBirth: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div className="col-span-2">
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Address</label>
+                  <input value={editForm.address} onChange={e => setEditForm({ ...editForm, address: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Pincode</label>
+                  <input value={editForm.pincode} onChange={e => setEditForm({ ...editForm, pincode: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">ID Proof Type</label>
+                  <select value={editForm.idProofType} onChange={e => setEditForm({ ...editForm, idProofType: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold">
+                    <option value="Aadhaar Card">Aadhaar Card</option>
+                    <option value="PAN Card">PAN Card</option>
+                    <option value="Passport">Passport</option>
+                    <option value="Driving License">Driving License</option>
+                    <option value="Government ID">Government ID</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">ID Proof Number</label>
+                  <input value={editForm.idProofNumber} onChange={e => setEditForm({ ...editForm, idProofNumber: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium" />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Skills (Comma Separated)</label>
+                <input value={editForm.skills} onChange={e => setEditForm({ ...editForm, skills: e.target.value })} placeholder="React, Node.js, System Design" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium" />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Instructor Bio</label>
+                <textarea rows={3} value={editForm.bio} onChange={e => setEditForm({ ...editForm, bio: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium resize-none" />
+              </div>
+
+              <div className="pt-4 border-t border-slate-200 flex justify-end gap-3 shrink-0">
+                <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-5 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold">Cancel</button>
+                <button type="submit" disabled={isSubmitting} className="px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold shadow-xs">
+                  {isSubmitting ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

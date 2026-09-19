@@ -23,14 +23,14 @@ interface TemplateOption {
 const TEMPLATES: TemplateOption[] = [
   {
     id: "tpl-101",
-    name: "[MARKETING] GRAFTY FOR SHOPIFY",
+    name: "[MARKETING] ECHO ADMISSIONS & SCHOLARSHIP",
     category: "MARKETING",
     status: "APPROVED",
     language: "en_US",
     headerType: "IMAGE",
-    defaultImage: "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80",
-    bodyText: "Want to increase your product sales through WhatsApp? Grafty Pro automates order updates, abandoned cart recovery, product broadcasts, and customer follow-ups—all from one dashboard.",
-    ctaText: "Explore Grafty Pro"
+    defaultImage: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80",
+    bodyText: "Welcome to Echo Academy! Applications are now open for our upcoming Full Stack & UI/UX Design cohort. Tap below to claim your early-bird scholarship discount and syllabus.",
+    ctaText: "Explore Echo Academy"
   },
   {
     id: "tpl-102",
@@ -40,7 +40,7 @@ const TEMPLATES: TemplateOption[] = [
     language: "en_US",
     headerType: "IMAGE",
     defaultImage: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80",
-    bodyText: "You are 85% through your Full Stack Web Development course. Complete your final module today to unlock your official verified certificate!",
+    bodyText: "You are 85% through your Full Stack Web Development course on Echo LMS. Complete your final module today to unlock your official verified certificate!",
     ctaText: "Continue Learning"
   },
   {
@@ -51,7 +51,7 @@ const TEMPLATES: TemplateOption[] = [
     language: "en_US",
     headerType: "IMAGE",
     defaultImage: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80",
-    bodyText: "Your upcoming fee installment of ₹4,999 for Full Stack Web Dev is due on 25th Sept 2026. Tap below to complete instant payment via UPI.",
+    bodyText: "Your upcoming fee installment of ₹4,999 for Full Stack Web Dev at Echo Academy is due on 25th Sept 2026. Tap below to complete instant payment via UPI.",
     ctaText: "Pay Fee via UPI"
   },
   {
@@ -62,7 +62,7 @@ const TEMPLATES: TemplateOption[] = [
     language: "en_US",
     headerType: "IMAGE",
     defaultImage: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80",
-    bodyText: "Congratulations! Your official verified certificate for UI/UX Masterclass has been generated. Tap below to view and download your A4 PDF certificate.",
+    bodyText: "Congratulations! Your official verified certificate for UI/UX Masterclass at Echo Academy has been generated. Tap below to view and download your PDF certificate.",
     ctaText: "Verify Certificate"
   },
   {
@@ -73,7 +73,7 @@ const TEMPLATES: TemplateOption[] = [
     language: "en_US",
     headerType: "IMAGE",
     defaultImage: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80",
-    bodyText: "New Admissions Open for October 2026 Full Stack Cohort! Enroll now to claim early-bird 20% scholarship discount and placement support.",
+    bodyText: "New Admissions Open for October 2026 Full Stack Cohort at Echo Academy! Enroll now to claim early-bird 20% scholarship discount and placement support.",
     ctaText: "Apply For Scholarship"
   }
 ]
@@ -91,9 +91,9 @@ const CONTACT_GROUPS = [
 export default function WhatsAppPage() {
   const [activeTab, setActiveTab] = useState<"direct" | "groups" | "automation">("direct")
   
-  // Direct Message Form State (Recreating Screenshot 2)
-  const [recipientName, setRecipientName] = useState("LEGEND FITNESS GYM & SPA")
-  const [phoneNumber, setPhoneNumber] = useState("+91 9159745200")
+  // Direct Message Form State
+  const [recipientName, setRecipientName] = useState("Rahul Sharma")
+  const [phoneNumber, setPhoneNumber] = useState("+91 9876543210")
   const [providerEngine, setProviderEngine] = useState<"waba" | "direct" | "auto">("auto")
   const [selectedTplId, setSelectedTplId] = useState<string>("tpl-101")
   const [imageSource, setImageSource] = useState<"local" | "asset" | "url">("local")
@@ -108,7 +108,7 @@ export default function WhatsAppPage() {
 
   // Automations Tab State
   const [automations, setAutomations] = useState([
-    { id: "auto-1", title: "Student Enrollment Welcome", trigger: "On Student Registration", template: "[MARKETING] GRAFTY FOR SHOPIFY", active: true },
+    { id: "auto-1", title: "Student Enrollment Welcome", trigger: "On Student Registration", template: "[MARKETING] ECHO ADMISSIONS & SCHOLARSHIP", active: true },
     { id: "auto-2", title: "Fee Due Date Alert", trigger: "3 Days Before Fee Due", template: "[UTILITY] FEE INSTALLMENT REMINDER", active: true },
     { id: "auto-3", title: "Certificate Download Link", trigger: "On Course 100% Completion", template: "[UTILITY] CERTIFICATE ISSUED ALERT", active: true },
     { id: "auto-4", title: "Lead Brochure Follow-up", trigger: "On Form Submission", template: "[MARKETING] NEW BATCH ADMISSION OFFER", active: false },
@@ -272,7 +272,7 @@ export default function WhatsAppPage() {
                   value={recipientName}
                   onChange={e => setRecipientName(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-900 focus:bg-white focus:outline-teal-600 focus:ring-2 focus:ring-teal-500/20"
-                  placeholder="LEGEND FITNESS GYM & SPA"
+                  placeholder="Student Name (e.g. Rahul Sharma)"
                 />
               </div>
 
@@ -285,7 +285,7 @@ export default function WhatsAppPage() {
                   value={phoneNumber}
                   onChange={e => setPhoneNumber(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-teal-600 focus:ring-2 focus:ring-teal-500/20"
-                  placeholder="+91 9159745200"
+                  placeholder="+91 9876543210"
                 />
               </div>
             </div>

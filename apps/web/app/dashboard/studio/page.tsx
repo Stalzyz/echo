@@ -39,9 +39,9 @@ export default function EducatorDashboard() {
             <button className="flex-1 md:w-32 py-1.5 px-3 text-slate-500 hover:text-slate-900 rounded-lg text-sm font-semibold transition-all">Virtual</button>
           </div>
           
-          <button className="w-full md:w-auto justify-center px-5 py-3 md:py-2.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 font-semibold text-sm text-slate-800 transition-colors flex items-center gap-2 min-h-[44px] shadow-sm">
+          <Link href="/dashboard/studio/live" className="w-full md:w-auto justify-center px-5 py-3 md:py-2.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 font-semibold text-sm text-slate-800 transition-colors flex items-center gap-2 min-h-[44px] shadow-sm">
             <Video className="w-4 h-4 text-teal-600" /> Go Live
-          </button>
+          </Link>
           <Link href="/dashboard/studio/courses/builder" className="w-full md:w-auto justify-center px-5 py-3 md:py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-semibold text-sm transition-all flex items-center gap-2 shadow-sm min-h-[44px]">
             <Plus className="w-4 h-4" /> New Course
           </Link>
