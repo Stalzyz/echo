@@ -28,14 +28,14 @@ const MASTER_EMAIL_TEMPLATES: EmailTemplate[] = [
     code: "ACADEMY_WELCOME",
     name: "Academy Onboarding & Credentials",
     category: "Academy Lifecycle",
-    subject: "Welcome to GECHO LMS — Provisioning Complete for {{academy_name}}",
+    subject: "Welcome to Echo LMS — Provisioning Complete for {{academy_name}}",
     triggerEvent: "On provisioning new academy tenant",
     recipientRole: "Academy Admin",
     autoDispatch: true,
     totalSent: 24,
     htmlBody: `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; rounded: 16px;">
-        <h2 style="color: #0d9488;">Welcome to GECHO LMS, {{owner_name}}!</h2>
+        <h2 style="color: #0d9488;">Welcome to Echo LMS, {{owner_name}}!</h2>
         <p>Your tenant academy <strong>{{academy_name}}</strong> has been provisioned successfully.</p>
         <div style="background: #f8fafc; padding: 16px; border-radius: 12px; margin: 16px 0;">
           <p style="margin: 4px 0;"><strong>Subdomain:</strong> {{subdomain}}</p>
@@ -69,7 +69,7 @@ const MASTER_EMAIL_TEMPLATES: EmailTemplate[] = [
     code: "ACADEMY_TRIAL_EXPIRING",
     name: "Free Trial Expiring Warning",
     category: "Academy Lifecycle",
-    subject: "Action Required: 3 Days Left on Your GECHO Free Trial",
+    subject: "Action Required: 3 Days Left on Your Echo Free Trial",
     triggerEvent: "3 days before trial completion",
     recipientRole: "Academy Admin",
     autoDispatch: true,
@@ -109,7 +109,7 @@ const MASTER_EMAIL_TEMPLATES: EmailTemplate[] = [
     code: "SECURITY_PASSWORD_RESET",
     name: "Password Reset Code & Link",
     category: "Authentication & Security",
-    subject: "GECHO Password Reset Verification Code: {{otp_code}}",
+    subject: "Echo Password Reset Verification Code: {{otp_code}}",
     triggerEvent: "User requests password reset",
     recipientRole: "User / Student",
     autoDispatch: true,
@@ -128,7 +128,7 @@ const MASTER_EMAIL_TEMPLATES: EmailTemplate[] = [
     code: "SECURITY_2FA_OTP",
     name: "Two-Factor Authentication OTP",
     category: "Authentication & Security",
-    subject: "Your GECHO 2FA Security Passcode is {{otp_code}}",
+    subject: "Your Echo 2FA Security Passcode is {{otp_code}}",
     triggerEvent: "2FA login challenge",
     recipientRole: "User / Student",
     autoDispatch: true,

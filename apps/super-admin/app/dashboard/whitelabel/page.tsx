@@ -40,7 +40,7 @@ interface EchoBrandingLocation {
   id: string
   locationName: string
   description: string
-  rule: "ALWAYS_GECHO" | "VENDOR_BRANDING" | "HIDDEN"
+  rule: "ALWAYS_Echo" | "VENDOR_BRANDING" | "HIDDEN"
 }
 
 export default function SuperAdminWhitelabelPage() {
@@ -134,13 +134,13 @@ export default function SuperAdminWhitelabelPage() {
     }
   ])
 
-  // 3. GECHO Branding Placement Matrix
+  // 3. Echo Branding Placement Matrix
   const [brandingRules, setBrandingRules] = useState<EchoBrandingLocation[]>([
-    { id: "loc-1", locationName: "Login Portal Footer", description: "Shows 'Powered by GECHO' on student sign-in screens.", rule: "VENDOR_BRANDING" },
+    { id: "loc-1", locationName: "Login Portal Footer", description: "Shows 'Powered by Echo' on student sign-in screens.", rule: "VENDOR_BRANDING" },
     { id: "loc-2", locationName: "Academy Dashboard Sidebar", description: "Bottom branding badge in main navigation sidebar.", rule: "VENDOR_BRANDING" },
-    { id: "loc-3", locationName: "Verified PDF Certificates", description: "Certificate validation link and watermark footer.", rule: "ALWAYS_GECHO" },
+    { id: "loc-3", locationName: "Verified PDF Certificates", description: "Certificate validation link and watermark footer.", rule: "ALWAYS_Echo" },
     { id: "loc-4", locationName: "Automated Email Templates", description: "Email footer copyright and provider links.", rule: "VENDOR_BRANDING" },
-    { id: "loc-5", locationName: "System Error Pages (404/500)", description: "Error diagnostic screens and fallback support.", rule: "ALWAYS_GECHO" },
+    { id: "loc-5", locationName: "System Error Pages (404/500)", description: "Error diagnostic screens and fallback support.", rule: "ALWAYS_Echo" },
   ])
 
   // New Custom Domain Modal State
@@ -168,9 +168,9 @@ export default function SuperAdminWhitelabelPage() {
     toast.success("Updated vendor white-label override permissions!")
   }
 
-  const updateBrandingRule = (locId: string, newRule: "ALWAYS_GECHO" | "VENDOR_BRANDING" | "HIDDEN") => {
+  const updateBrandingRule = (locId: string, newRule: "ALWAYS_Echo" | "VENDOR_BRANDING" | "HIDDEN") => {
     setBrandingRules(prev => prev.map(b => b.id === locId ? { ...b, rule: newRule } : b))
-    toast.success("Updated GECHO platform branding placement policy!")
+    toast.success("Updated Echo platform branding placement policy!")
   }
 
   const handleVerifyDomain = (vendorId: string) => {
@@ -231,7 +231,7 @@ export default function SuperAdminWhitelabelPage() {
             { id: 'global', label: 'Global Platform Settings', icon: Globe },
             { id: 'plans', label: 'SaaS Plan Permissions', icon: Layers },
             { id: 'vendors', label: 'Vendor Overrides', icon: Shield },
-            { id: 'branding', label: 'GECHO Branding Matrix', icon: Palette },
+            { id: 'branding', label: 'Echo Branding Matrix', icon: Palette },
             { id: 'domains', label: 'Custom Domain CNAME', icon: Server },
           ].map(tab => (
             <button
@@ -258,7 +258,7 @@ export default function SuperAdminWhitelabelPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-lg font-black text-slate-900">White-Label System Master Switch</h2>
-                    <p className="text-xs text-slate-500 mt-0.5">When ON, eligible vendors can replace GECHO branding with their own academy identity.</p>
+                    <p className="text-xs text-slate-500 mt-0.5">When ON, eligible vendors can replace Echo branding with their own academy identity.</p>
                   </div>
                   <input 
                     type="checkbox"
@@ -272,7 +272,7 @@ export default function SuperAdminWhitelabelPage() {
                   <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-1">
                     <span className="text-xs font-bold text-slate-900 block">System Mode</span>
                     <span className="text-xs font-black text-emerald-600 uppercase tracking-wider block">
-                      {globalWhiteLabel ? "Multi-Tenant White Label Active" : "Default GECHO Branding Only"}
+                      {globalWhiteLabel ? "Multi-Tenant White Label Active" : "Default Echo Branding Only"}
                     </span>
                   </div>
                   <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-1">
@@ -312,7 +312,7 @@ export default function SuperAdminWhitelabelPage() {
                       { key: 'allowCustomLogin', label: 'Custom Login Portal Layout' },
                       { key: 'allowCustomDomain', label: 'Custom CNAME Domain (learn.academy.com)' },
                       { key: 'allowEmailWhiteLabel', label: 'Custom Email SMTP Branding' },
-                      { key: 'allowRemoveEchoBranding', label: 'Remove "Powered by GECHO"' },
+                      { key: 'allowRemoveEchoBranding', label: 'Remove "Powered by Echo"' },
                       { key: 'allowMobileAppBranding', label: 'Standalone Mobile App Branding' },
                     ].map(row => (
                       <tr key={row.key} className="hover:bg-slate-50/60">
@@ -386,7 +386,7 @@ export default function SuperAdminWhitelabelPage() {
                           onChange={() => toggleVendorOverride(v.id, 'removeEchoBrandingAllowed')}
                           className="w-4 h-4 accent-teal-600 rounded"
                         />
-                        Allow Removing GECHO Branding
+                        Allow Removing Echo Branding
                       </label>
                     </div>
                   </div>
@@ -395,12 +395,12 @@ export default function SuperAdminWhitelabelPage() {
             </div>
           )}
 
-          {/* TAB 4: GECHO BRANDING PLACEMENT MATRIX */}
+          {/* TAB 4: Echo BRANDING PLACEMENT MATRIX */}
           {activeTab === 'branding' && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-black text-slate-900">GECHO Branding Placement Rules</h2>
-                <p className="text-xs text-slate-500 mt-1 font-medium">Define platform rules for where GECHO branding appears across academy views.</p>
+                <h2 className="text-xl font-black text-slate-900">Echo Branding Placement Rules</h2>
+                <p className="text-xs text-slate-500 mt-1 font-medium">Define platform rules for where Echo branding appears across academy views.</p>
               </div>
 
               <div className="space-y-3">
@@ -416,7 +416,7 @@ export default function SuperAdminWhitelabelPage() {
                       onChange={e => updateBrandingRule(rule.id, e.target.value as any)}
                       className="bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-800"
                     >
-                      <option value="ALWAYS_GECHO">Always GECHO</option>
+                      <option value="ALWAYS_Echo">Always Echo</option>
                       <option value="VENDOR_BRANDING">Allow Vendor Branding</option>
                       <option value="HIDDEN">Can Be Hidden (Enterprise)</option>
                     </select>

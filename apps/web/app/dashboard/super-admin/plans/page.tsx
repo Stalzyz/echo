@@ -102,7 +102,7 @@ export default function SaaSPlansAndBillingPage() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800 text-[10px] font-black uppercase tracking-wider border border-teal-200">
-              GECHO SAAS PRICING ENGINE
+              Echo SAAS PRICING ENGINE
             </span>
           </div>
           <h1 className="text-3xl font-black tracking-tight text-slate-900">Plans & Billing Controls</h1>

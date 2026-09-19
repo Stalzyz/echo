@@ -292,7 +292,7 @@ export default function InvoicesPage() {
                 </div>
                 <div>
                   <h2 className="text-xl font-black text-slate-900">Echo LMS Technologies</h2>
-                  <p className="text-xs text-slate-500 font-mono">Tax ID / GSTIN: 29GECHO1234F1Z5</p>
+                  <p className="text-xs text-slate-500 font-mono">Tax ID / GSTIN: 29Echo1234F1Z5</p>
                 </div>
               </div>
 

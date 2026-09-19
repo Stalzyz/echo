@@ -122,7 +122,7 @@ export default function SystemSettingsPage() {
                   </div>
                   <div>
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block mb-2">GSTIN / Tax Registration</label>
-                    <input type="text" defaultValue="29GECHO1234F1Z5" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 outline-none focus:ring-2 focus:ring-teal-500/50" />
+                    <input type="text" defaultValue="29Echo1234F1Z5" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 outline-none focus:ring-2 focus:ring-teal-500/50" />
                   </div>
                   <div className="col-span-2">
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block mb-2">Billing Address</label>

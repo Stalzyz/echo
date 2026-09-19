@@ -5,7 +5,7 @@ import { Award, Plus, FileText, Image as ImageIcon, Settings, Download, Send, Ch
 import { useApi, fetchApi } from "@/lib/useApi"
 import { toast } from "sonner"
 
-export type ThemeType = 'GECHO_MODERN' | 'ROYAL_GOLD' | 'CLASSIC_ACADEMIC' | 'CREATIVE_STUDIO'
+export type ThemeType = 'Echo_MODERN' | 'ROYAL_GOLD' | 'CLASSIC_ACADEMIC' | 'CREATIVE_STUDIO'
 export type BorderType = 'ORNATE' | 'DOUBLE_LINE' | 'MODERN_CORNERS' | 'NONE'
 export type FontType = 'Inter' | 'Playfair Display' | 'Cinzel' | 'Montserrat'
 
@@ -18,7 +18,7 @@ export default function CertificatesPage() {
   const [templateName, setTemplateName] = useState("New Certificate Template")
 
   // Theme & Design States
-  const [theme, setTheme] = useState<ThemeType>('GECHO_MODERN')
+  const [theme, setTheme] = useState<ThemeType>('Echo_MODERN')
   const [borderStyle, setBorderStyle] = useState<BorderType>('DOUBLE_LINE')
   const [fontFamily, setFontFamily] = useState<FontType>('Inter')
   const [watermarkUrl, setWatermarkUrl] = useState("")
@@ -38,7 +38,7 @@ export default function CertificatesPage() {
   const [authTitle, setAuthTitle] = useState("Authorized Signature")
   const [academyHeadSignatureUrl, setAcademyHeadSignatureUrl] = useState("")
   
-  const [sealText, setSealText] = useState("GECHO LMS\nAcademy")
+  const [sealText, setSealText] = useState("Echo LMS\nAcademy")
   const [collaborationLogosStr, setCollaborationLogosStr] = useState("")
   const [footerAddress, setFooterAddress] = useState("96/53A, 2nd Cross Street Bharathi Colony, Peelamedu, Coimbatore, Tamil Nadu 641004 : Ph: 9843199556")
 
@@ -91,7 +91,7 @@ export default function CertificatesPage() {
           sealBg: 'linear-gradient(135deg, #0d9488, #0f766e)',
           sealColor: '#ffffff'
         }
-      case 'GECHO_MODERN':
+      case 'Echo_MODERN':
       default:
         return {
           primaryColor: '#0d9488',
@@ -265,7 +265,7 @@ export default function CertificatesPage() {
             </label>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { id: 'GECHO_MODERN', label: 'Echo Teal', color: 'from-teal-500 to-emerald-600' },
+                { id: 'Echo_MODERN', label: 'Echo Teal', color: 'from-teal-500 to-emerald-600' },
                 { id: 'ROYAL_GOLD', label: 'Royal Executive', color: 'from-amber-400 to-yellow-600' },
                 { id: 'CLASSIC_ACADEMIC', label: 'Classic University', color: 'from-blue-800 to-indigo-900' },
                 { id: 'CREATIVE_STUDIO', label: 'Creative Studio', color: 'from-teal-600 to-emerald-700' },

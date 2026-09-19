@@ -556,7 +556,7 @@ export default function BrandingThemeSettingsPage() {
 
                   <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
                     <div>
-                      <span className="text-xs font-bold text-slate-900 block">Show "Powered by GECHO"</span>
+                      <span className="text-xs font-bold text-slate-900 block">Show "Powered by Echo"</span>
                       <span className="text-[11px] text-slate-500">Gated by SaaS Plan (Enterprise allows hiding)</span>
                     </div>
                     <input 
@@ -815,7 +815,7 @@ export default function BrandingThemeSettingsPage() {
                     </button>
 
                     {theme.loginPage.showEchoBranding && (
-                      <span className="text-[10px] text-slate-400 font-medium block">Powered by GECHO LMS Platform</span>
+                      <span className="text-[10px] text-slate-400 font-medium block">Powered by Echo LMS Platform</span>
                     )}
                   </div>
                 </div>

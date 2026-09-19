@@ -33,7 +33,7 @@ const INITIAL_COUPONS: Coupon[] = [
   },
   {
     id: "c-102",
-    code: "GECHO5000",
+    code: "Echo5000",
     discountType: "FIXED",
     discountValue: 5000,
     targetCourse: "Full Stack Web Dev",
@@ -311,7 +311,7 @@ export default function CouponsPage() {
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block mb-1">Promo Code (Uppercase) *</label>
                 <div className="flex items-center gap-2">
                   <input required placeholder="e.g. FLASH30" value={form.code} onChange={e => setForm(p => ({ ...p, code: e.target.value.toUpperCase() }))} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-mono font-black uppercase" />
-                  <button type="button" onClick={() => setForm(p => ({ ...p, code: `GECHO${Math.floor(100 + Math.random() * 900)}` }))} className="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl whitespace-nowrap">
+                  <button type="button" onClick={() => setForm(p => ({ ...p, code: `Echo${Math.floor(100 + Math.random() * 900)}` }))} className="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl whitespace-nowrap">
                     Generate Code
                   </button>
                 </div>

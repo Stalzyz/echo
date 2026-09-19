@@ -14,7 +14,7 @@ export default function PlatformSettingsPage() {
 
   // 1. General Settings State
   const [general, setGeneral] = useState({
-    platformName: "GECHO LMS Platform",
+    platformName: "Echo LMS Platform",
     supportEmail: "support@echolms.com",
     timezone: "Asia/Kolkata",
     currency: "INR",
@@ -52,7 +52,7 @@ export default function PlatformSettingsPage() {
     password: "SG.99a8b7c6d5e4f3a2b1_secret",
     encryption: "TLS",
     fromEmail: "notifications@echolms.com",
-    fromName: "GECHO Platform Notifications"
+    fromName: "Echo Platform Notifications"
   })
   const [showSmtpPassword, setShowSmtpPassword] = useState(false)
 
@@ -82,7 +82,7 @@ export default function PlatformSettingsPage() {
   // 7. Storage State
   const [storage, setStorage] = useState({
     provider: "Cloudflare R2",
-    bucketName: "gecho-lms-media-prod",
+    bucketName: "echo-lms-media-prod",
     region: "ap-south-1",
     accessKey: "AKIAIOSFODNN7EXAMPLE",
     secretKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
@@ -93,13 +93,13 @@ export default function PlatformSettingsPage() {
   // 8. API & Webhooks State
   const [apiConfig, setApiConfig] = useState({
     webhookUrl: "https://api.echolms.com/webhooks/master",
-    webhookSecret: "whsec_gecho_991823746501928",
+    webhookSecret: "whsec_echo_991823746501928",
     rateLimitPerMin: 600,
     enablePublicApiV1: true
   })
   const [apiTokens, setApiTokens] = useState([
-    { id: "tok-1", name: "Mobile App Production Token", key: "gecho_live_tok_99a8b...", createdAt: "2026-08-01" },
-    { id: "tok-2", name: "WhatsApp Grafty Engine Token", key: "gecho_live_tok_11c2d...", createdAt: "2026-09-10" }
+    { id: "tok-1", name: "Mobile App Production Token", key: "echo_live_tok_99a8b...", createdAt: "2026-08-01" },
+    { id: "tok-2", name: "WhatsApp Grafty Engine Token", key: "echo_live_tok_11c2d...", createdAt: "2026-09-10" }
   ])
 
   // 9. Audit Logs State
@@ -135,7 +135,7 @@ export default function PlatformSettingsPage() {
     const newToken = {
       id: `tok-${Date.now()}`,
       name: "New System Integration Token",
-      key: `gecho_live_tok_${Math.random().toString(36).substring(2, 12)}`,
+      key: `echo_live_tok_${Math.random().toString(36).substring(2, 12)}`,
       createdAt: new Date().toISOString().split("T")[0]
     }
     setApiTokens([newToken, ...apiTokens])
@@ -162,7 +162,7 @@ export default function PlatformSettingsPage() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800 text-[10px] font-black uppercase tracking-wider border border-teal-200">
-              GECHO SYSTEM CONFIGURATION
+              Echo SYSTEM CONFIGURATION
             </span>
           </div>
           <h1 className="text-3xl font-black tracking-tight text-slate-900">Platform Super Admin Settings</h1>
@@ -452,7 +452,7 @@ export default function PlatformSettingsPage() {
                     { code: "SUPERADMIN_CNAME_DNS_REQUEST", name: "Custom Domain CNAME Pending Verification", desc: "Sent when a tenant requests custom CNAME mapping.", subject: "CNAME Verification Request: {{custom_domain}}" },
                     { code: "SUPERADMIN_STORAGE_CAP_ALERT", name: "Tenant Storage Cap Exceeded (90%)", desc: "Sent when a tenant reaches 90% storage allocation.", subject: "Storage Warning: {{academy_name}} at {{percent}}% quota" },
                     { code: "SUPERADMIN_FAILED_PAYMENT_ALERT", name: "Subscription Payment Renewal Failed", desc: "Sent on card decline or UPI renewal failure.", subject: "URGENT: Payment failed for {{academy_name}}" },
-                    { code: "SUPERADMIN_DAILY_DIGEST", name: "Executive Daily SaaS Revenue & Growth Digest", desc: "Daily summary of MRR, active learners, & platform uptime.", subject: "GECHO Executive Daily Digest — {{date}}" },
+                    { code: "SUPERADMIN_DAILY_DIGEST", name: "Executive Daily SaaS Revenue & Growth Digest", desc: "Daily summary of MRR, active learners, & platform uptime.", subject: "Echo Executive Daily Digest — {{date}}" },
                     { code: "SUPERADMIN_SECURITY_THREAT", name: "Security Alert: Unauthorized IP Brute-Force", desc: "Sent on repeated failed super admin login attempts.", subject: "SECURITY ALERT: Multiple failed login attempts from {{ip}}" },
                   ].map((trigger, idx) => (
                     <div key={idx} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">

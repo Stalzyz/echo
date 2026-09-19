@@ -35,7 +35,7 @@ export default function SuperAdminDashboardPage() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800 text-[10px] font-black uppercase tracking-wider border border-teal-200">
-              GECHO SAAS CONTROL CENTER
+              Echo SAAS CONTROL CENTER
             </span>
             <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-black uppercase tracking-wider border border-amber-200 flex items-center gap-1">
               <Sparkles className="w-3 h-3 text-amber-600 fill-amber-500" /> Platform Super Admin
@@ -111,7 +111,7 @@ export default function SuperAdminDashboardPage() {
               />
               <QuickModuleLink 
                 title="Branding & White Label" 
-                desc="Global GECHO logo, colors, custom domain CNAMEs & remove branding." 
+                desc="Global Echo logo, colors, custom domain CNAMEs & remove branding." 
                 href="/dashboard/super-admin/branding"
                 tag="White Label Engine"
               />

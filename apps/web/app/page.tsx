@@ -30,7 +30,7 @@ export default function PublicHomePage() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xl font-black text-slate-900 tracking-tight">GECHO</span>
+                <span className="text-xl font-black text-slate-900 tracking-tight">Echo</span>
                 <span className="px-2 py-0.5 rounded-md bg-teal-50 border border-teal-200 text-teal-800 text-[10px] font-black uppercase tracking-wider">
                   Pro SaaS
                 </span>
@@ -72,7 +72,7 @@ export default function PublicHomePage() {
           
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-bold shadow-xs">
             <span className="w-2 h-2 rounded-full bg-teal-600 animate-pulse" />
-            GECHO • THE OPERATING SYSTEM FOR EDUCATION BUSINESSES
+            Echo • THE OPERATING SYSTEM FOR EDUCATION BUSINESSES
           </div>
 
           <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.15]">
@@ -105,7 +105,7 @@ export default function PublicHomePage() {
               href="#journey"
               className="w-full sm:w-auto px-8 py-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-800 font-bold text-sm rounded-2xl transition-all shadow-2xs flex items-center justify-center gap-2"
             >
-              See How GECHO Works <ArrowRight className="w-4 h-4 text-slate-400" />
+              See How Echo Works <ArrowRight className="w-4 h-4 text-slate-400" />
             </a>
           </div>
         </div>
@@ -145,8 +145,8 @@ export default function PublicHomePage() {
 
           {/* Transformation Banner */}
           <div className="bg-slate-900 text-white rounded-3xl p-8 md:p-12 text-center space-y-6 shadow-xl relative overflow-hidden">
-            <span className="text-xs font-black uppercase tracking-widest text-teal-400 block">The GECHO Unified Solution</span>
-            <h3 className="text-2xl md:text-4xl font-black tracking-tight text-white">GECHO brings it all together.</h3>
+            <span className="text-xs font-black uppercase tracking-widest text-teal-400 block">The Echo Unified Solution</span>
+            <h3 className="text-2xl md:text-4xl font-black tracking-tight text-white">Echo brings it all together.</h3>
             
             <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 text-xs md:text-sm font-bold pt-2">
               {["Leads", "CRM", "Admissions", "Payments", "Learning", "Automation", "Certification", "Growth"].map((step, i, arr) => (
@@ -252,7 +252,7 @@ export default function PublicHomePage() {
               FROM LEAD TO LEARNER
             </span>
             <h2 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight">
-              GECHO Connects the Entire Student Journey.
+              Echo Connects the Entire Student Journey.
             </h2>
           </div>
 
@@ -378,7 +378,7 @@ export default function PublicHomePage() {
             </div>
 
             <div className="pt-4 flex justify-between items-center text-xs font-semibold text-slate-500 border-t border-slate-100">
-              <span>Your team focuses on people. GECHO handles the repetitive work.</span>
+              <span>Your team focuses on people. Echo handles the repetitive work.</span>
               <Link href="/dashboard/academy/automation" className="text-teal-700 font-bold hover:underline">Explore Automation →</Link>
             </div>
           </div>
@@ -395,7 +395,7 @@ export default function PublicHomePage() {
               LIVE LEARNING & WEBINARS
             </span>
             <h2 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight">
-              Teach Live Without Leaving GECHO.
+              Teach Live Without Leaving Echo.
             </h2>
             <p className="text-slate-500 font-medium text-sm">Connect your Zoom and Google Meet accounts directly with your academy.</p>
           </div>
@@ -475,7 +475,7 @@ export default function PublicHomePage() {
               MULTI-TENANT WHITE LABEL
             </span>
             <h2 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight">
-              Make GECHO Look Like Your Business.
+              Make Echo Look Like Your Business.
             </h2>
             <p className="text-slate-500 font-medium text-sm">Customize your LMS + CRM directly from your dashboard.</p>
           </div>
@@ -485,7 +485,7 @@ export default function PublicHomePage() {
               { category: "Brand", items: ["Logo", "Favicon", "App Icon", "Login Branding"] },
               { category: "Design", items: ["Colors", "Typography", "Buttons", "Cards", "Sidebar", "Navigation"] },
               { category: "Experience", items: ["Light Mode", "Dark Mode", "Login Page", "Dashboard", "LMS", "CRM"] },
-              { category: "Enterprise White Label", items: ["Custom Domain", "Custom Branding", "Email Branding", "Certificate Branding", "App Branding", "Remove GECHO Branding"] }
+              { category: "Enterprise White Label", items: ["Custom Domain", "Custom Branding", "Email Branding", "Certificate Branding", "App Branding", "Remove Echo Branding"] }
             ].map((col, i) => (
               <div key={i} className="p-6 bg-slate-50 border border-slate-200 rounded-3xl space-y-3">
                 <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">{col.category}</h3>
@@ -549,14 +549,14 @@ export default function PublicHomePage() {
 
           <div className="space-y-4">
             {[
-              { q: "Is GECHO an LMS or CRM?", a: "Both. GECHO combines LMS, CRM, admissions, automation, payments, communication and analytics into one unified education-focused platform." },
-              { q: "Can I run live classes?", a: "Yes. GECHO integrates directly with Zoom and Google Meet for live classes, workshops, webinars, mentoring and private consultation sessions." },
+              { q: "Is Echo an LMS or CRM?", a: "Both. Echo combines LMS, CRM, admissions, automation, payments, communication and analytics into one unified education-focused platform." },
+              { q: "Can I run live classes?", a: "Yes. Echo integrates directly with Zoom and Google Meet for live classes, workshops, webinars, mentoring and private consultation sessions." },
               { q: "Can I automate WhatsApp messages?", a: "Yes. Build visual workflows around leads, payments, live classes, student activity, course completion and other events using the Meta WhatsApp API." },
               { q: "Can I sell courses online?", a: "Yes. Sell courses, bundles, workshops, memberships and subscriptions with integrated payment gateways and automatic invoicing." },
               { q: "Can I manage physical batches?", a: "Yes. Manage physical campus batches, instructors, schedules, attendance, students and live sessions." },
               { q: "Can I manage multiple branches?", a: "Yes. Enterprise organizations can centrally manage multiple branches, teams, courses, students and revenue metrics." },
-              { q: "Can I use my own branding?", a: "Yes. GECHO provides customizable branding and enterprise white-label capabilities, including custom CNAME domains depending on your plan." },
-              { q: "Can GECHO connect with our existing systems?", a: "Yes. Enterprise plans can use APIs, webhooks and integrations to connect GECHO with your existing technology stack." }
+              { q: "Can I use my own branding?", a: "Yes. Echo provides customizable branding and enterprise white-label capabilities, including custom CNAME domains depending on your plan." },
+              { q: "Can Echo connect with our existing systems?", a: "Yes. Enterprise plans can use APIs, webhooks and integrations to connect Echo with your existing technology stack." }
             ].map((faq, index) => (
               <div key={index} className="border border-slate-200 rounded-2xl overflow-hidden bg-slate-50">
                 <button
@@ -589,7 +589,7 @@ export default function PublicHomePage() {
           </h2>
 
           <p className="text-sm md:text-base text-slate-300 font-medium max-w-2xl mx-auto">
-            Stop managing your academy with disconnected tools. Start scaling with GECHO.
+            Stop managing your academy with disconnected tools. Start scaling with Echo.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -613,7 +613,7 @@ export default function PublicHomePage() {
       <footer className="py-10 bg-slate-950 text-slate-400 text-xs border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="font-black text-white text-sm">GECHO</span>
+            <span className="font-black text-white text-sm">Echo</span>
             <span>• The Operating System for Education Businesses.</span>
           </div>
 
@@ -624,7 +624,7 @@ export default function PublicHomePage() {
             <a href="#faq" className="hover:text-white">FAQ</a>
           </div>
 
-          <span>© {new Date().getFullYear()} GECHO LMS Inc. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} Echo LMS Inc. All rights reserved.</span>
         </div>
       </footer>
 
@@ -634,8 +634,8 @@ export default function PublicHomePage() {
           <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-8 space-y-6 shadow-2xl relative text-left">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
-                <h3 className="text-xl font-black text-slate-900">Book a Free GECHO Demo</h3>
-                <p className="text-xs text-slate-500">See how GECHO can streamline your academy</p>
+                <h3 className="text-xl font-black text-slate-900">Book a Free Echo Demo</h3>
+                <p className="text-xs text-slate-500">See how Echo can streamline your academy</p>
               </div>
               <button onClick={() => setIsDemoModalOpen(false)} className="text-slate-400 hover:text-slate-700 text-lg font-bold">&times;</button>
             </div>
