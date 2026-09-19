@@ -397,9 +397,9 @@ export default function PlatformSettingsPage() {
           {/* 5. NOTIFICATIONS TAB */}
           {activeTab === "notifications" && (
             <div className="space-y-6">
-              <h2 className="text-xl font-black text-slate-900 pb-4 border-b border-slate-100">Notification Triggers & Channels</h2>
+              <h2 className="text-xl font-black text-slate-900 pb-4 border-b border-slate-100">Super Admin Automated Email Notifications & Channels</h2>
               
-              <div className="space-y-4 text-xs">
+              <div className="space-y-4 text-xs mb-8">
                 <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-2xl">
                   <div>
                     <span className="font-extrabold text-slate-900 block text-sm">Security & System Alerts Email</span>
@@ -429,6 +429,53 @@ export default function PlatformSettingsPage() {
                 <div>
                   <label className="font-bold uppercase tracking-wider text-slate-700 block mb-1">Slack / Webhook System Alert URL</label>
                   <input type="text" value={notifications.slackWebhookUrl} onChange={e => setNotifications(p => ({ ...p, slackWebhookUrl: e.target.value }))} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-mono" />
+                </div>
+              </div>
+
+              {/* Super Admin Automated Email Triggers */}
+              <div className="pt-6 border-t border-slate-200 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-base font-black text-slate-900">SaaS Super Admin Automated Email Triggers</h3>
+                    <p className="text-xs text-slate-500">System email triggers dispatched automatically to the Super Admin team.</p>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full bg-teal-50 text-teal-800 text-[10px] font-black uppercase border border-teal-200">
+                    8 Super Admin Triggers
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  {[
+                    { code: "SUPERADMIN_NEW_ACADEMY_REGISTERED", name: "New Tenant Academy Provisioned", desc: "Sent when a new academy registers or is onboarded.", subject: "New Academy Registered: {{academy_name}}" },
+                    { code: "SUPERADMIN_PAYMENT_SETTLED", name: "SaaS Subscription Payment Collected", desc: "Sent when a tenant subscription payment settles.", subject: "Subscription Payment Settled: ₹{{amount}} from {{academy_name}}" },
+                    { code: "SUPERADMIN_SUBSCRIPTION_CANCELLED", name: "Tenant Subscription Cancellation / Churn", desc: "Sent when an academy cancels or downgrades.", subject: "Churn Alert: {{academy_name}} cancelled subscription" },
+                    { code: "SUPERADMIN_CNAME_DNS_REQUEST", name: "Custom Domain CNAME Pending Verification", desc: "Sent when a tenant requests custom CNAME mapping.", subject: "CNAME Verification Request: {{custom_domain}}" },
+                    { code: "SUPERADMIN_STORAGE_CAP_ALERT", name: "Tenant Storage Cap Exceeded (90%)", desc: "Sent when a tenant reaches 90% storage allocation.", subject: "Storage Warning: {{academy_name}} at {{percent}}% quota" },
+                    { code: "SUPERADMIN_FAILED_PAYMENT_ALERT", name: "Subscription Payment Renewal Failed", desc: "Sent on card decline or UPI renewal failure.", subject: "URGENT: Payment failed for {{academy_name}}" },
+                    { code: "SUPERADMIN_DAILY_DIGEST", name: "Executive Daily SaaS Revenue & Growth Digest", desc: "Daily summary of MRR, active learners, & platform uptime.", subject: "GECHO Executive Daily Digest — {{date}}" },
+                    { code: "SUPERADMIN_SECURITY_THREAT", name: "Security Alert: Unauthorized IP Brute-Force", desc: "Sent on repeated failed super admin login attempts.", subject: "SECURITY ALERT: Multiple failed login attempts from {{ip}}" },
+                  ].map((trigger, idx) => (
+                    <div key={idx} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-mono text-[10px] font-black text-teal-800 bg-teal-100 px-2 py-0.5 rounded border border-teal-200">{trigger.code}</span>
+                          <span className="font-extrabold text-slate-900 text-xs">{trigger.name}</span>
+                        </div>
+                        <p className="text-slate-500 text-[11px]">{trigger.desc}</p>
+                        <p className="text-slate-400 text-[10px] font-mono mt-0.5">Subject: {trigger.subject}</p>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button 
+                          type="button"
+                          onClick={() => toast.success(`Test Super Admin email sent for ${trigger.code}!`)}
+                          className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl flex items-center gap-1 transition-colors"
+                        >
+                          <Send className="w-3 h-3" /> Test Email
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
