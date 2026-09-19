@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { 
   Zap, Plus, Play, Pause, Trash2, ArrowDown, CheckCircle2, 
   MessageSquare, Mail, Award, Tag, Send, Layers, X, Loader2, Sparkles, Sliders
@@ -135,12 +136,21 @@ export default function AutomationEnginePage() {
           <p className="text-slate-500 mt-1 text-sm font-medium">Automate student retention, WhatsApp nudges, fee reminders, and certificate issuance with Trigger → Condition → Action rules.</p>
         </div>
 
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm px-6 py-3 rounded-xl transition-all shadow-sm shadow-teal-600/20"
-        >
-          <Plus className="w-4 h-4" /> Create Visual Workflow
-        </button>
+        <div className="flex items-center gap-3">
+          <Link 
+            href="/dashboard/academy/automation/email"
+            className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm px-5 py-3 rounded-xl transition-all border border-slate-200"
+          >
+            <Mail className="w-4 h-4 text-teal-600" /> Email Notification Triggers
+          </Link>
+
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm px-6 py-3 rounded-xl transition-all shadow-sm shadow-teal-600/20"
+          >
+            <Plus className="w-4 h-4" /> Create Visual Workflow
+          </button>
+        </div>
       </div>
 
       {/* Overview Stats */}
