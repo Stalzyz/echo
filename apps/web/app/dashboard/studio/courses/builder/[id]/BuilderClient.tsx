@@ -56,11 +56,11 @@ export default function BuilderClient({ initialCourse }: { initialCourse: any })
   const [isPending, startTransition] = useTransition()
   
   const [activeTab, setActiveTab] = useState<"SETTINGS" | "CURRICULUM">("CURRICULUM")
-  const [modules, setModules] = useState<Module[]>(initialCourse.modules || [])
-  const [expandedModules, setExpandedModules] = useState<string[]>(initialCourse.modules?.map((m: any) => m.id) || [])
+  const [modules, setModules] = useState<Module[]>(initialCourse?.modules || [])
+  const [expandedModules, setExpandedModules] = useState<string[]>(initialCourse?.modules?.map((m: any) => m.id) || [])
   const [activeItem, setActiveItem] = useState<{ type: "COURSE" | "MODULE" | "LESSON" | "THUMBNAIL" | "PRICING", id?: string } | null>(null)
 
-  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(initialCourse.course?.thumbnail || null)
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(initialCourse?.course?.thumbnail || null)
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false)
 
   const sensors = useSensors(
