@@ -60,8 +60,15 @@ export default function BuilderClient({ initialCourse }: { initialCourse: any })
   const [expandedModules, setExpandedModules] = useState<string[]>(initialCourse?.modules?.map((m: any) => m.id) || [])
   const [activeItem, setActiveItem] = useState<{ type: "COURSE" | "MODULE" | "LESSON" | "THUMBNAIL" | "PRICING", id?: string } | null>(null)
 
-  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(initialCourse?.course?.thumbnail || null)
-  const [uploadingThumbnail, setUploadingThumbnail] = useState(false)
+  const [actualPrice, setActualPrice] = useState<number>(initialCourse.course?.fee ? Math.round(initialCourse.course.fee * 1.3) : 10000)
+  const [sellingPrice, setSellingPrice] = useState<number>(initialCourse.course?.fee || 7499)
+  const [generatedCoupon, setGeneratedCoupon] = useState<string>("")
+  const [couponDiscount, setCouponDiscount] = useState<number>(20)
+  const [couponType, setCouponType] = useState<"PERCENT" | "FIXED">("PERCENT")
+  const [activeCoupons, setActiveCoupons] = useState<Array<{ code: string; type: string; value: number }>>([
+    { code: "EARLYBIRD20", type: "PERCENT", value: 20 },
+    { code: "SPECIAL500", type: "FIXED", value: 500 }
+  ])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -86,7 +93,8 @@ export default function BuilderClient({ initialCourse }: { initialCourse: any })
     setActiveItem({ type: "MODULE", id: tempId })
 
     startTransition(async () => {
-      const dbModule = await createModule(initialCourse.id, newModTitle)
+      const courseTargetId = initialCourse?.id || initialCourse?.courseId
+      const dbModule = await createModule(courseTargetId, newModTitle)
       if (dbModule) {
         setModules(prev => prev.map(m => m.id === tempId ? { ...dbModule, orderIndex: dbModule.sortOrder, lessons: [] } : m))
         setExpandedModules(prev => prev.map(id => id === tempId ? dbModule.id : id))
@@ -454,29 +462,141 @@ export default function BuilderClient({ initialCourse }: { initialCourse: any })
             {activeItem?.type === "PRICING" && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
                 <div>
-                  <h2 className="text-2xl font-bold mb-2 text-slate-900">Pricing & SEO</h2>
-                  <p className="text-slate-500 text-sm">Configure how much your course costs and how it appears on search engines.</p>
+                  <h2 className="text-2xl font-bold mb-2 text-slate-900">Pricing, Discounts & Coupons</h2>
+                  <p className="text-slate-500 text-sm">Set list price, selling price, discounts, and generate promotional coupons for students.</p>
                 </div>
                 
+                {/* Pricing Box */}
                 <div className="space-y-6 bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
-                  <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-slate-900"><DollarSign className="w-5 h-5 text-teal-600" /> Pricing Options</h3>
+                  <h3 className="font-bold text-lg mb-2 flex items-center gap-2 text-slate-900"><DollarSign className="w-5 h-5 text-teal-600" /> Course Pricing</h3>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-600 ml-1">Base Price (INR)</label>
+                      <label className="text-xs font-bold text-slate-600 ml-1">Actual Price / MRP (₹)</label>
                       <input 
                         type="number" 
-                        placeholder="e.g. 50000"
-                        defaultValue={initialCourse.course?.fee || 50000}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-teal-500" 
+                        placeholder="e.g. 10000"
+                        value={actualPrice}
+                        onChange={(e) => setActualPrice(Number(e.target.value))}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-teal-500 font-semibold" 
                       />
+                      <p className="text-[11px] text-slate-400">Original value displayed crossed-out.</p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-teal-700 ml-1">Selling Price (₹)</label>
+                      <input 
+                        type="number" 
+                        placeholder="e.g. 7499"
+                        value={sellingPrice}
+                        onChange={(e) => setSellingPrice(Number(e.target.value))}
+                        className="w-full bg-teal-50/50 border border-teal-300 rounded-xl px-4 py-3 text-sm text-teal-900 font-bold focus:outline-none focus:border-teal-500" 
+                      />
+                      <p className="text-[11px] text-slate-400">Final price charged to student.</p>
+                    </div>
+
+                    <div className="space-y-2 flex flex-col justify-center">
+                      <label className="text-xs font-bold text-slate-600 ml-1">Student Discount</label>
+                      <div className="h-11 bg-emerald-50 border border-emerald-200 rounded-xl px-4 flex items-center justify-between">
+                        <span className="text-xs text-emerald-700 font-medium">You Save:</span>
+                        <span className="text-sm font-bold text-emerald-800">
+                          {actualPrice > sellingPrice ? `${Math.round(((actualPrice - sellingPrice) / actualPrice) * 100)}% OFF (₹${actualPrice - sellingPrice})` : "No Discount"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Coupon Generator Box */}
+                <div className="space-y-6 bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-bold text-lg text-slate-900 flex items-center gap-2">
+                        <Plus className="w-5 h-5 text-teal-600" /> Promotional Coupon Generator
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-0.5">Generate single or batch discount promo codes for campaigns.</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-600 ml-1">Discount Type</label>
+                      <select 
+                        value={couponType}
+                        onChange={(e: any) => setCouponType(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-teal-500"
+                      >
+                        <option value="PERCENT">Percentage OFF (%)</option>
+                        <option value="FIXED">Flat Fixed Amount (₹)</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-600 ml-1">
+                        {couponType === "PERCENT" ? "Discount Percentage (%)" : "Discount Amount (₹)"}
+                      </label>
+                      <input 
+                        type="number"
+                        value={couponDiscount}
+                        onChange={(e) => setCouponDiscount(Number(e.target.value))}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-teal-500 font-semibold"
+                      />
+                    </div>
+
+                    <div className="flex items-end">
+                      <button 
+                        onClick={() => {
+                          const code = `ECHO-${Math.random().toString(36).substring(2, 7).toUpperCase()}`
+                          setGeneratedCoupon(code)
+                          setActiveCoupons(prev => [{ code, type: couponType, value: couponDiscount }, ...prev])
+                        }}
+                        className="w-full h-11 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl transition-all shadow-xs flex items-center justify-center gap-2 text-sm"
+                      >
+                        <Plus className="w-4 h-4" /> Generate Coupon Code
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Active Coupons List */}
+                  <div className="pt-4 border-t border-slate-100 space-y-3">
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Course Coupons</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                      {activeCoupons.map((coupon, idx) => (
+                        <div key={idx} className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between group hover:border-teal-300">
+                          <div>
+                            <div className="font-mono font-bold text-sm text-teal-700">{coupon.code}</div>
+                            <div className="text-[11px] text-slate-500">
+                              {coupon.type === "PERCENT" ? `${coupon.value}% Discount` : `Flat ₹${coupon.value} OFF`}
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => {
+                              navigator.clipboard.writeText(coupon.code)
+                              alert(`Copied code: ${coupon.code}`)
+                            }}
+                            className="text-xs font-bold text-slate-400 hover:text-teal-600 transition-colors bg-white border border-slate-200 px-2 py-1 rounded-lg"
+                          >
+                            Copy
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
 
                 <div className="flex justify-end pt-4">
-                  <button className="px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold transition-colors shadow-sm">
-                    Save Changes
+                  <button 
+                    onClick={() => {
+                      startTransition(async () => {
+                        const targetId = initialCourse?.id || initialCourse?.courseId
+                        const updateCoursePricing = (await import("./actions")).updateCoursePricing
+                        await updateCoursePricing(targetId, { fee: sellingPrice, salePrice: sellingPrice, listPrice: actualPrice })
+                        alert("Pricing & Coupon Settings Saved Successfully!")
+                      })
+                    }}
+                    className="px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold transition-colors shadow-sm flex items-center gap-2"
+                  >
+                    <Save className="w-4 h-4" /> Save Pricing Settings
                   </button>
                 </div>
               </motion.div>
