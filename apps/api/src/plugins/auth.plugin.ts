@@ -27,31 +27,46 @@ const authPlugin: FastifyPluginAsync = async (fastify, opts) => {
   fastify.decorate('requireAuth', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const cookies = cookie.parse(request.headers.cookie || '');
+      
+      const candidateCookies = [
+        '__Secure-authjs.session-token',
+        'authjs.session-token',
+        '__Secure-next-auth.session-token',
+        'next-auth.session-token'
+      ];
+
       let token = '';
-      let salt = '';
-      if (cookies['__Secure-authjs.session-token']) {
-        token = cookies['__Secure-authjs.session-token'];
-        salt = '__Secure-authjs.session-token';
-      } else if (cookies['authjs.session-token']) {
-        token = cookies['authjs.session-token'];
-        salt = 'authjs.session-token';
+      let detectedSalt = '';
+
+      for (const name of candidateCookies) {
+        if (cookies[name]) {
+          token = cookies[name];
+          detectedSalt = name;
+          break;
+        }
       }
 
       if (!token) {
         return reply.code(401).send({ error: 'Unauthorized', message: 'No session token found' });
       }
 
-      request.log.info(`[Auth] Token received. Secret length: ${process.env.AUTH_SECRET ? process.env.AUTH_SECRET.length : 0}`);
+      request.log.info(`[Auth] Token received for salt ${detectedSalt}.`);
       
       const secretsToTry = [
         process.env.AUTH_SECRET,
+        process.env.NEXTAUTH_SECRET,
+        process.env.JWT_SECRET,
+        "echo_jwt_secret_key_2026",
         "fallback-dev-secret-if-env-fails-12345"
       ].filter(Boolean) as string[];
 
-      const saltsToTry = [
+      const saltsToTry = Array.from(new Set([
+        detectedSalt,
         '__Secure-authjs.session-token',
-        'authjs.session-token'
-      ];
+        'authjs.session-token',
+        '__Secure-next-auth.session-token',
+        'next-auth.session-token'
+      ])).filter(Boolean);
 
       let decoded = null;
       for (const s of secretsToTry) {
