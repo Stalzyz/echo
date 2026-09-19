@@ -69,6 +69,17 @@ export default function OnlineEducatorsPage() {
     }
   }
 
+  const handleDeleteEducator = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to remove remote educator ${name}?`)) return
+    try {
+      await fetchApi(`/academy/educators/${id}`, { method: "DELETE" })
+      toast.success(`Educator ${name} deleted successfully`)
+      mutate()
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete educator")
+    }
+  }
+
   return (
     <div className="flex flex-col h-full bg-slate-50 text-slate-900 p-8 overflow-y-auto relative custom-scrollbar">
       <div className="flex-none border-b border-slate-200 bg-white p-6 rounded-2xl mb-8 shadow-xs">
@@ -79,7 +90,7 @@ export default function OnlineEducatorsPage() {
             </div>
             <div>
               <h1 className="text-3xl font-black text-slate-900 tracking-tight">Remote Faculty</h1>
-              <p className="text-sm text-slate-500 mt-1 font-medium">Manage virtual academy instructors and online cohorts</p>
+              <p className="text-sm text-slate-500 mt-1 font-medium">Manage all active online virtual learning educators for Echo LMS</p>
             </div>
           </div>
           <button 
@@ -101,7 +112,7 @@ export default function OnlineEducatorsPage() {
             <div key={educator.id} className="bg-white border border-slate-200/80 rounded-2xl p-6 relative group overflow-hidden shadow-xs flex flex-col justify-between">
               <div>
                 <div className="absolute top-4 right-4 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] px-2.5 py-1 rounded-md font-extrabold uppercase tracking-wider">
-                  REMOTE
+                  ACTIVE
                 </div>
                 
                 <div className="w-16 h-16 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-xl font-black text-teal-800 mb-4">
@@ -109,7 +120,7 @@ export default function OnlineEducatorsPage() {
                 </div>
                 
                 <h3 className="text-lg font-extrabold text-slate-900 truncate">{educator.user.firstName} {educator.user.lastName}</h3>
-                <p className="text-xs text-teal-700 font-bold mb-4">{educator.designation || "Remote Instructor"}</p>
+                <p className="text-xs text-teal-700 font-bold mb-4">{educator.designation || "Instructor"}</p>
                 
                 <div className="space-y-2 mb-6">
                   <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
@@ -128,7 +139,7 @@ export default function OnlineEducatorsPage() {
                 </div>
                 
                 {educator.skills && educator.skills.length > 0 && (
-                  <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-100">
+                  <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-100 mb-4">
                     {educator.skills.slice(0, 3).map((skill: string, i: number) => (
                       <span key={i} className="text-[10px] bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 rounded font-semibold">{skill}</span>
                     ))}
@@ -137,6 +148,15 @@ export default function OnlineEducatorsPage() {
                     )}
                   </div>
                 )}
+              </div>
+
+              <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+                <button
+                  onClick={() => handleDeleteEducator(educator.id, `${educator.user.firstName} ${educator.user.lastName}`)}
+                  className="w-full py-2 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 rounded-xl text-xs font-bold transition-colors"
+                >
+                  Delete Remote Educator
+                </button>
               </div>
             </div>
           ))}

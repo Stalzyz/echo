@@ -210,6 +210,32 @@ export default function BuilderClient({ initialCourse }: { initialCourse: any })
     }
   }
 
+  const [isPublished, setIsPublished] = useState<boolean>(initialCourse?.isPublished || false)
+  const [courseName, setCourseName] = useState<string>(initialCourse.course?.name || "Masterclass Course")
+  const [courseDuration, setCourseDuration] = useState<string>(initialCourse.course?.duration || "3 Months")
+  const [courseDescription, setCourseDescription] = useState<string>(initialCourse.course?.description || "")
+
+  const handleTogglePublish = () => {
+    startTransition(async () => {
+      const targetId = initialCourse?.id || initialCourse?.courseId
+      const togglePublishCourse = (await import("./actions")).togglePublishCourse
+      const res = await togglePublishCourse(targetId, !isPublished)
+      if (res) {
+        setIsPublished(!isPublished)
+        alert(isPublished ? "Course saved as Draft" : "Course Published successfully!")
+      }
+    })
+  }
+
+  const handleSaveSettings = () => {
+    startTransition(async () => {
+      const targetId = initialCourse?.id || initialCourse?.courseId
+      const updateCourseGeneralSettings = (await import("./actions")).updateCourseGeneralSettings
+      await updateCourseGeneralSettings(targetId, { name: courseName, duration: courseDuration, description: courseDescription })
+      alert("General course settings saved successfully!")
+    })
+  }
+
   return (
     <div className="h-full flex flex-col bg-slate-50 text-slate-900 overflow-hidden">
       
@@ -220,21 +246,32 @@ export default function BuilderClient({ initialCourse }: { initialCourse: any })
             <MonitorPlay className="w-4 h-4 text-teal-600" />
           </div>
           <div>
-            <h1 className="font-bold tracking-tight text-sm text-slate-900">{initialCourse.course?.name || "Course Builder"}</h1>
+            <h1 className="font-bold tracking-tight text-sm text-slate-900">{courseName}</h1>
             <div className="flex items-center gap-2 text-xs text-slate-500">
-              <span className={cn("w-2 h-2 rounded-full", initialCourse.isPublished ? "bg-emerald-500" : "bg-amber-500")} /> 
-              {initialCourse.isPublished ? "PUBLISHED" : "DRAFT"}
+              <span className={cn("w-2 h-2 rounded-full", isPublished ? "bg-emerald-500" : "bg-amber-500")} /> 
+              {isPublished ? "PUBLISHED" : "DRAFT"}
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           {isPending && <Loader2 className="w-4 h-4 animate-spin text-teal-600" />}
-          <button className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold transition-colors flex items-center gap-2">
-            <Eye className="w-4 h-4" /> Preview
-          </button>
-          <button className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold transition-colors flex items-center gap-2 shadow-xs">
-            <Save className="w-4 h-4" /> Publish Course
+          <a 
+            href={`/student/learn/${initialCourse?.courseId || initialCourse?.id || 'default-course'}`}
+            target="_blank"
+            rel="noreferrer"
+            className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold transition-colors flex items-center gap-2"
+          >
+            <Eye className="w-4 h-4" /> Preview Course
+          </a>
+          <button 
+            onClick={handleTogglePublish}
+            className={cn(
+              "px-4 py-2 rounded-xl text-white text-sm font-semibold transition-colors flex items-center gap-2 shadow-xs",
+              isPublished ? "bg-amber-600 hover:bg-amber-700" : "bg-teal-600 hover:bg-teal-700"
+            )}
+          >
+            <Save className="w-4 h-4" /> {isPublished ? "Unpublish (Draft)" : "Publish Course"}
           </button>
         </div>
       </header>
@@ -333,13 +370,49 @@ export default function BuilderClient({ initialCourse }: { initialCourse: any })
             {activeItem?.type === "COURSE" && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
                 <div>
-                  <h2 className="text-2xl font-bold mb-2 text-slate-900">Course Settings</h2>
-                  <p className="text-slate-500 text-sm">Manage the high-level details of your course.</p>
+                  <h2 className="text-2xl font-bold mb-2 text-slate-900">General Course Settings</h2>
+                  <p className="text-slate-500 text-sm">Manage the title, duration, and summary of your course.</p>
                 </div>
                 <div className="space-y-4 bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
                   <div>
                     <label className="text-xs font-bold text-slate-600 block mb-2">Course Name</label>
-                    <input type="text" defaultValue={initialCourse.course?.name || ""} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:border-teal-500 outline-none" />
+                    <input 
+                      type="text" 
+                      value={courseName}
+                      onChange={e => setCourseName(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:border-teal-500 outline-none font-semibold" 
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-600 block mb-2">Duration</label>
+                    <input 
+                      type="text" 
+                      value={courseDuration}
+                      onChange={e => setCourseDuration(e.target.value)}
+                      placeholder="e.g. 3 Months / 12 Weeks"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:border-teal-500 outline-none" 
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-600 block mb-2">Course Summary / Description</label>
+                    <textarea 
+                      rows={4}
+                      value={courseDescription}
+                      onChange={e => setCourseDescription(e.target.value)}
+                      placeholder="Comprehensive masterclass covering design, architecture, and deployment..."
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-900 focus:border-teal-500 outline-none" 
+                    />
+                  </div>
+
+                  <div className="pt-2 flex justify-end">
+                    <button 
+                      onClick={handleSaveSettings}
+                      className="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl transition-colors shadow-sm flex items-center gap-2 text-sm"
+                    >
+                      <Save className="w-4 h-4" /> Save Course Settings
+                    </button>
                   </div>
                 </div>
               </motion.div>

@@ -77,7 +77,7 @@ export default function WalkInsAdmin() {
           <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3">
             <Users className="w-8 h-8 text-teal-600" /> Walk-In Tracker
           </h1>
-          <p className="text-slate-500 mt-1 font-medium">Manage campus visitors, demo requests, and walk-in leads for Gecho LMS.</p>
+          <p className="text-slate-500 mt-1 font-medium">Manage campus visitors, demo requests, and walk-in leads for Echo LMS.</p>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={() => setIsQRModalOpen(true)} className="flex items-center gap-2 bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 px-5 py-2.5 rounded-xl transition-colors font-bold text-sm shadow-xs">
@@ -251,7 +251,7 @@ export default function WalkInsAdmin() {
             
             <div className="p-4 bg-white border border-slate-200 rounded-xl mb-6 shadow-xs">
               <img 
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent((typeof window !== 'undefined' ? window.location.origin : 'https://academy.gecholms.com') + '/kiosk')}`}
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent((typeof window !== 'undefined' ? window.location.origin : 'https://academy.echolms.com') + '/kiosk')}`}
                 alt="Kiosk QR Code" 
                 className="w-48 h-48"
               />

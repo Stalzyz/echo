@@ -114,7 +114,7 @@ export default function ProfileBuilderClient({ initialEducator }: { initialEduca
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-slate-700 ml-1">Vanity URL (Slug) *</label>
                 <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-4 focus-within:ring-1 focus-within:ring-teal-500 transition-shadow">
-                  <span className="text-slate-400 text-sm">academy.gecho.in/@</span>
+                  <span className="text-slate-400 text-sm">academy.echo.in/@</span>
                   <input 
                     name="slug"
                     type="text" 

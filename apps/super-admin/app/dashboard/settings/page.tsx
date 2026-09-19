@@ -13,7 +13,7 @@ export default function SystemSettingsPage() {
       <div className="flex-none px-8 py-6 border-b border-slate-200 bg-white flex items-center justify-between shadow-xs">
         <div>
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">System Settings</h1>
-          <p className="text-sm text-slate-500 mt-1 font-medium">Manage workspace preferences, branding, and configurations for Gecho LMS.</p>
+          <p className="text-sm text-slate-500 mt-1 font-medium">Manage workspace preferences, branding, and configurations for Echo LMS.</p>
         </div>
         <button onClick={() => toast.success("Settings saved!")} className="flex items-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-xl transition-colors shadow-xs">
           <Save className="w-4 h-4" /> Save Changes
@@ -78,7 +78,7 @@ export default function SystemSettingsPage() {
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block mb-2">Workspace Name</label>
                     <input 
                       type="text" 
-                      defaultValue="Gecho LMS"
+                      defaultValue="Echo LMS"
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 outline-none focus:ring-2 focus:ring-teal-500/50"
                     />
                   </div>
@@ -118,7 +118,7 @@ export default function SystemSettingsPage() {
                 <div className="grid grid-cols-2 gap-6">
                   <div>
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block mb-2">Legal Entity Name</label>
-                    <input type="text" defaultValue="Gecho Technologies Pvt Ltd" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 outline-none focus:ring-2 focus:ring-teal-500/50" />
+                    <input type="text" defaultValue="Echo Technologies Pvt Ltd" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 outline-none focus:ring-2 focus:ring-teal-500/50" />
                   </div>
                   <div>
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block mb-2">GSTIN / Tax Registration</label>

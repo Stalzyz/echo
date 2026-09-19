@@ -1,4 +1,4 @@
-# Gecho LMS / Grekam OS — Comprehensive Module Architecture Map
+# Echo LMS / Grekam OS — Comprehensive Module Architecture Map
 **Document Version**: 2.5  
 **Last Updated**: September 19, 2026  
 **Architecture Pattern**: Monorepo (Next.js 14 App Router + Node.js Express/Fastify API + PostgreSQL / Prisma ORM)

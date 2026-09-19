@@ -56,7 +56,7 @@ export function EducatorSidebar() {
           </div>
           <div className="overflow-hidden">
             <h3 className="font-bold text-sm text-slate-900 truncate">{session?.user?.name || "Educator"}</h3>
-            <p className="text-xs text-slate-500 truncate">{session?.user?.email || "educator@gecholms.com"}</p>
+            <p className="text-xs text-slate-500 truncate">{session?.user?.email || "educator@echolms.com"}</p>
           </div>
         </div>
       </div>

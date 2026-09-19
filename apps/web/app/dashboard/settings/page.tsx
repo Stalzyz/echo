@@ -13,7 +13,7 @@ import { DesignTokens, TenantTheme, ThemeVersionHistory } from "@/types/tenant-b
 // Color Preset Themes
 const COLOR_PRESETS = [
   {
-    name: "Gecho Teal (Default)",
+    name: "Echo Teal (Default)",
     primary: "#0d9488",
     secondary: "#f59e0b",
     accent: "#6366f1",
@@ -561,8 +561,8 @@ export default function BrandingThemeSettingsPage() {
                     </div>
                     <input 
                       type="checkbox"
-                      checked={theme.loginPage.showGechoBranding}
-                      onChange={e => { setTheme(p => ({ ...p, loginPage: { ...p.loginPage, showGechoBranding: e.target.checked } })); setIsDirty(true) }}
+                      checked={theme.loginPage.showEchoBranding}
+                      onChange={e => { setTheme(p => ({ ...p, loginPage: { ...p.loginPage, showEchoBranding: e.target.checked } })); setIsDirty(true) }}
                       className="w-4 h-4 accent-teal-600 rounded cursor-pointer"
                     />
                   </div>
@@ -814,7 +814,7 @@ export default function BrandingThemeSettingsPage() {
                       {theme.loginPage.buttonText}
                     </button>
 
-                    {theme.loginPage.showGechoBranding && (
+                    {theme.loginPage.showEchoBranding && (
                       <span className="text-[10px] text-slate-400 font-medium block">Powered by GECHO LMS Platform</span>
                     )}
                   </div>

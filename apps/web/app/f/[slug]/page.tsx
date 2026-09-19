@@ -90,7 +90,7 @@ export default function PublicFormRenderer() {
         <div className="text-center mb-8 text-slate-900">
           <div className="inline-flex items-center gap-2 mb-6 bg-teal-50 border border-teal-200 px-4 py-2 rounded-full shadow-sm">
             <Sparkles className="w-4 h-4 text-teal-600" />
-            <span className="text-xs font-bold tracking-widest uppercase text-teal-800">Gecho LMS</span>
+            <span className="text-xs font-bold tracking-widest uppercase text-teal-800">Echo LMS</span>
           </div>
           <h1 className="text-4xl font-black mb-3 text-slate-900">{form.title}</h1>
           {form.description && <p className="text-slate-500 text-lg">{form.description}</p>}

@@ -18,7 +18,7 @@ export default function ThemeCustomizerPage() {
     primaryColor: "#0d9488",
     secondaryColor: "#f59e0b",
     fontFamily: "Inter",
-    heroTitle: "Master In-Demand Skills with Gecho Academy",
+    heroTitle: "Master In-Demand Skills with Echo Academy",
     heroSubhead: "Industry-aligned curriculums, live mentorship, and verified certifications.",
     ctaLabel: "Browse Courses",
     showHero: true,
@@ -240,7 +240,7 @@ export default function ThemeCustomizerPage() {
                 <div className="w-7 h-7 rounded-lg text-white font-bold flex items-center justify-center text-xs" style={{ backgroundColor: theme.primaryColor }}>
                   G
                 </div>
-                Gecho Academy
+                Echo Academy
               </div>
               <button className="px-4 py-2 text-white font-bold text-xs rounded-xl shadow-xs" style={{ backgroundColor: theme.primaryColor }}>
                 Sign In

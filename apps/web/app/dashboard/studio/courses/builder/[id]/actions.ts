@@ -253,3 +253,60 @@ export async function updateCoursePricing(lmsCourseId: string, data: { fee?: num
     return null
   }
 }
+
+export async function togglePublishCourse(lmsCourseId: string, publishState?: boolean) {
+  try {
+    const lmsCourse = await getOrCreateLmsCourse(lmsCourseId)
+    if (!lmsCourse) return null
+
+    const targetState = publishState !== undefined ? publishState : !lmsCourse.isPublished
+
+    const updated = await prisma.lMSCourse.update({
+      where: { id: lmsCourse.id },
+      data: {
+        isPublished: targetState,
+        draftStatus: targetState ? "PUBLISHED" : "DRAFT",
+        publishedAt: targetState ? new Date() : null
+      }
+    }).catch(() => null)
+
+    try {
+      revalidatePath(`/dashboard/studio/courses/builder/${lmsCourseId}`)
+      revalidatePath(`/dashboard/studio/courses/builder/${lmsCourse.courseId}`)
+      revalidatePath(`/dashboard/studio/courses`)
+    } catch {}
+
+    return updated
+  } catch (err) {
+    console.error("Error publishing course:", err)
+    return null
+  }
+}
+
+export async function updateCourseGeneralSettings(lmsCourseId: string, data: { name?: string, duration?: string, description?: string }) {
+  try {
+    const lmsCourse = await getOrCreateLmsCourse(lmsCourseId)
+    if (!lmsCourse) return null
+
+    if (lmsCourse.courseId && data.name) {
+      await prisma.course.update({
+        where: { id: lmsCourse.courseId },
+        data: {
+          name: data.name,
+          duration: data.duration ?? "3 Months",
+          description: data.description
+        }
+      }).catch(() => null)
+    }
+
+    try {
+      revalidatePath(`/dashboard/studio/courses/builder/${lmsCourseId}`)
+      revalidatePath(`/dashboard/studio/courses/builder/${lmsCourse.courseId}`)
+    } catch {}
+
+    return true
+  } catch (err) {
+    console.error("Error updating course general settings:", err)
+    return null
+  }
+}

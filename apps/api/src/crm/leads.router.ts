@@ -34,14 +34,19 @@ async function notifyAssignedStaff(app: FastifyInstance, assignedToId: string, l
 }
 
 const LeadStatusValues = ['NEW', 'CONTACTED', 'QUALIFIED', 'PROPOSAL_SENT', 'NEGOTIATION', 'WON', 'LOST', 'ENQUIRY', 'COUNSELLING', 'TRIAL', 'ENROLLED_ACADEMY', 'DROPPED'] as const;
-const LeadSourceValues = ['WEBSITE', 'WHATSAPP', 'REFERRAL', 'COLD_OUTREACH', 'INSTAGRAM', 'LINKEDIN', 'ACADEMY_ALUMNI', 'OTHER'] as const;
+const LeadSourceValues = ['WEBSITE', 'WHATSAPP', 'REFERRAL', 'COLD_OUTREACH', 'INSTAGRAM', 'LINKEDIN', 'ACADEMY_ALUMNI', 'META_ADS', 'WALKIN', 'GOOGLE', 'IMPORT', 'OTHER'] as const;
 
 const CreateLeadSchema = z.object({
   name: z.string().min(1),
   email: z.union([z.string().email(), z.literal("")]).optional(),
   phone: z.union([z.string(), z.literal("")]).optional(),
   company: z.string().optional(),
-  source: z.enum(LeadSourceValues).optional().default('WEBSITE'),
+  source: z.string().optional().transform(val => {
+    if (!val) return 'WEBSITE';
+    const upper = val.toUpperCase();
+    if (LeadSourceValues.includes(upper as any)) return upper as any;
+    return 'OTHER';
+  }),
   status: z.enum(LeadStatusValues).optional(),
   estimatedBudget: z.number().optional(),
   projectType: z.string().optional(),

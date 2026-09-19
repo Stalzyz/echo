@@ -27,7 +27,7 @@ export default function SaaSLandingPage() {
     setTimeout(() => {
       setIsSubmitting(false)
       setRegisterModalOpen(false)
-      toast.success(`Welcome to Gecho LMS! Trial activated for ${form.academyName}. Check your email to get started.`)
+      toast.success(`Welcome to Echo LMS! Trial activated for ${form.academyName}. Check your email to get started.`)
       setForm({ academyName: "", adminName: "", email: "", domainSlug: "" })
     }, 1200)
   }
@@ -150,7 +150,7 @@ export default function SaaSLandingPage() {
                 "Up to 250 Active Students",
                 "10 Active Courses",
                 "Basic Quiz & Assignment Builder",
-                "Gecho Domain Subdomain",
+                "Echo Domain Subdomain",
                 "Email Support",
               ]}
               ctaText="Start 14-Day Free Trial"

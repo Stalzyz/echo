@@ -170,7 +170,7 @@ export default function CertificatesPage() {
 
             <div class="header">
               <div>
-                ${mainLogoUrl ? `<img src="${mainLogoUrl}" class="logo-img" />` : `<div style="font-size: 26px; font-weight: 700; color: ${themeConfig.primaryColor};">Gecho<span style="color:#555">LMS.com</span></div>`}
+                ${mainLogoUrl ? `<img src="${mainLogoUrl}" class="logo-img" />` : `<div style="font-size: 26px; font-weight: 700; color: ${themeConfig.primaryColor};">Echo<span style="color:#555">LMS.com</span></div>`}
               </div>
               ${showQrCode ? `
                 <div style="text-align: right;">
@@ -265,7 +265,7 @@ export default function CertificatesPage() {
             </label>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { id: 'GECHO_MODERN', label: 'Gecho Teal', color: 'from-teal-500 to-emerald-600' },
+                { id: 'GECHO_MODERN', label: 'Echo Teal', color: 'from-teal-500 to-emerald-600' },
                 { id: 'ROYAL_GOLD', label: 'Royal Executive', color: 'from-amber-400 to-yellow-600' },
                 { id: 'CLASSIC_ACADEMIC', label: 'Classic University', color: 'from-blue-800 to-indigo-900' },
                 { id: 'CREATIVE_STUDIO', label: 'Creative Studio', color: 'from-teal-600 to-emerald-700' },
@@ -403,7 +403,7 @@ export default function CertificatesPage() {
                   <img src={mainLogoUrl} alt="Logo" className="h-[70px] object-contain" />
                 ) : (
                   <div className="text-3xl font-bold" style={{ color: themeConfig.primaryColor }}>
-                    Gecho<span className="text-slate-600">LMS.com</span>
+                    Echo<span className="text-slate-600">LMS.com</span>
                     <div className="text-[10px] text-slate-500 tracking-widest mt-1">Enterprise Learning & Certificate Engine</div>
                   </div>
                 )}

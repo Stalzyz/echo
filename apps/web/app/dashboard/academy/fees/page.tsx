@@ -83,7 +83,7 @@ export default function FeeManagementPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-3xl font-black tracking-tight text-slate-900">Fee Management</h1>
-            <p className="text-slate-500 mt-1 font-medium">Track payments, issue invoices, and manage compliance for Gecho LMS.</p>
+            <p className="text-slate-500 mt-1 font-medium">Track payments, issue invoices, and manage compliance for Echo LMS.</p>
           </div>
           <div className="flex items-center gap-3">
             <button className="px-4 py-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 transition-colors flex items-center gap-2 shadow-xs">
@@ -337,8 +337,8 @@ export default function FeeManagementPage() {
                   <p className="text-slate-500 font-mono mt-1">#{selectedInvoice.id.slice(-6).toUpperCase()}</p>
                 </div>
                 <div className="text-right">
-                  <h2 className="font-extrabold text-xl text-slate-900">Gecho LMS</h2>
-                  <p className="text-slate-500 text-sm mt-1">billing@gecholms.com</p>
+                  <h2 className="font-extrabold text-xl text-slate-900">Echo LMS</h2>
+                  <p className="text-slate-500 text-sm mt-1">billing@echolms.com</p>
                 </div>
               </div>
 
@@ -388,7 +388,7 @@ export default function FeeManagementPage() {
               </div>
 
               <div className="pt-8 border-t border-slate-200">
-                <p className="text-slate-400 text-xs text-center font-medium">Thank you for choosing Gecho LMS.</p>
+                <p className="text-slate-400 text-xs text-center font-medium">Thank you for choosing Echo LMS.</p>
               </div>
             </div>
           </div>

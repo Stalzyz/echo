@@ -14,7 +14,7 @@ export default async function EducatorLayout({
       user: {
         id: "dev-educator-id",
         name: "Stalin Kumar",
-        email: "educator@gecholms.com",
+        email: "educator@echolms.com",
         role: "SUPER_ADMIN",
       },
       expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),

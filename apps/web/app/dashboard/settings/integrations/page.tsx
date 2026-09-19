@@ -306,7 +306,7 @@ export default function IntegrationsDashboard() {
           <div className="space-y-6">
             <div className="bg-primary/5 border border-primary/20 rounded-xl p-5">
               <h3 className="font-bold text-primary mb-2 flex items-center gap-2"><Webhook className="w-5 h-5"/> Event Webhooks</h3>
-              <p className="text-sm text-muted-foreground mb-4">Trigger external services when events occur inside Gecho LMS.</p>
+              <p className="text-sm text-muted-foreground mb-4">Trigger external services when events occur inside Echo LMS.</p>
               <div className="space-y-3">
                 {[
                   { event: "crm.lead_won", url: "https://example.com/webhooks/slack" },

@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { 
   DollarSign, Calendar, AlertTriangle, CheckCircle2, Clock, 
-  Send, Plus, Search, Filter, Calculator, Sparkles, X, ArrowRight, User
+  Send, Plus, Search, Filter, Calculator, Sparkles, X, ArrowRight, User, Settings, ShieldCheck, Percent, HelpCircle
 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -18,6 +18,17 @@ interface StudentEmiPlan {
   nextDueDate: string
   status: "ACTIVE" | "COMPLETED" | "OVERDUE"
   phone: string
+  ruleApplied: string
+}
+
+interface EmiRule {
+  id: string
+  name: string
+  mode: "ZERO_COST" | "SURCHARGE"
+  surchargePercent: number
+  minDownPaymentPercent: number
+  lateFeePenalty: number
+  isActive: boolean
 }
 
 const INITIAL_EMI_PLANS: StudentEmiPlan[] = [
@@ -31,19 +42,21 @@ const INITIAL_EMI_PLANS: StudentEmiPlan[] = [
     installmentAmount: 10000,
     nextDueDate: "2026-10-05",
     status: "ACTIVE",
-    phone: "+91 98765 43210"
+    phone: "+91 98765 43210",
+    ruleApplied: "Zero Extra Charge (0%)"
   },
   {
     id: "emi-202",
     studentName: "Meera Krishnan",
     courseName: "UI/UX Product Design Masterclass",
-    totalFee: 24000,
-    paidFee: 8000,
+    totalFee: 25200,
+    paidFee: 8400,
     installmentCount: 3,
-    installmentAmount: 8000,
+    installmentAmount: 8400,
     nextDueDate: "2026-09-15",
     status: "OVERDUE",
-    phone: "+91 91234 56789"
+    phone: "+91 91234 56789",
+    ruleApplied: "Standard 5% Surcharge"
   },
   {
     id: "emi-203",
@@ -55,7 +68,8 @@ const INITIAL_EMI_PLANS: StudentEmiPlan[] = [
     installmentAmount: 15000,
     nextDueDate: "2026-08-30",
     status: "COMPLETED",
-    phone: "+91 99887 76655"
+    phone: "+91 99887 76655",
+    ruleApplied: "Zero Extra Charge (0%)"
   }
 ]
 
@@ -65,6 +79,32 @@ export default function EmiSchedulePage() {
   const [search, setSearch] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isCalcOpen, setIsCalcOpen] = useState(false)
+  const [isRulesOpen, setIsRulesOpen] = useState(false)
+
+  // EMI Rules State
+  const [rules, setRules] = useState<EmiRule[]>([
+    {
+      id: "rule_1",
+      name: "Zero Extra Charge (0% Interest)",
+      mode: "ZERO_COST",
+      surchargePercent: 0,
+      minDownPaymentPercent: 33,
+      lateFeePenalty: 0,
+      isActive: true
+    },
+    {
+      id: "rule_2",
+      name: "Standard 5% Surcharge Plan",
+      mode: "SURCHARGE",
+      surchargePercent: 5,
+      minDownPaymentPercent: 20,
+      lateFeePenalty: 500,
+      isActive: false
+    }
+  ])
+
+  const [activeRuleId, setActiveRuleId] = useState<string>("rule_1")
+  const currentRule = rules.find(r => r.id === activeRuleId) || rules[0]
 
   // EMI Calculator State
   const [calcFee, setCalcFee] = useState(36000)
@@ -80,20 +120,30 @@ export default function EmiSchedulePage() {
     nextDueDate: ""
   })
 
+  // Calculate Surcharge & EMI
+  const surchargeFee = currentRule.mode === "SURCHARGE" ? Math.round(calcFee * (currentRule.surchargePercent / 100)) : 0
+  const finalTotalFee = calcFee + surchargeFee
+  const monthlyInstallment = Math.round(finalTotalFee / calcMonths)
+  const downPayment = Math.round(finalTotalFee * (currentRule.minDownPaymentPercent / 100))
+
   const handleCreatePlan = (e: React.FormEvent) => {
     e.preventDefault()
-    const instAmt = Math.round(form.totalFee / form.installmentCount)
+    const ruleSurcharge = currentRule.mode === "SURCHARGE" ? Math.round(form.totalFee * (currentRule.surchargePercent / 100)) : 0
+    const totalWithRule = form.totalFee + ruleSurcharge
+    const instAmt = Math.round(totalWithRule / form.installmentCount)
+
     const newPlan: StudentEmiPlan = {
       id: `emi-${Date.now().toString().slice(-4)}`,
       studentName: form.studentName,
       phone: form.phone,
       courseName: form.courseName,
-      totalFee: form.totalFee,
+      totalFee: totalWithRule,
       paidFee: instAmt, // 1st installment paid upfront
       installmentCount: form.installmentCount,
       installmentAmount: instAmt,
       nextDueDate: form.nextDueDate || "2026-10-15",
-      status: "ACTIVE"
+      status: "ACTIVE",
+      ruleApplied: currentRule.name
     }
     setPlans([newPlan, ...plans])
     setIsModalOpen(false)
@@ -121,11 +171,18 @@ export default function EmiSchedulePage() {
           </div>
           <div>
             <h1 className="text-2xl font-black text-slate-900 tracking-tight">Student EMI & Installment Schedule Builder</h1>
-            <p className="text-xs text-slate-500 font-medium">Manage flexible course fee installments, automated due alerts, and payment links.</p>
+            <p className="text-xs text-slate-500 font-medium">Manage flexible course fee installments, automated due alerts, and custom EMI rules.</p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setIsRulesOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl transition-all"
+          >
+            <Settings className="w-4 h-4 text-teal-600" /> EMI Rules Control System
+          </button>
+
           <button 
             onClick={() => setIsCalcOpen(true)}
             className="flex items-center gap-2 px-4 py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl transition-all"
@@ -145,6 +202,24 @@ export default function EmiSchedulePage() {
       {/* Main Workspace Area */}
       <div className="flex-1 p-8 space-y-6 overflow-y-auto custom-scrollbar">
         
+        {/* Rule Active Banner */}
+        <div className="bg-teal-50 border border-teal-200 rounded-2xl p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-xs">
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-xs font-bold text-teal-900 block">Active Rule Engine: {currentRule.name}</span>
+              <span className="text-[11px] text-teal-700">
+                {currentRule.mode === "ZERO_COST" 
+                  ? "Zero Extra Charge (0% Interest). Students pay exact course fee split into installments."
+                  : `Custom Surcharge: ${currentRule.surchargePercent}% extra charge applied to total course fee.`}
+              </span>
+            </div>
+          </div>
+          <button onClick={() => setIsRulesOpen(true)} className="text-xs font-bold text-teal-700 hover:underline">Change Rules</button>
+        </div>
+
         {/* Metric Cards Banner */}
         <div className="grid grid-cols-4 gap-4">
           <div className="bg-white border border-slate-200 rounded-3xl p-5 space-y-1 shadow-2xs">
@@ -211,13 +286,13 @@ export default function EmiSchedulePage() {
                 <th className="py-4 px-4 text-right">Paid Fee</th>
                 <th className="py-4 px-4 text-center">EMI Breakdown</th>
                 <th className="py-4 px-4">Next Due Date</th>
+                <th className="py-4 px-4 text-center">Rule Applied</th>
                 <th className="py-4 px-4 text-center">Status</th>
                 <th className="py-4 px-6 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-xs font-medium">
               {filtered.map(p => {
-                const remaining = p.totalFee - p.paidFee
                 return (
                   <tr key={p.id} className="hover:bg-slate-50/60 transition-colors">
                     <td className="py-4 px-6">
@@ -231,6 +306,9 @@ export default function EmiSchedulePage() {
                       <span className="text-[10px] text-slate-400">{p.installmentCount} Monthly Installments</span>
                     </td>
                     <td className="py-4 px-4 font-bold text-slate-900">{p.nextDueDate}</td>
+                    <td className="py-4 px-4 text-center text-[11px] font-medium text-slate-500">
+                      {p.ruleApplied || "Standard"}
+                    </td>
                     <td className="py-4 px-4 text-center">
                       <span className={`px-2.5 py-0.5 text-[10px] font-black rounded-full border ${
                         p.status === "ACTIVE" ? "bg-teal-50 text-teal-800 border-teal-200" :
@@ -258,6 +336,66 @@ export default function EmiSchedulePage() {
         </div>
       </div>
 
+      {/* EMI Rules Control System Modal */}
+      {isRulesOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 space-y-6 shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <Settings className="w-5 h-5 text-teal-600" />
+                <h2 className="text-lg font-black text-slate-900">EMI Rules & Control System</h2>
+              </div>
+              <button onClick={() => setIsRulesOpen(false)}><X className="w-5 h-5 text-slate-400 hover:text-slate-700" /></button>
+            </div>
+
+            <div className="space-y-4">
+              <p className="text-xs text-slate-500">Select or configure fee rules for installment payments.</p>
+              
+              <div className="space-y-3">
+                {rules.map((rule) => (
+                  <div 
+                    key={rule.id}
+                    onClick={() => setActiveRuleId(rule.id)}
+                    className={`p-4 rounded-2xl border cursor-pointer transition-all ${
+                      activeRuleId === rule.id 
+                        ? "bg-teal-50/80 border-teal-400 shadow-sm" 
+                        : "bg-slate-50 border-slate-200 hover:border-slate-300"
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-extrabold text-sm text-slate-900">{rule.name}</h4>
+                      {activeRuleId === rule.id && (
+                        <span className="px-2 py-0.5 bg-teal-600 text-white text-[10px] font-bold rounded-md">ACTIVE RULE</span>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-[11px] text-slate-600 mt-2 pt-2 border-t border-slate-200/60">
+                      <div>
+                        <span className="text-slate-400 block">Surcharge:</span>
+                        <span className="font-bold">{rule.mode === "ZERO_COST" ? "0% (Zero Extra)" : `${rule.surchargePercent}% Extra`}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block">Min Down Payment:</span>
+                        <span className="font-bold">{rule.minDownPaymentPercent}%</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block">Late Fee:</span>
+                        <span className="font-bold">₹{rule.lateFeePenalty} / mo</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-end gap-2">
+              <button onClick={() => setIsRulesOpen(false)} className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl shadow-xs">
+                Apply Active Rule
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* EMI Calculator Modal */}
       {isCalcOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
@@ -265,14 +403,19 @@ export default function EmiSchedulePage() {
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Calculator className="w-5 h-5 text-teal-600" />
-                <h2 className="text-lg font-black text-slate-900">Zero-Cost EMI Calculator</h2>
+                <h2 className="text-lg font-black text-slate-900">EMI Calculator</h2>
               </div>
               <button onClick={() => setIsCalcOpen(false)}><X className="w-5 h-5 text-slate-400 hover:text-slate-700" /></button>
             </div>
 
             <div className="space-y-4">
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                <span className="text-xs text-slate-500 font-medium">Applied Rule:</span>
+                <span className="text-xs font-bold text-teal-700">{currentRule.name}</span>
+              </div>
+
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Total Course Fee (₹)</label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Base Course Fee (₹)</label>
                 <input type="number" value={calcFee} onChange={e => setCalcFee(parseInt(e.target.value) || 0)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm font-bold" />
               </div>
 
@@ -295,13 +438,19 @@ export default function EmiSchedulePage() {
 
               <div className="p-4 bg-teal-50 border border-teal-200 rounded-2xl space-y-2">
                 <span className="text-xs font-bold text-teal-900 uppercase tracking-wider block">Installment Breakdown</span>
+                {surchargeFee > 0 && (
+                  <div className="flex justify-between items-center text-xs text-amber-700">
+                    <span>Surcharge ({currentRule.surchargePercent}%):</span>
+                    <span className="font-bold">+₹{surchargeFee.toLocaleString()}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-teal-800 font-medium">Monthly Installment:</span>
-                  <span className="text-xl font-black text-teal-900">₹{Math.round(calcFee / calcMonths).toLocaleString()} / mo</span>
+                  <span className="text-xl font-black text-teal-900">₹{monthlyInstallment.toLocaleString()} / mo</span>
                 </div>
                 <div className="flex justify-between items-center text-xs text-teal-700 pt-2 border-t border-teal-200/60">
-                  <span>Down Payment (1st Month):</span>
-                  <span className="font-bold">₹{Math.round(calcFee / calcMonths).toLocaleString()}</span>
+                  <span>Down Payment ({currentRule.minDownPaymentPercent}%):</span>
+                  <span className="font-bold">₹{downPayment.toLocaleString()}</span>
                 </div>
               </div>
             </div>
@@ -338,7 +487,7 @@ export default function EmiSchedulePage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Total Fee (₹)</label>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Base Fee (₹)</label>
                   <input type="number" value={form.totalFee} onChange={e => setForm(p => ({ ...p, totalFee: parseInt(e.target.value) || 0 }))} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-bold" />
                 </div>
                 <div>

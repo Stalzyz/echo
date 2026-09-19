@@ -194,7 +194,7 @@ export function Sidebar() {
           </div>
           <div className="flex flex-col min-w-0">
             <span className="text-sm font-bold leading-none truncate text-slate-900">{session?.user?.name || "Stalin Kumar"}</span>
-            <span className="text-xs text-slate-500 mt-1 truncate font-mono">{session?.user?.email || "admin@gecholms.com"}</span>
+            <span className="text-xs text-slate-500 mt-1 truncate font-mono">{session?.user?.email || "admin@echolms.com"}</span>
           </div>
         </div>
       </div>

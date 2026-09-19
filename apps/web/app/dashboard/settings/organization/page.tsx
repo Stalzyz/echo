@@ -7,7 +7,7 @@ import { Loader2, Palette, Image as ImageIcon, CheckCircle, BookOpen, Sparkles, 
 import { toast } from "sonner";
 
 const THEME_PRESETS = [
-  { name: "Gecho Teal", primary: "#0d9488", secondary: "#f59e0b", accent: "#10b981" },
+  { name: "Echo Teal", primary: "#0d9488", secondary: "#f59e0b", accent: "#10b981" },
   { name: "Royal Indigo", primary: "#4f46e5", secondary: "#ec4899", accent: "#3b82f6" },
   { name: "Violet Studio", primary: "#7c3aed", secondary: "#f59e0b", accent: "#06b6d4" },
   { name: "Emerald Learn", primary: "#059669", secondary: "#d97706", accent: "#3b82f6" },
@@ -289,7 +289,7 @@ export default function OrganizationSettingsPage() {
                     <div className="w-7 h-7 rounded-lg text-white font-bold flex items-center justify-center text-xs" style={{ backgroundColor: primaryCol }}>
                       {org?.name?.slice(0, 1) || "G"}
                     </div>
-                    <span className="font-bold text-sm text-slate-900">{org?.name || "Gecho LMS"}</span>
+                    <span className="font-bold text-sm text-slate-900">{org?.name || "Echo LMS"}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold" style={{ backgroundColor: `${secondaryCol}20`, color: secondaryCol }}>

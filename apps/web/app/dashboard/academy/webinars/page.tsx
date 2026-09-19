@@ -31,7 +31,7 @@ const INITIAL_WEBINARS: Webinar[] = [
     conversionRate: "18.4%",
     platform: "YOUTUBE_LIVE",
     status: "UPCOMING",
-    landingUrl: "https://gecholms.com/w/upsc-strategy"
+    landingUrl: "https://echolms.com/w/upsc-strategy"
   },
   {
     id: "web-302",
@@ -43,7 +43,7 @@ const INITIAL_WEBINARS: Webinar[] = [
     conversionRate: "24.2%",
     platform: "ZOOM_WEBINAR",
     status: "LIVE_NOW",
-    landingUrl: "https://gecholms.com/w/saas-masterclass"
+    landingUrl: "https://echolms.com/w/saas-masterclass"
   },
   {
     id: "web-303",
@@ -55,7 +55,7 @@ const INITIAL_WEBINARS: Webinar[] = [
     conversionRate: "15.8%",
     platform: "HLS_EMBED",
     status: "COMPLETED",
-    landingUrl: "https://gecholms.com/w/ai-roadmap"
+    landingUrl: "https://echolms.com/w/ai-roadmap"
   }
 ]
 
@@ -87,7 +87,7 @@ export default function WebinarsPage() {
       conversionRate: "0%",
       platform: form.platform,
       status: "UPCOMING",
-      landingUrl: `https://gecholms.com/w/${form.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
+      landingUrl: `https://echolms.com/w/${form.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
     }
     setWebinars([newWeb, ...webinars])
     setIsModalOpen(false)

@@ -45,7 +45,7 @@ export default function AcademyInternships() {
           <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3">
             <Briefcase className="w-8 h-8 text-teal-600" /> Internship Portal
           </h1>
-          <p className="text-slate-500 mt-1 font-medium">Track student internships and daily logs for Gecho LMS.</p>
+          <p className="text-slate-500 mt-1 font-medium">Track student internships and daily logs for Echo LMS.</p>
         </div>
         <button 
           onClick={() => setIsSlideOverOpen(true)}

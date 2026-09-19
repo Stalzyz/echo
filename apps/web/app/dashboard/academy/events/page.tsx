@@ -35,7 +35,7 @@ export default function CampusEventsAdmin() {
           <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3">
             <CalendarDays className="w-8 h-8 text-teal-600" /> Event Management
           </h1>
-          <p className="text-slate-500 mt-1 font-medium">Manage workshops, hackathons, and guest sessions for Gecho LMS.</p>
+          <p className="text-slate-500 mt-1 font-medium">Manage workshops, hackathons, and guest sessions for Echo LMS.</p>
         </div>
         <button onClick={() => setIsAddOpen(true)} className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold px-5 py-2.5 rounded-xl transition-colors shadow-xs">
           <Plus className="w-4 h-4" /> Create Event

@@ -23,7 +23,7 @@ const INITIAL_DOMAINS: WhitelabelDomain[] = [
   {
     id: "wl-1",
     academyName: "Apex Tech Institute",
-    subdomain: "apex.gecholms.com",
+    subdomain: "apex.echolms.com",
     customDomain: "learn.apextech.edu",
     cnameVerified: true,
     sslStatus: "ACTIVE",
@@ -33,7 +33,7 @@ const INITIAL_DOMAINS: WhitelabelDomain[] = [
   {
     id: "wl-2",
     academyName: "Stark Photography Academy",
-    subdomain: "starkphoto.gecholms.com",
+    subdomain: "starkphoto.echolms.com",
     customDomain: "academy.starkphoto.com",
     cnameVerified: true,
     sslStatus: "ACTIVE",
@@ -43,7 +43,7 @@ const INITIAL_DOMAINS: WhitelabelDomain[] = [
   {
     id: "wl-3",
     academyName: "Quantum Coding Labs",
-    subdomain: "quantum.gecholms.com",
+    subdomain: "quantum.echolms.com",
     customDomain: "learn.quantumlabs.io",
     cnameVerified: false,
     sslStatus: "PROVISIONING",
@@ -53,7 +53,7 @@ const INITIAL_DOMAINS: WhitelabelDomain[] = [
   {
     id: "wl-4",
     academyName: "Global Civil Services Hub",
-    subdomain: "civilservices.gecholms.com",
+    subdomain: "civilservices.echolms.com",
     customDomain: "learn.civilserviceshub.in",
     cnameVerified: true,
     sslStatus: "ACTIVE",
@@ -83,7 +83,7 @@ export default function WhitelabelPage() {
   }
 
   const copyCNAME = () => {
-    navigator.clipboard.writeText("cname.gecholms.com")
+    navigator.clipboard.writeText("cname.echolms.com")
     setCopied(true)
     toast.success("Target CNAME copied to clipboard!")
     setTimeout(() => setCopied(false), 2000)
@@ -117,7 +117,7 @@ export default function WhitelabelPage() {
             <div className="mt-3 flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 font-mono text-xs text-slate-800">
               <span className="text-slate-400 font-bold">TYPE: CNAME</span>
               <span className="text-slate-300">|</span>
-              <span className="font-bold text-teal-700">TARGET: cname.gecholms.com</span>
+              <span className="font-bold text-teal-700">TARGET: cname.echolms.com</span>
               <button onClick={copyCNAME} className="ml-auto text-slate-400 hover:text-slate-700">
                 {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
               </button>

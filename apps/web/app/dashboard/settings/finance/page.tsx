@@ -67,7 +67,7 @@ export default function FinanceSettingsPage() {
         <h1 className="text-3xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
           <DollarSign className="w-7 h-7 text-teal-600" /> Finance & Currency
         </h1>
-        <p className="text-slate-500 mt-2">Configure currency, tax model, and invoice numbering for your Gecho LMS instance.</p>
+        <p className="text-slate-500 mt-2">Configure currency, tax model, and invoice numbering for your Echo LMS instance.</p>
       </div>
 
       <div className="space-y-6">

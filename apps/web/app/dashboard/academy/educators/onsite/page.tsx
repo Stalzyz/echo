@@ -112,6 +112,17 @@ export default function OnsiteEducatorsPage() {
     }
   }
 
+  const handleDeleteEducator = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to remove educator ${name}?`)) return
+    try {
+      await fetchApi(`/academy/educators/${id}`, { method: "DELETE" })
+      toast.success(`Educator ${name} deleted successfully`)
+      mutate()
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete educator")
+    }
+  }
+
   return (
     <div className="flex flex-col h-full bg-slate-50 text-slate-900 p-8 overflow-y-auto relative custom-scrollbar">
       <div className="flex-none border-b border-slate-200 bg-white p-6 rounded-2xl mb-8 shadow-xs">
@@ -122,7 +133,7 @@ export default function OnsiteEducatorsPage() {
             </div>
             <div>
               <h1 className="text-3xl font-black text-slate-900 tracking-tight">Campus Faculty</h1>
-              <p className="text-sm text-slate-500 mt-1 font-medium">Manage physical academy instructors and lab assignments for Gecho LMS</p>
+              <p className="text-sm text-slate-500 mt-1 font-medium">Manage physical academy instructors and lab assignments for Echo LMS</p>
             </div>
           </div>
           <button 
@@ -182,31 +193,40 @@ export default function OnsiteEducatorsPage() {
                 )}
               </div>
 
-              <button
-                onClick={() => {
-                  setEditForm({
-                    id: educator.id,
-                    firstName: educator.user.firstName,
-                    lastName: educator.user.lastName,
-                    phone: educator.user.phone || "",
-                    designation: educator.designation || "",
-                    company: educator.company || "",
-                    yearsExperience: educator.yearsExperience || 0,
-                    skills: educator.skills ? educator.skills.join(", ") : "",
-                    bio: educator.bio || "",
-                    address: educator.address || "",
-                    city: educator.city || "",
-                    pincode: educator.pincode || "",
-                    dateOfBirth: educator.dateOfBirth ? educator.dateOfBirth.substring(0, 10) : "",
-                    idProofType: educator.idProofType || "",
-                    idProofNumber: educator.idProofNumber || ""
-                  })
-                  setIsEditOpen(true)
-                }}
-                className="w-full py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-xl text-xs font-bold transition-colors text-slate-800"
-              >
-                Edit Faculty Details
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    setEditForm({
+                      id: educator.id,
+                      firstName: educator.user.firstName,
+                      lastName: educator.user.lastName,
+                      phone: educator.user.phone || "",
+                      designation: educator.designation || "",
+                      company: educator.company || "",
+                      yearsExperience: educator.yearsExperience || 0,
+                      skills: educator.skills ? educator.skills.join(", ") : "",
+                      bio: educator.bio || "",
+                      address: educator.address || "",
+                      city: educator.city || "",
+                      pincode: educator.pincode || "",
+                      dateOfBirth: educator.dateOfBirth ? educator.dateOfBirth.substring(0, 10) : "",
+                      idProofType: educator.idProofType || "",
+                      idProofNumber: educator.idProofNumber || ""
+                    })
+                    setIsEditOpen(true)
+                  }}
+                  className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-xl text-xs font-bold transition-colors text-slate-800"
+                >
+                  Edit Faculty Details
+                </button>
+                <button
+                  onClick={() => handleDeleteEducator(educator.id, `${educator.user.firstName} ${educator.user.lastName}`)}
+                  className="p-2 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 rounded-xl text-xs font-bold transition-colors"
+                  title="Delete Faculty"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           ))}
           

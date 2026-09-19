@@ -81,7 +81,7 @@ export default function ReferralsAdmin() {
           <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3">
             <Share2 className="w-8 h-8 text-teal-600" /> Referral Payouts
           </h1>
-          <p className="text-slate-500 mt-1 font-medium">Manage and clear cash rewards for student referrals on Gecho LMS.</p>
+          <p className="text-slate-500 mt-1 font-medium">Manage and clear cash rewards for student referrals on Echo LMS.</p>
         </div>
 
         <form onSubmit={handleSaveCommissionRate} className="bg-white border border-slate-200 p-4 rounded-xl flex items-center gap-3 shadow-xs">

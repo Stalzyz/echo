@@ -40,7 +40,7 @@ export interface LoginPageBranding {
   description: string
   buttonText: string
   illustrationUrl?: string
-  showGechoBranding: boolean
+  showEchoBranding: boolean
 }
 
 export interface TenantBrandIdentity {
@@ -84,7 +84,7 @@ export interface PlanFeatureMatrix {
   allowCustomLogin: boolean
   allowCustomDomain: boolean
   allowEmailWhiteLabel: boolean
-  allowRemoveGechoBranding: boolean
+  allowRemoveEchoBranding: boolean
   allowMobileAppBranding: boolean
 }
 
@@ -95,7 +95,7 @@ export interface VendorWhiteLabelOverride {
   whiteLabelEnabled: boolean
   customDomainAllowed: boolean
   customBrandingAllowed: boolean
-  removeGechoBrandingAllowed: boolean
+  removeEchoBrandingAllowed: boolean
   emailWhiteLabelAllowed: boolean
   appWhiteLabelAllowed: boolean
   customDomain?: string
@@ -103,7 +103,7 @@ export interface VendorWhiteLabelOverride {
   sslStatus: "ACTIVE" | "PROVISIONING" | "FAILED"
 }
 
-export interface GechoBrandingPlacement {
+export interface EchoBrandingPlacement {
   location: "LOGIN" | "DASHBOARD" | "SIDEBAR" | "FOOTER" | "EMAIL" | "CERTIFICATES" | "PUBLIC_PAGES" | "ERROR_PAGES"
   label: string
   rule: "ALWAYS_GECHO" | "VENDOR_BRANDING" | "HIDDEN"

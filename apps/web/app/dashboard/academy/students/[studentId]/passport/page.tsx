@@ -124,7 +124,7 @@ export default function StudentPassportPage({ params }: { params: Promise<{ stud
     return acc
   }, {})
   const careerScore = passport.careerScore || 0
-  const passportUrl = `${typeof window !== 'undefined' ? window.location.origin : 'https://academy.gecholms.com'}/student/${studentId}`
+  const passportUrl = `${typeof window !== 'undefined' ? window.location.origin : 'https://academy.echolms.com'}/student/${studentId}`
 
   return (
     <div className="flex flex-col min-h-full bg-slate-50 text-slate-900 p-8 overflow-auto custom-scrollbar">
@@ -144,7 +144,7 @@ export default function StudentPassportPage({ params }: { params: Promise<{ stud
               {/* Header */}
               <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
                 <div>
-                  <div className="text-[10px] text-slate-400 tracking-wider uppercase font-bold">Gecho LMS</div>
+                  <div className="text-[10px] text-slate-400 tracking-wider uppercase font-bold">Echo LMS</div>
                   <div className="text-[11px] text-teal-700 tracking-wider uppercase font-black">Student Digital Passport</div>
                 </div>
                 <Shield className="w-6 h-6 text-teal-600" />

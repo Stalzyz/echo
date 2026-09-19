@@ -19,7 +19,7 @@ interface PlanFeatureMatrix {
   allowCustomLogin: boolean
   allowCustomDomain: boolean
   allowEmailWhiteLabel: boolean
-  allowRemoveGechoBranding: boolean
+  allowRemoveEchoBranding: boolean
   allowMobileAppBranding: boolean
 }
 
@@ -31,12 +31,12 @@ interface VendorOverride {
   plan: "STARTER" | "GROWTH" | "ENTERPRISE"
   whiteLabelEnabled: boolean
   customDomainAllowed: boolean
-  removeGechoBrandingAllowed: boolean
+  removeEchoBrandingAllowed: boolean
   cnameVerified: boolean
   sslStatus: "ACTIVE" | "PROVISIONING" | "FAILED"
 }
 
-interface GechoBrandingLocation {
+interface EchoBrandingLocation {
   id: string
   locationName: string
   description: string
@@ -61,7 +61,7 @@ export default function SuperAdminWhitelabelPage() {
       allowCustomLogin: false,
       allowCustomDomain: false,
       allowEmailWhiteLabel: false,
-      allowRemoveGechoBranding: false,
+      allowRemoveEchoBranding: false,
       allowMobileAppBranding: false,
     },
     {
@@ -75,7 +75,7 @@ export default function SuperAdminWhitelabelPage() {
       allowCustomLogin: true,
       allowCustomDomain: true,
       allowEmailWhiteLabel: true,
-      allowRemoveGechoBranding: false,
+      allowRemoveEchoBranding: false,
       allowMobileAppBranding: false,
     },
     {
@@ -89,7 +89,7 @@ export default function SuperAdminWhitelabelPage() {
       allowCustomLogin: true,
       allowCustomDomain: true,
       allowEmailWhiteLabel: true,
-      allowRemoveGechoBranding: true,
+      allowRemoveEchoBranding: true,
       allowMobileAppBranding: true,
     }
   ])
@@ -99,43 +99,43 @@ export default function SuperAdminWhitelabelPage() {
     {
       id: "v-1",
       academyName: "Apex Tech Institute",
-      subdomain: "apex.gecholms.com",
+      subdomain: "apex.echolms.com",
       customDomain: "learn.apextech.edu",
       plan: "ENTERPRISE",
       whiteLabelEnabled: true,
       customDomainAllowed: true,
-      removeGechoBrandingAllowed: true,
+      removeEchoBrandingAllowed: true,
       cnameVerified: true,
       sslStatus: "ACTIVE",
     },
     {
       id: "v-2",
       academyName: "Stark Photography Academy",
-      subdomain: "starkphoto.gecholms.com",
+      subdomain: "starkphoto.echolms.com",
       customDomain: "academy.starkphoto.com",
       plan: "GROWTH",
       whiteLabelEnabled: true,
       customDomainAllowed: true,
-      removeGechoBrandingAllowed: false,
+      removeEchoBrandingAllowed: false,
       cnameVerified: true,
       sslStatus: "ACTIVE",
     },
     {
       id: "v-3",
       academyName: "Quantum Coding Labs",
-      subdomain: "quantum.gecholms.com",
+      subdomain: "quantum.echolms.com",
       customDomain: "learn.quantumlabs.io",
       plan: "STARTER",
       whiteLabelEnabled: false,
       customDomainAllowed: false,
-      removeGechoBrandingAllowed: false,
+      removeEchoBrandingAllowed: false,
       cnameVerified: false,
       sslStatus: "PROVISIONING",
     }
   ])
 
   // 3. GECHO Branding Placement Matrix
-  const [brandingRules, setBrandingRules] = useState<GechoBrandingLocation[]>([
+  const [brandingRules, setBrandingRules] = useState<EchoBrandingLocation[]>([
     { id: "loc-1", locationName: "Login Portal Footer", description: "Shows 'Powered by GECHO' on student sign-in screens.", rule: "VENDOR_BRANDING" },
     { id: "loc-2", locationName: "Academy Dashboard Sidebar", description: "Bottom branding badge in main navigation sidebar.", rule: "VENDOR_BRANDING" },
     { id: "loc-3", locationName: "Verified PDF Certificates", description: "Certificate validation link and watermark footer.", rule: "ALWAYS_GECHO" },
@@ -312,7 +312,7 @@ export default function SuperAdminWhitelabelPage() {
                       { key: 'allowCustomLogin', label: 'Custom Login Portal Layout' },
                       { key: 'allowCustomDomain', label: 'Custom CNAME Domain (learn.academy.com)' },
                       { key: 'allowEmailWhiteLabel', label: 'Custom Email SMTP Branding' },
-                      { key: 'allowRemoveGechoBranding', label: 'Remove "Powered by GECHO"' },
+                      { key: 'allowRemoveEchoBranding', label: 'Remove "Powered by GECHO"' },
                       { key: 'allowMobileAppBranding', label: 'Standalone Mobile App Branding' },
                     ].map(row => (
                       <tr key={row.key} className="hover:bg-slate-50/60">
@@ -382,8 +382,8 @@ export default function SuperAdminWhitelabelPage() {
                       <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
                         <input 
                           type="checkbox"
-                          checked={v.removeGechoBrandingAllowed}
-                          onChange={() => toggleVendorOverride(v.id, 'removeGechoBrandingAllowed')}
+                          checked={v.removeEchoBrandingAllowed}
+                          onChange={() => toggleVendorOverride(v.id, 'removeEchoBrandingAllowed')}
                           className="w-4 h-4 accent-teal-600 rounded"
                         />
                         Allow Removing GECHO Branding
@@ -442,7 +442,7 @@ export default function SuperAdminWhitelabelPage() {
                   <Server className="w-4 h-4 text-teal-600" /> Platform DNS Target Instructions for Vendors
                 </div>
                 <p className="text-xs text-teal-800 font-medium">
-                  Vendors must point their custom domain CNAME record to: <code className="bg-white px-2 py-0.5 rounded font-mono font-bold border border-teal-300">cname.gecholms.com</code>
+                  Vendors must point their custom domain CNAME record to: <code className="bg-white px-2 py-0.5 rounded font-mono font-bold border border-teal-300">cname.echolms.com</code>
                 </p>
               </div>
 

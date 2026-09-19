@@ -63,7 +63,7 @@ export const DEFAULT_TENANT_THEME: TenantTheme = {
     welcomeHeading: "Welcome to Echo LMS",
     description: "Sign in to access your courses, live studio, and CRM.",
     buttonText: "Sign In to Academy",
-    showGechoBranding: true,
+    showEchoBranding: true,
   },
   updatedAt: new Date().toISOString(),
 }

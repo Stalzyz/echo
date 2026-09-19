@@ -291,7 +291,7 @@ export default function InvoicesPage() {
                   <Layers className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-black text-slate-900">Gecho LMS Technologies</h2>
+                  <h2 className="text-xl font-black text-slate-900">Echo LMS Technologies</h2>
                   <p className="text-xs text-slate-500 font-mono">Tax ID / GSTIN: 29GECHO1234F1Z5</p>
                 </div>
               </div>
