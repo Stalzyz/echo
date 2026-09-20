@@ -594,107 +594,139 @@ export default function PublicHomePage() {
 
       {/* ========================================================================= */}
       {/* 06 — DYNAMIC PRICING SECTION */}
-      {/* ========================================================================= */}
-      <section id="pricing" className="py-20 border-b border-slate-200 bg-slate-50">
+      {/* ======================      <section id="pricing" className="py-20 border-b border-slate-200 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 space-y-12">
           
           <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-teal-700">06 — DYNAMIC ACADEMY PRICING</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-teal-700">06 — ANNUAL ACADEMY PACKAGING & PRICING</span>
             <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
-              Transparent Plans for Growing Academies
+              Transparent Yearly Plans for Growing Academies
             </h2>
-            <p className="text-sm text-slate-600">
-              Configured dynamically via Grekam Super Admin. Choose the plan that fits your academy scale.
+            <p className="text-sm text-slate-600 font-medium">
+              No hidden per-student commissions. Billed annually with explicit <strong className="text-teal-700">+ 18% GST</strong> disclosure and customizable module permissions.
             </p>
 
-            {/* Billing Toggle */}
-            <div className="flex items-center justify-center gap-3 pt-4">
-              <span className={`text-xs font-bold ${billingCycle === "monthly" ? "text-slate-900" : "text-slate-500"}`}>Monthly Billing</span>
-              <button 
-                onClick={() => setBillingCycle(billingCycle === "monthly" ? "yearly" : "monthly")}
-                className="w-12 h-6 bg-teal-600 rounded-full p-1 transition-colors relative"
-              >
-                <div className={`w-4 h-4 bg-white rounded-full transition-transform ${billingCycle === "yearly" ? "translate-x-6" : "translate-x-0"}`} />
-              </button>
-              <span className={`text-xs font-bold flex items-center gap-1.5 ${billingCycle === "yearly" ? "text-slate-900" : "text-slate-500"}`}>
-                Annual Billing <span className="px-2 py-0.5 bg-teal-100 text-teal-800 font-mono text-[10px] rounded-full">Save 20%</span>
+            <div className="pt-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-100 text-teal-900 font-mono text-xs font-black border border-teal-200">
+                <CheckCircle2 className="w-3.5 h-3.5 text-teal-600" /> Billed Yearly Only • Save up to 40%
               </span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {plans.map((p, idx) => {
-              const priceDisplay = billingCycle === "yearly" 
-                ? (typeof p.yearlyPrice === "number" && p.yearlyPrice > 0 ? `₹${p.yearlyPrice.toLocaleString()}` : "Custom")
-                : (typeof p.monthlyPrice === "number" && p.monthlyPrice > 0 ? `₹${p.monthlyPrice.toLocaleString()}` : "Custom")
-              
-              return (
-                <div 
-                  key={p.id || idx}
-                  className={`bg-white border rounded-3xl p-8 flex flex-col justify-between shadow-xs relative transition-all ${
-                    p.popular ? "border-teal-500 ring-2 ring-teal-500/20" : "border-slate-200"
-                  }`}
-                >
-                  {p.popular && (
-                    <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-teal-600 text-white text-[10px] font-black uppercase tracking-widest shadow-sm">
-                      RECOMMENDED FOR ACADEMIES
-                    </span>
-                  )}
+            {[
+              {
+                id: "starter",
+                name: "Starter Academy",
+                originalPrice: "₹24,999",
+                offerPrice: "₹14,999",
+                gstText: "+ 18% GST",
+                studentLimit: "500",
+                instructorLimit: "5",
+                storageLimitGB: "50 GB",
+                badge: "Save 40% • Yearly",
+                popular: false,
+                features: ["Core LMS & Course Studio", "Student Portal & Mobile App", "Student Fees & Automated EMI", "AI Certificate Verification", "Custom Payment Gateway Link"]
+              },
+              {
+                id: "growth",
+                name: "Growth Institute",
+                originalPrice: "₹49,999",
+                offerPrice: "₹29,999",
+                gstText: "+ 18% GST",
+                studentLimit: "2,500",
+                instructorLimit: "20",
+                storageLimitGB: "250 GB",
+                badge: "RECOMMENDED FOR ACADEMIES",
+                popular: true,
+                features: ["All Starter Features", "WhatsApp 1-Tap Automation", "Email Drip & Sequences", "Webinars & Conversion Funnels", "Custom Domain & Whitelabel", "1-on-1 Mentorship Booking"]
+              },
+              {
+                id: "enterprise",
+                name: "Enterprise Multi-Branch",
+                originalPrice: "₹99,999",
+                offerPrice: "₹69,999",
+                gstText: "+ 18% GST",
+                studentLimit: "Unlimited",
+                instructorLimit: "Unlimited",
+                storageLimitGB: "Unlimited GB",
+                badge: "FULL SUITE UNLOCKED",
+                popular: false,
+                features: ["All Growth Features", "Offline Walk-in & Kiosk CRM", "Affiliate & Student Referrals", "Dedicated SLA Support", "Custom API & Webhooks Engine"]
+              }
+            ].map((p, idx) => (
+              <div 
+                key={p.id}
+                className={`bg-white border rounded-3xl p-8 flex flex-col justify-between shadow-xs relative transition-all ${
+                  p.popular ? "border-teal-500 ring-2 ring-teal-500/20" : "border-slate-200"
+                }`}
+              >
+                {p.popular && (
+                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-teal-600 text-white text-[10px] font-black uppercase tracking-widest shadow-sm">
+                    {p.badge}
+                  </span>
+                )}
 
-                  <div className="space-y-6">
-                    <div>
-                      <span className="text-xs font-black uppercase tracking-widest text-teal-700">{p.name}</span>
-                      <div className="mt-3 flex items-baseline gap-1">
-                        <span className="text-4xl font-black text-slate-900 font-mono">{priceDisplay}</span>
-                        <span className="text-xs text-slate-500 font-semibold">{billingCycle === "yearly" ? "/ year" : "/ month"}</span>
+                <div className="space-y-6">
+                  <div>
+                    <span className="text-xs font-black uppercase tracking-widest text-teal-700">{p.name}</span>
+                    <div className="mt-3 flex items-baseline justify-between">
+                      <div>
+                        <span className="text-3xl font-black text-slate-900 font-mono">{p.offerPrice}</span>
+                        <span className="text-xs text-slate-400 font-mono line-through ml-2">{p.originalPrice}</span>
+                        <span className="text-xs text-slate-500 font-bold block">/ year</span>
                       </div>
-                      <p className="text-xs text-slate-500 mt-1 font-medium">
-                        {p.freeTrialDays > 0 ? `${p.freeTrialDays} Days Free Trial Included` : "Instant Activation"}
-                      </p>
+                      <span className="text-[10px] font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                        Yearly
+                      </span>
                     </div>
 
-                    <div className="space-y-3 pt-4 border-t border-slate-100 text-xs font-semibold">
-                      <div className="flex justify-between text-slate-700">
-                        <span>Student Limit</span>
-                        <span className="font-mono font-bold text-slate-900">{p.studentLimit}</span>
-                      </div>
-                      <div className="flex justify-between text-slate-700">
-                        <span>Educator Limit</span>
-                        <span className="font-mono font-bold text-slate-900">{p.instructorLimit}</span>
-                      </div>
-                      <div className="flex justify-between text-slate-700">
-                        <span>Storage Allocation</span>
-                        <span className="font-mono font-bold text-slate-900">{p.storageLimitGB} GB</span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2 pt-4 border-t border-slate-100 text-xs">
-                      <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">Included Platform Features</span>
-                      {p.features.map((feat, fIdx) => (
-                        <div key={fIdx} className="flex items-center gap-2 text-slate-700 font-medium">
-                          <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" /> {feat}
-                        </div>
-                      ))}
+                    <div className="mt-2 text-[11px] font-bold text-slate-600 pt-2 border-t border-slate-100 flex items-center justify-between">
+                      <span className="text-teal-700 font-black">{p.gstText}</span>
+                      <span>No Per-Student Fee</span>
                     </div>
                   </div>
 
-                  <div className="pt-8">
-                    <Link
-                      href="/auth/login"
-                      className={`w-full py-3.5 rounded-xl font-bold text-xs text-center block transition-all shadow-sm ${
-                        p.popular 
-                          ? "bg-teal-600 hover:bg-teal-700 text-white shadow-teal-600/20" 
-                          : "bg-slate-100 hover:bg-slate-200 text-slate-900"
-                      }`}
-                    >
-                      Choose {p.name} Plan →
-                    </Link>
+                  <div className="space-y-3 pt-4 border-t border-slate-100 text-xs font-semibold">
+                    <div className="flex justify-between text-slate-700">
+                      <span>Student Limit</span>
+                      <span className="font-mono font-bold text-slate-900">{p.studentLimit}</span>
+                    </div>
+                    <div className="flex justify-between text-slate-700">
+                      <span>Educator Limit</span>
+                      <span className="font-mono font-bold text-slate-900">{p.instructorLimit}</span>
+                    </div>
+                    <div className="flex justify-between text-slate-700">
+                      <span>Storage Cap</span>
+                      <span className="font-mono font-bold text-slate-900">{p.storageLimitGB}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 pt-4 border-t border-slate-100 text-xs">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">Included Platform Modules</span>
+                    {p.features.map((feat, fIdx) => (
+                      <div key={fIdx} className="flex items-center gap-2 text-slate-700 font-medium">
+                        <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" /> {feat}
+                      </div>
+                    ))}
                   </div>
                 </div>
-              )
-            })}
-          </div>
 
+                <div className="pt-8">
+                  <Link
+                    href="/pricing"
+                    className={`w-full py-3.5 rounded-xl font-bold text-xs text-center block transition-all shadow-sm ${
+                      p.popular 
+                        ? "bg-teal-600 hover:bg-teal-700 text-white shadow-teal-600/20" 
+                        : "bg-slate-100 hover:bg-slate-200 text-slate-900"
+                    }`}
+                  >
+                    Subscribe to {p.name} →
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
