@@ -2,8 +2,7 @@
 
 import { useState } from "react"
 import { 
-  BookOpen, Plus, Tag, Layers, CheckCircle2, ShieldCheck, 
-  Sparkles, Check, X, Edit3, Settings2
+  BookOpen, Plus, Tag, Layers, CheckCircle2, ShieldCheck, Check, X, Edit3, Settings2
 } from "lucide-react"
 import { toast } from "sonner"
 

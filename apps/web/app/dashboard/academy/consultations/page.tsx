@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { 
   Calendar, Clock, Video, User, Plus, Search, Filter, 
-  CheckCircle2, AlertCircle, ExternalLink, Copy, Check, X, Loader2, Sparkles, DollarSign
+  CheckCircle2, AlertCircle, ExternalLink, Copy, Check, X, Loader2, DollarSign
 } from "lucide-react"
 import { toast } from "sonner"
 

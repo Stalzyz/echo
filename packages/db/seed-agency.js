@@ -8,7 +8,7 @@ async function main() {
     category: '01. Identity',
     title: 'Identity & Branding',
     subtitle: 'We craft magnetic brand identities that command attention. From striking logos to comprehensive design systems, we build the foundation of your digital presence.',
-    iconName: 'Sparkles',
+    iconName: '',
     colorHex: '#3b82f6', // blue
     cta: 'View Branding Work',
     projects: []

@@ -4,7 +4,7 @@ import { useState, useRef } from "react"
 import { 
   Palette, Building, Bell, Save, Image as ImageIcon, CheckCircle2, 
   DollarSign, Plug, RefreshCw, Upload, Eye, Lock, Layers, RotateCcw, 
-  Check, Monitor, Smartphone, Sparkles, AlertCircle, Trash2, ArrowUpRight, History
+  Check, Monitor, Smartphone, AlertCircle, Trash2, ArrowUpRight, History
 } from "lucide-react"
 import { toast } from "sonner"
 import { DEFAULT_TENANT_THEME } from "@/components/theme/TenantThemeProvider"
@@ -268,7 +268,7 @@ export default function BrandingThemeSettingsPage() {
               { id: 'profile', label: 'Admin Profile', icon: Lock },
               { id: 'colors', label: 'Colors', icon: Palette },
               { id: 'typography', label: 'Style & Fonts', icon: Layers },
-              { id: 'login', label: 'Login Portal', icon: Sparkles },
+              { id: 'login', label: 'Login Portal', icon: Lock },
               { id: 'history', label: 'History', icon: History },
             ].map(t => (
               <button

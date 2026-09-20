@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { 
   CreditCard, Plus, Edit3, CheckCircle2, ShieldCheck, X, 
-  Users, BookOpen, HardDrive, Check, Sparkles, AlertCircle
+  Users, BookOpen, HardDrive, Check, AlertCircle
 } from "lucide-react"
 import { toast } from "sonner"
 

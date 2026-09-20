@@ -2,8 +2,7 @@
 
 import { useState } from "react"
 import { 
-  Palette, Save, Monitor, Smartphone, Layout, Type, 
-  Sparkles, Layers, Check, Image as ImageIcon, Eye, ArrowRight
+  Palette, Save, Monitor, Smartphone, Layout, Type, Layers, Check, Image as ImageIcon, Eye, ArrowRight
 } from "lucide-react"
 import { toast } from "sonner"
 

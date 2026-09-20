@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { 
-  Layers, ArrowRight, Sparkles, Globe, BookOpen, Video, 
+  Layers, ArrowRight, Globe, BookOpen, Video, 
   Award, Users, Zap, Check, X, Loader2
 } from "lucide-react"
 import { toast } from "sonner"
@@ -39,7 +39,7 @@ export default function SaaSLandingPage() {
       <section className="relative pt-16 pb-24 overflow-hidden border-b border-slate-200 bg-gradient-to-b from-teal-50/50 to-slate-50">
         <div className="max-w-7xl mx-auto px-6 text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-100/80 border border-teal-200 text-teal-800 text-xs font-bold uppercase tracking-wider mb-8 shadow-xs">
-            <Sparkles className="w-3.5 h-3.5 text-teal-600 fill-teal-600" />
+            
             <span>Powering 500+ Academies & Universities Worldwide</span>
           </div>
 

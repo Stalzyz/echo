@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { CheckCircle2, Loader2, GraduationCap, Star, Sparkles, Building2, HelpCircle, BookOpen, Compass } from "lucide-react"
+import { CheckCircle2, Loader2, GraduationCap, Star, Building2, HelpCircle, BookOpen, Compass } from "lucide-react"
 import { fetchApi } from "@/lib/useApi"
 
 const INTERESTS = [
@@ -198,9 +198,7 @@ export default function KioskPage() {
 
           <button type="submit" disabled={isSubmitting}
             className="w-full py-4 bg-teal-600 hover:bg-teal-700 text-white font-black text-lg rounded-2xl transition-all disabled:opacity-50 flex items-center justify-center gap-3 shadow-sm">
-            {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : (
-              <><Sparkles className="w-5 h-5" /> Register My Visit</>
-            )}
+            {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : "Register My Visit"}
           </button>
         </form>
 

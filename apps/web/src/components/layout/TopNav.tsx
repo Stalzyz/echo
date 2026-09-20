@@ -6,7 +6,7 @@ import { useState } from "react"
 import { getNavItemsByRole, Role } from "@/config/navigation"
 import { cn } from "@/lib/utils"
 import { useSession, signOut } from "next-auth/react"
-import { ShieldCheck, Moon, Sun, Menu, X, LogOut, Sparkles, Layers } from "lucide-react"
+import { ShieldCheck, Moon, Sun, Menu, X, LogOut, Layers } from "lucide-react"
 import dynamic from "next/dynamic"
 import Image from "next/image"
 import { useOrganization } from "@/context/OrganizationContext"
@@ -31,7 +31,7 @@ function OrgHeader() {
         <div className="flex items-center gap-2">
           <span className="text-base font-black tracking-tight text-slate-900">{orgName}</span>
           <span className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-800 text-[10px] font-extrabold border border-amber-400/40 uppercase tracking-wider flex items-center gap-1 shadow-sm">
-            <Sparkles className="w-2.5 h-2.5 fill-amber-500 text-amber-600" /> PRO SAAS
+            PRO SAAS
           </span>
         </div>
       </div>

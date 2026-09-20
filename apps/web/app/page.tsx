@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import {
-  Sparkles, GraduationCap, Users, Bot, MessageSquare, CreditCard,
+  GraduationCap, Users, Bot, MessageSquare, CreditCard,
   BarChart3, CheckCircle2, ArrowRight, Play, ChevronDown, ChevronUp,
   Globe, Shield, Zap, Video, Check, Laptop, Layers, Calendar, Clock,
   Lock, User, Sliders, Search, Award, RefreshCw, FileText, Send, Building2,
-  BookOpen, CheckSquare, PhoneCall, Workflow, Sparkle, ExternalLink, Mail, MapPin, Phone
+  BookOpen, CheckSquare, PhoneCall, Workflow, ExternalLink, Mail, MapPin, Phone
 } from "lucide-react"
 import { toast } from "sonner"
 

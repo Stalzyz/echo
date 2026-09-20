@@ -2,7 +2,7 @@
 
 import { 
   Activity, Users, DollarSign, TrendingUp, AlertCircle, 
-  GraduationCap, Sparkles, Building2, Layers, CheckCircle2, ArrowRight
+  GraduationCap, Building2, Layers, CheckCircle2, ArrowRight
 } from "lucide-react"
 import Link from "next/link"
 
@@ -18,7 +18,7 @@ export default function SuperAdminOverviewPage() {
               STANDALONE SUPER ADMIN SUITE • PORT 4400
             </span>
             <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-black uppercase tracking-wider border border-amber-200 flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-amber-600 fill-amber-500" /> Multi-Tenant Control
+               Multi-Tenant Control
             </span>
           </div>
           <h1 className="text-3xl font-black tracking-tight text-slate-900">

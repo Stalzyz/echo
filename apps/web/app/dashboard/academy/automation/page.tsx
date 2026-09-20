@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { 
   Zap, Plus, Play, Pause, Trash2, ArrowDown, CheckCircle2, 
-  MessageSquare, Mail, Award, Tag, Send, Layers, X, Loader2, Sparkles, Sliders
+  MessageSquare, Mail, Award, Tag, Send, Layers, X, Loader2, Sliders
 } from "lucide-react"
 import { toast } from "sonner"
 

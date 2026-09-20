@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { 
   Building2, Plus, Search, Filter, ShieldCheck, MoreVertical, 
-  UserCheck, AlertTriangle, ExternalLink, Check, X, Loader2, Sparkles, Layers, RefreshCw
+  UserCheck, AlertTriangle, ExternalLink, Check, X, Loader2, Layers, RefreshCw
 } from "lucide-react"
 import { toast } from "sonner"
 

@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { 
   Tag, Plus, Percent, DollarSign, Calendar, Users, 
-  CheckCircle2, AlertCircle, Copy, Check, Trash2, X, Loader2, Sparkles
+  CheckCircle2, AlertCircle, Copy, Check, Trash2, X, Loader2
 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -188,7 +188,7 @@ export default function CouponsPage() {
         {/* Live Checkout Discount Calculator */}
         <div className="lg:col-span-1 bg-white border border-slate-200 rounded-3xl p-6 shadow-xs">
           <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-            <Sparkles className="w-4 h-4 text-teal-600" /> Checkout Discount Simulator
+             Checkout Discount Simulator
           </h3>
 
           <div className="space-y-3 text-xs">

@@ -5,7 +5,7 @@ test.describe('OpenAI Modules', () => {
     await page.goto('/dashboard');
 
     // Find and click the floating AI assistant button
-    const floatBtn = page.locator('button:has(svg.lucide-sparkles)').first();
+    const floatBtn = page.locator('button:has(svg.lucide-layers)').first();
     await expect(floatBtn).toBeVisible();
     await floatBtn.click();
 
@@ -57,7 +57,7 @@ test.describe('OpenAI Modules', () => {
     await expect(searchInput).toBeVisible();
     await searchInput.fill('design mockup');
 
-    // Locate the Sparkles search button
+    // Locate the  search button
     const aiSearchBtn = page.locator('button[title="Semantic AI Search"]');
     await expect(aiSearchBtn).toBeVisible();
     await aiSearchBtn.click();

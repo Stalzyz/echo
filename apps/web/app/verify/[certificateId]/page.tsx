@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { CheckCircle2, Shield, Award, Calendar, User, BookOpen, ExternalLink, Sparkles } from "lucide-react"
+import { CheckCircle2, Shield, Award, Calendar, User, BookOpen, ExternalLink } from "lucide-react"
 
 interface VerifyProps {
   params: Promise<{ certificateId: string }>
@@ -18,7 +18,7 @@ export default async function CertificateVerificationPage({ params }: VerifyProp
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-teal-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-teal-500/20">
-              <Sparkles className="w-4 h-4 text-slate-950" />
+              
             </div>
             <span className="font-extrabold text-lg tracking-tight">ECHO <span className="text-teal-400 text-xs font-normal bg-teal-500/10 px-2 py-0.5 rounded border border-teal-500/20 font-mono">VERIFIER</span></span>
           </Link>

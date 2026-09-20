@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { 
   MessageSquare, Heart, Share2, Pin, CheckCircle2, User, 
-  Send, Plus, Image as ImageIcon, Code, Sparkles, Filter, Search, Award
+  Send, Plus, Image as ImageIcon, Code, Filter, Search, Award
 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -119,7 +119,7 @@ export default function SocialCommunityPage() {
         </div>
 
         <span className="px-3.5 py-1.5 bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold rounded-xl flex items-center gap-1.5">
-          <Sparkles className="w-3.5 h-3.5 text-teal-600" /> Active Student Wall
+           Active Student Wall
         </span>
       </div>
 

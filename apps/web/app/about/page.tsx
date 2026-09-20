@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Sparkles, Shield, Users, Award, ArrowRight } from "lucide-react"
+import { Shield, Users, Award, ArrowRight } from "lucide-react"
 
 export default function AboutPage() {
   return (
@@ -8,7 +8,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-teal-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-teal-500/20">
-              <Sparkles className="w-5 h-5 text-slate-950" />
+              
             </div>
             <span className="font-extrabold text-xl tracking-tight">ECHO <span className="text-teal-400 font-normal text-xs uppercase tracking-widest ml-1 bg-teal-500/10 px-2 py-0.5 rounded border border-teal-500/20">SaaS</span></span>
           </Link>

@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { 
-  Mail, Send, Eye, Edit3, CheckCircle2, ShieldAlert, Sparkles, 
+  Mail, Send, Eye, Edit3, CheckCircle2, ShieldAlert, 
   Search, Filter, X, Save, RefreshCw, Copy, ExternalLink, Zap
 } from "lucide-react"
 import { toast } from "sonner"

@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { 
   Building2, Plus, Search, Filter, ShieldCheck, MoreVertical, 
-  UserCheck, AlertTriangle, ExternalLink, Check, X, Loader2, Sparkles, LogIn, KeyRound, Eye, EyeOff, Send
+  UserCheck, AlertTriangle, ExternalLink, Check, X, Loader2, LogIn, KeyRound, Eye, EyeOff, Send
 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -464,7 +464,7 @@ export default function AcademiesManagementPage() {
                     onClick={() => setForm(p => ({ ...p, initialPassword: generateRandomPassword() }))}
                     className="text-xs font-bold text-teal-700 hover:underline flex items-center gap-1"
                   >
-                    <Sparkles className="w-3.5 h-3.5" /> Auto-Generate
+                     Auto-Generate
                   </button>
                 </div>
 
@@ -563,7 +563,7 @@ export default function AcademiesManagementPage() {
                     onClick={() => setManagePassword(generateRandomPassword())}
                     className="text-[11px] font-bold text-teal-700 hover:underline flex items-center gap-1"
                   >
-                    <Sparkles className="w-3 h-3" /> Generate New
+                     Generate New
                   </button>
                 </div>
                 <div className="relative">

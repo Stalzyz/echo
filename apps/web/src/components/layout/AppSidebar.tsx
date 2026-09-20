@@ -26,7 +26,6 @@ import {
   ChevronRight,
   ChevronDown,
   Layers,
-  Sparkles,
   ShieldAlert,
   Percent,
   Building2,
@@ -168,7 +167,7 @@ const sidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
       {
         title: "Visual Automations",
         href: "/dashboard/academy/automation",
-        icon: Sparkles,
+        icon: Layers,
       },
       {
         title: "Global Leaderboard",

@@ -2,8 +2,7 @@
 
 import { useState } from "react"
 import { 
-  MessageSquare, Send, Upload, RefreshCw, CheckCircle2, 
-  Sparkles, Image as ImageIcon, Link as LinkIcon, FileText, 
+  MessageSquare, Send, Upload, RefreshCw, CheckCircle2, Image as ImageIcon, Link as LinkIcon, FileText, 
   Users, Layers, Calendar, Check, AlertCircle, Clock, ShieldCheck, X, ChevronRight, Play, Settings2
 } from "lucide-react"
 import { toast } from "sonner"
@@ -230,7 +229,7 @@ export default function WhatsAppPage() {
               activeTab === "automation" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5 text-teal-600" /> Automations
+             Automations
           </button>
         </div>
       </div>
@@ -758,7 +757,7 @@ export default function WhatsAppPage() {
                     <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold ${
                       auto.active ? "bg-teal-100 text-teal-800 border border-teal-200" : "bg-slate-100 text-slate-400"
                     }`}>
-                      <Sparkles className="w-5 h-5" />
+                      
                     </div>
                     <div>
                       <h3 className="text-sm font-black text-slate-900">{auto.title}</h3>

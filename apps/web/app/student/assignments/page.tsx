@@ -5,7 +5,7 @@ import { useApi } from "@/lib/useApi"
 import Link from "next/link"
 import {
   ArrowLeft, FileText, Upload, CheckCircle2, Clock, 
-  Award, Sparkles, AlertCircle, ExternalLink, Loader2, RefreshCw
+  Award, AlertCircle, ExternalLink, Loader2, RefreshCw
 } from "lucide-react"
 
 export default function StudentAssignmentsPage() {
@@ -98,7 +98,7 @@ export default function StudentAssignmentsPage() {
           </div>
 
           <div className="flex items-center gap-3 bg-violet-50 border border-violet-200 px-4 py-2 rounded-2xl">
-            <Sparkles className="w-4 h-4 text-violet-600 animate-pulse" />
+            
             <span className="text-xs font-bold text-violet-800">Matrix AI Auto-Grading Enabled</span>
           </div>
         </div>

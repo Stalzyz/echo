@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Award, Plus, FileText, Image as ImageIcon, Settings, Download, Send, CheckCircle, Edit3, Sparkles, ShieldCheck, QrCode, Palette, Layers, Type } from "lucide-react"
+import { Award, Plus, FileText, Image as ImageIcon, Settings, Download, Send, CheckCircle, Edit3, ShieldCheck, QrCode, Palette, Layers, Type } from "lucide-react"
 import { useApi, fetchApi } from "@/lib/useApi"
 import { toast } from "sonner"
 
@@ -245,7 +245,7 @@ export default function CertificatesPage() {
         {/* Left Sidebar Controls */}
         <div className="w-88 border-r border-slate-200 bg-white flex flex-col p-6 overflow-y-auto space-y-6 shadow-sm">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-teal-600" />
+            
             <div>
               <h2 className="text-lg font-bold text-slate-900">Certificate Studio</h2>
               <p className="text-xs text-slate-500">Configure themes, frames & branding</p>

@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { 
   Layers, LayoutDashboard, Building2, Package, FileText, 
-  Globe, Settings, Sparkles, ExternalLink, ShieldCheck
+  Globe, Settings, ExternalLink, ShieldCheck
 } from "lucide-react"
 
 export function Sidebar() {
@@ -77,7 +77,7 @@ export function Sidebar() {
                     : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                 }`}
               >
-                <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                
                 <span>Public Landing Page</span>
               </Link>
             </nav>

@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Shield, Zap, Users, BookOpen, CreditCard, MessageSquare, Sparkles, CheckCircle2, ArrowRight } from "lucide-react"
+import { Shield, Zap, Users, BookOpen, CreditCard, MessageSquare, CheckCircle2, ArrowRight } from "lucide-react"
 
 export default function FeaturesPage() {
   return (
@@ -9,7 +9,7 @@ export default function FeaturesPage() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-teal-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-teal-500/20 group-hover:scale-105 transition-transform">
-              <Sparkles className="w-5 h-5 text-slate-950" />
+              
             </div>
             <span className="font-extrabold text-xl tracking-tight">ECHO <span className="text-teal-400 font-normal text-xs uppercase tracking-widest ml-1 bg-teal-500/10 px-2 py-0.5 rounded border border-teal-500/20">SaaS</span></span>
           </Link>
@@ -28,7 +28,7 @@ export default function FeaturesPage() {
       {/* Hero */}
       <section className="py-20 px-6 max-w-7xl mx-auto text-center">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-400 text-xs font-mono font-semibold mb-6">
-          <Sparkles className="w-3.5 h-3.5" /> Complete Platform Capabilities
+           Complete Platform Capabilities
         </div>
         <h1 className="text-4xl md:text-6xl font-black tracking-tight text-white mb-6">
           Everything your academy needs to <span className="bg-gradient-to-r from-teal-400 to-emerald-400 bg-clip-text text-transparent">Scale & Automate</span>
@@ -72,7 +72,7 @@ export default function FeaturesPage() {
             items: ["Razorpay & PhonePe Gateways", "Automated PDF Invoices", "Payment Link Sharing"]
           },
           {
-            icon: Sparkles,
+            icon: Zap,
             title: "Public Certificate Verification",
             desc: "Every issued certificate gets a public tamper-proof verification URL for employer verification.",
             items: ["QR Code Credential Verification", "Public Verifier Portal", "Custom Academy Badging"]
