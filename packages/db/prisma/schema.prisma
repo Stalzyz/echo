@@ -3254,7 +3254,7 @@ model TeamAchievement {
 
 model WebhookLog {
   id          String   @id @default(cuid())
-  provider    String   // RAZORPAY | WHATSAPP | META_LEAD
+  provider    String   // RAZORPAY | WHATSAPP | META_LEAD | CUSTOM_OUTGOING
   eventId     String   @unique // Unique event ID or message ID
   eventType   String   // e.g. payment.captured, order.paid, leadgen, messages
   status      String   @default("PROCESSED") // PROCESSED | SKIPPED_DUPLICATE | FAILED
@@ -3266,3 +3266,17 @@ model WebhookLog {
   @@index([provider, eventId])
   @@map("webhook_logs")
 }
+
+model WebhookEndpoint {
+  id          String   @id @default(cuid())
+  name        String?  // e.g. "Slack Alerts", "Zapier Integration"
+  url         String   // The URL to post payload to
+  events      String[] // e.g. ["crm.lead_created", "crm.lead_won", "enquiry.received", "finance.invoice_paid", "lms.student_enrolled"]
+  secret      String?  // Signing secret (e.g. whsec_...)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("webhook_endpoints")
+}
+

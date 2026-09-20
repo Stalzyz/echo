@@ -181,6 +181,11 @@ export default async function leadsRouter(app: FastifyInstance) {
       notifyAssignedStaff(app, lead.assignedToId, lead);
     }
     
+    // Dispatch outgoing webhooks
+    import('../services/webhook-dispatcher.service').then(({ dispatchWebhookEvent }) => {
+      dispatchWebhookEvent(app, 'crm.lead_created', lead);
+    }).catch(() => {});
+
     reply.code(201);
     return lead;
   });
@@ -219,6 +224,11 @@ export default async function leadsRouter(app: FastifyInstance) {
           EventBus.emit(SystemEvents.ACADEMY_TRIAL_SCHEDULED, lead);
         }
       }
+
+      const eventName = body.status === 'WON' ? 'crm.lead_won' : 'crm.lead_updated';
+      import('../services/webhook-dispatcher.service').then(({ dispatchWebhookEvent }) => {
+        dispatchWebhookEvent(app, eventName, lead);
+      }).catch(() => {});
     }
     return lead;
   });

@@ -77,7 +77,20 @@ export default async function metaRouter(app: FastifyInstance) {
     const token = query['hub.verify_token'];
     const challenge = query['hub.challenge'];
 
-    const VERIFY_TOKEN = process.env.META_VERIFY_TOKEN;
+    let VERIFY_TOKEN = process.env.META_VERIFY_TOKEN || process.env.WEBHOOK_VERIFY_TOKEN;
+    if (!VERIFY_TOKEN) {
+      const key = await app.prisma.integrationKey.findFirst({
+        where: {
+          service: { in: ['META', 'WHATSAPP'] },
+          keyName: { in: ['META_VERIFY_TOKEN', 'WEBHOOK_VERIFY_TOKEN'] },
+          isActive: true,
+        },
+      });
+      if (key) {
+        const { decrypt } = await import('../settings/integrations.router');
+        VERIFY_TOKEN = decrypt(key.encryptedValue);
+      }
+    }
 
     if (mode && token) {
       if (mode === 'subscribe' && (token === VERIFY_TOKEN || !VERIFY_TOKEN)) {
@@ -182,7 +195,21 @@ async function fetchAndProcessLead(app: FastifyInstance, leadgenId: string, form
     }
   });
 
-  const ACCESS_TOKEN = process.env.META_ACCESS_TOKEN;
+  let ACCESS_TOKEN = process.env.META_ACCESS_TOKEN;
+  if (!ACCESS_TOKEN) {
+    const key = await app.prisma.integrationKey.findFirst({
+      where: {
+        service: { in: ['META', 'WHATSAPP'] },
+        keyName: 'META_ACCESS_TOKEN',
+        isActive: true,
+      },
+    });
+    if (key) {
+      const { decrypt } = await import('../settings/integrations.router');
+      ACCESS_TOKEN = decrypt(key.encryptedValue);
+    }
+  }
+
   if (!ACCESS_TOKEN) {
     app.log.error('META_ACCESS_TOKEN is not configured');
     return;
@@ -287,6 +314,19 @@ async function fetchAndProcessLead(app: FastifyInstance, leadgenId: string, form
   if (typeof (app as any).broadcast === 'function') {
     (app as any).broadcast('LEAD_CREATED', { lead: newLead, source: 'META_ADS' });
   }
+
+  // Dispatch custom webhook event
+  const { dispatchWebhookEvent } = await import('../services/webhook-dispatcher.service');
+  await dispatchWebhookEvent(app, 'crm.lead_created', {
+    id: newLead.id,
+    name: newLead.name,
+    email: newLead.email,
+    phone: newLead.phone,
+    company: newLead.company,
+    source: newLead.source,
+    status: newLead.status,
+    createdAt: newLead.createdAt,
+  });
 }
 
 /**

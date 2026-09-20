@@ -73,6 +73,23 @@ export default async function integrationKeysRouter(app: FastifyInstance) {
     await app.prisma.integrationKey.delete({ where: { id } });
     return reply.code(204).send();
   });
+
+  // POST /api/v1/settings/integrations/whatsapp/test — Test WhatsApp connections
+  app.post('/integrations/whatsapp/test', async (req, reply) => {
+    try {
+      const { WhatsAppService } = await import('../integrations/whatsapp.service');
+      const ws = new WhatsAppService();
+      const metaResult = await ws.testMetaConnection();
+      const graftyResult = await ws.testGraftyConnection();
+      return {
+        meta: metaResult,
+        grafty: graftyResult,
+      };
+    } catch (err: any) {
+      app.log.error(err, 'Failed to test WhatsApp connections');
+      return reply.code(500).send({ error: err.message || 'Failed to test WhatsApp connections' });
+    }
+  });
 }
 
 // Export decrypt helper for use in services
