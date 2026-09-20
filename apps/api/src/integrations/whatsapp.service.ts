@@ -881,26 +881,12 @@ const KNOWN_TEMPLATE_MEDIA: Record<string, string> = {
     }
 
     if (!sendResult.success) {
-      // Surface the actual error — include raw details so the router & frontend can present actionable info
       const errDetail = sendResult.error || 'WhatsApp message delivery failed.';
-      const is132012 = errDetail.includes('132012') || errDetail.toLowerCase().includes('parameter format does not match');
-      const is132001 = errDetail.includes('132001') || errDetail.toLowerCase().includes('translation');
-
-      if (is132001) {
-        throw new Error(
-          `WhatsApp API Rejection (#132001): The template "${templateName}" does not exist in Meta Manager for the requested language. ` +
-          `Please check template approval status/language in Meta WABA or switch to a verified template like "grafty_welcome". ` +
-          `Details: ${errDetail}`
-        );
-      }
-      if (is132012) {
-        throw new Error(
-          `WhatsApp API Rejection (#132012): The template "${templateName}" was created in Meta with rigid/fixed parameters that do not match the request. ` +
-          `Please switch to a verified template like "grafty_welcome", or check the required media attachment format. ` +
-          `Details: ${errDetail}`
-        );
-      }
-      throw new Error(errDetail);
+      console.warn(`[WhatsApp] Delivery notice for ${cleanPhone} (${templateName}): ${errDetail}`);
+      return {
+        success: false,
+        error: errDetail
+      };
     }
 
     return {
