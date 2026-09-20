@@ -272,6 +272,9 @@ enum LeadSource {
   LINKEDIN
   ACADEMY_ALUMNI
   META_ADS
+  GOOGLE
+  WALKIN
+  IMPORT
   OTHER
 }
 

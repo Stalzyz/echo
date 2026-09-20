@@ -16,7 +16,7 @@ export default async function meRouter(app: FastifyInstance) {
     });
 
     if (!user) {
-      return reply.notFound('User not found in database');
+      return reply.status(401).send({ success: false, error: 'Session expired or user not found. Please log in again.' });
     }
 
     return {

@@ -271,52 +271,58 @@ export default async function leadsRouter(app: FastifyInstance) {
 
   // POST /api/v1/crm/leads/:id/activities — log activity
   app.post('/leads/:id/activities', async (req, reply) => {
-    const { id } = req.params as { id: string };
-    const body = AddActivitySchema.parse(req.body);
+    try {
+      const { id } = req.params as { id: string };
+      const body = AddActivitySchema.parse(req.body);
 
-    const activity = await app.prisma.leadActivity.create({
-      data: {
-        leadId: id,
-        type: body.type,
-        content: body.content,
-        userId: req.user?.id || 'system',
-      },
-    });
+      const activity = await app.prisma.leadActivity.create({
+        data: {
+          leadId: id,
+          type: body.type,
+          content: body.content,
+          userId: (req.user as any)?.id || 'system',
+        },
+      });
 
-    //     // If logging a phone call, update status to CONTACTED if it was NEW/ENQUIRY and emit event
-    if (body.type === 'CALL') {
-      const targetLead = await app.prisma.lead.findUnique({ where: { id } });
-      let finalLead = targetLead;
-      if (targetLead && (targetLead.status === 'NEW' || targetLead.status === 'ENQUIRY')) {
-        finalLead = await app.prisma.lead.update({
-          where: { id },
-          data: { status: 'CONTACTED' }
-        });
-      }
-      
-      if (finalLead) {
-        if (body.whatsappTemplate && body.whatsappTemplate !== 'NONE') {
-          try {
-            await whatsappService.sendTemplateMessage({
-              phone: finalLead.phone || '',
-              name: finalLead.name || 'Client',
-              event: 'LEAD_CONTACTED',
-              templateName: body.whatsappTemplate,
-              variables: [finalLead.name || 'there', finalLead.company || finalLead.courseInterest || 'your inquiry'],
-            });
-          } catch (err: any) {
-            app.log.error(`Failed to send telecaller selected template ${body.whatsappTemplate}: ${err.message}`);
+      //     // If logging a phone call, update status to CONTACTED if it was NEW/ENQUIRY and emit event
+      if (body.type === 'CALL') {
+        const targetLead = await app.prisma.lead.findUnique({ where: { id } });
+        let finalLead = targetLead;
+        if (targetLead && (targetLead.status === 'NEW' || targetLead.status === 'ENQUIRY')) {
+          finalLead = await app.prisma.lead.update({
+            where: { id },
+            data: { status: 'CONTACTED' }
+          });
+        }
+        
+        if (finalLead) {
+          if (body.whatsappTemplate && body.whatsappTemplate !== 'NONE') {
+            try {
+              await whatsappService.sendTemplateMessage({
+                phone: finalLead.phone || '',
+                name: finalLead.name || 'Client',
+                event: 'LEAD_CONTACTED',
+                templateName: body.whatsappTemplate,
+                variables: [finalLead.name || 'there', finalLead.company || finalLead.courseInterest || 'your inquiry'],
+              });
+            } catch (err: any) {
+              app.log.warn(`Failed to send telecaller selected template ${body.whatsappTemplate}: ${err.message}`);
+            }
+          } else if (body.whatsappTemplate !== 'SKIP') {
+            // If not explicitly set to SKIP, run default autopilot template
+            EventBus.emit(SystemEvents.LEAD_CONTACTED, finalLead);
           }
-        } else if (body.whatsappTemplate !== 'SKIP') {
-          // If not explicitly set to SKIP, run default autopilot template
-          EventBus.emit(SystemEvents.LEAD_CONTACTED, finalLead);
         }
       }
-    }
 
-    reply.code(201);
-    return activity;
+      reply.code(201);
+      return activity;
+    } catch (err: any) {
+      app.log.error({ err }, `[CRM] Failed to log lead activity: ${err.message}`);
+      return reply.status(500).send({ error: 'Failed to log activity', detail: err.message });
+    }
   });
+
 
   // GET /api/v1/crm/leads/stats — pipeline stats
   app.get('/leads/stats', async (req, reply) => {
