@@ -37,7 +37,7 @@ export default function StudentCoursePlayerPage({ params }: { params: Promise<{ 
   const [newNote, setNewNote] = useState("")
 
   // Q&A State
-  const [qaList, setQaList] = useState([
+  const [qaList, setQaList] = useState<Array<{ id: string; author: string; avatar: string; time: string; question: string; upvotes: number; answer?: { author: string; text: string } }>>([
     {
       id: "q1",
       author: "Alex Morgan",

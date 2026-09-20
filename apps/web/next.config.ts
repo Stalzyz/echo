@@ -25,6 +25,30 @@ const nextConfig: NextConfig = {
         source: '/api/v1/:path*',
         destination: `${API_INTERNAL}/:path*`,
       },
+      {
+        source: '/admin',
+        destination: '/dashboard/academy',
+      },
+      {
+        source: '/admin/:path*',
+        destination: '/dashboard/academy/:path*',
+      },
+      {
+        source: '/educator',
+        destination: '/dashboard/studio',
+      },
+      {
+        source: '/educator/:path*',
+        destination: '/dashboard/studio/:path*',
+      },
+      {
+        source: '/control',
+        destination: '/dashboard/super-admin',
+      },
+      {
+        source: '/control/:path*',
+        destination: '/dashboard/super-admin/:path*',
+      },
     ];
   },
   async redirects() {

@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation"
 import {
   User, Mail, Phone, MapPin, Calendar, Briefcase, 
   GraduationCap, Award, Shield, CheckCircle2, Save, 
-  Globe, Github, Linkedin, Bell, ArrowLeft, Loader2,
+  Globe, Bell, ArrowLeft, Loader2,
   Check, RefreshCw, AlertCircle
 } from "lucide-react"
 

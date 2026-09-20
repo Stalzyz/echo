@@ -31,7 +31,7 @@ interface Lead {
   phone?: string
   courseInterest?: string
   score: number
-  updatedAt: string
+  updatedAt?: string
   status: ColumnType
   source?: string
 }
@@ -289,7 +289,6 @@ export default function AdmissionsPipelinePage() {
       source: newLead.source || "WEBSITE",
       status: newLead.status || "ENQUIRY",
       score: 75,
-      activities: []
     }
 
     try {
@@ -358,7 +357,6 @@ export default function AdmissionsPipelinePage() {
           source: cols[4] || "IMPORT",
           status: "ENQUIRY",
           score: 70,
-          activities: []
         }
 
         newImportedLeads.push(itemLead)
