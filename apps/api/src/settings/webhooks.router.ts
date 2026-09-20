@@ -60,7 +60,7 @@ export default async function webhooksRouter(app: FastifyInstance) {
       }
     } catch (err: any) {
       if (err instanceof z.ZodError) {
-        return reply.code(400).send({ error: err.errors[0]?.message || 'Invalid webhook data' });
+        return reply.code(400).send({ error: err.issues?.[0]?.message || err.message || 'Invalid webhook data' });
       }
       app.log.error(err, 'Failed to save webhook endpoint');
       return reply.code(500).send({ error: 'Failed to save webhook endpoint' });
