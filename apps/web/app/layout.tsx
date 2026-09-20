@@ -1,32 +1,33 @@
 import type { Metadata } from "next"
-import { Inter, Caveat, Space_Grotesk, Playfair_Display } from "next/font/google"
+import { Inter, Caveat, Space_Grotesk, Playfair_Display, Poppins } from "next/font/google"
 import "./globals.css"
 import { SmoothScroll } from "@/components/SmoothScroll"
 import { OrganizationProvider } from "@/context/OrganizationContext"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
+const poppins = Poppins({ weight: ["300", "400", "500", "600", "700", "800", "900"], subsets: ["latin"], variable: "--font-poppins" })
 const caveat = Caveat({ subsets: ["latin"], variable: "--font-caveat" })
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space" })
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://academy.grekam.in'),
+  metadataBase: new URL('https://echo.grekam.in'),
   title: {
-    default: 'Grekam Academy — Master Design & Tech',
-    template: '%s | Grekam Academy'
+    default: 'echo — Your Academy. One Connected System.',
+    template: '%s | echo LMS by Grekam'
   },
-  description: 'Learn design, visual arts, and digital technology from industry experts. Master professional tools with Grekam Academy.',
+  description: 'echo is an Academy Operating System bringing courses, students, educators, live classes, payments, CRM, automation and academy website into one platform. A product by Grekam, Coimbatore, India.',
   openGraph: {
-    title: 'Grekam Academy — Master Design & Technical Arts',
-    description: 'Learn design, visual arts, and digital technology from industry experts. Hands-on projects, certification, and career placement.',
-    url: 'https://academy.grekam.in',
-    siteName: 'Grekam Academy',
+    title: 'echo — Your Academy. One Connected System.',
+    description: 'echo brings your courses, students, educators, live classes, payments, CRM, automation and academy website into one connected platform. Product by Grekam, Coimbatore.',
+    url: 'https://echo.grekam.in',
+    siteName: 'echo by Grekam',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Grekam Academy Course Preview',
+        alt: 'echo Academy Operating System',
       }
     ],
     locale: 'en_US',
@@ -34,8 +35,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Grekam Academy',
-    description: 'Learn visual editing, color grading, and motion design.',
+    title: 'echo by Grekam',
+    description: 'Operating system for modern academies and education businesses.',
     images: ['/og-image.png'],
   },
   robots: {
@@ -59,8 +60,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${caveat.variable} ${spaceGrotesk.variable} ${playfair.variable}`}>
-      <body suppressHydrationWarning className="min-h-screen bg-[#FAFAF8] text-[#1C1C1C] font-sans antialiased">
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${poppins.variable} ${caveat.variable} ${spaceGrotesk.variable} ${playfair.variable}`}>
+      <body suppressHydrationWarning className="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased">
         <OrganizationProvider>
           <SmoothScroll>
             {children}
@@ -70,3 +71,4 @@ export default function RootLayout({
     </html>
   )
 }
+

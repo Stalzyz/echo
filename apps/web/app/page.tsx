@@ -1,15 +1,96 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import {
   Sparkles, GraduationCap, Users, Bot, MessageSquare, CreditCard,
   BarChart3, CheckCircle2, ArrowRight, Play, ChevronDown, ChevronUp,
   Globe, Shield, Zap, Video, Check, Laptop, Layers, Calendar, Clock,
   Lock, User, Sliders, Search, Award, RefreshCw, FileText, Send, Building2,
-  BookOpen, CheckSquare, PhoneCall, Workflow, Sparkle, ExternalLink
+  BookOpen, CheckSquare, PhoneCall, Workflow, Sparkle, ExternalLink, Mail, MapPin, Phone
 } from "lucide-react"
 import { toast } from "sonner"
+
+interface Plan {
+  id: string
+  name: string
+  monthlyPrice: number
+  yearlyPrice: number
+  freeTrialDays: number
+  studentLimit: number | string
+  instructorLimit: number | string
+  courseLimit: number | string
+  storageLimitGB: number | string
+  features: string[]
+  status: "ACTIVE" | "DISABLED"
+  popular?: boolean
+}
+
+const DEFAULT_HOMEPAGE_PLANS: Plan[] = [
+  {
+    id: "plan-starter",
+    name: "STARTER ACADEMY",
+    monthlyPrice: 999,
+    yearlyPrice: 9990,
+    freeTrialDays: 14,
+    studentLimit: 500,
+    instructorLimit: 5,
+    courseLimit: 15,
+    storageLimitGB: 50,
+    features: [
+      "Up to 500 Active Students",
+      "5 Educator Accounts",
+      "Courses & Video Player",
+      "Razorpay & Stripe Integration",
+      "Basic Admissions CRM",
+      "Automated Email Alerts"
+    ],
+    status: "ACTIVE"
+  },
+  {
+    id: "plan-growth",
+    name: "GROWTH INSTITUTE",
+    monthlyPrice: 2499,
+    yearlyPrice: 24990,
+    freeTrialDays: 14,
+    studentLimit: 2500,
+    instructorLimit: 20,
+    courseLimit: 50,
+    storageLimitGB: 250,
+    features: [
+      "Up to 2,500 Active Students",
+      "20 Educator Accounts",
+      "Meta Lead Ads Webhook Receiver",
+      "WhatsApp Business API Reminders",
+      "Zoom & Google Meet Live Classes",
+      "Automated GST PDF Invoices",
+      "Custom Domain (CNAME) Support",
+      "Full Whitelabel Engine"
+    ],
+    status: "ACTIVE",
+    popular: true
+  },
+  {
+    id: "plan-enterprise",
+    name: "ENTERPRISE MULTI-BRANCH",
+    monthlyPrice: 9999,
+    yearlyPrice: 99990,
+    freeTrialDays: 30,
+    studentLimit: "Unlimited",
+    instructorLimit: "Unlimited",
+    courseLimit: "Unlimited",
+    storageLimitGB: "Unlimited",
+    features: [
+      "Unlimited Active Students & Staff",
+      "Multi-Branch Architecture",
+      "Dedicated Edge Database Isolation",
+      "Custom API & Webhook Dispatch",
+      "Custom SSO & SAML Auth",
+      "24/7 Dedicated Support & SLA"
+    ],
+    status: "ACTIVE"
+  }
+]
 
 export default function PublicHomePage() {
   const [activeJourneyStep, setActiveJourneyStep] = useState<number>(0)
@@ -17,56 +98,72 @@ export default function PublicHomePage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0)
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false)
   const [activeBrandTab, setActiveBrandTab] = useState<"bright" | "northstar" | "creative">("northstar")
+  const [plans, setPlans] = useState<Plan[]>(DEFAULT_HOMEPAGE_PLANS)
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly")
+
+  useEffect(() => {
+    // Attempt to fetch dynamic packages/plans configured by Super Admin
+    fetch("/api/v1/plans")
+      .then(res => res.json())
+      .then(data => {
+        if (data && Array.isArray(data.plans) && data.plans.length > 0) {
+          setPlans(data.plans)
+        }
+      })
+      .catch(() => {
+        // Fallback to default pricing plans if endpoint is offline or SSR
+      })
+  }, [])
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index)
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F6F2] text-[#151515] font-sans antialiased selection:bg-[#1F6B4F]/20 selection:text-[#1F6B4F]">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-poppins selection:bg-teal-500/20 selection:text-teal-900 antialiased">
       
       {/* ========================================================================= */}
       {/* 00 — NAVIGATION HEADER */}
       {/* ========================================================================= */}
-      <header className="sticky top-0 z-50 bg-[#F7F6F2]/90 backdrop-blur-md border-b border-[#DEDED8]">
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-xl bg-[#1F6B4F] flex items-center justify-center text-white font-black shadow-xs group-hover:bg-[#16513B] transition-colors">
-              <span className="text-base tracking-tighter">E</span>
+            <div className="w-9 h-9 rounded-xl bg-teal-600 flex items-center justify-center text-white font-black text-lg shadow-sm group-hover:bg-teal-700 transition-colors">
+              e
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xl font-black text-[#151515] tracking-tight">ECHO</span>
-                <span className="px-2 py-0.5 rounded-md bg-[#E5F0EA] border border-[#1F6B4F]/20 text-[#1F6B4F] text-[10px] font-bold uppercase tracking-wider">
+                <span className="text-xl font-bold text-slate-900 tracking-tight lowercase">echo</span>
+                <span className="px-2 py-0.5 rounded-md bg-teal-50 border border-teal-200 text-teal-800 text-[10px] font-bold uppercase tracking-wider">
                   OS
                 </span>
               </div>
-              <p className="text-[10px] text-[#6B6B67] font-medium tracking-wide">Academy Operating System</p>
+              <p className="text-[10px] text-slate-500 font-medium tracking-wide">Academy Operating System by Grekam</p>
             </div>
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-7 text-xs font-semibold text-[#6B6B67]">
-            <a href="#ecosystem" className="hover:text-[#1F6B4F] transition-colors">Ecosystem</a>
-            <a href="#journey" className="hover:text-[#1F6B4F] transition-colors">Journey</a>
-            <a href="#student-experience" className="hover:text-[#1F6B4F] transition-colors">Learner UI</a>
-            <a href="#crm" className="hover:text-[#1F6B4F] transition-colors">CRM & Sales</a>
-            <a href="#automation" className="hover:text-[#1F6B4F] transition-colors">Automation</a>
-            <a href="#website-builder" className="hover:text-[#1F6B4F] transition-colors">Website</a>
-            <a href="#branding" className="hover:text-[#1F6B4F] transition-colors">White-Label</a>
-            <a href="#faq" className="hover:text-[#1F6B4F] transition-colors">FAQ</a>
+          <nav className="hidden lg:flex items-center gap-7 text-xs font-semibold text-slate-600">
+            <a href="#ecosystem" className="hover:text-teal-700 transition-colors">Ecosystem</a>
+            <a href="#journey" className="hover:text-teal-700 transition-colors">Journey</a>
+            <a href="#student-experience" className="hover:text-teal-700 transition-colors">Learner UI</a>
+            <a href="#crm" className="hover:text-teal-700 transition-colors">CRM & Sales</a>
+            <a href="#automation" className="hover:text-teal-700 transition-colors">Automation</a>
+            <a href="#pricing" className="hover:text-teal-700 transition-colors">Pricing</a>
+            <a href="#branding" className="hover:text-teal-700 transition-colors">White-Label</a>
+            <a href="#faq" className="hover:text-teal-700 transition-colors">FAQ</a>
           </nav>
 
           <div className="flex items-center gap-3">
             <Link 
               href="/auth/login" 
-              className="px-4 py-2.5 rounded-xl border border-[#DEDED8] hover:bg-white text-[#151515] text-xs font-bold transition-all"
+              className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-white text-slate-900 text-xs font-bold transition-all"
             >
               Sign In
             </Link>
 
             <button 
               onClick={() => setIsDemoModalOpen(true)}
-              className="px-4 py-2.5 rounded-xl bg-[#1F6B4F] hover:bg-[#16513B] text-white text-xs font-bold transition-all shadow-xs flex items-center gap-2"
+              className="px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-2"
             >
               Book Demo
             </button>
@@ -77,80 +174,80 @@ export default function PublicHomePage() {
       {/* ========================================================================= */}
       {/* 01 — HERO SECTION */}
       {/* ========================================================================= */}
-      <section className="relative pt-12 pb-20 border-b border-[#DEDED8] overflow-hidden">
+      <section className="relative pt-12 pb-20 border-b border-slate-200 bg-gradient-to-b from-white via-slate-50 to-teal-50/20 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* Left Column (70% Content) */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E5F0EA] border border-[#1F6B4F]/20 text-[#1F6B4F] text-xs font-bold">
-              <span className="w-2 h-2 rounded-full bg-[#1F6B4F] animate-pulse" />
-              ECHO • ACADEMY OPERATING SYSTEM
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-teal-600 animate-pulse" />
+              echo • ACADEMY OPERATING SYSTEM BY GREKAM
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-[#151515] tracking-tight leading-[1.08]">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.08]">
               YOUR ACADEMY.<br />
-              <span className="text-[#1F6B4F]">ONE CONNECTED SYSTEM.</span>
+              <span className="text-teal-600">ONE CONNECTED SYSTEM.</span>
             </h1>
 
-            <div className="flex flex-wrap gap-2 text-sm sm:text-base font-bold text-[#1F6B4F]">
+            <div className="flex flex-wrap gap-2 text-sm sm:text-base font-bold text-teal-700">
               <span>Teach.</span>
-              <span className="text-[#6B6B67]">•</span>
+              <span className="text-slate-400">•</span>
               <span>Manage.</span>
-              <span className="text-[#6B6B67]">•</span>
+              <span className="text-slate-400">•</span>
               <span>Sell.</span>
-              <span className="text-[#6B6B67]">•</span>
+              <span className="text-slate-400">•</span>
               <span>Grow.</span>
             </div>
 
-            <p className="text-sm sm:text-base text-[#6B6B67] font-normal leading-relaxed max-w-xl">
-              ECHO brings your courses, students, educators, live classes, payments, CRM, communication and academy website into one connected platform.
+            <p className="text-sm sm:text-base text-slate-600 font-normal leading-relaxed max-w-xl">
+              <strong>echo</strong> brings your courses, students, educators, live classes, payments, CRM, communication and academy website into one connected platform.
             </p>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
               <Link 
                 href="/auth/login"
-                className="px-6 py-3.5 rounded-xl bg-[#1F6B4F] hover:bg-[#16513B] text-white font-bold text-xs sm:text-sm text-center transition-all shadow-sm flex items-center justify-center gap-2"
+                className="px-6 py-3.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs sm:text-sm text-center transition-all shadow-md shadow-teal-600/20 flex items-center justify-center gap-2"
               >
                 Start Your Academy <ArrowRight className="w-4 h-4" />
               </Link>
               <button 
                 onClick={() => setIsDemoModalOpen(true)}
-                className="px-6 py-3.5 rounded-xl bg-white border border-[#DEDED8] hover:bg-slate-50 text-[#151515] font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2"
+                className="px-6 py-3.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-900 font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2"
               >
-                <Play className="w-4 h-4 text-[#1F6B4F] fill-[#1F6B4F]" /> Watch Demo
+                <Play className="w-4 h-4 text-teal-600 fill-teal-600" /> Watch Demo
               </button>
             </div>
 
-            <div className="pt-4 border-t border-[#DEDED8]/60 space-y-2">
-              <p className="text-xs font-semibold text-[#6B6B67]">
-                <strong className="text-[#151515]">No complicated setup. No scattered tools.</strong> Built for coaching institutes, academies, educators, training centres and modern learning businesses.
+            <div className="pt-4 border-t border-slate-200 space-y-2">
+              <p className="text-xs font-semibold text-slate-500">
+                <strong className="text-slate-900">No complicated setup. No scattered tools.</strong> Built for coaching institutes, academies, educators, training centres and modern learning businesses.
               </p>
             </div>
           </div>
 
           {/* Right Column (30% Overlap Visual - Realistic Product Screenshot) */}
           <div className="lg:col-span-5 relative">
-            <div className="bg-white border border-[#DEDED8] rounded-2xl p-4 shadow-xl space-y-4 font-sans text-xs">
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xl space-y-4 font-sans text-xs">
               
               {/* Header Bar */}
-              <div className="flex items-center justify-between border-b border-[#DEDED8] pb-3">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-rose-400" />
                   <div className="w-3 h-3 rounded-full bg-amber-400" />
                   <div className="w-3 h-3 rounded-full bg-emerald-400" />
-                  <span className="font-mono text-[10px] text-[#6B6B67] ml-2">echo.northstaracademy.in/admin</span>
+                  <span className="font-mono text-[10px] text-slate-400 ml-2">echo.northstaracademy.in/admin</span>
                 </div>
-                <div className="flex items-center gap-2 text-[#6B6B67]">
-                  <span className="px-2 py-0.5 rounded bg-[#E5F0EA] text-[#1F6B4F] font-bold text-[10px]">Northstar Academy</span>
-                  <div className="w-6 h-6 rounded-full bg-[#1F6B4F] text-white flex items-center justify-center font-bold text-[10px]">SK</div>
+                <div className="flex items-center gap-2 text-slate-500">
+                  <span className="px-2 py-0.5 rounded bg-teal-50 text-teal-800 font-bold text-[10px]">Northstar Academy</span>
+                  <div className="w-6 h-6 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-[10px]">SK</div>
                 </div>
               </div>
 
               {/* Top Greeting */}
-              <div className="flex items-center justify-between bg-[#F7F6F2] p-3 rounded-xl border border-[#DEDED8]">
+              <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200">
                 <div>
-                  <p className="font-bold text-[#151515]">Good morning, Sarah</p>
-                  <p className="text-[10px] text-[#6B6B67]">Academy Manager • Northstar Academy</p>
+                  <p className="font-bold text-slate-900">Good morning, Sarah</p>
+                  <p className="text-[10px] text-slate-500">Academy Manager • Northstar Academy</p>
                 </div>
                 <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 font-bold text-[10px] rounded-full border border-emerald-200">
                   ● 8 Classes Today
@@ -159,36 +256,36 @@ export default function PublicHomePage() {
 
               {/* Metrics Row */}
               <div className="grid grid-cols-3 gap-3">
-                <div className="bg-[#F7F6F2] p-3 rounded-xl border border-[#DEDED8]">
-                  <p className="text-[10px] font-medium text-[#6B6B67]">Students</p>
-                  <p className="text-base font-black text-[#151515]">1,248</p>
+                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                  <p className="text-[10px] font-medium text-slate-500">Students</p>
+                  <p className="text-base font-black text-slate-900">1,248</p>
                   <span className="text-[9px] text-emerald-700 font-bold">+14% this mo.</span>
                 </div>
-                <div className="bg-[#F7F6F2] p-3 rounded-xl border border-[#DEDED8]">
-                  <p className="text-[10px] font-medium text-[#6B6B67]">Courses</p>
-                  <p className="text-base font-black text-[#151515]">36</p>
-                  <span className="text-[9px] text-[#6B6B67]">Active batches</span>
+                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                  <p className="text-[10px] font-medium text-slate-500">Courses</p>
+                  <p className="text-base font-black text-slate-900">36</p>
+                  <span className="text-[9px] text-slate-500">Active batches</span>
                 </div>
-                <div className="bg-[#F7F6F2] p-3 rounded-xl border border-[#DEDED8]">
-                  <p className="text-[10px] font-medium text-[#6B6B67]">Revenue</p>
-                  <p className="text-base font-black text-[#1F6B4F]">₹4.82L</p>
+                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                  <p className="text-[10px] font-medium text-slate-500">Revenue</p>
+                  <p className="text-base font-black text-teal-700">₹4.82L</p>
                   <span className="text-[9px] text-emerald-700 font-bold">This month</span>
                 </div>
               </div>
 
               {/* Enrollment Bar Graph */}
-              <div className="bg-[#F7F6F2] p-3 rounded-xl border border-[#DEDED8] space-y-2">
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
                 <div className="flex justify-between items-center text-[10px] font-bold">
-                  <span className="text-[#151515]">Monthly Admissions Trend</span>
-                  <span className="text-[#1F6B4F]">84 New Enrollments</span>
+                  <span className="text-slate-900">Monthly Admissions Trend</span>
+                  <span className="text-teal-700">84 New Enrollments</span>
                 </div>
-                <div className="h-14 flex items-end gap-2 pt-2 border-b border-[#DEDED8] pb-1">
+                <div className="h-14 flex items-end gap-2 pt-2 border-b border-slate-200 pb-1">
                   {[35, 42, 58, 65, 74, 84].map((h, i) => (
                     <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                      <div className="w-full bg-[#1F6B4F]/20 rounded-t hover:bg-[#1F6B4F] transition-all" style={{ height: `${h}%` }}>
-                        <div className="w-full bg-[#1F6B4F] rounded-t" style={{ height: `${h * 0.7}%` }} />
+                      <div className="w-full bg-teal-100 rounded-t hover:bg-teal-600 transition-all" style={{ height: `${h}%` }}>
+                        <div className="w-full bg-teal-600 rounded-t" style={{ height: `${h * 0.7}%` }} />
                       </div>
-                      <span className="text-[8px] text-[#6B6B67] font-mono">{['Apr','May','Jun','Jul','Aug','Sep'][i]}</span>
+                      <span className="text-[8px] text-slate-400 font-mono">{['Apr','May','Jun','Jul','Aug','Sep'][i]}</span>
                     </div>
                   ))}
                 </div>
@@ -196,21 +293,21 @@ export default function PublicHomePage() {
 
               {/* Upcoming Classes Widget */}
               <div className="space-y-2">
-                <p className="text-[11px] font-bold text-[#151515]">Upcoming Live Sessions</p>
+                <p className="text-[11px] font-bold text-slate-900">Upcoming Live Sessions</p>
                 <div className="space-y-1.5 text-[10px]">
-                  <div className="flex items-center justify-between p-2 bg-[#E5F0EA] border border-[#1F6B4F]/20 rounded-lg">
+                  <div className="flex items-center justify-between p-2 bg-teal-50/70 border border-teal-200 rounded-lg">
                     <div>
-                      <p className="font-bold text-[#151515]">UI/UX Design Masterclass</p>
-                      <p className="text-[#6B6B67]">Batch #14 • 48 Students enrolled</p>
+                      <p className="font-bold text-slate-900">UI/UX Design Masterclass</p>
+                      <p className="text-slate-500">Batch #14 • 48 Students enrolled</p>
                     </div>
-                    <span className="px-2 py-1 bg-[#1F6B4F] text-white rounded font-bold text-[9px]">06:00 PM</span>
+                    <span className="px-2 py-1 bg-teal-600 text-white rounded font-bold text-[9px]">06:00 PM</span>
                   </div>
-                  <div className="flex items-center justify-between p-2 bg-[#F7F6F2] border border-[#DEDED8] rounded-lg">
+                  <div className="flex items-center justify-between p-2 bg-slate-50 border border-slate-200 rounded-lg">
                     <div>
-                      <p className="font-bold text-[#151515]">Digital Marketing Sprint</p>
-                      <p className="text-[#6B6B67]">Batch #09 • 32 Students enrolled</p>
+                      <p className="font-bold text-slate-900">Digital Marketing Sprint</p>
+                      <p className="text-slate-500">Batch #09 • 32 Students enrolled</p>
                     </div>
-                    <span className="px-2 py-1 bg-white border border-[#DEDED8] text-[#151515] rounded font-bold text-[9px]">07:30 PM</span>
+                    <span className="px-2 py-1 bg-white border border-slate-200 text-slate-900 rounded font-bold text-[9px]">07:30 PM</span>
                   </div>
                 </div>
               </div>
@@ -224,18 +321,18 @@ export default function PublicHomePage() {
       {/* ========================================================================= */}
       {/* 02 — CAPABILITY RIBBON */}
       {/* ========================================================================= */}
-      <section className="py-4 bg-[#151515] text-white overflow-hidden font-mono text-xs uppercase tracking-widest border-b border-[#DEDED8]">
+      <section className="py-4 bg-slate-900 text-white overflow-hidden font-mono text-xs uppercase tracking-widest border-b border-slate-800">
         <div className="flex items-center gap-12 whitespace-nowrap animate-marquee">
           {["COURSES", "LIVE CLASSES", "CRM", "PAYMENTS", "AUTOMATION", "CERTIFICATES", "WEBSITE", "ANALYTICS", "WHATSAPP", "EXAMS", "BATCHES"].map((cap, i) => (
-            <div key={i} className="flex items-center gap-6 text-[#E5F0EA]/80 font-bold">
+            <div key={i} className="flex items-center gap-6 text-teal-300/90 font-bold">
               <span>{cap}</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#1F6B4F]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
             </div>
           ))}
           {["COURSES", "LIVE CLASSES", "CRM", "PAYMENTS", "AUTOMATION", "CERTIFICATES", "WEBSITE", "ANALYTICS", "WHATSAPP", "EXAMS", "BATCHES"].map((cap, i) => (
-            <div key={`repeat-${i}`} className="flex items-center gap-6 text-[#E5F0EA]/80 font-bold">
+            <div key={`repeat-${i}`} className="flex items-center gap-6 text-teal-300/90 font-bold">
               <span>{cap}</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#1F6B4F]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
             </div>
           ))}
         </div>
@@ -244,26 +341,26 @@ export default function PublicHomePage() {
       {/* ========================================================================= */}
       {/* 03 — THE PROBLEM */}
       {/* ========================================================================= */}
-      <section className="py-20 border-b border-[#DEDED8] bg-white">
+      <section className="py-20 border-b border-slate-200 bg-white">
         <div className="max-w-7xl mx-auto px-6 space-y-12">
           
           <div className="max-w-3xl space-y-4">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#1F6B4F]">03 — UNIFIED ARCHITECTURE</span>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#151515] tracking-tight">
+            <span className="text-xs font-bold uppercase tracking-widest text-teal-700">03 — UNIFIED ARCHITECTURE</span>
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
               Your academy shouldn't run across 10 different tools.
             </h2>
-            <p className="text-sm text-[#6B6B67] leading-relaxed">
+            <p className="text-sm text-slate-600 leading-relaxed">
               Moving student data manually between WhatsApp chats, spreadsheets, zoom links and payment gateways causes lost admissions and exhausted staff.
             </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             
-            {/* Before ECHO: Scattered Tools */}
-            <div className="p-8 rounded-2xl bg-[#F7F6F2] border border-[#DEDED8] space-y-6">
+            {/* Before echo: Scattered Tools */}
+            <div className="p-8 rounded-2xl bg-slate-50 border border-slate-200 space-y-6">
               <div className="flex items-center justify-between">
                 <span className="px-3 py-1 rounded-full bg-rose-100 text-rose-800 font-bold text-xs">BEFORE ECHO</span>
-                <span className="text-xs text-[#6B6B67] font-mono">Disconnected Stack</span>
+                <span className="text-xs text-slate-500 font-mono">Disconnected Stack</span>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
@@ -277,57 +374,57 @@ export default function PublicHomePage() {
                   { title: "Course Platform", desc: "Separate logins" },
                   { title: "Email Tools", desc: "Unread newsletters" },
                 ].map((item, idx) => (
-                  <div key={idx} className="p-3 bg-white border border-[#DEDED8] rounded-xl text-left space-y-1 shadow-2xs">
-                    <p className="font-bold text-xs text-[#151515]">{item.title}</p>
-                    <p className="text-[10px] text-[#6B6B67]">{item.desc}</p>
+                  <div key={idx} className="p-3 bg-white border border-slate-200 rounded-xl text-left space-y-1 shadow-2xs">
+                    <p className="font-bold text-xs text-slate-900">{item.title}</p>
+                    <p className="text-[10px] text-slate-500">{item.desc}</p>
                   </div>
                 ))}
               </div>
 
-              <p className="text-xs text-rose-700 font-medium border-t border-[#DEDED8] pt-4">
+              <p className="text-xs text-rose-700 font-medium border-t border-slate-200 pt-4">
                 ❌ Result: High drop-off rate, missed follow-ups, double entry, and frustrated learners.
               </p>
             </div>
 
-            {/* With ECHO: One Connected System */}
-            <div className="p-8 rounded-2xl bg-[#151515] text-white border border-[#151515] space-y-6 shadow-xl">
+            {/* With echo: One Connected System */}
+            <div className="p-8 rounded-2xl bg-slate-900 text-white border border-slate-900 space-y-6 shadow-xl">
               <div className="flex items-center justify-between">
-                <span className="px-3 py-1 rounded-full bg-[#1F6B4F] text-white font-bold text-xs">WITH ECHO</span>
-                <span className="text-xs text-[#E5F0EA] font-mono">One Connected Platform</span>
+                <span className="px-3 py-1 rounded-full bg-teal-600 text-white font-bold text-xs">WITH ECHO</span>
+                <span className="text-xs text-teal-300 font-mono">One Connected Platform</span>
               </div>
 
               <div className="space-y-4">
-                <div className="p-4 bg-[#1F6B4F]/20 border border-[#1F6B4F]/40 rounded-xl space-y-2">
-                  <h3 className="font-bold text-base text-[#E5F0EA]">ECHO Unified Engine</h3>
+                <div className="p-4 bg-teal-950/60 border border-teal-800/60 rounded-xl space-y-2">
+                  <h3 className="font-bold text-base text-teal-200">echo Unified Engine</h3>
                   <p className="text-xs text-slate-300">
                     Brings enquiries, admissions, learning, live sessions, fees, notifications and certificates into one single source of truth.
                   </p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div className="p-3 bg-slate-900 border border-slate-800 rounded-xl font-medium text-slate-300">
+                  <div className="p-3 bg-slate-800 border border-slate-700 rounded-xl font-medium text-slate-200">
                     ✅ Automated Lead Routing
                   </div>
-                  <div className="p-3 bg-slate-900 border border-slate-800 rounded-xl font-medium text-slate-300">
+                  <div className="p-3 bg-slate-800 border border-slate-700 rounded-xl font-medium text-slate-200">
                     ✅ Unified Student ID
                   </div>
-                  <div className="p-3 bg-slate-900 border border-slate-800 rounded-xl font-medium text-slate-300">
+                  <div className="p-3 bg-slate-800 border border-slate-700 rounded-xl font-medium text-slate-200">
                     ✅ Instant Fee Receipts
                   </div>
-                  <div className="p-3 bg-slate-900 border border-slate-800 rounded-xl font-medium text-slate-300">
+                  <div className="p-3 bg-slate-800 border border-slate-700 rounded-xl font-medium text-slate-200">
                     ✅ Automated Certificates
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-800 text-xs font-bold text-[#E5F0EA] flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#1F6B4F]" /> Every step connected naturally.
+              <div className="pt-4 border-t border-slate-800 text-xs font-bold text-teal-300 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-teal-400" /> Every step connected naturally.
               </div>
             </div>
 
           </div>
 
-          <div className="text-center font-mono text-xs font-bold text-[#6B6B67] tracking-wider uppercase pt-4">
+          <div className="text-center font-mono text-xs font-bold text-slate-500 tracking-wider uppercase pt-4">
             SCATTERED TOOLS ↓ ECHO ↓ ONE CONNECTED ACADEMY
           </div>
 
@@ -337,16 +434,16 @@ export default function PublicHomePage() {
       {/* ========================================================================= */}
       {/* 04 — CORE STORY (LEAD TO LEARNER JOURNEY) */}
       {/* ========================================================================= */}
-      <section id="journey" className="py-20 border-b border-[#DEDED8] bg-[#F7F6F2]">
+      <section id="journey" className="py-20 border-b border-slate-200 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 space-y-12">
           
           <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#1F6B4F]">04 — THE ECHO JOURNEY</span>
-            <h2 className="text-3xl sm:text-5xl font-black text-[#151515] tracking-tight">
+            <span className="text-xs font-bold uppercase tracking-widest text-teal-700">04 — THE ECHO JOURNEY</span>
+            <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
               Every step connected.
             </h2>
-            <p className="text-sm text-[#6B6B67]">
-              ECHO connects the business side of your academy with the learning side—so information moves naturally from enquiry to enrollment to learning.
+            <p className="text-sm text-slate-600">
+              <strong>echo</strong> connects the business side of your academy with the learning side—so information moves naturally from enquiry to enrollment to learning.
             </p>
           </div>
 
@@ -367,28 +464,28 @@ export default function PublicHomePage() {
                 onClick={() => setActiveJourneyStep(idx)}
                 className={`p-4 rounded-xl border text-left cursor-pointer transition-all ${
                   activeJourneyStep === idx 
-                    ? "bg-[#1F6B4F] text-white border-[#1F6B4F] shadow-md" 
-                    : "bg-white text-[#151515] border-[#DEDED8] hover:border-[#1F6B4F]"
+                    ? "bg-teal-600 text-white border-teal-600 shadow-md" 
+                    : "bg-white text-slate-900 border-slate-200 hover:border-teal-500"
                 }`}
               >
-                <span className={`font-mono text-xs font-bold block mb-1 ${activeJourneyStep === idx ? "text-[#E5F0EA]" : "text-[#1F6B4F]"}`}>
+                <span className={`font-mono text-xs font-bold block mb-1 ${activeJourneyStep === idx ? "text-teal-100" : "text-teal-700"}`}>
                   {step.num}
                 </span>
                 <h3 className="font-bold text-xs tracking-tight mb-1">{step.title}</h3>
-                <p className={`text-[10px] leading-tight ${activeJourneyStep === idx ? "text-[#E5F0EA]/90" : "text-[#6B6B67]"}`}>
+                <p className={`text-[10px] leading-tight ${activeJourneyStep === idx ? "text-teal-50" : "text-slate-500"}`}>
                   {step.desc}
                 </p>
               </div>
             ))}
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-[#DEDED8] flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-[#E5F0EA] text-[#1F6B4F] flex items-center justify-center font-bold font-mono">
+              <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-800 flex items-center justify-center font-bold font-mono text-base">
                 0{activeJourneyStep + 1}
               </div>
               <div>
-                <h4 className="font-bold text-sm text-[#151515]">
+                <h4 className="font-bold text-sm text-slate-900">
                   {[
                     "Stage 1: Lead Capture & Multi-Channel Ingestion",
                     "Stage 2: CRM & Automated Counsellor Assignment",
@@ -400,14 +497,14 @@ export default function PublicHomePage() {
                     "Stage 8: Community Nurturing & Renewal Workflows"
                   ][activeJourneyStep]}
                 </h4>
-                <p className="text-xs text-[#6B6B67]">
-                  No manual copy-pasting. ECHO passes state data down the pipeline smoothly.
+                <p className="text-xs text-slate-500">
+                  No manual copy-pasting. echo passes state data down the pipeline smoothly.
                 </p>
               </div>
             </div>
             <Link 
               href="/auth/login"
-              className="px-4 py-2 bg-[#1F6B4F] text-white text-xs font-bold rounded-xl whitespace-nowrap hover:bg-[#16513B] transition-colors"
+              className="px-4 py-2 bg-teal-600 text-white text-xs font-bold rounded-xl whitespace-nowrap hover:bg-teal-700 transition-colors"
             >
               Test Journey Workflow →
             </Link>
@@ -419,16 +516,16 @@ export default function PublicHomePage() {
       {/* ========================================================================= */}
       {/* 05 — PRODUCT ECOSYSTEM (6 CORE SYSTEMS) */}
       {/* ========================================================================= */}
-      <section id="ecosystem" className="py-20 border-b border-[#DEDED8] bg-white">
+      <section id="ecosystem" className="py-20 border-b border-slate-200 bg-white">
         <div className="max-w-7xl mx-auto px-6 space-y-12">
           
           <div className="max-w-3xl space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#1F6B4F]">05 — PRODUCT ECOSYSTEM</span>
-            <h2 className="text-3xl sm:text-5xl font-black text-[#151515] tracking-tight">
+            <span className="text-xs font-bold uppercase tracking-widest text-teal-700">05 — PRODUCT ECOSYSTEM</span>
+            <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
               Everything Your Academy Needs
             </h2>
-            <p className="text-sm text-[#6B6B67]">
-              Instead of 20 small feature cards, ECHO organizes your education business into 6 meaningful core systems.
+            <p className="text-sm text-slate-600">
+              Instead of 20 small feature cards, <strong>echo</strong> organizes your education business into 6 meaningful core systems.
             </p>
           </div>
 
@@ -471,21 +568,21 @@ export default function PublicHomePage() {
                 items: ["Trigger-Condition Automation", "Custom Domain CNAME", "Drag-and-Drop Theme Builder", "Revenue & Growth Metrics"]
               }
             ].map((system, idx) => (
-              <div key={idx} className="p-8 rounded-2xl bg-[#F7F6F2] border border-[#DEDED8] space-y-4 hover:border-[#1F6B4F] transition-colors flex flex-col justify-between">
+              <div key={idx} className="p-8 rounded-2xl bg-slate-50 border border-slate-200 space-y-4 hover:border-teal-500 transition-colors flex flex-col justify-between shadow-2xs">
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="font-mono text-xs font-bold text-[#1F6B4F] px-2.5 py-1 bg-[#E5F0EA] rounded-md">
+                    <span className="font-mono text-xs font-bold text-teal-800 px-2.5 py-1 bg-teal-100 rounded-md">
                       SYSTEM {system.num}
                     </span>
                   </div>
-                  <h3 className="text-xl font-black text-[#151515]">{system.title}</h3>
-                  <p className="text-xs text-[#6B6B67] leading-relaxed font-normal">{system.desc}</p>
+                  <h3 className="text-xl font-black text-slate-900">{system.title}</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed font-normal">{system.desc}</p>
                 </div>
 
-                <div className="pt-4 border-t border-[#DEDED8] space-y-2">
+                <div className="pt-4 border-t border-slate-200 space-y-2">
                   {system.items.map((item, i) => (
-                    <div key={i} className="flex items-center gap-2 text-xs font-semibold text-[#151515]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#1F6B4F]" />
+                    <div key={i} className="flex items-center gap-2 text-xs font-semibold text-slate-800">
+                      <span className="w-1.5 h-1.5 rounded-full bg-teal-600" />
                       {item}
                     </div>
                   ))}
@@ -498,59 +595,165 @@ export default function PublicHomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 06 — LEARNING EXPERIENCE (STUDENT DASHBOARD MOCKUP) */}
+      {/* 06 — DYNAMIC PRICING SECTION */}
       {/* ========================================================================= */}
-      <section id="student-experience" className="py-20 border-b border-[#DEDED8] bg-[#F7F6F2]">
+      <section id="pricing" className="py-20 border-b border-slate-200 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-6 space-y-12">
+          
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-teal-700">06 — DYNAMIC ACADEMY PRICING</span>
+            <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
+              Transparent Plans for Growing Academies
+            </h2>
+            <p className="text-sm text-slate-600">
+              Configured dynamically via Grekam Super Admin. Choose the plan that fits your academy scale.
+            </p>
+
+            {/* Billing Toggle */}
+            <div className="flex items-center justify-center gap-3 pt-4">
+              <span className={`text-xs font-bold ${billingCycle === "monthly" ? "text-slate-900" : "text-slate-500"}`}>Monthly Billing</span>
+              <button 
+                onClick={() => setBillingCycle(billingCycle === "monthly" ? "yearly" : "monthly")}
+                className="w-12 h-6 bg-teal-600 rounded-full p-1 transition-colors relative"
+              >
+                <div className={`w-4 h-4 bg-white rounded-full transition-transform ${billingCycle === "yearly" ? "translate-x-6" : "translate-x-0"}`} />
+              </button>
+              <span className={`text-xs font-bold flex items-center gap-1.5 ${billingCycle === "yearly" ? "text-slate-900" : "text-slate-500"}`}>
+                Annual Billing <span className="px-2 py-0.5 bg-teal-100 text-teal-800 font-mono text-[10px] rounded-full">Save 20%</span>
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {plans.map((p, idx) => {
+              const priceDisplay = billingCycle === "yearly" 
+                ? (typeof p.yearlyPrice === "number" && p.yearlyPrice > 0 ? `₹${p.yearlyPrice.toLocaleString()}` : "Custom")
+                : (typeof p.monthlyPrice === "number" && p.monthlyPrice > 0 ? `₹${p.monthlyPrice.toLocaleString()}` : "Custom")
+              
+              return (
+                <div 
+                  key={p.id || idx}
+                  className={`bg-white border rounded-3xl p-8 flex flex-col justify-between shadow-xs relative transition-all ${
+                    p.popular ? "border-teal-500 ring-2 ring-teal-500/20" : "border-slate-200"
+                  }`}
+                >
+                  {p.popular && (
+                    <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-teal-600 text-white text-[10px] font-black uppercase tracking-widest shadow-sm">
+                      RECOMMENDED FOR ACADEMIES
+                    </span>
+                  )}
+
+                  <div className="space-y-6">
+                    <div>
+                      <span className="text-xs font-black uppercase tracking-widest text-teal-700">{p.name}</span>
+                      <div className="mt-3 flex items-baseline gap-1">
+                        <span className="text-4xl font-black text-slate-900 font-mono">{priceDisplay}</span>
+                        <span className="text-xs text-slate-500 font-semibold">{billingCycle === "yearly" ? "/ year" : "/ month"}</span>
+                      </div>
+                      <p className="text-xs text-slate-500 mt-1 font-medium">
+                        {p.freeTrialDays > 0 ? `${p.freeTrialDays} Days Free Trial Included` : "Instant Activation"}
+                      </p>
+                    </div>
+
+                    <div className="space-y-3 pt-4 border-t border-slate-100 text-xs font-semibold">
+                      <div className="flex justify-between text-slate-700">
+                        <span>Student Limit</span>
+                        <span className="font-mono font-bold text-slate-900">{p.studentLimit}</span>
+                      </div>
+                      <div className="flex justify-between text-slate-700">
+                        <span>Educator Limit</span>
+                        <span className="font-mono font-bold text-slate-900">{p.instructorLimit}</span>
+                      </div>
+                      <div className="flex justify-between text-slate-700">
+                        <span>Storage Allocation</span>
+                        <span className="font-mono font-bold text-slate-900">{p.storageLimitGB} GB</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 pt-4 border-t border-slate-100 text-xs">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">Included Platform Features</span>
+                      {p.features.map((feat, fIdx) => (
+                        <div key={fIdx} className="flex items-center gap-2 text-slate-700 font-medium">
+                          <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" /> {feat}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-8">
+                    <Link
+                      href="/auth/login"
+                      className={`w-full py-3.5 rounded-xl font-bold text-xs text-center block transition-all shadow-sm ${
+                        p.popular 
+                          ? "bg-teal-600 hover:bg-teal-700 text-white shadow-teal-600/20" 
+                          : "bg-slate-100 hover:bg-slate-200 text-slate-900"
+                      }`}
+                    >
+                      Choose {p.name} Plan →
+                    </Link>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
+      {/* 07 — LEARNING EXPERIENCE (STUDENT DASHBOARD MOCKUP) */}
+      {/* ========================================================================= */}
+      <section id="student-experience" className="py-20 border-b border-slate-200 bg-white">
         <div className="max-w-7xl mx-auto px-6 space-y-12">
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
             <div className="lg:col-span-5 space-y-6">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#1F6B4F]">06 — LEARNER EXPERIENCE</span>
-              <h2 className="text-3xl sm:text-4xl font-black text-[#151515] tracking-tight">
+              <span className="text-xs font-bold uppercase tracking-widest text-teal-700">07 — LEARNER EXPERIENCE</span>
+              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
                 Give Students a Better Place to Learn
               </h2>
-              <p className="text-sm text-[#6B6B67] leading-relaxed">
+              <p className="text-sm text-slate-600 leading-relaxed">
                 Everything students need. Nothing they don't. Students can access their courses, attend live classes, submit assignments, take assessments, track progress and download certificates from one dashboard.
               </p>
 
-              <div className="grid grid-cols-2 gap-3 text-xs font-bold text-[#151515]">
-                <span className="p-3 bg-white rounded-xl border border-[#DEDED8]">COURSES</span>
-                <span className="p-3 bg-white rounded-xl border border-[#DEDED8]">LIVE CLASSES</span>
-                <span className="p-3 bg-white rounded-xl border border-[#DEDED8]">ASSIGNMENTS</span>
-                <span className="p-3 bg-white rounded-xl border border-[#DEDED8]">CERTIFICATES</span>
+              <div className="grid grid-cols-2 gap-3 text-xs font-bold text-slate-900">
+                <span className="p-3 bg-slate-50 rounded-xl border border-slate-200">COURSES</span>
+                <span className="p-3 bg-slate-50 rounded-xl border border-slate-200">LIVE CLASSES</span>
+                <span className="p-3 bg-slate-50 rounded-xl border border-slate-200">ASSIGNMENTS</span>
+                <span className="p-3 bg-slate-50 rounded-xl border border-slate-200">CERTIFICATES</span>
               </div>
             </div>
 
             {/* Dummy Student Dashboard Screenshot Composition */}
-            <div className="lg:col-span-7 bg-white border border-[#DEDED8] rounded-2xl p-6 shadow-xl space-y-6 text-xs">
-              <div className="flex items-center justify-between border-b border-[#DEDED8] pb-4">
+            <div className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-6 shadow-xl space-y-6 text-xs">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#1F6B4F] text-white flex items-center justify-center font-bold text-sm">
+                  <div className="w-10 h-10 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-sm">
                     AS
                   </div>
                   <div>
-                    <h3 className="font-bold text-sm text-[#151515]">Hello, Arjun Sharma</h3>
-                    <p className="text-[10px] text-[#6B6B67]">Student ID: #NS-8921 • Northstar Academy</p>
+                    <h3 className="font-bold text-sm text-slate-900">Hello, Arjun Sharma</h3>
+                    <p className="text-[10px] text-slate-500">Student ID: #NS-8921 • Northstar Academy</p>
                   </div>
                 </div>
-                <span className="px-3 py-1 bg-[#E5F0EA] text-[#1F6B4F] font-bold text-xs rounded-full">Active Learner</span>
+                <span className="px-3 py-1 bg-teal-50 text-teal-800 font-bold text-xs rounded-full border border-teal-200">Active Learner</span>
               </div>
 
               {/* Continue Learning Section */}
               <div className="space-y-3">
-                <p className="font-bold text-xs text-[#151515] uppercase tracking-wider">Continue Learning</p>
-                <div className="p-4 bg-[#F7F6F2] border border-[#DEDED8] rounded-xl space-y-3">
+                <p className="font-bold text-xs text-slate-900 uppercase tracking-wider">Continue Learning</p>
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="font-bold text-sm text-[#151515]">UI/UX Design Masterclass</span>
-                    <span className="font-mono text-xs text-[#1F6B4F] font-bold">68% Complete</span>
+                    <span className="font-bold text-sm text-slate-900">UI/UX Design Masterclass</span>
+                    <span className="font-mono text-xs text-teal-700 font-bold">68% Complete</span>
                   </div>
-                  <div className="w-full bg-[#DEDED8] h-2 rounded-full overflow-hidden">
-                    <div className="bg-[#1F6B4F] h-full w-[68%]" />
+                  <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                    <div className="bg-teal-600 h-full w-[68%]" />
                   </div>
                   <div className="flex justify-between items-center pt-1">
-                    <span className="text-[10px] text-[#6B6B67]">Module 4: Wireframing & Prototyping</span>
-                    <button className="px-4 py-1.5 bg-[#1F6B4F] text-white font-bold rounded-lg text-xs hover:bg-[#16513B] transition-colors">
+                    <span className="text-[10px] text-slate-500">Module 4: Wireframing & Prototyping</span>
+                    <button className="px-4 py-1.5 bg-teal-600 text-white font-bold rounded-lg text-xs hover:bg-teal-700 transition-colors">
                       Continue Learning →
                     </button>
                   </div>
@@ -559,14 +762,14 @@ export default function PublicHomePage() {
 
               {/* Upcoming & Certificates */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 bg-[#F7F6F2] border border-[#DEDED8] rounded-xl space-y-2">
-                  <p className="font-bold text-xs text-[#151515]">Upcoming Live Class</p>
-                  <p className="font-bold text-xs text-[#1F6B4F]">UX Workshop</p>
-                  <p className="text-[10px] text-[#6B6B67]">Today at 6:00 PM • Zoom Integration</p>
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                  <p className="font-bold text-xs text-slate-900">Upcoming Live Class</p>
+                  <p className="font-bold text-xs text-teal-700">UX Workshop</p>
+                  <p className="text-[10px] text-slate-500">Today at 6:00 PM • Zoom Integration</p>
                 </div>
-                <div className="p-4 bg-[#F7F6F2] border border-[#DEDED8] rounded-xl space-y-2">
-                  <p className="font-bold text-xs text-[#151515]">Earned Certificates</p>
-                  <p className="font-bold text-xs text-[#151515]">2 Verified Certificates</p>
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                  <p className="font-bold text-xs text-slate-900">Earned Certificates</p>
+                  <p className="font-bold text-xs text-slate-900">2 Verified Certificates</p>
                   <p className="text-[10px] text-emerald-700 font-bold">Ready to Download PDF</p>
                 </div>
               </div>
@@ -578,33 +781,33 @@ export default function PublicHomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 07 — EDUCATOR EXPERIENCE */}
+      {/* 08 — EDUCATOR WORKSPACE */}
       {/* ========================================================================= */}
-      <section className="py-20 border-b border-[#DEDED8] bg-white">
+      <section className="py-20 border-b border-slate-200 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 space-y-12">
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
             {/* Dummy Educator Dashboard Screenshot Composition */}
-            <div className="lg:col-span-7 bg-[#151515] text-white border border-[#151515] rounded-2xl p-6 shadow-xl space-y-6 text-xs order-2 lg:order-1">
+            <div className="lg:col-span-7 bg-slate-900 text-white border border-slate-900 rounded-2xl p-6 shadow-xl space-y-6 text-xs order-2 lg:order-1">
               <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                 <div>
-                  <h3 className="font-bold text-sm text-[#E5F0EA]">Educator Workspace • Prof. Rajesh Kumar</h3>
+                  <h3 className="font-bold text-sm text-teal-200">Educator Workspace • Prof. Rajesh Kumar</h3>
                   <p className="text-[10px] text-slate-400">Department of Design & Digital Skills</p>
                 </div>
-                <span className="px-3 py-1 bg-[#1F6B4F] text-white font-bold text-xs rounded-full">Educator Portal</span>
+                <span className="px-3 py-1 bg-teal-600 text-white font-bold text-xs rounded-full">Educator Portal</span>
               </div>
 
               <div className="grid grid-cols-3 gap-3 text-center">
-                <div className="p-3 bg-slate-900 border border-slate-800 rounded-xl">
+                <div className="p-3 bg-slate-800 border border-slate-700 rounded-xl">
                   <p className="text-[10px] text-slate-400">My Courses</p>
                   <p className="text-base font-black text-white">3 Active</p>
                 </div>
-                <div className="p-3 bg-slate-900 border border-slate-800 rounded-xl">
+                <div className="p-3 bg-slate-800 border border-slate-700 rounded-xl">
                   <p className="text-[10px] text-slate-400">Today's Classes</p>
-                  <p className="text-base font-black font-mono text-[#E5F0EA]">2 Sessions</p>
+                  <p className="text-base font-black font-mono text-teal-300">2 Sessions</p>
                 </div>
-                <div className="p-3 bg-slate-900 border border-slate-800 rounded-xl">
+                <div className="p-3 bg-slate-800 border border-slate-700 rounded-xl">
                   <p className="text-[10px] text-slate-400">Pending Reviews</p>
                   <p className="text-base font-black text-rose-400">12 Submissions</p>
                 </div>
@@ -613,14 +816,14 @@ export default function PublicHomePage() {
               <div className="space-y-2">
                 <p className="font-bold text-slate-300">Today's Teaching Schedule</p>
                 <div className="space-y-2 font-mono">
-                  <div className="p-3 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-between">
+                  <div className="p-3 bg-slate-800 border border-slate-700 rounded-xl flex items-center justify-between">
                     <div>
                       <p className="font-bold text-white text-xs">06:00 PM — UI/UX Design Workshop</p>
                       <p className="text-[10px] text-slate-400">48 Students • Batch #14</p>
                     </div>
-                    <span className="px-2.5 py-1 bg-[#1F6B4F] text-white rounded font-bold text-[10px]">Start Class</span>
+                    <span className="px-2.5 py-1 bg-teal-600 text-white rounded font-bold text-[10px]">Start Class</span>
                   </div>
-                  <div className="p-3 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-between">
+                  <div className="p-3 bg-slate-800 border border-slate-700 rounded-xl flex items-center justify-between">
                     <div>
                       <p className="font-bold text-white text-xs">07:30 PM — Figma Masterclass</p>
                       <p className="text-[10px] text-slate-400">32 Students • Batch #09</p>
@@ -632,22 +835,22 @@ export default function PublicHomePage() {
             </div>
 
             <div className="lg:col-span-5 space-y-6 order-1 lg:order-2">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#1F6B4F]">07 — EDUCATOR WORKSPACE</span>
-              <h2 className="text-3xl sm:text-4xl font-black text-[#151515] tracking-tight">
+              <span className="text-xs font-bold uppercase tracking-widest text-teal-700">08 — EDUCATOR WORKSPACE</span>
+              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
                 Give Educators Their Own Workspace
               </h2>
-              <p className="text-sm text-[#6B6B67] leading-relaxed">
-                Don't just say "educator management." Show what educators actually do. Educators can manage curriculum, launch live classes, review assignments, conduct assessments and track learner progress.
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Don't just say &quot;educator management.&quot; Show what educators actually do. Educators can manage curriculum, launch live classes, review assignments, conduct assessments and track learner progress.
               </p>
 
-              <div className="flex flex-wrap gap-2 text-xs font-mono font-bold text-[#1F6B4F]">
-                <span className="px-3 py-1 bg-[#E5F0EA] rounded-md">CREATE</span>
+              <div className="flex flex-wrap gap-2 text-xs font-mono font-bold text-teal-700">
+                <span className="px-3 py-1 bg-teal-50 rounded-md border border-teal-200">CREATE</span>
                 <span>→</span>
-                <span className="px-3 py-1 bg-[#E5F0EA] rounded-md">TEACH</span>
+                <span className="px-3 py-1 bg-teal-50 rounded-md border border-teal-200">TEACH</span>
                 <span>→</span>
-                <span className="px-3 py-1 bg-[#E5F0EA] rounded-md">TRACK</span>
+                <span className="px-3 py-1 bg-teal-50 rounded-md border border-teal-200">TRACK</span>
                 <span>→</span>
-                <span className="px-3 py-1 bg-[#E5F0EA] rounded-md">ENGAGE</span>
+                <span className="px-3 py-1 bg-teal-50 rounded-md border border-teal-200">ENGAGE</span>
               </div>
             </div>
 
@@ -657,65 +860,17 @@ export default function PublicHomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 08 — ACADEMY ADMIN */}
+      {/* 09 — INTEGRATED CRM */}
       {/* ========================================================================= */}
-      <section className="py-20 border-b border-[#DEDED8] bg-[#F7F6F2]">
-        <div className="max-w-7xl mx-auto px-6 space-y-12">
-          
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#1F6B4F]">08 — ACADEMY ADMIN</span>
-            <h2 className="text-3xl sm:text-5xl font-black text-[#151515] tracking-tight">
-              Run the Academy From One Dashboard
-            </h2>
-            <p className="text-sm text-[#6B6B67]">
-              Manage the people, learning, payments and daily operations of your academy from one place.
-            </p>
-          </div>
-
-          <div className="bg-white border border-[#DEDED8] rounded-2xl p-6 shadow-xl space-y-6">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-              <div className="p-4 bg-[#F7F6F2] border border-[#DEDED8] rounded-xl space-y-1">
-                <p className="text-xs text-[#6B6B67] font-medium">Active Students</p>
-                <p className="text-2xl font-black text-[#151515]">1,248</p>
-              </div>
-              <div className="p-4 bg-[#F7F6F2] border border-[#DEDED8] rounded-xl space-y-1">
-                <p className="text-xs text-[#6B6B67] font-medium">Active Courses</p>
-                <p className="text-2xl font-black text-[#151515]">36</p>
-              </div>
-              <div className="p-4 bg-[#F7F6F2] border border-[#DEDED8] rounded-xl space-y-1">
-                <p className="text-xs text-[#6B6B67] font-medium">Monthly Revenue</p>
-                <p className="text-2xl font-black text-[#1F6B4F]">₹4.82L</p>
-              </div>
-              <div className="p-4 bg-[#F7F6F2] border border-[#DEDED8] rounded-xl space-y-1">
-                <p className="text-xs text-[#6B6B67] font-medium">Avg Attendance</p>
-                <p className="text-2xl font-black text-[#151515]">91%</p>
-              </div>
-            </div>
-
-            <div className="p-4 bg-[#E5F0EA] border border-[#1F6B4F]/20 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-3">
-                <span className="w-3 h-3 rounded-full bg-[#1F6B4F] animate-pulse" />
-                <span className="font-bold text-[#151515]">Academy Operations Operating Normal</span>
-              </div>
-              <span className="font-mono text-[#1F6B4F] font-bold">Northstar Academy • Central Instance</span>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 09 — CRM (TURN ENQUIRIES INTO ENROLLMENTS) */}
-      {/* ========================================================================= */}
-      <section id="crm" className="py-20 border-b border-[#DEDED8] bg-white">
+      <section id="crm" className="py-20 border-b border-slate-200 bg-white">
         <div className="max-w-7xl mx-auto px-6 space-y-12">
           
           <div className="max-w-3xl space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#1F6B4F]">09 — INTEGRATED CRM</span>
-            <h2 className="text-3xl sm:text-5xl font-black text-[#151515] tracking-tight">
+            <span className="text-xs font-bold uppercase tracking-widest text-teal-700">09 — INTEGRATED CRM</span>
+            <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
               Turn Enquiries Into Enrollments
             </h2>
-            <p className="text-sm text-[#6B6B67]">
+            <p className="text-sm text-slate-600">
               Stop losing admissions between WhatsApp conversations, spreadsheets and follow-ups.
             </p>
           </div>
@@ -724,70 +879,70 @@ export default function PublicHomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-sans">
             
             {/* New Leads */}
-            <div className="bg-[#F7F6F2] p-4 rounded-xl border border-[#DEDED8] space-y-3">
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
               <div className="flex justify-between items-center font-bold">
-                <span className="text-[#151515]">NEW LEADS</span>
-                <span className="px-2 py-0.5 bg-[#DEDED8] rounded text-[10px]">12</span>
+                <span className="text-slate-900">NEW LEADS</span>
+                <span className="px-2 py-0.5 bg-slate-200 rounded text-[10px]">12</span>
               </div>
               <div className="space-y-2">
-                <div className="p-3 bg-white border border-[#DEDED8] rounded-lg shadow-2xs space-y-1">
-                  <p className="font-bold text-[#151515]">Priya Sharma</p>
-                  <p className="text-[10px] text-[#6B6B67]">Course: UI/UX Design</p>
+                <div className="p-3 bg-white border border-slate-200 rounded-lg shadow-2xs space-y-1">
+                  <p className="font-bold text-slate-900">Priya Sharma</p>
+                  <p className="text-[10px] text-slate-500">Course: UI/UX Design</p>
                   <span className="text-[9px] px-2 py-0.5 bg-sky-100 text-sky-800 rounded font-bold">Meta Ads</span>
                 </div>
-                <div className="p-3 bg-white border border-[#DEDED8] rounded-lg shadow-2xs space-y-1">
-                  <p className="font-bold text-[#151515]">Karthik V.</p>
-                  <p className="text-[10px] text-[#6B6B67]">Course: Digital Marketing</p>
+                <div className="p-3 bg-white border border-slate-200 rounded-lg shadow-2xs space-y-1">
+                  <p className="font-bold text-slate-900">Karthik V.</p>
+                  <p className="text-[10px] text-slate-500">Course: Digital Marketing</p>
                   <span className="text-[9px] px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold">WhatsApp</span>
                 </div>
               </div>
             </div>
 
             {/* Contacted */}
-            <div className="bg-[#F7F6F2] p-4 rounded-xl border border-[#DEDED8] space-y-3">
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
               <div className="flex justify-between items-center font-bold">
-                <span className="text-[#151515]">CONTACTED</span>
-                <span className="px-2 py-0.5 bg-[#DEDED8] rounded text-[10px]">18</span>
+                <span className="text-slate-900">CONTACTED</span>
+                <span className="px-2 py-0.5 bg-slate-200 rounded text-[10px]">18</span>
               </div>
               <div className="space-y-2">
-                <div className="p-3 bg-white border border-[#DEDED8] rounded-lg shadow-2xs space-y-1">
-                  <p className="font-bold text-[#151515]">Rahul Verma</p>
-                  <p className="text-[10px] text-[#6B6B67]">Follow-up today at 4 PM</p>
+                <div className="p-3 bg-white border border-slate-200 rounded-lg shadow-2xs space-y-1">
+                  <p className="font-bold text-slate-900">Rahul Verma</p>
+                  <p className="text-[10px] text-slate-500">Follow-up today at 4 PM</p>
                   <span className="text-[9px] px-2 py-0.5 bg-amber-100 text-amber-800 rounded font-bold">Counsellor Assigned</span>
                 </div>
-                <div className="p-3 bg-white border border-[#DEDED8] rounded-lg shadow-2xs space-y-1">
-                  <p className="font-bold text-[#151515]">Divya N.</p>
-                  <p className="text-[10px] text-[#6B6B67]">Sent syllabus brochure</p>
+                <div className="p-3 bg-white border border-slate-200 rounded-lg shadow-2xs space-y-1">
+                  <p className="font-bold text-slate-900">Divya N.</p>
+                  <p className="text-[10px] text-slate-500">Sent syllabus brochure</p>
                   <span className="text-[9px] px-2 py-0.5 bg-purple-100 text-purple-800 rounded font-bold">WhatsApp Sent</span>
                 </div>
               </div>
             </div>
 
             {/* Demo */}
-            <div className="bg-[#F7F6F2] p-4 rounded-xl border border-[#DEDED8] space-y-3">
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
               <div className="flex justify-between items-center font-bold">
-                <span className="text-[#151515]">DEMO / TRIAL</span>
-                <span className="px-2 py-0.5 bg-[#DEDED8] rounded text-[10px]">7</span>
+                <span className="text-slate-900">DEMO / TRIAL</span>
+                <span className="px-2 py-0.5 bg-slate-200 rounded text-[10px]">7</span>
               </div>
               <div className="space-y-2">
-                <div className="p-3 bg-white border border-[#DEDED8] rounded-lg shadow-2xs space-y-1">
-                  <p className="font-bold text-[#151515]">Arjun S.</p>
-                  <p className="text-[10px] text-[#6B6B67]">Attended Live Workshop</p>
-                  <span className="text-[9px] px-2 py-0.5 bg-[#E5F0EA] text-[#1F6B4F] rounded font-bold">High Intent</span>
+                <div className="p-3 bg-white border border-slate-200 rounded-lg shadow-2xs space-y-1">
+                  <p className="font-bold text-slate-900">Arjun S.</p>
+                  <p className="text-[10px] text-slate-500">Attended Live Workshop</p>
+                  <span className="text-[9px] px-2 py-0.5 bg-teal-50 text-teal-800 rounded font-bold border border-teal-200">High Intent</span>
                 </div>
               </div>
             </div>
 
             {/* Enrolled */}
-            <div className="bg-[#E5F0EA] p-4 rounded-xl border border-[#1F6B4F]/30 space-y-3">
+            <div className="bg-teal-50 p-4 rounded-xl border border-teal-200 space-y-3">
               <div className="flex justify-between items-center font-bold">
-                <span className="text-[#1F6B4F]">ENROLLED (WON)</span>
-                <span className="px-2 py-0.5 bg-[#1F6B4F] text-white rounded text-[10px]">24</span>
+                <span className="text-teal-800">ENROLLED (WON)</span>
+                <span className="px-2 py-0.5 bg-teal-600 text-white rounded text-[10px]">24</span>
               </div>
               <div className="space-y-2">
-                <div className="p-3 bg-white border border-[#1F6B4F]/30 rounded-lg shadow-2xs space-y-1">
-                  <p className="font-bold text-[#151515]">Vivek M.</p>
-                  <p className="text-[10px] text-[#1F6B4F] font-bold">Fee Paid ₹14,999</p>
+                <div className="p-3 bg-white border border-teal-200 rounded-lg shadow-2xs space-y-1">
+                  <p className="font-bold text-slate-900">Vivek M.</p>
+                  <p className="text-[10px] text-teal-700 font-bold">Fee Paid ₹14,999</p>
                   <span className="text-[9px] px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold">Auto Access Granted</span>
                 </div>
               </div>
@@ -799,23 +954,23 @@ export default function PublicHomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 10 — AUTOMATION */}
+      {/* 10 — VISUAL AUTOMATION */}
       {/* ========================================================================= */}
-      <section id="automation" className="py-20 border-b border-[#DEDED8] bg-[#F7F6F2]">
+      <section id="automation" className="py-20 border-b border-slate-200 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 space-y-12">
           
           <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#1F6B4F]">10 — VISUAL AUTOMATION</span>
-            <h2 className="text-3xl sm:text-5xl font-black text-[#151515] tracking-tight">
-              Let ECHO Handle the Repetitive Work
+            <span className="text-xs font-bold uppercase tracking-widest text-teal-700">10 — VISUAL AUTOMATION</span>
+            <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
+              Let echo Handle the Repetitive Work
             </h2>
-            <p className="text-sm text-[#6B6B67]">
-              Build the workflow once. Let ECHO run it automatically.
+            <p className="text-sm text-slate-600">
+              Build the workflow once. Let <strong>echo</strong> run it automatically.
             </p>
           </div>
 
-          <div className="bg-white border border-[#DEDED8] rounded-2xl p-6 shadow-xl space-y-6">
-            <div className="flex flex-wrap gap-2 border-b border-[#DEDED8] pb-4">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xl space-y-6">
+            <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-4">
               {[
                 { id: "lead", label: "New Lead Workflow" },
                 { id: "payment", label: "Payment Due Workflow" },
@@ -827,8 +982,8 @@ export default function PublicHomePage() {
                   onClick={() => setActiveWorkflowTab(tab.id as any)}
                   className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                     activeWorkflowTab === tab.id
-                      ? "bg-[#1F6B4F] text-white"
-                      : "bg-[#F7F6F2] text-[#6B6B67] hover:bg-[#DEDED8]"
+                      ? "bg-teal-600 text-white"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                   }`}
                 >
                   {tab.label}
@@ -844,8 +999,8 @@ export default function PublicHomePage() {
                 "THEN Assign Counsellor",
                 "THEN Send Follow-up Reminder"
               ].map((node, i) => (
-                <div key={i} className="p-3 bg-[#F7F6F2] border border-[#DEDED8] rounded-xl font-bold text-[#151515] flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full bg-[#E5F0EA] text-[#1F6B4F] flex items-center justify-center text-[10px]">{i + 1}</span>
+                <div key={i} className="p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 flex items-center gap-3">
+                  <span className="w-6 h-6 rounded-full bg-teal-100 text-teal-800 flex items-center justify-center text-[10px]">{i + 1}</span>
                   {node}
                 </div>
               ))}
@@ -856,8 +1011,8 @@ export default function PublicHomePage() {
                 "THEN Grant Instant Course Access",
                 "THEN Send Class Reminder via WhatsApp"
               ].map((node, i) => (
-                <div key={i} className="p-3 bg-[#F7F6F2] border border-[#DEDED8] rounded-xl font-bold text-[#151515] flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full bg-[#E5F0EA] text-[#1F6B4F] flex items-center justify-center text-[10px]">{i + 1}</span>
+                <div key={i} className="p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 flex items-center gap-3">
+                  <span className="w-6 h-6 rounded-full bg-teal-100 text-teal-800 flex items-center justify-center text-[10px]">{i + 1}</span>
                   {node}
                 </div>
               ))}
@@ -867,8 +1022,8 @@ export default function PublicHomePage() {
                 "THEN Send WhatsApp Fee Reminder",
                 "THEN Send Email Invoice Breakdown"
               ].map((node, i) => (
-                <div key={i} className="p-3 bg-[#F7F6F2] border border-[#DEDED8] rounded-xl font-bold text-[#151515] flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full bg-[#E5F0EA] text-[#1F6B4F] flex items-center justify-center text-[10px]">{i + 1}</span>
+                <div key={i} className="p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 flex items-center gap-3">
+                  <span className="w-6 h-6 rounded-full bg-teal-100 text-teal-800 flex items-center justify-center text-[10px]">{i + 1}</span>
                   {node}
                 </div>
               ))}
@@ -878,8 +1033,8 @@ export default function PublicHomePage() {
                 "THEN Generate PDF Certificate #ECHO-CERT",
                 "THEN Send Certificate via WhatsApp & Email"
               ].map((node, i) => (
-                <div key={i} className="p-3 bg-[#F7F6F2] border border-[#DEDED8] rounded-xl font-bold text-[#151515] flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full bg-[#E5F0EA] text-[#1F6B4F] flex items-center justify-center text-[10px]">{i + 1}</span>
+                <div key={i} className="p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 flex items-center gap-3">
+                  <span className="w-6 h-6 rounded-full bg-teal-100 text-teal-800 flex items-center justify-center text-[10px]">{i + 1}</span>
                   {node}
                 </div>
               ))}
@@ -890,164 +1045,18 @@ export default function PublicHomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 11 — LIVE LEARNING */}
+      {/* 11 — WHITE-LABEL BRANDING */}
       {/* ========================================================================= */}
-      <section className="py-20 border-b border-[#DEDED8] bg-white">
-        <div className="max-w-7xl mx-auto px-6 space-y-12">
-          
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
-            <div className="lg:col-span-6 space-y-6">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#1F6B4F]">11 — LIVE LEARNING</span>
-              <h2 className="text-3xl sm:text-4xl font-black text-[#151515] tracking-tight">
-                Teach Live. Teach Recorded. Teach Your Way.
-              </h2>
-              <p className="text-sm text-[#6B6B67] leading-relaxed">
-                Schedule classes, webinars, and mentoring sessions using native Zoom and Google Meet integrations where configured.
-              </p>
-
-              <div className="grid grid-cols-2 gap-3 text-xs font-bold text-[#151515]">
-                <div className="p-3 bg-[#F7F6F2] rounded-xl border border-[#DEDED8]">● Live Classes</div>
-                <div className="p-3 bg-[#F7F6F2] rounded-xl border border-[#DEDED8]">● Recorded Courses</div>
-                <div className="p-3 bg-[#F7F6F2] rounded-xl border border-[#DEDED8]">● Hybrid Learning</div>
-                <div className="p-3 bg-[#F7F6F2] rounded-xl border border-[#DEDED8]">● Attendance Logs</div>
-              </div>
-            </div>
-
-            <div className="lg:col-span-6 bg-[#151515] text-white p-6 rounded-2xl border border-[#151515] shadow-xl space-y-4 font-mono text-xs">
-              <div className="flex justify-between items-center border-b border-slate-800 pb-3">
-                <span className="text-[#E5F0EA] font-bold">LIVE CLASS STUDIO</span>
-                <span className="px-2 py-0.5 bg-rose-600 text-white text-[10px] rounded font-bold animate-pulse">● LIVE NOW</span>
-              </div>
-
-              <div className="p-6 bg-slate-900 border border-slate-800 rounded-xl text-center space-y-3">
-                <p className="text-sm font-bold text-white">UI/UX Design Masterclass Workshop</p>
-                <p className="text-xs text-slate-400">Host: Prof. Rajesh Kumar • 48 Students Joined</p>
-                <button className="px-6 py-2.5 bg-[#1F6B4F] text-white font-bold rounded-lg text-xs hover:bg-[#16513B] transition-colors">
-                  Join Live Session (Zoom / Meet)
-                </button>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 12 — COURSE BUILDER */}
-      {/* ========================================================================= */}
-      <section className="py-20 border-b border-[#DEDED8] bg-[#F7F6F2]">
-        <div className="max-w-7xl mx-auto px-6 space-y-12">
-          
-          <div className="max-w-3xl space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#1F6B4F]">12 — COURSE BUILDER</span>
-            <h2 className="text-3xl sm:text-5xl font-black text-[#151515] tracking-tight">
-              Turn Knowledge Into Structured Learning
-            </h2>
-            <p className="text-sm text-[#6B6B67]">
-              Build multi-module curriculums with videos, PDFs, live sessions, quizzes, assignments and certificates.
-            </p>
-          </div>
-
-          <div className="bg-white border border-[#DEDED8] rounded-2xl p-6 shadow-xl space-y-4 font-mono text-xs">
-            <div className="font-bold text-sm text-[#151515] border-b border-[#DEDED8] pb-3">
-              CURRICULUM BUILDER: UI/UX Design Masterclass
-            </div>
-
-            <div className="space-y-2">
-              <div className="p-3 bg-[#F7F6F2] rounded-xl border border-[#DEDED8] font-bold text-[#151515]">
-                MODULE 01: Introduction to Design Systems
-              </div>
-              <div className="p-3 bg-[#F7F6F2] rounded-xl border border-[#DEDED8] font-bold text-[#151515]">
-                MODULE 02: User Research & Wireframing
-              </div>
-              <div className="p-3 bg-[#E5F0EA] rounded-xl border border-[#1F6B4F]/30 font-bold text-[#1F6B4F]">
-                MODULE 03: Interactive Prototyping in Figma
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-2 pt-2">
-              <span className="px-3 py-1 bg-white border border-[#DEDED8] rounded text-[10px] font-bold">+ Add Video</span>
-              <span className="px-3 py-1 bg-white border border-[#DEDED8] rounded text-[10px] font-bold">+ Add PDF</span>
-              <span className="px-3 py-1 bg-white border border-[#DEDED8] rounded text-[10px] font-bold">+ Add Quiz</span>
-              <span className="px-3 py-1 bg-white border border-[#DEDED8] rounded text-[10px] font-bold">+ Add Live Class</span>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 13 — WEBSITE BUILDER */}
-      {/* ========================================================================= */}
-      <section id="website-builder" className="py-20 border-b border-[#DEDED8] bg-white">
-        <div className="max-w-7xl mx-auto px-6 space-y-12">
-          
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
-            <div className="lg:col-span-5 space-y-6">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#1F6B4F]">13 — ACADEMY WEBSITE BUILDER</span>
-              <h2 className="text-3xl sm:text-4xl font-black text-[#151515] tracking-tight">
-                Your Academy Deserves Its Own Website
-              </h2>
-              <p className="text-sm text-[#6B6B67] leading-relaxed">
-                Build your academy website without waiting for a developer. Includes custom domain, logo, colors, pages, course catalogue, and mobile responsive design.
-              </p>
-
-              <div className="space-y-2 text-xs font-semibold text-[#151515]">
-                <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#1F6B4F]" /> Custom Domain Support</div>
-                <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#1F6B4F]" /> Course Catalogue Pages</div>
-                <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#1F6B4F]" /> Admission Forms</div>
-              </div>
-            </div>
-
-            {/* Dummy Theme Builder Mockup */}
-            <div className="lg:col-span-7 bg-[#F7F6F2] border border-[#DEDED8] rounded-2xl p-6 shadow-xl space-y-4 font-sans text-xs">
-              <div className="flex justify-between items-center border-b border-[#DEDED8] pb-3">
-                <span className="font-bold text-[#151515]">WEBSITE THEME EDITOR</span>
-                <span className="px-2.5 py-1 bg-[#1F6B4F] text-white rounded font-bold text-[10px]">Published Live</span>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-white p-3 rounded-xl border border-[#DEDED8] space-y-2 font-mono text-[10px]">
-                  <p className="font-bold text-[#151515]">SECTIONS</p>
-                  <p className="p-1 bg-[#E5F0EA] text-[#1F6B4F] rounded">Hero Banner</p>
-                  <p className="p-1 bg-[#F7F6F2] rounded">Courses Grid</p>
-                  <p className="p-1 bg-[#F7F6F2] rounded">About Section</p>
-                  <p className="p-1 bg-[#F7F6F2] rounded">FAQ Accordion</p>
-                </div>
-
-                <div className="col-span-2 bg-white p-4 rounded-xl border border-[#DEDED8] space-y-3">
-                  <div className="p-3 bg-[#151515] text-white rounded-lg space-y-1">
-                    <p className="font-black text-sm">BRIGHT ACADEMY</p>
-                    <p className="text-[10px] text-slate-300">Learn Skills That Matter. Join 1,200+ Students.</p>
-                  </div>
-                  <div className="p-2 bg-[#F7F6F2] rounded text-[10px] font-bold text-center">
-                    [ Explore Courses ]
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 14 — YOUR BRAND (WHITE LABEL) */}
-      {/* ========================================================================= */}
-      <section id="branding" className="py-20 border-b border-[#DEDED8] bg-[#151515] text-white">
+      <section id="branding" className="py-20 border-b border-slate-200 bg-slate-900 text-white">
         <div className="max-w-7xl mx-auto px-6 space-y-12">
           
           <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#E5F0EA]">14 — WHITE-LABEL BRANDING</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-teal-300">11 — WHITE-LABEL BRANDING</span>
             <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-              Powered by ECHO. Experienced as your academy.
+              Powered by echo. Experienced as your academy.
             </h2>
             <p className="text-sm text-slate-300">
-              ECHO disappears behind your brand. Your custom domain, logo, colors, and unique student experience.
+              <strong>echo</strong> disappears behind your brand. Custom domain, logo, colors, and unique student portal.
             </p>
           </div>
 
@@ -1058,8 +1067,8 @@ export default function PublicHomePage() {
                 onClick={() => setActiveBrandTab(tab)}
                 className={`px-4 py-2 rounded-xl text-xs font-bold capitalize transition-all ${
                   activeBrandTab === tab
-                    ? "bg-[#1F6B4F] text-white"
-                    : "bg-slate-900 text-slate-400 border border-slate-800"
+                    ? "bg-teal-600 text-white"
+                    : "bg-slate-800 text-slate-400 border border-slate-700"
                 }`}
               >
                 {tab} Academy Preview
@@ -1067,19 +1076,19 @@ export default function PublicHomePage() {
             ))}
           </div>
 
-          <div className="bg-slate-900 p-8 rounded-2xl border border-slate-800 text-center space-y-4">
-            <p className="text-xs font-mono text-slate-400">
+          <div className="bg-slate-800/80 p-8 rounded-2xl border border-slate-700 text-center space-y-4 shadow-xl">
+            <p className="text-xs font-mono text-teal-300">
               {activeBrandTab === "northstar" && "https://learn.northstaracademy.in"}
               {activeBrandTab === "bright" && "https://courses.brightacademy.com"}
               {activeBrandTab === "creative" && "https://academy.creativeskills.io"}
             </p>
-            <h3 className="text-2xl font-black text-[#E5F0EA] uppercase tracking-wider">
+            <h3 className="text-2xl font-black text-white uppercase tracking-wider">
               {activeBrandTab === "northstar" && "NORTHSTAR ACADEMY"}
               {activeBrandTab === "bright" && "BRIGHT SKILLS INSTITUTE"}
               {activeBrandTab === "creative" && "CREATIVE DESIGN SCHOOL"}
             </h3>
-            <p className="text-xs text-slate-400 max-w-md mx-auto">
-              Same ECHO underlying technology. Entirely customized branding, logo, colors, and CNAME domain.
+            <p className="text-xs text-slate-300 max-w-md mx-auto">
+              Same echo underlying technology. Entirely customized branding, logo, colors, and CNAME domain.
             </p>
           </div>
 
@@ -1087,341 +1096,42 @@ export default function PublicHomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 15 — PAYMENTS */}
+      {/* 12 — FAQ ACCORDION */}
       {/* ========================================================================= */}
-      <section className="py-20 border-b border-[#DEDED8] bg-white">
-        <div className="max-w-7xl mx-auto px-6 space-y-12">
-          
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
-            <div className="lg:col-span-5 space-y-6">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#1F6B4F]">15 — PAYMENTS & COMMERCE</span>
-              <h2 className="text-3xl sm:text-4xl font-black text-[#151515] tracking-tight">
-                Make Getting Paid Part of Learning
-              </h2>
-              <p className="text-sm text-[#6B6B67] leading-relaxed">
-                Online payments, course fees, instant GST invoices, coupons, payment tracking and automated fee reminders via Razorpay & Stripe integrations.
-              </p>
-            </div>
-
-            <div className="lg:col-span-7 bg-[#F7F6F2] border border-[#DEDED8] rounded-2xl p-6 shadow-xl space-y-4 font-sans text-xs">
-              <div className="p-4 bg-white border border-[#DEDED8] rounded-xl space-y-3">
-                <div className="flex justify-between items-center font-bold">
-                  <span className="text-[#151515]">COURSE CHECKOUT</span>
-                  <span className="text-[#1F6B4F]">₹12,999</span>
-                </div>
-                <p className="text-[10px] text-[#6B6B67]">Advanced UI/UX Masterclass • Northstar Academy</p>
-                <div className="flex gap-2 text-[10px] font-bold">
-                  <span className="px-2 py-1 bg-[#E5F0EA] text-[#1F6B4F] rounded">UPI</span>
-                  <span className="px-2 py-1 bg-[#F7F6F2] rounded">Card</span>
-                  <span className="px-2 py-1 bg-[#F7F6F2] rounded">Net Banking</span>
-                </div>
-              </div>
-
-              <div className="p-4 bg-[#E5F0EA] border border-[#1F6B4F]/30 rounded-xl space-y-1 font-mono text-[10px]">
-                <p className="font-bold text-[#1F6B4F]">PAYMENT RECEIVED • INVOICE #ECHO-1024</p>
-                <p className="text-[#151515]">Student enrolled automatically. Login credentials sent to WhatsApp.</p>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 16 — COMMUNICATION */}
-      {/* ========================================================================= */}
-      <section className="py-20 border-b border-[#DEDED8] bg-[#F7F6F2]">
-        <div className="max-w-7xl mx-auto px-6 space-y-12">
-          
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#1F6B4F]">16 — AUTOMATED COMMUNICATION</span>
-            <h2 className="text-3xl sm:text-5xl font-black text-[#151515] tracking-tight">
-              Stay Connected Without Chasing Everyone
-            </h2>
-            <p className="text-sm text-[#6B6B67]">
-              Class reminders, payment updates, announcements and student communication—without manually sending every message.
-            </p>
-          </div>
-
-          <div className="max-w-md mx-auto bg-white border border-[#DEDED8] rounded-2xl p-4 shadow-xl space-y-3 text-xs font-sans">
-            <div className="flex items-center justify-between border-b border-[#DEDED8] pb-2 text-[10px] font-bold text-[#6B6B67]">
-              <span>WHATSAPP OFFICIAL NOTIFICATION</span>
-              <span>10:42 AM</span>
-            </div>
-
-            <div className="p-3 bg-[#E5F0EA] border border-[#1F6B4F]/20 rounded-xl space-y-2">
-              <p className="font-bold text-[#151515]">BRIGHT ACADEMY</p>
-              <p className="text-[#151515]">
-                Your UI/UX Design class starts today at 6:00 PM. Tap below to join your live room:
-              </p>
-              <div className="p-2 bg-[#1F6B4F] text-white rounded text-center font-bold text-[10px]">
-                [ Join Live Class ]
-              </div>
-            </div>
-
-            <div className="flex justify-between text-[10px] text-[#6B6B67] font-mono pt-1">
-              <span>WhatsApp</span>
-              <span>• Email</span>
-              <span>• Push Notification</span>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 17 — ANALYTICS */}
-      {/* ========================================================================= */}
-      <section className="py-20 border-b border-[#DEDED8] bg-white">
-        <div className="max-w-7xl mx-auto px-6 space-y-12">
-          
-          <div className="max-w-3xl space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#1F6B4F]">17 — ACADEMY ANALYTICS</span>
-            <h2 className="text-3xl sm:text-5xl font-black text-[#151515] tracking-tight">
-              Know What's Happening Inside Your Academy
-            </h2>
-            <p className="text-sm text-[#6B6B67]">
-              Real-time demo data and analytics for enrollments, revenue, attendance, course completion rates and lead conversion.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 text-center font-mono text-xs">
-            <div className="p-4 bg-[#F7F6F2] rounded-xl border border-[#DEDED8]">
-              <p className="text-[10px] text-[#6B6B67]">STUDENTS</p>
-              <p className="text-xl font-black text-[#151515]">1,248</p>
-            </div>
-            <div className="p-4 bg-[#F7F6F2] rounded-xl border border-[#DEDED8]">
-              <p className="text-[10px] text-[#6B6B67]">ENROLLMENTS</p>
-              <p className="text-xl font-black text-[#151515]">324</p>
-            </div>
-            <div className="p-4 bg-[#F7F6F2] rounded-xl border border-[#DEDED8]">
-              <p className="text-[10px] text-[#6B6B67]">COMPLETION</p>
-              <p className="text-xl font-black text-[#151515]">78%</p>
-            </div>
-            <div className="p-4 bg-[#F7F6F2] rounded-xl border border-[#DEDED8]">
-              <p className="text-[10px] text-[#6B6B67]">ATTENDANCE</p>
-              <p className="text-xl font-black text-[#151515]">91%</p>
-            </div>
-            <div className="p-4 bg-[#E5F0EA] rounded-xl border border-[#1F6B4F]/30 col-span-2 sm:col-span-1">
-              <p className="text-[10px] text-[#1F6B4F]">REVENUE</p>
-              <p className="text-xl font-black text-[#1F6B4F]">₹4.82L</p>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 18 — WHO IS ECHO FOR */}
-      {/* ========================================================================= */}
-      <section className="py-20 border-b border-[#DEDED8] bg-[#F7F6F2]">
-        <div className="max-w-7xl mx-auto px-6 space-y-12">
-          
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#1F6B4F]">18 — AUDIENCE & USE CASES</span>
-            <h2 className="text-3xl sm:text-5xl font-black text-[#151515] tracking-tight">
-              One Platform. Different Ways to Teach.
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { title: "Coaching Institutes", desc: "Admissions, batches, attendance, exams and communication." },
-              { title: "Skill Academies", desc: "Courses, assignments, projects and certificates." },
-              { title: "Online Educators", desc: "Recorded courses, live classes and payments." },
-              { title: "Training Centres", desc: "Students, educators, schedules and reporting." },
-              { title: "Professional Institutes", desc: "Programs, assessments, certificates and CRM." },
-              { title: "Education Businesses", desc: "Sell courses, build communities and grow your audience." },
-            ].map((item, idx) => (
-              <div key={idx} className="p-6 bg-white border border-[#DEDED8] rounded-2xl space-y-2">
-                <h3 className="font-bold text-base text-[#151515]">{item.title}</h3>
-                <p className="text-xs text-[#6B6B67] font-normal leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 19 — INTEGRATIONS */}
-      {/* ========================================================================= */}
-      <section className="py-20 border-b border-[#DEDED8] bg-white">
-        <div className="max-w-7xl mx-auto px-6 space-y-12">
-          
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#1F6B4F]">19 — INTEGRATIONS</span>
-            <h2 className="text-3xl sm:text-5xl font-black text-[#151515] tracking-tight">
-              ECHO Fits Into Your Existing Workflow
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center font-mono text-xs">
-            {[
-              { name: "ZOOM", status: "Active" },
-              { name: "GOOGLE MEET", status: "Active" },
-              { name: "RAZORPAY", status: "Active" },
-              { name: "STRIPE", status: "Active" },
-              { name: "WHATSAPP (META)", status: "Active" },
-              { name: "EMAIL (SMTP)", status: "Active" },
-              { name: "GOOGLE CALENDAR", status: "Active" },
-              { name: "CLOUD STORAGE", status: "Active" },
-            ].map((item, idx) => (
-              <div key={idx} className="p-4 bg-[#F7F6F2] border border-[#DEDED8] rounded-xl space-y-1">
-                <p className="font-black text-[#151515]">{item.name}</p>
-                <span className="text-[10px] text-[#1F6B4F] font-bold">{item.status}</span>
-              </div>
-            ))}
-          </div>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 20 — SETUP JOURNEY */}
-      {/* ========================================================================= */}
-      <section className="py-20 border-b border-[#DEDED8] bg-[#F7F6F2]">
-        <div className="max-w-7xl mx-auto px-6 space-y-12">
-          
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#1F6B4F]">20 — SETUP JOURNEY</span>
-            <h2 className="text-3xl sm:text-5xl font-black text-[#151515] tracking-tight">
-              Start Small. Build As You Grow.
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 font-mono text-xs">
-            {[
-              { step: "01", title: "CREATE", desc: "Create your account and academy profile." },
-              { step: "02", title: "BRAND", desc: "Add logo, colors, domain and details." },
-              { step: "03", title: "BUILD", desc: "Build your curriculum and learning content." },
-              { step: "04", title: "CONNECT", desc: "Import or invite your learners." },
-              { step: "05", title: "SELL", desc: "Start accepting course fees online." },
-              { step: "06", title: "GO LIVE", desc: "Publish your academy and start teaching." },
-            ].map((s, idx) => (
-              <div key={idx} className="p-4 bg-white border border-[#DEDED8] rounded-xl space-y-2">
-                <span className="text-[#1F6B4F] font-bold">{s.step}</span>
-                <p className="font-bold text-[#151515]">{s.title}</p>
-                <p className="text-[10px] text-[#6B6B67] font-sans">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 21 — WHITE LABEL & DATA ISOLATION */}
-      {/* ========================================================================= */}
-      <section className="py-20 border-b border-[#DEDED8] bg-[#151515] text-white">
-        <div className="max-w-7xl mx-auto px-6 space-y-8 text-center">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#E5F0EA]">21 — WHITE LABEL & DATA ISOLATION</span>
-          <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-            Your Academy. Your Data. Your Identity.
-          </h2>
-          <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl mx-auto font-mono text-xs space-y-2 text-[#E5F0EA]">
-            <p>ECHO ↓ YOUR LOGO • YOUR DOMAIN • YOUR COLORS • YOUR WEBSITE • YOUR STUDENT EXPERIENCE</p>
-            <p className="text-[10px] text-slate-400">ECHO powers the technology in the background. Your academy stays at the front.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 22 — SECURITY & CONTROL */}
-      {/* ========================================================================= */}
-      <section className="py-20 border-b border-[#DEDED8] bg-white">
-        <div className="max-w-7xl mx-auto px-6 space-y-12">
-          
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#1F6B4F]">22 — SECURITY & CONTROL</span>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#151515] tracking-tight">
-              Built With Control at Every Level
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center font-mono text-xs">
-            <div className="p-4 bg-[#F7F6F2] border border-[#DEDED8] rounded-xl font-bold">ROLE-BASED ACCESS</div>
-            <div className="p-4 bg-[#F7F6F2] border border-[#DEDED8] rounded-xl font-bold">DATA ISOLATION</div>
-            <div className="p-4 bg-[#F7F6F2] border border-[#DEDED8] rounded-xl font-bold">AUDIT LOGS</div>
-            <div className="p-4 bg-[#F7F6F2] border border-[#DEDED8] rounded-xl font-bold">BACKUPS & SSL</div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 23 — SOCIAL PROOF / DEMO ACADEMIES */}
-      {/* ========================================================================= */}
-      <section className="py-20 border-b border-[#DEDED8] bg-[#F7F6F2]">
-        <div className="max-w-7xl mx-auto px-6 space-y-12">
-          
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#1F6B4F]">23 — ACADEMY PROFILES</span>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#151515] tracking-tight">
-              Designed for Real Education Businesses
-            </h2>
-            <p className="text-xs text-[#6B6B67]">
-              Demo academy profiles below illustrate live system capabilities.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 font-sans">
-            {[
-              { name: "Northstar Academy", type: "Coaching Institute", stats: "1,248 Students • 36 Courses" },
-              { name: "Bright Academy", type: "Skill Institute", stats: "850 Students • 18 Courses" },
-              { name: "Creative Skills School", type: "Design Studio", stats: "420 Students • 12 Courses" },
-            ].map((demo, idx) => (
-              <div key={idx} className="p-6 bg-white border border-[#DEDED8] rounded-2xl space-y-2">
-                <span className="text-[10px] px-2 py-0.5 bg-[#E5F0EA] text-[#1F6B4F] font-bold rounded">Demo Academy</span>
-                <h3 className="font-bold text-base text-[#151515]">{demo.name}</h3>
-                <p className="text-xs text-[#6B6B67]">{demo.type}</p>
-                <p className="text-xs font-mono font-bold text-[#1F6B4F] pt-2">{demo.stats}</p>
-              </div>
-            ))}
-          </div>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 24 — FAQ ACCORDION */}
-      {/* ========================================================================= */}
-      <section id="faq" className="py-20 border-b border-[#DEDED8] bg-white">
+      <section id="faq" className="py-20 border-b border-slate-200 bg-white">
         <div className="max-w-4xl mx-auto px-6 space-y-10">
           
           <div className="text-center space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#1F6B4F]">24 — FREQUENTLY ASKED QUESTIONS</span>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#151515] tracking-tight">
+            <span className="text-xs font-bold uppercase tracking-widest text-teal-700">12 — FREQUENTLY ASKED QUESTIONS</span>
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
               Frequently Asked Questions
             </h2>
           </div>
 
           <div className="space-y-3">
             {[
-              { q: "Can I create my own academy website?", a: "Yes. ECHO provides academy website and branding tools." },
+              { q: "Can I create my own academy website?", a: "Yes. echo provides academy website and branding tools." },
               { q: "Can students register themselves?", a: "Yes. Academy administrators can control student registration." },
               { q: "Can educators register?", a: "Yes, depending on the academy's registration and approval settings." },
-              { q: "Can academy admins register themselves?", a: "No. Academy owner accounts are created through ECHO onboarding." },
-              { q: "Can I conduct live classes?", a: "Yes. ECHO supports live learning workflows and integrations such as Zoom and Google Meet where configured." },
+              { q: "Can academy admins register themselves?", a: "No. Academy owner accounts are created through Grekam onboarding." },
+              { q: "Can I conduct live classes?", a: "Yes. echo supports live learning workflows and integrations such as Zoom and Google Meet where configured." },
               { q: "Can I sell courses?", a: "Yes. You can create paid courses and connect supported payment gateways." },
               { q: "Can I connect my own domain?", a: "Yes, with custom-domain support." },
-              { q: "Can I use my own branding?", a: "Yes. ECHO is designed to support academy branding and white-label experiences depending on your plan." },
-              { q: "Can I manage leads?", a: "Yes. ECHO combines LMS and CRM workflows so enquiries can move toward enrollment." },
+              { q: "Can I use my own branding?", a: "Yes. echo is designed to support academy branding and white-label experiences depending on your plan." },
+              { q: "Can I manage leads?", a: "Yes. echo combines LMS and CRM workflows so enquiries can move toward enrollment." },
               { q: "Can I automate WhatsApp communication?", a: "Yes, when the relevant WhatsApp integration is connected and configured." }
             ].map((faq, index) => (
-              <div key={index} className="border border-[#DEDED8] rounded-xl overflow-hidden bg-[#F7F6F2]">
+              <div key={index} className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50">
                 <button
                   onClick={() => toggleFaq(index)}
-                  className="w-full text-left p-4 flex items-center justify-between font-bold text-xs sm:text-sm text-[#151515] hover:bg-[#DEDED8]/40 transition-colors"
+                  className="w-full text-left p-4 flex items-center justify-between font-bold text-xs sm:text-sm text-slate-900 hover:bg-slate-100 transition-colors"
                 >
                   <span>{faq.q}</span>
-                  {openFaq === index ? <ChevronUp className="w-4 h-4 text-[#1F6B4F]" /> : <ChevronDown className="w-4 h-4 text-[#6B6B67]" />}
+                  {openFaq === index ? <ChevronUp className="w-4 h-4 text-teal-600" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
                 </button>
 
                 {openFaq === index && (
-                  <div className="px-4 pb-4 text-xs text-[#6B6B67] leading-relaxed border-t border-[#DEDED8]/60 pt-3">
+                  <div className="px-4 pb-4 text-xs text-slate-600 leading-relaxed border-t border-slate-200 pt-3">
                     {faq.a}
                   </div>
                 )}
@@ -1433,9 +1143,9 @@ export default function PublicHomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 25 — FINAL CTA & FOOTER */}
+      {/* 13 — FINAL CTA & FOOTER */}
       {/* ========================================================================= */}
-      <section className="py-20 bg-[#151515] text-white">
+      <section className="py-20 bg-slate-900 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center space-y-8">
           <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-[#E5F0EA]">
             Your Academy Is Ready for Its Next Chapter.
@@ -1448,36 +1158,42 @@ export default function PublicHomePage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
             <Link 
               href="/auth/login"
-              className="w-full sm:w-auto px-8 py-4 bg-[#1F6B4F] hover:bg-[#16513B] text-white font-bold text-sm rounded-xl transition-all shadow-lg"
+              className="w-full sm:w-auto px-8 py-4 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-xl transition-all shadow-lg"
             >
               Start Your Academy
             </Link>
             <button 
               onClick={() => setIsDemoModalOpen(true)}
-              className="w-full sm:w-auto px-8 py-4 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-white font-bold text-sm rounded-xl transition-all"
+              className="w-full sm:w-auto px-8 py-4 bg-slate-800 border border-slate-700 hover:bg-slate-700 text-white font-bold text-sm rounded-xl transition-all"
             >
-              Talk to ECHO
+              Talk to echo
             </button>
           </div>
 
           <p className="text-xs text-slate-400">
-            Book a walkthrough and see how ECHO fits your academy.
+            Book a walkthrough and see how <strong>echo</strong> fits your academy.
           </p>
         </div>
       </section>
 
       {/* Multi-Column Editorial Footer */}
-      <footer className="py-12 bg-[#0D0D0D] text-slate-400 text-xs border-t border-slate-900">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-5 gap-8">
+      <footer className="py-12 bg-slate-950 text-slate-400 text-xs border-t border-slate-800">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-5 gap-8">
           
           <div className="col-span-2 space-y-3">
             <div className="flex items-center gap-2">
-              <span className="font-black text-white text-base">ECHO</span>
-              <span className="px-2 py-0.5 bg-[#1F6B4F] text-white text-[10px] font-bold rounded">OS</span>
+              <span className="font-bold text-white text-lg tracking-tight lowercase">echo</span>
+              <span className="px-2 py-0.5 bg-teal-600 text-white text-[10px] font-bold rounded uppercase">OS</span>
             </div>
             <p className="text-slate-400 leading-relaxed max-w-sm">
               Your Academy. One Connected System. Teach, manage, sell and grow from one platform.
             </p>
+
+            <div className="space-y-1.5 pt-2 font-mono text-[11px] text-slate-400">
+              <div className="flex items-center gap-2"><MapPin className="w-3.5 h-3.5 text-teal-400 shrink-0" /> Grekam, Coimbatore, Tamil Nadu, India</div>
+              <div className="flex items-center gap-2"><Phone className="w-3.5 h-3.5 text-teal-400 shrink-0" /> +91 98431 99556</div>
+              <div className="flex items-center gap-2"><Mail className="w-3.5 h-3.5 text-teal-400 shrink-0" /> admin@grekam.in</div>
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -1486,7 +1202,7 @@ export default function PublicHomePage() {
               <li><a href="#ecosystem" className="hover:text-white">LMS</a></li>
               <li><a href="#crm" className="hover:text-white">CRM</a></li>
               <li><a href="#automation" className="hover:text-white">Automation</a></li>
-              <li><a href="#website-builder" className="hover:text-white">Website Builder</a></li>
+              <li><a href="#pricing" className="hover:text-white">Pricing</a></li>
               <li><a href="#branding" className="hover:text-white">White Label</a></li>
             </ul>
           </div>
@@ -1502,49 +1218,50 @@ export default function PublicHomePage() {
           </div>
 
           <div className="space-y-2">
-            <p className="font-bold text-white uppercase tracking-wider text-[10px]">LEGAL & COMPANY</p>
+            <p className="font-bold text-white uppercase tracking-wider text-[10px]">LEGAL & POLICIES</p>
             <ul className="space-y-1.5 font-medium">
               <li><Link href="/privacy-policy" className="hover:text-white">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="hover:text-white">Terms of Service</Link></li>
-              <li><Link href="/contact" className="hover:text-white">Contact</Link></li>
-              <li><Link href="/pricing" className="hover:text-white">Pricing</Link></li>
+              <li><Link href="/terms" className="hover:text-white">Terms and Conditions</Link></li>
+              <li><Link href="/terms-of-access" className="hover:text-white">Terms of Access</Link></li>
+              <li><Link href="/data-deletion" className="hover:text-white text-rose-400">Data Deletion Request</Link></li>
+              <li><Link href="/contact" className="hover:text-white">Contact Us</Link></li>
             </ul>
           </div>
 
         </div>
 
         <div className="max-w-7xl mx-auto px-6 pt-8 mt-8 border-t border-slate-900 flex flex-col sm:flex-row justify-between items-center text-[10px] text-slate-500">
-          <p>© 2026 ECHO. Powered by Grekam.</p>
+          <p>© 2026 echo. All rights reserved. A product by Grekam, Coimbatore, Tamil Nadu, India.</p>
           <p>The Operating System for Modern Education Businesses.</p>
         </div>
       </footer>
 
       {/* DEMO BOOKING MODAL */}
       {isDemoModalOpen && (
-        <div className="fixed inset-0 z-50 bg-[#151515]/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-[#DEDED8] rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl relative text-left text-xs">
-            <div className="flex items-center justify-between pb-3 border-b border-[#DEDED8]">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl relative text-left text-xs">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <div>
-                <h3 className="text-base font-black text-[#151515]">Book an ECHO Demo</h3>
-                <p className="text-[10px] text-[#6B6B67]">Walkthrough for your academy</p>
+                <h3 className="text-base font-black text-slate-900">Book an echo Demo</h3>
+                <p className="text-[10px] text-slate-500">Walkthrough for your academy</p>
               </div>
-              <button onClick={() => setIsDemoModalOpen(false)} className="text-[#6B6B67] hover:text-[#151515] text-base font-bold">&times;</button>
+              <button onClick={() => setIsDemoModalOpen(false)} className="text-slate-400 hover:text-slate-900 text-base font-bold">&times;</button>
             </div>
 
-            <form onSubmit={e => { e.preventDefault(); toast.success("Demo booking submitted! An ECHO specialist will contact you shortly."); setIsDemoModalOpen(false) }} className="space-y-3">
+            <form onSubmit={e => { e.preventDefault(); toast.success("Demo booking submitted! An echo specialist will contact you shortly."); setIsDemoModalOpen(false) }} className="space-y-3">
               <div>
-                <label className="font-bold text-[#151515] block mb-1">Full Name *</label>
-                <input required placeholder="e.g. Sarah Jenkins" className="w-full bg-[#F7F6F2] border border-[#DEDED8] rounded-xl px-3 py-2 text-xs font-medium focus:bg-white focus:outline-[#1F6B4F]" />
+                <label className="font-bold text-slate-900 block mb-1">Full Name *</label>
+                <input required placeholder="e.g. Sarah Jenkins" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium focus:bg-white focus:outline-teal-600" />
               </div>
               <div>
-                <label className="font-bold text-[#151515] block mb-1">Academy / Business Name *</label>
-                <input required placeholder="e.g. Northstar Academy" className="w-full bg-[#F7F6F2] border border-[#DEDED8] rounded-xl px-3 py-2 text-xs font-medium focus:bg-white focus:outline-[#1F6B4F]" />
+                <label className="font-bold text-slate-900 block mb-1">Academy / Business Name *</label>
+                <input required placeholder="e.g. Northstar Academy" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium focus:bg-white focus:outline-teal-600" />
               </div>
               <div>
-                <label className="font-bold text-[#151515] block mb-1">WhatsApp Phone Number *</label>
-                <input required placeholder="+91 98765 43210" className="w-full bg-[#F7F6F2] border border-[#DEDED8] rounded-xl px-3 py-2 text-xs font-medium focus:bg-white focus:outline-[#1F6B4F]" />
+                <label className="font-bold text-slate-900 block mb-1">WhatsApp Phone Number *</label>
+                <input required placeholder="+91 98431 99556" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium focus:bg-white focus:outline-teal-600" />
               </div>
-              <button type="submit" className="w-full py-3 bg-[#1F6B4F] hover:bg-[#16513B] text-white font-bold rounded-xl shadow-xs transition-all">
+              <button type="submit" className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-xs transition-all">
                 Submit Demo Request →
               </button>
             </form>

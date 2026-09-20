@@ -41,6 +41,7 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
   const [courseInterest, setCourseInterest] = useState("Full Stack Web Development")
   const [expertise, setExpertise] = useState("Computer Science & Web Dev")
   const [qualification, setQualification] = useState("Senior Educator / 5+ Yrs Experience")
+  const [acceptTerms, setAcceptTerms] = useState(false)
   
   // Forgot password modal state
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false)
@@ -125,6 +126,11 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
     e.preventDefault()
     if (!fullName || !signupEmail || !signupPassword) {
       setError("Please fill in all required fields.")
+      return
+    }
+
+    if (!acceptTerms) {
+      setError("You must accept the Terms and Conditions and Privacy Policy to continue.")
       return
     }
 
@@ -552,6 +558,21 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
                 </div>
               </>
             )}
+
+            {/* Accept Terms & Conditions Checkbox */}
+            <div className="flex items-start gap-2.5 pt-1">
+              <input
+                type="checkbox"
+                id="signup-terms"
+                required
+                checked={acceptTerms}
+                onChange={(e) => setAcceptTerms(e.target.checked)}
+                className="mt-0.5 w-4 h-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500 cursor-pointer"
+              />
+              <label htmlFor="signup-terms" className="text-xs text-slate-600 leading-snug cursor-pointer select-none">
+                I accept the <Link href="/terms" target="_blank" className="text-teal-700 font-bold underline">Terms & Conditions</Link>, <Link href="/terms-of-access" target="_blank" className="text-teal-700 font-bold underline">Terms of Access</Link>, and <Link href="/privacy-policy" target="_blank" className="text-teal-700 font-bold underline">Privacy Policy</Link>.
+              </label>
+            </div>
 
             <button
               type="submit"
