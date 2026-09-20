@@ -128,9 +128,7 @@ export default function PublicHomePage() {
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-xl bg-teal-600 flex items-center justify-center text-white font-black text-lg shadow-sm group-hover:bg-teal-700 transition-colors">
-              e
-            </div>
+            <img src="/echo_logo.png" alt="echo logo" className="h-9 w-auto object-contain" />
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xl font-bold text-slate-900 tracking-tight lowercase">echo</span>

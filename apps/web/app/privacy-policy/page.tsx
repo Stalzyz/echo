@@ -11,9 +11,7 @@ export default function PrivacyPolicyPage() {
       <header className="border-b border-slate-200 bg-white/90 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-teal-600 flex items-center justify-center text-white font-bold text-sm shadow-xs">
-              e
-            </div>
+            <img src="/echo_logo.png" alt="echo logo" className="h-8 w-auto object-contain" />
             <span className="font-bold text-lg text-slate-900 tracking-tight lowercase">echo</span>
             <span className="px-2 py-0.5 rounded bg-teal-50 border border-teal-200 text-teal-800 text-[10px] font-bold uppercase tracking-wider">
               Legal

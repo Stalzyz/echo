@@ -188,12 +188,10 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
         {/* Top Brand Tag & Mode Switcher (Sign In vs Sign Up) */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-100 gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-teal-600 flex items-center justify-center text-white font-black shadow-xs">
-              <GraduationCap className="w-6 h-6" />
-            </div>
+            <img src="/echo_logo.png" alt="echo logo" className="w-10 h-10 object-contain" />
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-lg font-black text-slate-900 tracking-tight">Echo</span>
+                <span className="text-lg font-bold text-slate-900 tracking-tight lowercase">echo</span>
                 <span className="px-2 py-0.5 rounded-md bg-teal-50 border border-teal-200 text-teal-800 text-[10px] font-black uppercase tracking-wider">
                   {mode === "signin" ? "Sign In Portal" : "Create Account"}
                 </span>
