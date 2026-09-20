@@ -636,13 +636,21 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
               <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl space-y-3 text-center">
                 <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
                 <p className="text-xs font-bold text-emerald-900">{resetSuccess}</p>
-                <button
-                  type="button"
-                  onClick={() => setIsForgotPasswordOpen(false)}
-                  className="px-5 py-2.5 bg-emerald-600 text-white font-bold text-xs rounded-xl shadow-xs"
-                >
-                  Back to Login
-                </button>
+                <div className="flex gap-2 justify-center pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setIsForgotPasswordOpen(false)}
+                    className="px-5 py-2.5 bg-emerald-600 text-white font-bold text-xs rounded-xl shadow-xs"
+                  >
+                    Back to Login
+                  </button>
+                  <Link
+                    href="/auth/forgot-password"
+                    className="px-5 py-2.5 bg-slate-900 text-white font-bold text-xs rounded-xl shadow-xs inline-block"
+                  >
+                    Enter Code & Reset →
+                  </Link>
+                </div>
               </div>
             ) : (
               <form onSubmit={handleResetPassword} className="space-y-4">
@@ -676,6 +684,12 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
                   >
                     {resetLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send Reset Link"}
                   </button>
+                </div>
+
+                <div className="text-center pt-2">
+                  <Link href="/auth/forgot-password" className="text-xs font-bold text-teal-700 hover:underline">
+                    Or open full Password Recovery Page →
+                  </Link>
                 </div>
               </form>
             )}

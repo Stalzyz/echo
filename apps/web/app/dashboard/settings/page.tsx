@@ -265,6 +265,7 @@ export default function BrandingThemeSettingsPage() {
           <div className="flex border-b border-slate-200 bg-slate-50 px-2 pt-2 gap-1 overflow-x-auto flex-none scrollbar-none">
             {[
               { id: 'identity', label: 'Identity', icon: ImageIcon },
+              { id: 'profile', label: 'Admin Profile', icon: Lock },
               { id: 'colors', label: 'Colors', icon: Palette },
               { id: 'typography', label: 'Style & Fonts', icon: Layers },
               { id: 'login', label: 'Login Portal', icon: Sparkles },
@@ -567,6 +568,135 @@ export default function BrandingThemeSettingsPage() {
                     />
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* ADMIN PROFILE & SECURITY TAB */}
+            {brandSubTab === ('profile' as any) && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">Admin Profile & Security</h2>
+                  <p className="text-xs text-slate-500 mt-0.5">Manage your admin profile details and update your login password.</p>
+                </div>
+
+                {/* Profile Form */}
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
+                  <div className="flex items-center gap-3 pb-3 border-b border-slate-200/80">
+                    <div className="w-12 h-12 rounded-2xl bg-teal-600 text-white font-black text-lg flex items-center justify-center shadow-sm">
+                      SK
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-black text-slate-900">Stalin Kumar</h3>
+                      <p className="text-[11px] font-mono text-teal-700 font-bold">admin@grekam.in (Master Academy Owner)</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 block mb-1">Full Name</label>
+                      <input 
+                        defaultValue="Stalin Kumar" 
+                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium focus:outline-teal-600" 
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 block mb-1">Username</label>
+                      <input 
+                        defaultValue="stalin_admin" 
+                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-bold focus:outline-teal-600" 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 block mb-1">Email Address</label>
+                      <input 
+                        defaultValue="admin@grekam.in" 
+                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium focus:outline-teal-600" 
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 block mb-1">Contact Phone</label>
+                      <input 
+                        defaultValue="+91 98431 99556" 
+                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium focus:outline-teal-600" 
+                      />
+                    </div>
+                  </div>
+
+                  <button 
+                    onClick={() => toast.success("Admin profile information updated!")}
+                    className="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
+                  >
+                    Save Profile Information
+                  </button>
+                </div>
+
+                {/* Change Password Card */}
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-teal-600" />
+                    <h3 className="text-xs font-black uppercase tracking-wider text-slate-900">Change Admin Password</h3>
+                  </div>
+                  <p className="text-[11px] text-slate-500">Update your initial assigned password to keep your academy account secure.</p>
+
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 block mb-1">Current Password *</label>
+                      <input 
+                        type="password"
+                        placeholder="Enter current or assigned initial password" 
+                        className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-mono focus:outline-teal-600" 
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 block mb-1">New Password *</label>
+                      <input 
+                        type="password"
+                        placeholder="••••••••" 
+                        className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-mono focus:outline-teal-600" 
+                      />
+                      <div className="mt-1.5 flex items-center gap-1.5 text-[10px] text-slate-500">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Min 8 chars
+                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span> 1 Uppercase
+                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span> 1 Number & Special Char
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 block mb-1">Confirm New Password *</label>
+                      <input 
+                        type="password"
+                        placeholder="••••••••" 
+                        className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-mono focus:outline-teal-600" 
+                      />
+                    </div>
+
+                    <button 
+                      onClick={() => toast.success("Password changed successfully! Please use your new password next time you log in.")}
+                      className="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all"
+                    >
+                      Update Password Now
+                    </button>
+                  </div>
+                </div>
+
+                {/* 2FA Security Banner */}
+                <div className="p-4 bg-teal-50 border border-teal-200 rounded-2xl flex items-center justify-between">
+                  <div>
+                    <span className="text-xs font-bold text-teal-900 block">Two-Factor Authentication (2FA)</span>
+                    <span className="text-[11px] text-teal-700">Add extra layer of protection to admin login</span>
+                  </div>
+                  <a 
+                    href="/dashboard/settings/security" 
+                    className="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-lg transition-colors shadow-2xs"
+                  >
+                    Configure 2FA
+                  </a>
+                </div>
+
               </div>
             )}
 
