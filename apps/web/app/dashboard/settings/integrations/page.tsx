@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { Plug, Zap, Video, Mail, CreditCard, Save, CheckCircle2, Webhook, Plus, Trash2, Loader2, Eye, EyeOff, X, KeyRound, Send, Copy, AlertCircle, RefreshCw } from "lucide-react"
 
-type Service = "RAZORPAY" | "PHONEPE" | "STRIPE" | "SMTP" | "WHATSAPP" | "META" | "GOOGLE" | "ZOOM"
+type Service = "RAZORPAY" | "PHONEPE" | "STRIPE" | "SMTP" | "WHATSAPP" | "META" | "FIREBASE" | "GOOGLE" | "ZOOM"
 
 interface IntegrationKey {
   id: string
@@ -31,11 +31,12 @@ const SERVICE_META: Record<Service, { label: string; icon: any; color: string; b
   SMTP:      { label: "SMTP",      icon: Mail,       color: "text-cyan-400",   bg: "bg-cyan-500/10",    border: "border-cyan-500/20",    desc: "Transactional email delivery" },
   WHATSAPP:  { label: "WhatsApp",  icon: Zap,        color: "text-emerald-400",bg: "bg-emerald-500/10", border: "border-emerald-500/20", desc: "WhatsApp Business API & Grafty Autopilot" },
   META:      { label: "Meta Leads & Ads", icon: Zap,  color: "text-blue-500",   bg: "bg-blue-500/10",    border: "border-blue-500/20",    desc: "Facebook & Instagram Lead Ads Auto-Sync" },
+  FIREBASE:  { label: "Firebase SMS & Auth", icon: KeyRound, color: "text-amber-500", bg: "bg-amber-500/10", border: "border-amber-500/20", desc: "Firebase Phone Auth SMS OTP & OAuth Provider" },
   GOOGLE:    { label: "Google",    icon: Video,      color: "text-red-400",    bg: "bg-red-500/10",     border: "border-red-500/20",     desc: "OAuth, Meet & Calendar integrations" },
   ZOOM:      { label: "Zoom",      icon: Video,      color: "text-sky-400",    bg: "bg-sky-500/10",     border: "border-sky-500/20",     desc: "Zoom Meetings & Webinars OAuth API" },
 }
 
-const SERVICES: Service[] = ["RAZORPAY", "PHONEPE", "STRIPE", "SMTP", "WHATSAPP", "META", "GOOGLE", "ZOOM"]
+const SERVICES: Service[] = ["RAZORPAY", "PHONEPE", "STRIPE", "SMTP", "WHATSAPP", "META", "FIREBASE", "GOOGLE", "ZOOM"]
 
 const AVAILABLE_EVENTS = [
   { id: "crm.lead_created", label: "New Lead Created (CRM)", desc: "Triggers when a lead is added via manual entry, Meta ads, or webform" },
@@ -110,6 +111,7 @@ export default function IntegrationsDashboard() {
     SMTP: ["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS", "SMTP_FROM"],
     WHATSAPP: ["META_ACCESS_TOKEN", "META_PHONE_NUMBER_ID", "META_WABA_ID", "GRAFTY_API_KEY", "GRAFTY_INSTANCE_ID", "WEBHOOK_VERIFY_TOKEN"],
     META: ["META_ACCESS_TOKEN", "META_PHONE_NUMBER_ID", "META_WABA_ID", "META_APP_SECRET", "META_VERIFY_TOKEN"],
+    FIREBASE: ["NEXT_PUBLIC_FIREBASE_API_KEY", "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN", "NEXT_PUBLIC_FIREBASE_PROJECT_ID", "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET", "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID", "NEXT_PUBLIC_FIREBASE_APP_ID"],
     RAZORPAY: ["RAZORPAY_KEY_ID", "RAZORPAY_KEY_SECRET", "RAZORPAY_WEBHOOK_SECRET"],
     PHONEPE: ["PHONEPE_MERCHANT_ID", "PHONEPE_SALT_KEY", "PHONEPE_SALT_INDEX"],
     STRIPE: ["STRIPE_PUBLISHABLE_KEY", "STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"],
