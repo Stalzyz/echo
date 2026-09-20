@@ -51,9 +51,9 @@ export default function DashboardHome() {
   return (
     <div className="w-full bg-slate-50 text-slate-900 font-sans pb-12">
       {/* Header Banner */}
-      <div className="px-8 py-8 border-b border-slate-200 bg-white flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="p-4 sm:p-6 lg:p-8 border-b border-slate-200 bg-white flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex flex-wrap items-center gap-2 mb-1">
             <span className="px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800 text-[10px] font-bold uppercase tracking-wider border border-teal-200">
               Echo LMS Platform
             </span>
@@ -61,24 +61,24 @@ export default function DashboardHome() {
               Academy Control Center
             </span>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
             Welcome back, {session?.user?.name || 'Academy Admin'}!
           </h1>
-          <p className="text-slate-500 mt-1 text-sm font-medium">Real-time operational health, educator course approvals and academy analytics.</p>
+          <p className="text-slate-500 mt-1 text-xs sm:text-sm font-medium">Real-time operational health, educator course approvals and academy analytics.</p>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="px-4 py-2 rounded-2xl bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold flex items-center gap-2 shadow-xs">
+          <div className="px-3 sm:px-4 py-2 rounded-2xl bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold flex items-center gap-2 shadow-xs">
             <div className="w-2 h-2 rounded-full bg-teal-600" />
             System Live & Operational
           </div>
         </div>
       </div>
 
-      <div className="px-8 py-8 space-y-8">
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
         
         {/* Top Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard 
             title="Total Revenue" 
             value={isLoading ? "..." : `$${revenue.toLocaleString()}`} 
@@ -114,19 +114,19 @@ export default function DashboardHome() {
         </div>
 
         {/* EDUCATOR COURSE APPROVAL QUEUE PANEL */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-4">
-          <div className="flex items-center justify-between">
+        <div className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-6 shadow-xs space-y-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-700">
+              <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-700 shrink-0">
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-slate-900">Educator Course Approval Requests</h2>
+                <h2 className="text-base sm:text-lg font-bold text-slate-900">Educator Course Approval Requests</h2>
                 <p className="text-xs text-slate-500">Educators can add course drafts. Academy Admin approval is required to publish to public catalog.</p>
               </div>
             </div>
             
-            <span className="px-3 py-1 bg-amber-50 text-amber-800 text-xs font-bold rounded-full border border-amber-200 font-mono">
+            <span className="px-3 py-1 bg-amber-50 text-amber-800 text-xs font-bold rounded-full border border-amber-200 font-mono self-start sm:self-auto">
               {pendingCourses.length} Pending Approvals
             </span>
           </div>
@@ -138,8 +138,8 @@ export default function DashboardHome() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
               {pendingCourses.map((c) => (
-                <div key={c.id} className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-4 hover:border-indigo-300 transition-colors">
-                  <div className="flex items-start justify-between">
+                <div key={c.id} className="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-4 hover:border-indigo-300 transition-colors">
+                  <div className="flex items-start justify-between gap-2">
                     <div>
                       <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-bold uppercase tracking-wider font-mono">
                         Pending Admin Approval
@@ -147,10 +147,10 @@ export default function DashboardHome() {
                       <h3 className="font-bold text-slate-900 text-sm mt-1.5">{c.title}</h3>
                       <p className="text-xs text-slate-500 font-medium">By {c.educator} • {c.modules} Modules</p>
                     </div>
-                    <span className="text-[10px] text-slate-400 font-mono">{c.submittedAt}</span>
+                    <span className="text-[10px] text-slate-400 font-mono shrink-0">{c.submittedAt}</span>
                   </div>
 
-                  <div className="flex items-center gap-2 pt-2 border-t border-slate-200/80">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-2 border-t border-slate-200/80">
                     <button
                       onClick={() => handleApproveCourse(c.id, c.title)}
                       className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5"
@@ -171,54 +171,58 @@ export default function DashboardHome() {
         </div>
 
         {/* Two Column Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           
           {/* Revenue Chart */}
-          <div className="lg:col-span-2 bg-white border border-slate-200 rounded-3xl p-6 shadow-xs relative overflow-hidden">
-            <div className="flex items-center justify-between mb-6">
+          <div className="lg:col-span-2 bg-white border border-slate-200 rounded-3xl p-4 sm:p-6 shadow-xs relative overflow-hidden">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-6">
               <div>
-                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <h2 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-teal-600" /> Subscription Revenue Growth
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">Monthly SaaS recurring revenue & enrollment analytics</p>
               </div>
-              <span className="text-xs font-bold text-teal-800 bg-teal-50 px-3 py-1 rounded-xl border border-teal-200">
+              <span className="text-xs font-bold text-teal-800 bg-teal-50 px-3 py-1 rounded-xl border border-teal-200 self-start sm:self-auto">
                 8 Months View
               </span>
             </div>
             
             {/* Chart Grid */}
-            <div className="h-64 flex items-end gap-3 pt-6 border-b border-slate-200 relative">
-              <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col justify-between text-[10px] text-slate-400 font-mono py-2">
-                <span>$50k</span>
-                <span>$25k</span>
-                <span>$0</span>
-              </div>
-              
-              <div className="flex-1 flex items-end gap-4 pl-12 h-full">
-                {revenueData?.data?.map((m: any, i: number) => {
-                  const maxRev = Math.max(...(revenueData.data.map((d: any) => d.revenue || 0)), 50000)
-                  const hPct = m.revenue > 0 ? Math.max((m.revenue / maxRev) * 100, 8) : 5
+            <div className="overflow-x-auto custom-scrollbar">
+              <div className="min-w-[400px]">
+                <div className="h-64 flex items-end gap-3 pt-6 border-b border-slate-200 relative">
+                  <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col justify-between text-[10px] text-slate-400 font-mono py-2">
+                    <span>$50k</span>
+                    <span>$25k</span>
+                    <span>$0</span>
+                  </div>
                   
-                  return (
-                    <div key={i} className="flex-1 group relative h-full flex items-end">
-                      <div 
-                        className="w-full bg-teal-600 rounded-t-xl transition-all duration-300 hover:bg-teal-700 shadow-xs"
-                        style={{ height: `${hPct}%` }}
-                      />
-                      {/* Tooltip */}
-                      <div className="opacity-0 group-hover:opacity-100 absolute -top-9 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-2.5 py-1 rounded-lg text-[10px] font-mono shadow-md whitespace-nowrap transition-opacity pointer-events-none z-20">
-                        ${m.revenue.toLocaleString()}
-                      </div>
-                    </div>
-                  )
-                })}
+                  <div className="flex-1 flex items-end gap-4 pl-12 h-full">
+                    {revenueData?.data?.map((m: any, i: number) => {
+                      const maxRev = Math.max(...(revenueData.data.map((d: any) => d.revenue || 0)), 50000)
+                      const hPct = m.revenue > 0 ? Math.max((m.revenue / maxRev) * 100, 8) : 5
+                      
+                      return (
+                        <div key={i} className="flex-1 group relative h-full flex items-end">
+                          <div 
+                            className="w-full bg-teal-600 rounded-t-xl transition-all duration-300 hover:bg-teal-700 shadow-xs"
+                            style={{ height: `${hPct}%` }}
+                          />
+                          {/* Tooltip */}
+                          <div className="opacity-0 group-hover:opacity-100 absolute -top-9 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-2.5 py-1 rounded-lg text-[10px] font-mono shadow-md whitespace-nowrap transition-opacity pointer-events-none z-20">
+                            ${m.revenue.toLocaleString()}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+                <div className="flex justify-between pl-12 pr-4 pt-4 text-[11px] text-slate-600 font-bold font-mono">
+                  {revenueData?.data?.map((m: any, i: number) => (
+                    <span key={i} className="flex-1 text-center">{m.month}</span>
+                  ))}
+                </div>
               </div>
-            </div>
-            <div className="flex justify-between pl-12 pr-4 pt-4 text-[11px] text-slate-600 font-bold font-mono">
-              {revenueData?.data?.map((m: any, i: number) => (
-                <span key={i} className="flex-1 text-center">{m.month}</span>
-              ))}
             </div>
           </div>
 

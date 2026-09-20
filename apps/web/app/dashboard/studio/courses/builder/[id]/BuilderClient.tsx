@@ -277,10 +277,10 @@ export default function BuilderClient({ initialCourse }: { initialCourse: any })
       </header>
 
       {/* Main Workspace */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
         
         {/* LEFT PANEL - Curriculum Sidebar */}
-        <aside className="w-80 border-r border-slate-200 bg-white flex flex-col shrink-0 h-full overflow-hidden shadow-xs">
+        <aside className="w-full lg:w-80 border-b lg:border-b-0 lg:border-r border-slate-200 bg-white flex flex-col shrink-0 h-auto lg:h-full overflow-hidden shadow-xs">
           
           {/* Tabs */}
           <div className="flex p-2 border-b border-slate-200 shrink-0 bg-slate-50">
@@ -298,7 +298,7 @@ export default function BuilderClient({ initialCourse }: { initialCourse: any })
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[350px] lg:max-h-none">
             {activeTab === "SETTINGS" ? (
               <div className="space-y-2">
                 <button 
@@ -364,7 +364,7 @@ export default function BuilderClient({ initialCourse }: { initialCourse: any })
         </aside>
 
         {/* RIGHT PANEL - Editor Area */}
-        <main className="flex-1 bg-slate-50 overflow-y-auto relative p-8 lg:p-12 text-slate-900">
+        <main className="flex-1 bg-slate-50 overflow-y-auto relative p-4 sm:p-8 lg:p-12 text-slate-900">
           
           <div className="max-w-3xl mx-auto">
             {activeItem?.type === "COURSE" && (

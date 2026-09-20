@@ -225,26 +225,26 @@ export default function StudentCoursePlayerPage({ params }: { params: Promise<{ 
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans overflow-x-hidden">
       
       {/* 1. TOP NAVBAR (UNIFIED LIGHT THEME) */}
-      <header className="h-16 border-b border-slate-200 bg-white px-4 sm:px-6 flex items-center justify-between sticky top-0 z-40 shadow-xs">
-        <div className="flex items-center gap-4">
+      <header className="min-h-[64px] py-3 border-b border-slate-200 bg-white px-4 sm:px-6 flex flex-wrap items-center justify-between sticky top-0 z-40 shadow-xs gap-2">
+        <div className="flex items-center gap-3">
           <Link 
             href="/student" 
-            className="p-2 hover:bg-slate-100 rounded-xl transition-all text-slate-600 hover:text-slate-900 border border-slate-200"
+            className="p-2 hover:bg-slate-100 rounded-xl transition-all text-slate-600 hover:text-slate-900 border border-slate-200 shrink-0"
             title="Back to Dashboard"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           </Link>
-          <div>
+          <div className="min-w-0">
             <span className="text-[10px] font-bold text-teal-700 uppercase tracking-widest block font-mono">
               Echo Learning Studio
             </span>
-            <h1 className="text-sm font-bold text-slate-900 truncate max-w-xs sm:max-w-md lg:max-w-lg">
+            <h1 className="text-xs sm:text-sm font-bold text-slate-900 truncate max-w-[200px] sm:max-w-md lg:max-w-lg">
               {course.title || course.name}
             </h1>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           {/* Clean Solid Progress Bar */}
           <div className="hidden md:flex items-center gap-3 bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-full">
             <span className="text-xs text-slate-600 font-medium">Progress</span>
@@ -273,10 +273,10 @@ export default function StudentCoursePlayerPage({ params }: { params: Promise<{ 
           {/* Assignments Link */}
           <Link 
             href="/student/assignments" 
-            className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold transition-all flex items-center gap-2"
+            className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5"
           >
             <FileText className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Assignments</span>
+            <span>Assignments</span>
           </Link>
         </div>
       </header>

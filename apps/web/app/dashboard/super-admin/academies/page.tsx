@@ -233,18 +233,18 @@ export default function AcademiesManagementPage() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-slate-50 text-slate-900 overflow-y-auto custom-scrollbar p-8">
+    <div className="flex flex-col h-full bg-slate-50 text-slate-900 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8">
       
       {/* Header */}
-      <div className="flex-none pb-8 border-b border-slate-200 mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="flex-none pb-6 sm:pb-8 border-b border-slate-200 mb-6 sm:mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800 text-[10px] font-black uppercase tracking-wider border border-teal-200">
               ECHO SAAS TENANTS
             </span>
           </div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900">Academies Directory</h1>
-          <p className="text-slate-500 mt-1 text-sm font-medium">Provision customer LMS academies, assign admin credentials, reset passwords & impersonate login.</p>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">Academies Directory</h1>
+          <p className="text-slate-500 mt-1 text-xs sm:text-sm font-medium">Provision customer LMS academies, assign admin credentials, reset passwords & impersonate login.</p>
         </div>
 
         <button 
@@ -252,14 +252,14 @@ export default function AcademiesManagementPage() {
             setForm(p => ({ ...p, initialPassword: generateRandomPassword() }))
             setIsAddModalOpen(true)
           }}
-          className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm px-6 py-3 rounded-xl transition-all shadow-sm"
+          className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm px-6 py-3 rounded-xl transition-all shadow-sm self-start md:self-auto"
         >
           <Plus className="w-4 h-4" /> Provision Academy
         </button>
       </div>
 
       {/* Filters & Search */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-4 mb-6 shadow-xs flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="bg-white border border-slate-200 rounded-2xl p-4 mb-6 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <div className="relative w-full md:w-96">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input 
@@ -271,11 +271,11 @@ export default function AcademiesManagementPage() {
           />
         </div>
 
-        <div className="flex items-center gap-3 w-full md:w-auto">
+        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full md:w-auto">
           <select 
             value={filterPlan} 
             onChange={e => setFilterPlan(e.target.value)}
-            className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 outline-none"
+            className="w-full sm:w-auto bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 outline-none"
           >
             <option value="ALL">All Subscription Plans</option>
             <option value="FREE">FREE Plan</option>
@@ -287,7 +287,7 @@ export default function AcademiesManagementPage() {
           <select 
             value={filterStatus} 
             onChange={e => setFilterStatus(e.target.value)}
-            className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 outline-none"
+            className="w-full sm:w-auto bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 outline-none"
           >
             <option value="ALL">All Statuses</option>
             <option value="ACTIVE">Active</option>

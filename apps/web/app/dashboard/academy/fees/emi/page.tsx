@@ -164,35 +164,35 @@ export default function EmiSchedulePage() {
     <div className="flex flex-col h-full bg-slate-50 text-slate-900 overflow-hidden">
       
       {/* Top Header */}
-      <div className="flex-none px-8 py-6 bg-white border-b border-slate-200 flex items-center justify-between shadow-xs">
+      <div className="flex-none p-4 sm:p-6 lg:p-8 bg-white border-b border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-teal-600 flex items-center justify-center text-white font-black shadow-xs">
+          <div className="w-10 h-10 rounded-2xl bg-teal-600 flex items-center justify-center text-white font-black shadow-xs shrink-0">
             <DollarSign className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Student EMI & Installment Schedule Builder</h1>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Student EMI & Installment Schedule Builder</h1>
             <p className="text-xs text-slate-500 font-medium">Manage flexible course fee installments, automated due alerts, and custom EMI rules.</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto">
           <button 
             onClick={() => setIsRulesOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl transition-all"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl transition-all"
           >
             <Settings className="w-4 h-4 text-teal-600" /> EMI Rules Control System
           </button>
 
           <button 
             onClick={() => setIsCalcOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl transition-all"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl transition-all"
           >
             <Calculator className="w-4 h-4 text-teal-600" /> EMI Calculator
           </button>
           
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl transition-all shadow-sm"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl transition-all shadow-sm"
           >
             <Plus className="w-4 h-4" /> Create EMI Schedule
           </button>
@@ -200,12 +200,12 @@ export default function EmiSchedulePage() {
       </div>
 
       {/* Main Workspace Area */}
-      <div className="flex-1 p-8 space-y-6 overflow-y-auto custom-scrollbar">
+      <div className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 overflow-y-auto custom-scrollbar">
         
         {/* Rule Active Banner */}
-        <div className="bg-teal-50 border border-teal-200 rounded-2xl p-4 flex items-center justify-between">
+        <div className="bg-teal-50 border border-teal-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-xs">
+            <div className="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
               <ShieldCheck className="w-4 h-4" />
             </div>
             <div>
@@ -217,11 +217,11 @@ export default function EmiSchedulePage() {
               </span>
             </div>
           </div>
-          <button onClick={() => setIsRulesOpen(true)} className="text-xs font-bold text-teal-700 hover:underline">Change Rules</button>
+          <button onClick={() => setIsRulesOpen(true)} className="text-xs font-bold text-teal-700 hover:underline shrink-0">Change Rules</button>
         </div>
 
         {/* Metric Cards Banner */}
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white border border-slate-200 rounded-3xl p-5 space-y-1 shadow-2xs">
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Managed EMI Capital</span>
             <span className="text-2xl font-black text-slate-900 block">₹{plans.reduce((a, b) => a + b.totalFee, 0).toLocaleString()}</span>
@@ -248,13 +248,13 @@ export default function EmiSchedulePage() {
         </div>
 
         {/* Filter Bar */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
-          <div className="flex items-center gap-2">
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-2xs">
+          <div className="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-1 sm:pb-0">
             {(["ALL", "ACTIVE", "OVERDUE", "COMPLETED"] as const).map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
                   activeTab === tab 
                     ? "bg-teal-50 text-teal-800 border border-teal-200 shadow-2xs" 
                     : "text-slate-500 hover:bg-slate-100"
@@ -265,7 +265,7 @@ export default function EmiSchedulePage() {
             ))}
           </div>
 
-          <div className="relative w-72">
+          <div className="relative w-full sm:w-72">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
             <input 
               placeholder="Search student or course..."
@@ -277,8 +277,8 @@ export default function EmiSchedulePage() {
         </div>
 
         {/* EMI Table */}
-        <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xs">
-          <table className="w-full text-left border-collapse">
+        <div className="bg-white border border-slate-200 rounded-3xl overflow-x-auto custom-scrollbar shadow-xs">
+          <table className="w-full min-w-[800px] text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 <th className="py-4 px-6">Student & Course</th>

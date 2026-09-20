@@ -183,7 +183,7 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
       <motion.div 
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-200/60 relative overflow-hidden text-left"
+        className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-6 lg:p-8 shadow-xl shadow-slate-200/60 relative overflow-y-auto max-h-[95vh] text-left custom-scrollbar"
       >
         {/* Top Brand Tag & Mode Switcher (Sign In vs Sign Up) */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-100 gap-4">
@@ -229,7 +229,7 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
             1. SELECT PORTAL ROLE:
           </label>
           
-          <div className={`grid ${mode === "signup" ? "grid-cols-2" : "grid-cols-3"} gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200/80`}>
+          <div className={`grid ${mode === "signup" ? "grid-cols-2" : "grid-cols-3"} gap-1.5 sm:gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200/80`}>
             {(Object.keys(roleConfig) as RoleType[])
               .filter(rKey => mode === "signin" || rKey !== "admin") // Admins don't self-signup
               .map((rKey) => {

@@ -95,30 +95,30 @@ export default function SaaSPlansAndBillingPage() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-slate-50 text-slate-900 overflow-y-auto custom-scrollbar p-8">
+    <div className="flex flex-col h-full bg-slate-50 text-slate-900 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8">
       
       {/* Header */}
-      <div className="flex-none pb-8 border-b border-slate-200 mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="flex-none pb-6 sm:pb-8 border-b border-slate-200 mb-6 sm:mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800 text-[10px] font-black uppercase tracking-wider border border-teal-200">
               Echo SAAS PRICING ENGINE
             </span>
           </div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900">Plans & Billing Controls</h1>
-          <p className="text-slate-500 mt-1 text-sm font-medium">Create & edit subscription tiers, student/instructor limits, storage allocations, and pricing structures.</p>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">Plans & Billing Controls</h1>
+          <p className="text-slate-500 mt-1 text-xs sm:text-sm font-medium">Create & edit subscription tiers, student/instructor limits, storage allocations, and pricing structures.</p>
         </div>
 
         <button 
           onClick={() => setIsAddModalOpen(true)}
-          className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm px-6 py-3 rounded-xl transition-all shadow-sm"
+          className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm px-6 py-3 rounded-xl transition-all shadow-sm self-start md:self-auto"
         >
           <Plus className="w-4 h-4" /> Create New Plan
         </button>
       </div>
 
       {/* Plan Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         {plans.map(p => (
           <div key={p.id} className={`bg-white border rounded-3xl p-6 shadow-xs relative flex flex-col justify-between transition-all ${
             p.popular ? "border-teal-500 ring-2 ring-teal-500/20" : "border-slate-200"

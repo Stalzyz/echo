@@ -176,18 +176,18 @@ export default function StudentDirectory() {
     <div className="flex flex-col h-full min-h-0 overflow-hidden bg-slate-50 text-slate-900 relative">
       
       {/* Header */}
-      <div className="flex-none px-8 py-6 border-b border-slate-200 bg-white relative z-10 shadow-xs">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+      <div className="flex-none p-4 sm:p-6 lg:p-8 border-b border-slate-200 bg-white relative z-10 shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center shrink-0">
-              <GraduationCap className="w-6 h-6 text-teal-700" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center shrink-0">
+              <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-teal-700" />
             </div>
             <div>
-              <h1 className="text-3xl font-black text-slate-900 tracking-tight">Remote Students</h1>
-              <p className="text-sm text-slate-500 mt-1 font-medium">Manage and edit all active online virtual learning enrollments</p>
+              <h1 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight">Remote Students</h1>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">Manage and edit all active online virtual learning enrollments</p>
             </div>
           </div>
-          <button onClick={() => setIsEnrollModalOpen(true)} className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-colors shadow-xs">
+          <button onClick={() => setIsEnrollModalOpen(true)} className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-colors shadow-xs self-start md:self-auto">
             <Plus className="w-4 h-4" /> Enroll Student
           </button>
         </div>
@@ -199,7 +199,7 @@ export default function StudentDirectory() {
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`text-xs px-4 py-2 rounded-lg font-bold transition-all ${
+                className={`text-xs px-3 sm:px-4 py-2 rounded-lg font-bold transition-all ${
                   filter === f
                     ? "bg-white text-slate-900 shadow-xs"
                     : "text-slate-500 hover:text-slate-800"
@@ -209,8 +209,8 @@ export default function StudentDirectory() {
               </button>
             ))}
           </div>
-          <div className="flex gap-2">
-            <div className="relative w-72">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="relative flex-1 sm:w-72">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 value={search}
@@ -219,7 +219,7 @@ export default function StudentDirectory() {
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/50"
               />
             </div>
-            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 shrink-0">
               <button 
                 onClick={() => setViewMode("GRID")}
                 className={`p-1.5 rounded-lg transition-colors ${viewMode === 'GRID' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'}`}
@@ -238,9 +238,9 @@ export default function StudentDirectory() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-8 relative z-10">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 relative z-10">
         {viewMode === "GRID" ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             <AnimatePresence>
             {filtered.map((student: any, i: number) => (
               <motion.div 
@@ -250,7 +250,7 @@ export default function StudentDirectory() {
                 transition={{ delay: i * 0.03 }}
                 key={student.id} 
                 onClick={() => setActiveStudent(student)}
-                className="cursor-pointer group bg-white border border-slate-200/80 hover:border-slate-300 rounded-2xl p-6 transition-all hover:shadow-md flex flex-col justify-between"
+                className="cursor-pointer group bg-white border border-slate-200/80 hover:border-slate-300 rounded-2xl p-4 sm:p-6 transition-all hover:shadow-md flex flex-col justify-between"
               >
                 <div>
                   <div className="flex gap-4 items-start mb-4">
@@ -317,8 +317,8 @@ export default function StudentDirectory() {
             </AnimatePresence>
           </div>
         ) : (
-          <div className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-xs">
-            <table className="w-full text-left text-sm border-collapse">
+          <div className="bg-white border border-slate-200/80 rounded-2xl overflow-x-auto custom-scrollbar shadow-xs">
+            <table className="w-full min-w-[700px] text-left text-sm border-collapse">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50 text-slate-600 font-extrabold text-[11px] tracking-wider uppercase">
                   <th className="px-6 py-4">Student</th>

@@ -216,21 +216,70 @@ export function TopNav() {
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-[100] flex">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs" onClick={() => setMobileOpen(false)} />
-          <div className="relative w-[85%] max-w-sm h-full flex flex-col bg-white border-r border-slate-200 shadow-2xl animate-in slide-in-from-left">
-            <div className="h-16 flex items-center justify-between px-5 border-b border-slate-200">
+          <div className="relative w-[85%] max-w-sm h-full flex flex-col bg-white border-r border-slate-200 shadow-2xl animate-in slide-in-from-left overflow-y-auto">
+            <div className="h-16 flex items-center justify-between px-5 border-b border-slate-200 shrink-0">
               <OrgHeader />
               <button onClick={() => setMobileOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 text-slate-600 hover:text-slate-900">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-4 border-t border-slate-200 bg-slate-50 flex flex-col gap-2 mt-auto">
-               <div className="flex items-center justify-around py-2 border-b border-slate-200 mb-2">
+            {/* Mobile Navigation Links */}
+            <div className="p-4 space-y-1">
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block px-3 mb-2 font-mono">Mobile Workspace Nav</span>
+              
+              {pathname?.startsWith("/dashboard/super-admin") ? (
+                <>
+                  <Link href="/dashboard/super-admin" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-slate-100">
+                    Dashboard Overview
+                  </Link>
+                  <Link href="/dashboard/super-admin/academies" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-slate-100">
+                    Academies Directory
+                  </Link>
+                  <Link href="/dashboard/super-admin/plans" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-slate-100">
+                    Plans & Billing
+                  </Link>
+                  <Link href="/dashboard/super-admin/branding" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-slate-100">
+                    Branding Controls
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-teal-50 hover:text-teal-800">
+                    Main Dashboard
+                  </Link>
+                  <Link href="/dashboard/academy/admissions" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-teal-50 hover:text-teal-800">
+                    Academy Admin & CRM
+                  </Link>
+                  <Link href="/dashboard/studio" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-teal-50 hover:text-teal-800">
+                    Teaching Studio
+                  </Link>
+                  <Link href="/dashboard/settings" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-teal-50 hover:text-teal-800">
+                    Branding & Settings
+                  </Link>
+                </>
+              )}
+            </div>
+
+            {/* Mobile Footer & User Card */}
+            <div className="p-4 border-t border-slate-200 bg-slate-50 flex flex-col gap-3 mt-auto shrink-0">
+               <div className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-2xl">
+                 <div className="w-10 h-10 rounded-xl bg-teal-600 text-white font-black text-sm flex items-center justify-center shrink-0">
+                   {session?.user?.name?.charAt(0) || "S"}
+                 </div>
+                 <div className="min-w-0 flex-1">
+                   <div className="text-xs font-bold text-slate-900 truncate">{session?.user?.name || "Stalin Kumar"}</div>
+                   <div className="text-[10px] text-teal-700 font-bold uppercase font-mono">{role}</div>
+                 </div>
+               </div>
+
+               <div className="flex items-center justify-around py-1 border-b border-slate-200 mb-1">
                  <NotificationMenu />
                  <RealtimeIndicator />
                </div>
-               <button onClick={() => signOut()} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-rose-600 hover:bg-rose-50">
-                  <LogOut className="w-5 h-5" /> Sign Out
+               
+               <button onClick={() => signOut()} className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 transition-colors">
+                  <LogOut className="w-4 h-4" /> Sign Out
                </button>
             </div>
           </div>

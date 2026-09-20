@@ -223,10 +223,10 @@ export default function BrandingThemeSettingsPage() {
     <div className="flex flex-col h-full bg-slate-50 text-slate-900 overflow-hidden">
       
       {/* Top Header */}
-      <div className="flex-none px-8 py-5 border-b border-slate-200 bg-white flex items-center justify-between shadow-xs">
+      <div className="flex-none p-4 sm:p-6 lg:p-8 bg-white border-b border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xs">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Branding & Theme Editor</h1>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Branding & Theme Editor</h1>
             {isDirty && (
               <span className="px-2.5 py-0.5 text-xs font-black bg-amber-100 text-amber-800 rounded-full border border-amber-200 flex items-center gap-1">
                 <AlertCircle className="w-3.5 h-3.5" /> Unsaved Changes
@@ -236,10 +236,10 @@ export default function BrandingThemeSettingsPage() {
           <p className="text-xs text-slate-500 mt-1 font-medium">Customize academy identity, design tokens, typography, and login portal live.</p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto">
           <button 
             onClick={() => setTheme(DEFAULT_TENANT_THEME)} 
-            className="flex items-center gap-1.5 px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl transition-all"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl transition-all"
           >
             <RotateCcw className="w-3.5 h-3.5" /> Reset Default
           </button>
@@ -248,7 +248,7 @@ export default function BrandingThemeSettingsPage() {
             onClick={handlePublish} 
             disabled={isPublishing}
             style={{ backgroundColor: theme.colors.primary }}
-            className="flex items-center gap-2 px-5 py-2.5 text-white font-bold text-xs rounded-xl transition-all shadow-sm hover:opacity-90 disabled:opacity-50"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 text-white font-bold text-xs rounded-xl transition-all shadow-sm hover:opacity-90 disabled:opacity-50"
           >
             {isPublishing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Publish Theme (v{theme.version})
@@ -262,7 +262,7 @@ export default function BrandingThemeSettingsPage() {
         <div className="w-full lg:w-[480px] border-b lg:border-b-0 lg:border-r border-slate-200 bg-white flex flex-col overflow-hidden flex-none">
           
           {/* Sub-tabs */}
-          <div className="flex border-b border-slate-200 bg-slate-50 px-2 pt-2 gap-1 overflow-x-auto flex-none scrollbar-none">
+          <div className="flex border-b border-slate-200 bg-slate-50 px-2 pt-2 gap-1 overflow-x-auto flex-none scrollbar-none flex-nowrap">
             {[
               { id: 'identity', label: 'Identity', icon: ImageIcon },
               { id: 'profile', label: 'Admin Profile', icon: Lock },
@@ -274,7 +274,7 @@ export default function BrandingThemeSettingsPage() {
               <button
                 key={t.id}
                 onClick={() => setBrandSubTab(t.id as any)}
-                className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-t-lg transition-all border-t border-x ${
+                className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-t-lg transition-all border-t border-x shrink-0 ${
                   brandSubTab === t.id 
                     ? 'bg-white border-slate-200 text-slate-900 border-b-white -mb-px' 
                     : 'border-transparent text-slate-500 hover:text-slate-900'

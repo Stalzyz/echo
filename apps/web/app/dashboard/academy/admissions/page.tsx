@@ -391,21 +391,21 @@ export default function AdmissionsPipelinePage() {
     <div className="flex flex-col h-full bg-slate-50 text-slate-900 overflow-hidden relative">
       
       {/* Header */}
-      <header className="px-8 py-6 border-b border-slate-200 shrink-0 bg-white shadow-2xs">
+      <header className="p-4 sm:p-6 lg:p-8 border-b border-slate-200 shrink-0 bg-white shadow-2xs">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-black tracking-tight text-slate-900">Admissions Pipeline</h1>
-            <p className="text-slate-500 text-sm mt-1 font-medium">Manage and track student leads across the enrollment lifecycle for Echo LMS.</p>
+            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">Admissions Pipeline</h1>
+            <p className="text-slate-500 text-xs sm:text-sm mt-1 font-medium">Manage and track student leads across the enrollment lifecycle for Echo LMS.</p>
           </div>
-          <div className="flex items-center flex-wrap gap-3">
-            <div className="relative">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto">
+            <div className="relative flex-1 sm:flex-initial">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input 
                 type="text" 
                 placeholder="Search name, phone, course..." 
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-56 md:w-64 pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/50 text-sm font-medium"
+                className="w-full sm:w-56 md:w-64 pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/50 text-sm font-medium"
               />
             </div>
             
@@ -440,7 +440,7 @@ export default function AdmissionsPipelinePage() {
       </header>
 
       {/* Kanban Board */}
-      <div className="flex-1 overflow-x-auto overflow-y-hidden p-8">
+      <div className="flex-1 overflow-x-auto overflow-y-hidden p-4 sm:p-6 lg:p-8">
         <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
           <div className="flex h-full gap-6 min-w-max">
             
@@ -463,7 +463,7 @@ export default function AdmissionsPipelinePage() {
       {/* Add Lead Modal */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 shadow-xl space-y-5 animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-4 sm:p-6 shadow-xl space-y-5 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <h3 className="text-xl font-black text-slate-900">Add New Lead</h3>
               <button onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-slate-600">
@@ -479,7 +479,7 @@ export default function AdmissionsPipelinePage() {
                   value={newLead.name} onChange={e => setNewLead(p => ({ ...p, name: e.target.value }))} />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Phone Number</label>
                   <input type="tel" placeholder="10-digit mobile"
@@ -501,7 +501,7 @@ export default function AdmissionsPipelinePage() {
                   value={newLead.courseInterest} onChange={e => setNewLead(p => ({ ...p, courseInterest: e.target.value }))} />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Source</label>
                   <select className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:border-teal-500"
