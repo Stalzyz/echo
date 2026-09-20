@@ -482,18 +482,18 @@ export default function BuilderClient({ initialCourse }: { initialCourse: any })
                                   <MonitorPlay className="w-8 h-8 text-teal-600" />
                                 </div>
                                 <h3 className="text-lg font-bold mb-1 text-slate-900">Add Video Content</h3>
-                                <p className="text-sm text-slate-500 mb-6">Paste a YouTube or Vimeo link</p>
+                                <p className="text-sm text-slate-500 mb-4">Paste a YouTube Unlisted Video URL, Vimeo, or Direct MP4 Link</p>
                                 <input 
                                   type="text"
-                                  placeholder="https://youtube.com/watch?v=..."
-                                  className="w-full max-w-md bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-teal-500"
+                                  placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
+                                  className="w-full max-w-md bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-teal-500 font-mono text-xs"
                                   onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
                                       handleUpdateLessonVideo(mod.id, lesson.id, e.currentTarget.value)
                                     }
                                   }}
                                 />
-                                <p className="text-xs text-slate-400 mt-2">Press Enter to save</p>
+                                <p className="text-xs text-teal-700 font-medium mt-2">💡 Tip: Upload videos as <strong>Unlisted</strong> on YouTube so only enrolled students in your academy can view them!</p>
                               </div>
                             ) : (
                               <div className="space-y-2">

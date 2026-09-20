@@ -290,14 +290,42 @@ export default function StudentCoursePlayerPage({ params }: { params: Promise<{ 
           {/* VIDEO CANVAS CONTAINER */}
           <div className="relative aspect-video rounded-2xl overflow-hidden bg-slate-900 border border-slate-300 shadow-md flex items-center justify-center group">
             {activeLesson?.videoUrl ? (
-              <video 
-                ref={videoRef}
-                src={activeLesson.videoUrl.startsWith('http') ? activeLesson.videoUrl : `https://echo.grekam.in/${activeLesson.videoUrl}`}
-                controls 
-                autoPlay={autoPlayNext}
-                className="w-full h-full object-contain"
-                poster={activeLesson.thumbnailUrl || undefined}
-              />
+              (() => {
+                const url = activeLesson.videoUrl
+                const isYouTube = url.includes("youtube.com") || url.includes("youtu.be")
+                let ytEmbed = ""
+                if (isYouTube) {
+                  if (url.includes("v=")) {
+                    ytEmbed = url.split("v=")[1]?.split("&")[0] || ""
+                  } else if (url.includes("youtu.be/")) {
+                    ytEmbed = url.split("youtu.be/")[1]?.split("?")[0] || ""
+                  } else if (url.includes("embed/")) {
+                    ytEmbed = url.split("embed/")[1]?.split("?")[0] || ""
+                  }
+                }
+
+                if (isYouTube && ytEmbed) {
+                  return (
+                    <iframe
+                      src={`https://www.youtube-nocookie.com/embed/${ytEmbed}?autoplay=1&rel=0&modestbranding=1`}
+                      className="w-full h-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  )
+                }
+
+                return (
+                  <video 
+                    ref={videoRef}
+                    src={url.startsWith('http') ? url : `https://echo.grekam.in/${url}`}
+                    controls 
+                    autoPlay={autoPlayNext}
+                    className="w-full h-full object-contain"
+                    poster={activeLesson.thumbnailUrl || undefined}
+                  />
+                )
+              })()
             ) : (
               <div className="text-center p-8 max-w-md text-white">
                 <div className="w-14 h-14 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto mb-3">
