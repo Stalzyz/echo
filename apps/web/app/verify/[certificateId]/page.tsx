@@ -1,15 +1,23 @@
+"use client"
+
 import Link from "next/link"
-import { CheckCircle2, Shield, Award, Calendar, User, BookOpen, ExternalLink } from "lucide-react"
+import { CheckCircle2, Shield, Award, Calendar, User, BookOpen, Share2, Sparkles, MessageSquare } from "lucide-react"
+import { useState, use } from "react"
+import { toast } from "sonner"
+import { BragGeneratorModal, BragData } from "@/components/BragGeneratorModal"
 
 interface VerifyProps {
   params: Promise<{ certificateId: string }>
 }
 
-export default async function CertificateVerificationPage({ params }: VerifyProps) {
-  const { certificateId } = await params
+export default function CertificateVerificationPage({ params }: VerifyProps) {
+  const { certificateId } = use(params)
+  const cleanId = (certificateId || "ECHO-2026-00124").toUpperCase()
 
-  // Clean uppercase ID
-  const cleanId = (certificateId || "GECHO-2026-00124").toUpperCase()
+  const [bragModal, setBragModal] = useState<{ isOpen: boolean; data: BragData }>({
+    isOpen: false,
+    data: { type: "CERTIFICATE", title: "" }
+  })
 
   return (
     <div className="min-h-screen bg-slate-950 text-white selection:bg-teal-500 selection:text-slate-950 flex flex-col justify-between">
@@ -17,10 +25,10 @@ export default async function CertificateVerificationPage({ params }: VerifyProp
       <header className="border-b border-slate-800/80 backdrop-blur-md sticky top-0 z-50 bg-slate-950/80">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-teal-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-teal-500/20">
-              
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-teal-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-teal-500/20 font-black text-slate-950 text-sm">
+              e
             </div>
-            <span className="font-extrabold text-lg tracking-tight">ECHO <span className="text-teal-400 text-xs font-normal bg-teal-500/10 px-2 py-0.5 rounded border border-teal-500/20 font-mono">VERIFIER</span></span>
+            <span className="font-extrabold text-lg tracking-tight">echo <span className="text-teal-400 text-xs font-normal bg-teal-500/10 px-2 py-0.5 rounded border border-teal-500/20 font-mono">VERIFIER</span></span>
           </Link>
           <div className="text-xs text-slate-400 font-mono">
             Public Certificate Registry
@@ -34,9 +42,34 @@ export default async function CertificateVerificationPage({ params }: VerifyProp
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
           {/* Verification Badge Header */}
-          <div className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-4 py-2.5 rounded-2xl w-fit mb-6">
-            <CheckCircle2 className="w-5 h-5 shrink-0" />
-            <span className="text-xs font-bold uppercase tracking-wider">Official Certificate Verified</span>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-4 py-2.5 rounded-2xl w-fit">
+              <CheckCircle2 className="w-5 h-5 shrink-0" />
+              <span className="text-xs font-bold uppercase tracking-wider">Official Certificate Verified</span>
+            </div>
+            
+            <button
+              onClick={() =>
+                setBragModal({
+                  isOpen: true,
+                  data: {
+                    type: "CERTIFICATE",
+                    title: "Fullstack Web & AI Engineering Certificate",
+                    authorOrAcademy: "Grekam Academy of Technology",
+                    priceOrId: cleanId,
+                    highlights: [
+                      "Verified Industry Credential",
+                      "Multi-Tenant SaaS Signed",
+                      "Alex Martin • 2026"
+                    ],
+                    linkUrl: `https://echo.grekam.in/verify/${cleanId}`
+                  }
+                })
+              }
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold text-xs transition-all hover:scale-105"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-purple-400 animate-pulse" /> ⚡ Brag & Share
+            </button>
           </div>
 
           <h1 className="text-2xl font-black text-white mb-2">Fullstack Web & AI Engineering Certificate</h1>
@@ -61,16 +94,47 @@ export default async function CertificateVerificationPage({ params }: VerifyProp
             </div>
           </div>
 
-          <div className="text-xs text-slate-400 leading-relaxed">
-            This credential is digitally signed by Grekam Academy via the ECHO LMS Multi-Tenant SaaS platform. Tampering invalidates this verification record.
+          <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="text-xs text-slate-400 leading-relaxed">
+              Digitally signed by Grekam Academy via echo LMS Multi-Tenant SaaS.
+            </div>
+            <button
+              onClick={() =>
+                setBragModal({
+                  isOpen: true,
+                  data: {
+                    type: "CERTIFICATE",
+                    title: "Fullstack Web & AI Engineering Certificate",
+                    authorOrAcademy: "Grekam Academy of Technology",
+                    priceOrId: cleanId,
+                    highlights: [
+                      "Verified Industry Credential",
+                      "Multi-Tenant SaaS Signed",
+                      "Alex Martin • 2026"
+                    ],
+                    linkUrl: `https://echo.grekam.in/verify/${cleanId}`
+                  }
+                })
+              }
+              className="px-5 py-2.5 bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30 hover:scale-105 transition-all shrink-0"
+            >
+              <Share2 className="w-4 h-4" /> ⚡ Brag Video Generator
+            </button>
           </div>
         </div>
       </main>
 
       {/* Footer */}
       <footer className="border-t border-slate-900 py-6 text-center text-xs text-slate-600 font-mono">
-        © 2026 ECHO LMS SaaS. All rights reserved.
+        © 2026 echo LMS SaaS. All rights reserved.
       </footer>
+
+      <BragGeneratorModal
+        isOpen={bragModal.isOpen}
+        onClose={() => setBragModal(prev => ({ ...prev, isOpen: false }))}
+        data={bragModal.data}
+      />
     </div>
   )
 }
+

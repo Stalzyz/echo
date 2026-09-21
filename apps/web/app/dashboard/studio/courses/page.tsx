@@ -1,10 +1,11 @@
 "use client"
 
 import { useApi, fetchApi } from "@/lib/useApi"
-import { BookOpen, Plus, Loader2, ArrowRight, UserPlus, X } from "lucide-react"
+import { BookOpen, Plus, Loader2, ArrowRight, UserPlus, X, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import { toast } from "sonner"
+import { BragGeneratorModal, BragData } from "@/components/BragGeneratorModal"
 
 export default function OnsiteCoursesPage() {
   const { data: batchesRes, isLoading, mutate } = useApi<any>("/academy/batches")
@@ -17,6 +18,11 @@ export default function OnsiteCoursesPage() {
   const [assignModal, setAssignModal] = useState<{isOpen: boolean, batchId: string, currentEducatorId: string}>({isOpen: false, batchId: "", currentEducatorId: ""})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedEducator, setSelectedEducator] = useState("")
+
+  const [bragModal, setBragModal] = useState<{ isOpen: boolean; data: BragData }>({
+    isOpen: false,
+    data: { type: "COURSE", title: "" }
+  })
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [createForm, setCreateForm] = useState({
@@ -117,12 +123,32 @@ export default function OnsiteCoursesPage() {
                 </button>
               </div>
               
-              <div className="mt-auto pt-4 border-t border-slate-100 flex justify-between items-center">
-                <div className="text-sm text-slate-500">
-                  {batch._count?.enrollments || 0} Enrolled
-                </div>
-                <Link href={`/dashboard/studio/courses/builder/${batch.courseId}`} className="text-teal-600 hover:text-teal-700 font-bold text-sm flex items-center gap-1 transition-colors">
-                  Open Builder <ArrowRight className="w-4 h-4" />
+              <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                <button
+                  onClick={() =>
+                    setBragModal({
+                      isOpen: true,
+                      data: {
+                        type: "COURSE",
+                        title: batch.course?.name || "Fullstack Web & AI Masterclass",
+                        subtitle: `${batch.name} • ${batch.type}`,
+                        authorOrAcademy: "echo Academy",
+                        priceOrId: `₹${batch.courseFee || "49,999"}`,
+                        highlights: [
+                          "Live Mentorship & Doubt Sessions",
+                          "Hands-on Real-world Capstone Projects",
+                          "Official Industry Verified Certificate"
+                        ],
+                        linkUrl: `https://echo.grekam.in/academy/courses/${batch.courseId || "c-123"}`
+                      }
+                    })
+                  }
+                  className="px-3 py-1.5 rounded-xl bg-purple-50 text-purple-600 hover:bg-purple-100 font-bold text-xs flex items-center gap-1.5 transition-colors border border-purple-200 shadow-sm"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-purple-600 animate-pulse" /> Brag & Launch
+                </button>
+                <Link href={`/dashboard/studio/courses/builder/${batch.courseId}`} className="text-teal-600 hover:text-teal-700 font-bold text-xs flex items-center gap-1 transition-colors">
+                  Open Builder <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
@@ -241,6 +267,12 @@ export default function OnsiteCoursesPage() {
           </div>
         </div>
       )}
+
+      <BragGeneratorModal
+        isOpen={bragModal.isOpen}
+        onClose={() => setBragModal(prev => ({ ...prev, isOpen: false }))}
+        data={bragModal.data}
+      />
     </div>
   )
 }
