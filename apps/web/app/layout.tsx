@@ -24,10 +24,16 @@ export const metadata: Metadata = {
     siteName: 'echo by Grekam',
     images: [
       {
-        url: '/og-image.png',
+        url: 'https://echo.grekam.in/echo_preview.png',
         width: 1200,
         height: 630,
-        alt: 'echo Academy Operating System',
+        alt: 'echo — Academy Operating System by Grekam',
+      },
+      {
+        url: '/echo_preview.png',
+        width: 1200,
+        height: 630,
+        alt: 'echo — Academy Operating System by Grekam',
       }
     ],
     locale: 'en_US',
@@ -37,7 +43,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'echo by Grekam',
     description: 'Operating system for modern academies and education businesses.',
-    images: ['/og-image.png'],
+    images: ['https://echo.grekam.in/echo_preview.png'],
   },
   robots: {
     index: true,
