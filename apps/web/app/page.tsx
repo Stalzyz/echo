@@ -146,7 +146,6 @@ export default function PublicHomePage() {
             <a href="#student-experience" className="hover:text-teal-700 transition-colors">Learner UI</a>
             <a href="#crm" className="hover:text-teal-700 transition-colors">CRM & Sales</a>
             <a href="#automation" className="hover:text-teal-700 transition-colors">Automation</a>
-            <a href="#pricing" className="hover:text-teal-700 transition-colors">Pricing</a>
             <a href="#branding" className="hover:text-teal-700 transition-colors">White-Label</a>
             <a href="#faq" className="hover:text-teal-700 transition-colors">FAQ</a>
           </nav>
@@ -1232,7 +1231,6 @@ export default function PublicHomePage() {
               <li><a href="#ecosystem" className="hover:text-white">LMS</a></li>
               <li><a href="#crm" className="hover:text-white">CRM</a></li>
               <li><a href="#automation" className="hover:text-white">Automation</a></li>
-              <li><a href="#pricing" className="hover:text-white">Pricing</a></li>
               <li><a href="#branding" className="hover:text-white">White Label</a></li>
             </ul>
           </div>
