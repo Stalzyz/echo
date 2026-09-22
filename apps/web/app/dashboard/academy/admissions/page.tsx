@@ -8,7 +8,9 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent
+  DragEndEvent,
+  DragStartEvent,
+  DragOverlay
 } from '@dnd-kit/core'
 import {
   SortableContext,
@@ -44,6 +46,62 @@ const columns: { id: ColumnType, title: string, color: string }[] = [
   { id: 'DROPPED', title: 'Dropped', color: 'bg-rose-100 text-rose-800 border-rose-200' },
 ]
 
+// Lead Card Content Component
+function LeadCardContent({ lead, onSelect }: { lead: Lead, onSelect?: (lead: Lead, action?: string) => void }) {
+  return (
+    <div className="bg-white border border-slate-200 hover:border-teal-500/50 hover:shadow-md p-4 rounded-xl cursor-grab active:cursor-grabbing group relative z-10 transition-all select-none">
+      <div className="flex justify-between items-start mb-2">
+        <div>
+          <h4 className="font-extrabold text-slate-900 text-sm">{lead.name}</h4>
+          {lead.phone && <p className="text-[11px] text-slate-400 font-mono">{lead.phone}</p>}
+        </div>
+        <button 
+          className="text-slate-400 hover:text-slate-700 transition-colors p-1" 
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => { e.stopPropagation(); onSelect?.(lead, "CALL"); }}
+        >
+          <MoreHorizontal className="w-4 h-4" />
+        </button>
+      </div>
+      <p className="text-xs text-slate-500 font-medium mb-3">{lead.courseInterest || 'No Course Specified'}</p>
+      
+      <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-100">
+        <div className="flex items-center gap-2">
+          <div className="flex -space-x-1">
+            <button 
+              className="w-7 h-7 rounded-full bg-teal-50 hover:bg-teal-100 border border-teal-200 flex items-center justify-center text-teal-700 transition-colors" 
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => { e.stopPropagation(); onSelect?.(lead, "CALL"); }}
+            >
+              <Phone className="w-3.5 h-3.5" />
+            </button>
+            <button 
+              className="w-7 h-7 rounded-full bg-amber-50 hover:bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-700 transition-colors" 
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => { e.stopPropagation(); onSelect?.(lead, "EMAIL"); }}
+            >
+              <Mail className="w-3.5 h-3.5" />
+            </button>
+            <button 
+              className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-700 transition-colors" 
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => { e.stopPropagation(); onSelect?.(lead, "MEETING"); }}
+            >
+              <Calendar className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] uppercase font-black tracking-wider text-slate-400">Score</span>
+          <span className={`text-xs font-black ${lead.score > 80 ? 'text-emerald-600' : lead.score > 50 ? 'text-amber-600' : 'text-rose-600'}`}>
+            {lead.score || 50}
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // Droppable Column Wrapper
 function KanbanColumn({ column, leads, onSelectLead }: { column: typeof columns[0], leads: Lead[], onSelectLead: (lead: Lead, tab?: string) => void }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id })
@@ -52,7 +110,7 @@ function KanbanColumn({ column, leads, onSelectLead }: { column: typeof columns[
     <div 
       ref={setNodeRef}
       className={`flex flex-col w-80 shrink-0 border rounded-2xl overflow-hidden transition-colors shadow-xs ${
-        isOver ? 'bg-teal-50 border-teal-300' : 'bg-white border-slate-200'
+        isOver ? 'bg-teal-50/70 border-teal-300' : 'bg-white border-slate-200'
       }`}
     >
       <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
@@ -86,71 +144,27 @@ function SortableLeadCard({ lead, onSelect }: { lead: Lead, onSelect: (lead: Lea
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: lead.id })
   
   const style = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Translate.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
+  }
+
+  if (isDragging) {
+    return (
+      <div 
+        ref={setNodeRef} 
+        style={style}
+        className="opacity-30 border-2 border-dashed border-teal-400 bg-teal-50/50 p-4 rounded-xl h-[120px]"
+      />
+    )
   }
 
   return (
-    <div 
-      ref={setNodeRef} 
-      style={style} 
-      {...attributes} 
-      {...listeners}
-      onClick={() => onSelect(lead, "CALL")}
-      className="bg-white border border-slate-200 hover:border-teal-500/50 hover:shadow-md p-4 rounded-xl cursor-grab active:cursor-grabbing group relative z-10 transition-all"
-    >
-      <div className="flex justify-between items-start mb-2">
-        <div>
-          <h4 className="font-extrabold text-slate-900 text-sm">{lead.name}</h4>
-          {lead.phone && <p className="text-[11px] text-slate-400 font-mono">{lead.phone}</p>}
-        </div>
-        <button 
-          className="text-slate-400 hover:text-slate-700 transition-colors p-1" 
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={(e) => { e.stopPropagation(); onSelect(lead, "CALL"); }}
-        >
-          <MoreHorizontal className="w-4 h-4" />
-        </button>
-      </div>
-      <p className="text-xs text-slate-500 font-medium mb-3">{lead.courseInterest || 'No Course Specified'}</p>
-      
-      <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-100">
-        <div className="flex items-center gap-2">
-          <div className="flex -space-x-1">
-            <button 
-              className="w-7 h-7 rounded-full bg-teal-50 hover:bg-teal-100 border border-teal-200 flex items-center justify-center text-teal-700 transition-colors" 
-              onPointerDown={(e) => e.stopPropagation()}
-              onClick={(e) => { e.stopPropagation(); onSelect(lead, "CALL"); }}
-            >
-              <Phone className="w-3.5 h-3.5" />
-            </button>
-            <button 
-              className="w-7 h-7 rounded-full bg-amber-50 hover:bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-700 transition-colors" 
-              onPointerDown={(e) => e.stopPropagation()}
-              onClick={(e) => { e.stopPropagation(); onSelect(lead, "EMAIL"); }}
-            >
-              <Mail className="w-3.5 h-3.5" />
-            </button>
-            <button 
-              className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-700 transition-colors" 
-              onPointerDown={(e) => e.stopPropagation()}
-              onClick={(e) => { e.stopPropagation(); onSelect(lead, "MEETING"); }}
-            >
-              <Calendar className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="text-[10px] uppercase font-black tracking-wider text-slate-400">Score</span>
-          <span className={`text-xs font-black ${lead.score > 80 ? 'text-emerald-600' : lead.score > 50 ? 'text-amber-600' : 'text-rose-600'}`}>
-            {lead.score || 50}
-          </span>
-        </div>
-      </div>
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} onClick={() => onSelect(lead, "CALL")}>
+      <LeadCardContent lead={lead} onSelect={onSelect} />
     </div>
   )
 }
+
 
 export default function AdmissionsPipelinePage() {
   const [leads, setLeads] = useState<Lead[]>([])
@@ -239,28 +253,40 @@ export default function AdmissionsPipelinePage() {
     })
   }, [leads, searchTerm, statusFilter])
 
+  const [activeId, setActiveId] = useState<string | null>(null)
+  const activeLead = useMemo(() => leads.find(l => l.id === activeId), [leads, activeId])
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor)
   )
 
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(String(event.active.id))
+  }
+
+  const handleDragCancel = () => {
+    setActiveId(null)
+  }
+
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
+    setActiveId(null)
     
     if (!over) return
 
-    const activeLead = leads.find(l => l.id === active.id)
+    const activeLeadItem = leads.find(l => l.id === active.id)
     const overId = String(over.id)
     
     const overColumn = columns.find(c => c.id === overId)?.id || leads.find(l => l.id === overId)?.status
 
-    if (activeLead && overColumn && activeLead.status !== overColumn) {
+    if (activeLeadItem && overColumn && activeLeadItem.status !== overColumn) {
       setLeads(leads.map(lead => 
-        lead.id === activeLead.id ? { ...lead, status: overColumn } : lead
+        lead.id === activeLeadItem.id ? { ...lead, status: overColumn } : lead
       ))
       
       try {
-        await fetchApi(`/crm/leads/${activeLead.id}`, {
+        await fetchApi(`/crm/leads/${activeLeadItem.id}`, {
           method: "PATCH",
           body: JSON.stringify({ status: overColumn })
         })
@@ -271,6 +297,7 @@ export default function AdmissionsPipelinePage() {
       }
     }
   }
+
 
   const handleAddLead = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -441,7 +468,13 @@ export default function AdmissionsPipelinePage() {
 
       {/* Kanban Board */}
       <div className="flex-1 overflow-x-auto overflow-y-hidden p-4 sm:p-6 lg:p-8">
-        <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
+        <DndContext 
+          sensors={sensors} 
+          collisionDetection={closestCorners} 
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
+        >
           <div className="flex h-full gap-6 min-w-max">
             
             {columns.map(column => {
@@ -457,8 +490,17 @@ export default function AdmissionsPipelinePage() {
             })}
 
           </div>
+
+          <DragOverlay>
+            {activeLead ? (
+              <div className="rotate-1 scale-105 shadow-2xl rounded-xl z-50 pointer-events-none opacity-95">
+                <LeadCardContent lead={activeLead} />
+              </div>
+            ) : null}
+          </DragOverlay>
         </DndContext>
       </div>
+
 
       {/* Add Lead Modal */}
       {isAddModalOpen && (

@@ -1,13 +1,14 @@
 "use client"
 
 import { useApi, fetchApi } from "@/lib/useApi"
-import { Video, Plus, Loader2, Users, Calendar, Clock, ExternalLink, X } from "lucide-react"
+import { Video, Plus, Loader2, Users, Calendar, Clock, ExternalLink, X, Pencil, Trash2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
 export default function OnsiteLiveSessionsPage() {
   const { data: sessions, isLoading, mutate } = useApi<any[]>("/academy/demo-sessions")
   const [isScheduleOpen, setIsScheduleOpen] = useState(false)
+  const [editingSession, setEditingSession] = useState<any | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [form, setForm] = useState({
     title: "",
@@ -42,6 +43,61 @@ export default function OnsiteLiveSessionsPage() {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const handleEditSession = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingSession) return
+    setIsSubmitting(true)
+    try {
+      const finalMeetUrl = form.meetUrl || `https://meet.google.com/new`
+      await fetchApi(`/academy/demo-sessions/${editingSession.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          title: form.title,
+          scheduledAt: new Date(form.scheduledAt).toISOString(),
+          durationMins: Number(form.durationMins),
+          capacity: Number(form.capacity),
+          venue: `${form.venue} | ${finalMeetUrl}`
+        })
+      })
+      toast.success("Live session updated!")
+      setEditingSession(null)
+      setForm({ title: "", scheduledAt: "", durationMins: 60, capacity: 30, meetUrl: "", venue: "Online / Google Meet" })
+      mutate()
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update session")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleDeleteSession = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this live session?")) return
+    try {
+      await fetchApi(`/academy/demo-sessions/${id}`, { method: "DELETE" })
+      toast.success("Live session deleted!")
+      mutate()
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete session")
+    }
+  }
+
+  const openEditModal = (session: any) => {
+    setEditingSession(session)
+    const formattedDate = session.scheduledAt ? new Date(session.scheduledAt).toISOString().slice(0, 16) : ""
+    const meetUrlParts = (session.venue || "").split("|")
+    const venueName = meetUrlParts[0]?.trim() || "Online / Google Meet"
+    const meetUrl = meetUrlParts[1]?.trim() || session.meetLink || ""
+
+    setForm({
+      title: session.title || "",
+      scheduledAt: formattedDate,
+      durationMins: session.durationMins || 60,
+      capacity: session.capacity || 30,
+      meetUrl,
+      venue: venueName
+    })
   }
 
   return (
@@ -80,7 +136,7 @@ export default function OnsiteLiveSessionsPage() {
             >
               <Video className="w-4 h-4 text-teal-400" /> Go Live Now
             </button>
-            <button onClick={() => setIsScheduleOpen(true)} className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold px-5 py-3 rounded-xl transition-colors shadow-xs">
+            <button onClick={() => { setForm({ title: "", scheduledAt: "", durationMins: 60, capacity: 30, meetUrl: "", venue: "Online / Google Meet" }); setIsScheduleOpen(true); }} className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold px-5 py-3 rounded-xl transition-colors shadow-xs">
               <Plus className="w-4 h-4" /> Schedule Session
             </button>
           </div>
@@ -94,18 +150,24 @@ export default function OnsiteLiveSessionsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sessions?.map((session: any) => (
-            <div key={session.id} className="bg-white border border-slate-200 rounded-2xl p-6 flex flex-col group hover:border-teal-400 transition-colors shadow-sm">
+            <div key={session.id} className="bg-white border border-slate-200 rounded-2xl p-6 flex flex-col group hover:border-teal-400 transition-colors shadow-sm relative">
               <div className="flex justify-between items-start mb-4">
                 <span className="text-[10px] bg-teal-50 text-teal-700 px-2.5 py-1 rounded font-bold uppercase tracking-widest border border-teal-200">
                   LIVE SESSION
                 </span>
-                <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded font-bold uppercase border border-emerald-200">
-                  SCHEDULED
-                </span>
+                
+                <div className="flex items-center gap-1">
+                  <button onClick={() => openEditModal(session)} title="Edit Session" className="p-1.5 text-slate-400 hover:text-teal-700 hover:bg-teal-50 rounded-lg transition-colors">
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => handleDeleteSession(session.id)} title="Delete Session" className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
               
               <h3 className="font-bold text-lg mb-2 text-slate-900">{session.title}</h3>
-              <p className="text-sm text-slate-500 mb-6">{session.venue || "Main Hall"}</p>
+              <p className="text-sm text-slate-500 mb-6">{session.venue?.split('|')[0] || "Main Hall"}</p>
               
               <div className="space-y-3 mb-6">
                 <div className="flex items-center gap-2 text-xs text-slate-600 font-medium">
@@ -145,15 +207,15 @@ export default function OnsiteLiveSessionsPage() {
         </div>
       )}
 
-      {/* Schedule Session Modal */}
-      {isScheduleOpen && (
+      {/* Schedule / Edit Session Modal */}
+      {(isScheduleOpen || editingSession) && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-md p-6 shadow-xl text-slate-900">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold">Schedule Live Class</h2>
-              <button onClick={() => setIsScheduleOpen(false)}><X className="w-5 h-5 text-slate-400 hover:text-slate-700" /></button>
+              <h2 className="text-xl font-bold">{editingSession ? "Edit Live Class" : "Schedule Live Class"}</h2>
+              <button onClick={() => { setIsScheduleOpen(false); setEditingSession(null); }}><X className="w-5 h-5 text-slate-400 hover:text-slate-700" /></button>
             </div>
-            <form onSubmit={handleScheduleSession} className="space-y-4">
+            <form onSubmit={editingSession ? handleEditSession : handleScheduleSession} className="space-y-4">
               <div>
                 <label className="text-xs text-slate-500 font-bold uppercase tracking-widest block mb-2">Class Title</label>
                 <input required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:border-teal-500 outline-none"
@@ -186,7 +248,7 @@ export default function OnsiteLiveSessionsPage() {
               </div>
               <button disabled={isSubmitting || !form.title || !form.scheduledAt} type="submit"
                 className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl transition-colors disabled:opacity-50 mt-4 flex justify-center items-center gap-2 shadow-sm">
-                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Schedule Session"}
+                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : editingSession ? "Update Live Class" : "Schedule Session"}
               </button>
             </form>
           </div>
@@ -195,3 +257,4 @@ export default function OnsiteLiveSessionsPage() {
     </div>
   )
 }
+

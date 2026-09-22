@@ -257,6 +257,41 @@ export default async function walkInsRouter(app: FastifyInstance) {
     return session;
   });
 
+  // ── PATCH /api/v1/academy/demo-sessions/:id ───────────────────────────
+  app.patch('/demo-sessions/:id', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const schema = z.object({
+      title: z.string().optional(),
+      scheduledAt: z.string().optional(),
+      durationMins: z.number().optional(),
+      venue: z.string().optional(),
+      meetLink: z.string().optional(),
+      capacity: z.number().optional(),
+    });
+    const body = schema.parse(req.body);
+    const updateData: any = { ...body };
+    if (body.scheduledAt) updateData.scheduledAt = new Date(body.scheduledAt);
+
+    const updated = await app.prisma.demoSession.update({
+      where: { id },
+      data: updateData,
+    });
+    return updated;
+  });
+
+  // ── DELETE /api/v1/academy/demo-sessions/:id ──────────────────────────
+  app.delete('/demo-sessions/:id', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    await app.prisma.demoSession.update({
+      where: { id },
+      data: { isActive: false },
+    }).catch(async () => {
+      await app.prisma.demoSession.delete({ where: { id } }).catch(() => {});
+    });
+    return { success: true, message: "Demo session deleted" };
+  });
+
+
   // ── POST /api/v1/academy/demo-sessions/:id/register ──────────────────────
   app.post('/demo-sessions/:id/register', async (req, reply) => {
     const { id } = req.params as { id: string };

@@ -41,10 +41,12 @@ export default function FinanceSettingsPage() {
         currencySymbol: settings.currencySymbol || "₹",
         taxModel: settings.taxModel || "NONE",
         gstNumber: settings.gstNumber ? settings.gstNumber.trim() : null,
+        panNumber: settings.panNumber ? settings.panNumber.trim() : null,
         vatNumber: settings.vatNumber ? settings.vatNumber.trim() : null,
         fiscalYearStart: Number(settings.fiscalYearStart) || 4,
         invoicePrefix: settings.invoicePrefix ? settings.invoicePrefix.trim() : "INV",
       };
+
 
       const updated = await ApiClient.patch("/settings/finance", payload);
       setSettings({ ...updated, currencies });
@@ -115,7 +117,7 @@ export default function FinanceSettingsPage() {
               </button>
             ))}
           </div>
-          {settings.taxModel === 'GST' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-600">GST Number (GSTIN)</label>
               <input
@@ -126,7 +128,18 @@ export default function FinanceSettingsPage() {
                 placeholder="22AAAAA0000A1Z5"
               />
             </div>
-          )}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-600">PAN Number (Permanent Account Number)</label>
+              <input
+                type="text"
+                value={settings.panNumber || ""}
+                onChange={(e) => setSettings({ ...settings, panNumber: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-900 focus:outline-none focus:border-teal-500 font-mono uppercase"
+                placeholder="ABCDE1234F"
+              />
+            </div>
+          </div>
+
           {settings.taxModel === 'VAT' && (
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-600">VAT Number</label>

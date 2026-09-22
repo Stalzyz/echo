@@ -7,7 +7,25 @@ import { useApi, fetchApi } from "@/lib/useApi"
 import { SlideOver } from "@/components/SlideOver"
 import { toast } from "sonner"
 
-const SYSTEM_MODULES = ["CRM & Sales", "Projects", "Finance", "HR & Payroll", "LMS & Academy", "Marketing Hub", "Support Helpdesk", "System Settings"]
+const SYSTEM_MODULES = [
+  "Admissions CRM",
+  "Form Builder & Kiosk",
+  "Demo Sessions & Live Studio",
+  "Campus & Remote Students",
+  "Instructors & Faculty",
+  "Fee Collection & EMI",
+  "Batches & Course Builder",
+  "Live Projects & Internships",
+  "Placements",
+  "Webinars & Funnels",
+  "Social Community",
+  "WhatsApp Messages",
+  "Visual Automations",
+  "Global Leaderboard",
+  "Quiz & Certificates",
+  "Branding & System Settings"
+]
+
 
 export default function RolesPage() {
   const { data, mutate, isLoading } = useApi<any>("/settings/roles")

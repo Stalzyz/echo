@@ -1,7 +1,6 @@
 import { auth } from "../../auth"
 import { SessionProvider } from "next-auth/react"
 import { CommandPalette } from "@/components/ui/CommandPalette"
-import { TelemetryNotifier } from "@/components/TelemetryNotifier"
 import { WebSocketProvider } from "@/components/providers/WebSocketProvider"
 import { CurrentUserProvider } from "@/context/CurrentUserContext"
 import { DashboardShell } from "@/components/layout/DashboardShell"
@@ -33,9 +32,9 @@ export default async function DashboardLayout({
             {children}
           </DashboardShell>
           <CommandPalette />
-          <TelemetryNotifier />
         </CurrentUserProvider>
       </WebSocketProvider>
     </SessionProvider>
   )
 }
+

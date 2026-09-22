@@ -6,10 +6,30 @@ export const authConfig = {
     signIn: '/auth/login',
   },
   callbacks: {
-    authorized() {
-      return true; // Password and auth restriction removed for development
+    authorized({ auth, request: { nextUrl } }) {
+      const isLoggedIn = !!auth?.user
+      const isOnDashboard = nextUrl.pathname.startsWith('/dashboard')
+      const isOnPortal = nextUrl.pathname.startsWith('/portal')
+      const isOnStudent = nextUrl.pathname.startsWith('/student')
+
+      if (isOnDashboard || isOnPortal || isOnStudent) {
+        if (isLoggedIn) return true
+        return false // Redirect unauthenticated users to login page
+      } else if (isLoggedIn) {
+        if (nextUrl.pathname.startsWith('/auth/login') || nextUrl.pathname === '/login') {
+          const role = (auth?.user as any)?.role
+          if (role === 'CLIENT') {
+            return Response.redirect(new URL('/portal', nextUrl))
+          } else if (role === 'STUDENT') {
+            return Response.redirect(new URL('/student', nextUrl))
+          } else if (role === 'EDUCATOR') {
+            return Response.redirect(new URL('/dashboard/studio', nextUrl))
+          }
+          return Response.redirect(new URL('/dashboard', nextUrl))
+        }
+      }
+      return true
     },
   },
   providers: [],
 } satisfies NextAuthConfig
-

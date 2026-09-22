@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Search, Plus, Users, Calendar, GraduationCap, ChevronRight } from "lucide-react"
+import { Search, Plus, Users, Calendar, GraduationCap, ChevronRight, Video, Sparkles, Clock, Link as LinkIcon, CheckCircle2, PlayCircle, Loader2, X, Trash2, Edit3, ShieldAlert } from "lucide-react"
 import { useApi, fetchApi } from "@/lib/useApi"
 import { format } from "date-fns"
 import { SlideOver } from "@/components/SlideOver"
@@ -18,7 +18,25 @@ export default function BatchesPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [isEditOpen, setIsEditOpen] = useState(false)
+  const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null)
+  const [isSessionsOpen, setIsSessionsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isAutoScheduling, setIsAutoScheduling] = useState(false)
+
+  const { data: selectedBatchData, mutate: mutateSelectedBatch } = useApi<any>(
+    selectedBatchId ? `/academy/batches/${selectedBatchId}` : null
+  )
+
+  const [editingSession, setEditingSession] = useState<any | null>(null)
+  const [sessionForm, setSessionForm] = useState({
+    title: "",
+    description: "",
+    startTime: "",
+    endTime: "",
+    meetLink: "",
+    recordingUrl: ""
+  })
+
   const [newBatch, setNewBatch] = useState({
     name: "",
     courseId: "",
@@ -26,8 +44,10 @@ export default function BatchesPage() {
     capacity: 20,
     startDate: "",
     endDate: "",
-    educatorId: ""
+    educatorId: "",
+    recordingAccessDays: 7
   })
+
   const [editBatch, setEditBatch] = useState<any>({
     id: "",
     name: "",
@@ -37,6 +57,7 @@ export default function BatchesPage() {
     startDate: "",
     endDate: "",
     educatorId: "",
+    recordingAccessDays: 7,
     isActive: true
   })
 
@@ -51,12 +72,13 @@ export default function BatchesPage() {
           startDate: new Date(newBatch.startDate).toISOString(),
           endDate: new Date(newBatch.endDate).toISOString(),
           capacity: Number(newBatch.capacity),
+          recordingAccessDays: Number(newBatch.recordingAccessDays || 7),
           educatorId: newBatch.educatorId || undefined
         })
       })
-      toast.success("Batch created successfully")
+      toast.success("Batch created successfully!")
       setIsCreateOpen(false)
-      setNewBatch({ name: "", courseId: "", type: "ONLINE", capacity: 20, startDate: "", endDate: "", educatorId: "" })
+      setNewBatch({ name: "", courseId: "", type: "ONLINE", capacity: 20, startDate: "", endDate: "", educatorId: "", recordingAccessDays: 7 })
       mutate()
     } catch (err: any) {
       toast.error(err.message || "Failed to create batch")
@@ -72,17 +94,15 @@ export default function BatchesPage() {
       await fetchApi(`/academy/batches/${editBatch.id}`, {
         method: "PATCH",
         body: JSON.stringify({
-          name: editBatch.name,
-          courseId: editBatch.courseId,
-          type: editBatch.type,
-          capacity: Number(editBatch.capacity),
+          ...editBatch,
           startDate: new Date(editBatch.startDate).toISOString(),
           endDate: new Date(editBatch.endDate).toISOString(),
-          educatorId: editBatch.educatorId || null,
-          isActive: editBatch.isActive
+          capacity: Number(editBatch.capacity),
+          recordingAccessDays: Number(editBatch.recordingAccessDays || 7),
+          educatorId: editBatch.educatorId || undefined
         })
       })
-      toast.success("Batch updated successfully")
+      toast.success("Batch updated successfully!")
       setIsEditOpen(false)
       mutate()
     } catch (err: any) {
@@ -92,8 +112,68 @@ export default function BatchesPage() {
     }
   }
 
+  const handleAutoSchedule = async () => {
+    if (!selectedBatchId) return
+    setIsAutoScheduling(true)
+    try {
+      const res = await fetchApi<any>(`/academy/batches/${selectedBatchId}/auto-schedule`, {
+        method: "POST",
+        body: JSON.stringify({ daysCount: 45, defaultMeetLink: "https://meet.google.com/new" })
+      })
+      toast.success(res.message || "45 Daily sessions auto-generated!")
+      mutateSelectedBatch()
+    } catch (err: any) {
+      toast.error(err.message || "Failed to auto-schedule sessions")
+    } finally {
+      setIsAutoScheduling(false)
+    }
+  }
+
+  const handleSaveSession = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingSession || !selectedBatchId) return
+    setIsSubmitting(true)
+    try {
+      await fetchApi(`/academy/batches/sessions/${editingSession.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          title: sessionForm.title,
+          description: sessionForm.description,
+          startTime: sessionForm.startTime ? new Date(sessionForm.startTime).toISOString() : undefined,
+          endTime: sessionForm.endTime ? new Date(sessionForm.endTime).toISOString() : undefined,
+          meetLink: sessionForm.meetLink,
+          recordingUrl: sessionForm.recordingUrl
+        })
+      })
+      toast.success("Session updated!")
+      setEditingSession(null)
+      mutateSelectedBatch()
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save session")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const openManageSessions = (batchId: string) => {
+    setSelectedBatchId(batchId)
+    setIsSessionsOpen(true)
+  }
+
+  const openEditSessionModal = (session: any) => {
+    setEditingSession(session)
+    setSessionForm({
+      title: session.title || "",
+      description: session.description || "",
+      startTime: session.startTime ? new Date(session.startTime).toISOString().slice(0, 16) : "",
+      endTime: session.endTime ? new Date(session.endTime).toISOString().slice(0, 16) : "",
+      meetLink: session.meetLink || "",
+      recordingUrl: session.recordingUrl || ""
+    })
+  }
+
   const filteredBatches = batches.filter((b: any) => 
-    b.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    b.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     b.course?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
@@ -117,7 +197,7 @@ export default function BatchesPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-black text-slate-900 tracking-tight">Batches & Cohorts</h1>
-            <p className="text-sm text-slate-500 mt-1 font-medium">Manage course cohorts and schedule sessions for Echo LMS</p>
+            <p className="text-sm text-slate-500 mt-1 font-medium">Manage 45-day course cohorts, topic schedules, and time-restricted session recordings.</p>
           </div>
           <button onClick={() => setIsCreateOpen(true)} className="flex items-center gap-2 px-5 py-2.5 bg-teal-600 text-white font-bold text-sm rounded-xl hover:bg-teal-700 transition-colors shadow-xs">
             <Plus className="w-4 h-4" /> Create Batch
@@ -187,9 +267,12 @@ export default function BatchesPage() {
                 </div>
 
                 <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
-                  <div className="text-xs text-slate-500 font-bold">
-                    Type: <span className="text-slate-800">{batch.type}</span>
-                  </div>
+                  <button 
+                    onClick={() => openManageSessions(batch.id)}
+                    className="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 border border-teal-200 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5"
+                  >
+                    <Video className="w-3.5 h-3.5" /> Sessions & Recordings ({batch._count?.sessions || 0})
+                  </button>
                   <button 
                     onClick={() => {
                       setEditBatch({
@@ -201,11 +284,13 @@ export default function BatchesPage() {
                         startDate: new Date(batch.startDate).toISOString().slice(0, 16),
                         endDate: new Date(batch.endDate).toISOString().slice(0, 16),
                         educatorId: batch.educatorId || "",
+                        recordingAccessDays: batch.recordingAccessDays || 7,
                         isActive: batch.isActive ?? true
                       })
                       setIsEditOpen(true)
                     }}
-                    className="text-teal-700 hover:text-teal-800 text-xs font-bold transition-colors flex items-center gap-1">
+                    className="text-slate-600 hover:text-slate-900 text-xs font-bold transition-colors flex items-center gap-1"
+                  >
                     Manage <ChevronRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -215,6 +300,7 @@ export default function BatchesPage() {
         )}
       </div>
 
+      {/* Create Batch SlideOver */}
       <SlideOver title="Create New Batch" open={isCreateOpen} onClose={() => setIsCreateOpen(false)}>
         <form onSubmit={handleCreateBatch} className="p-6 flex flex-col gap-4 text-slate-900">
           <div>
@@ -224,7 +310,7 @@ export default function BatchesPage() {
               value={newBatch.name}
               onChange={e => setNewBatch({...newBatch, name: e.target.value})}
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 outline-none focus:ring-2 focus:ring-teal-500/50"
-              placeholder="e.g. Cohort 5 - Summer 2026"
+              placeholder="e.g. Cohort 5 - 45 Day Online"
             />
           </div>
           <div>
@@ -279,7 +365,7 @@ export default function BatchesPage() {
               />
             </div>
             <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-1 block">End Date</label>
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-1 block">End Date (45 Days)</label>
               <input 
                 type="datetime-local"
                 required
@@ -288,6 +374,19 @@ export default function BatchesPage() {
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 outline-none focus:ring-2 focus:ring-teal-500/50"
               />
             </div>
+          </div>
+          <div>
+            <label className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-1 block">Recording Access Validity (Days)</label>
+            <input 
+              type="number"
+              required
+              min={1}
+              value={newBatch.recordingAccessDays}
+              onChange={e => setNewBatch({...newBatch, recordingAccessDays: parseInt(e.target.value) || 7})}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 outline-none focus:ring-2 focus:ring-teal-500/50"
+              placeholder="e.g. 7 days access post live class"
+            />
+            <p className="text-[10px] text-slate-400 mt-1">Students can view session recordings for this number of days after each class.</p>
           </div>
           <div>
             <label className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-1 block">Instructor / Educator</label>
@@ -386,6 +485,17 @@ export default function BatchesPage() {
             </div>
           </div>
           <div>
+            <label className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-1 block">Recording Access Validity (Days)</label>
+            <input 
+              type="number"
+              required
+              min={1}
+              value={editBatch.recordingAccessDays}
+              onChange={e => setEditBatch({...editBatch, recordingAccessDays: parseInt(e.target.value) || 7})}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 outline-none focus:ring-2 focus:ring-teal-500/50"
+            />
+          </div>
+          <div>
             <label className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-1 block">Instructor / Educator</label>
             <select 
               value={editBatch.educatorId}
@@ -416,6 +526,159 @@ export default function BatchesPage() {
           </div>
         </form>
       </SlideOver>
+
+      {/* 45-Day Sessions & Recording Management Drawer */}
+      {isSessionsOpen && selectedBatchData && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs" onClick={() => setIsSessionsOpen(false)} />
+          <div className="w-full md:w-[680px] bg-white h-full border-l border-slate-200 relative flex flex-col shadow-2xl z-10 animate-in slide-in-from-right text-slate-900">
+            <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+              <div>
+                <h2 className="text-lg font-bold flex items-center gap-2 text-slate-900">
+                  <Video className="w-5 h-5 text-teal-600" />
+                  {selectedBatchData.name} — Sessions & Recordings
+                </h2>
+                <p className="text-xs text-slate-500 font-medium mt-0.5">
+                  Video Access: <span className="font-bold text-teal-700">{selectedBatchData.recordingAccessDays || 7} Days Post-Class</span>
+                </p>
+              </div>
+              <button onClick={() => setIsSessionsOpen(false)} className="p-2 hover:bg-slate-200 rounded-full transition-colors">
+                <X className="w-5 h-5 text-slate-500" />
+              </button>
+            </div>
+
+            <div className="p-4 bg-teal-50 border-b border-teal-200 flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold text-teal-900 flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-teal-600" /> Auto-Generate 45-Day Course Schedule?
+                </p>
+                <p className="text-[11px] text-teal-700">Creates 45 daily topics starting from batch start date ({new Date(selectedBatchData.startDate).toLocaleDateString('en-IN')}).</p>
+              </div>
+              <button 
+                onClick={handleAutoSchedule}
+                disabled={isAutoScheduling}
+                className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl transition-colors shadow-xs flex items-center gap-2 shrink-0 disabled:opacity-50"
+              >
+                {isAutoScheduling ? <Loader2 className="w-4 h-4 animate-spin" /> : "⚡ Auto-Generate"}
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {selectedBatchData.sessions?.length === 0 ? (
+                <div className="py-16 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50">
+                  <Video className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                  <p className="font-bold text-slate-700">No sessions scheduled for this batch yet.</p>
+                  <p className="text-xs text-slate-400 mt-1 mb-4">Click "Auto-Generate" above to create all 45 daily sessions automatically.</p>
+                </div>
+              ) : (
+                selectedBatchData.sessions.map((session: any) => (
+                  <div key={session.id} className="bg-white border border-slate-200 rounded-xl p-4 space-y-3 hover:border-teal-400 transition-colors shadow-xs">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-black bg-teal-100 text-teal-900 px-2.5 py-1 rounded-md border border-teal-200">
+                          Day {session.dayNumber || 1}
+                        </span>
+                        <h4 className="font-extrabold text-slate-900 text-sm">{session.title}</h4>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {session.isExpired ? (
+                          <span className="text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded flex items-center gap-1">
+                            <ShieldAlert className="w-3 h-3" /> Video Expired
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" /> {session.daysRemaining}d Access Left
+                          </span>
+                        )}
+                        <button onClick={() => openEditSessionModal(session)} title="Edit Topic / Recording" className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors">
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {session.description && <p className="text-xs text-slate-600">{session.description}</p>}
+
+                    <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-100">
+                      <div className="flex items-center gap-1.5 text-slate-500 font-mono">
+                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{new Date(session.startTime).toLocaleString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-slate-500 font-mono">
+                        <LinkIcon className="w-3.5 h-3.5 text-slate-400" />
+                        <a href={session.meetLink || "https://meet.google.com/new"} target="_blank" rel="noreferrer" className="text-teal-600 hover:underline truncate">
+                          {session.meetLink || "Join Meet"}
+                        </a>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 flex items-center justify-between bg-slate-50 p-2.5 rounded-lg border border-slate-200/60">
+                      <div className="flex items-center gap-2 text-xs">
+                        <PlayCircle className="w-4 h-4 text-rose-600" />
+                        <span className="font-bold text-slate-700">Recording MP4 / HLS:</span>
+                        {session.recordingUrl ? (
+                          <a href={session.recordingUrl} target="_blank" rel="noreferrer" className="text-teal-600 font-bold truncate max-w-[220px] hover:underline">
+                            {session.recordingUrl}
+                          </a>
+                        ) : (
+                          <span className="text-slate-400 italic">No video attached yet</span>
+                        )}
+                      </div>
+                      <button onClick={() => openEditSessionModal(session)} className="text-[11px] font-bold text-teal-700 hover:text-teal-800 underline">
+                        {session.recordingUrl ? "Update Link" : "+ Attach Recording"}
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Session Topic & Recording Modal */}
+      {editingSession && (
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-md p-6 shadow-xl text-slate-900">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-bold text-slate-900">Edit Class Session Topic & Recording</h3>
+              <button onClick={() => setEditingSession(null)}><X className="w-5 h-5 text-slate-400 hover:text-slate-700" /></button>
+            </div>
+            <form onSubmit={handleSaveSession} className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1">Topic Title *</label>
+                <input required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:border-teal-500 outline-none"
+                  value={sessionForm.title} onChange={e => setSessionForm(p => ({ ...p, title: e.target.value }))} />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1">Topic Description / Syllabus</label>
+                <textarea rows={2} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-900 focus:border-teal-500 outline-none"
+                  value={sessionForm.description} onChange={e => setSessionForm(p => ({ ...p, description: e.target.value }))} />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1">Meeting Link (Google Meet / Zoom)</label>
+                <input className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:border-teal-500 outline-none"
+                  placeholder="https://meet.google.com/abc-defg-hij"
+                  value={sessionForm.meetLink} onChange={e => setSessionForm(p => ({ ...p, meetLink: e.target.value }))} />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1">Session Recording Video URL (MP4 / Vimeo / Drive)</label>
+                <input className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:border-teal-500 outline-none font-mono text-xs"
+                  placeholder="https://drive.google.com/file/d/... or Vimeo MP4"
+                  value={sessionForm.recordingUrl} onChange={e => setSessionForm(p => ({ ...p, recordingUrl: e.target.value }))} />
+                <p className="text-[10px] text-slate-400 mt-1">Once attached, students can watch this recording for {selectedBatchData?.recordingAccessDays || 7} days from the session date.</p>
+              </div>
+
+              <div className="flex gap-3 pt-4 border-t border-slate-200">
+                <button type="button" onClick={() => setEditingSession(null)} className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-colors">Cancel</button>
+                <button type="submit" disabled={isSubmitting} className="flex-1 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold transition-colors shadow-xs disabled:opacity-50 flex items-center justify-center">
+                  {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Session"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
+

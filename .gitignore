@@ -12,3 +12,4 @@ build/
 coverage/
 .vercel/
 prisma/migrations/*.sql
+echo-demo/

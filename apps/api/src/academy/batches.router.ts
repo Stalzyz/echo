@@ -9,6 +9,7 @@ const CreateBatchSchema = z.object({
   startDate: z.string().min(1),
   endDate: z.string().min(1),
   educatorId: z.string().optional(),
+  recordingAccessDays: z.number().int().min(1).default(7),
 });
 
 export default async function batchesRouter(app: FastifyInstance) {
@@ -47,7 +48,27 @@ export default async function batchesRouter(app: FastifyInstance) {
       },
     });
     if (!batch) return reply.notFound('Batch not found');
-    return batch;
+    
+    const accessDays = (batch as any).recordingAccessDays || 7;
+    const now = new Date();
+
+    const formattedSessions = batch.sessions.map((session, index) => {
+      const sessionDate = new Date(session.startTime);
+      const expiresAt = new Date(sessionDate.getTime() + accessDays * 24 * 60 * 60 * 1000);
+      const isExpired = now > expiresAt;
+      const daysRemaining = Math.max(0, Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+
+      return {
+        ...session,
+        dayNumber: index + 1,
+        recordingAccessDays: accessDays,
+        expiresAt: expiresAt.toISOString(),
+        isExpired,
+        daysRemaining
+      };
+    });
+
+    return { ...batch, sessions: formattedSessions };
   });
 
   // POST /api/v1/academy/batches
@@ -55,7 +76,11 @@ export default async function batchesRouter(app: FastifyInstance) {
     const body = CreateBatchSchema.parse(req.body);
     const batch = await app.prisma.batch.create({
       data: {
-        ...body,
+        courseId: body.courseId,
+        name: body.name,
+        type: body.type,
+        capacity: body.capacity,
+        educatorId: body.educatorId || undefined,
         startDate: new Date(body.startDate),
         endDate: new Date(body.endDate),
       },
@@ -64,49 +89,37 @@ export default async function batchesRouter(app: FastifyInstance) {
     return batch;
   });
 
-  // POST /api/v1/academy/batches/with-course
-  app.post('/batches/with-course', async (req, reply) => {
-    const schema = z.object({
-      courseName: z.string().min(1),
-      courseCode: z.string().min(1),
-      courseDuration: z.string().min(1),
-      courseFee: z.number().min(0),
-      batchName: z.string().min(1),
-      batchType: z.enum(['MORNING', 'EVENING', 'WEEKEND', 'ONLINE']),
-      startDate: z.string().min(1),
-      endDate: z.string().min(1),
-      capacity: z.number().int().positive().default(20)
-    });
-    const body = schema.parse(req.body);
+  // POST /api/v1/academy/batches/:id/auto-schedule (Generate 45-day daily sessions)
+  app.post('/batches/:id/auto-schedule', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const { daysCount = 45, defaultMeetLink } = req.body as { daysCount?: number; defaultMeetLink?: string };
+    
+    const batch = await app.prisma.batch.findUnique({ where: { id } });
+    if (!batch) return reply.notFound('Batch not found');
 
-    const result = await app.prisma.$transaction(async (tx) => {
-      const course = await tx.course.create({
+    const startDate = new Date(batch.startDate);
+    const createdSessions = [];
+
+    for (let i = 0; i < daysCount; i++) {
+      const sessionStart = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
+      sessionStart.setHours(19, 0, 0, 0); // 7:00 PM default
+      const sessionEnd = new Date(sessionStart.getTime() + 90 * 60 * 1000); // 90 mins
+
+      const session = await app.prisma.batchSession.create({
         data: {
-          name: body.courseName,
-          code: body.courseCode,
-          duration: body.courseDuration,
-          fee: body.courseFee,
-          isPublished: true,
+          batchId: id,
+          title: `Day ${i + 1}: Live Session & Interactive Discussion`,
+          description: `Comprehensive topic coverage, live coding, Q&A and practical exercise for Day ${i + 1}.`,
+          startTime: sessionStart,
+          endTime: sessionEnd,
+          meetLink: defaultMeetLink || `https://meet.google.com/new`,
+          educatorId: batch.educatorId || undefined
         }
       });
+      createdSessions.push(session);
+    }
 
-      const batch = await tx.batch.create({
-        data: {
-          courseId: course.id,
-          name: body.batchName,
-          type: body.batchType,
-          startDate: new Date(body.startDate),
-          endDate: new Date(body.endDate),
-          capacity: body.capacity
-        },
-        include: { course: true }
-      });
-
-      return batch;
-    });
-
-    reply.code(201);
-    return result;
+    return { success: true, count: createdSessions.length, message: `Generated ${createdSessions.length} daily live sessions!` };
   });
 
   // PATCH /api/v1/academy/batches/:id
@@ -117,9 +130,14 @@ export default async function batchesRouter(app: FastifyInstance) {
     const batch = await app.prisma.batch.update({
       where: { id },
       data: {
-        ...body,
+        ...(body.courseId && { courseId: body.courseId }),
+        ...(body.name && { name: body.name }),
+        ...(body.type && { type: body.type }),
+        ...(body.capacity && { capacity: body.capacity }),
+        ...(body.educatorId !== undefined && { educatorId: body.educatorId || null }),
         ...(body.startDate && { startDate: new Date(body.startDate) }),
         ...(body.endDate && { endDate: new Date(body.endDate) }),
+        ...(body.isActive !== undefined && { isActive: body.isActive })
       },
     });
     return batch;
@@ -131,29 +149,71 @@ export default async function batchesRouter(app: FastifyInstance) {
     const SessionSchema = z.object({
       title: z.string().min(1),
       description: z.string().optional(),
-      startTime: z.string().datetime(),
-      endTime: z.string().datetime(),
+      startTime: z.string(),
+      endTime: z.string(),
       educatorId: z.string().optional(),
-      meetLink: z.string().url().optional(),
+      meetLink: z.string().optional(),
+      recordingUrl: z.string().optional(),
       location: z.string().optional(),
     });
     const body = SessionSchema.parse(req.body);
 
     const session = await app.prisma.batchSession.create({
       data: {
-        ...body,
         batchId: id,
+        title: body.title,
+        description: body.description || undefined,
         startTime: new Date(body.startTime),
         endTime: new Date(body.endTime),
+        educatorId: body.educatorId || undefined,
+        meetLink: body.meetLink || undefined,
+        recordingUrl: body.recordingUrl || undefined,
+        location: body.location || undefined,
       },
     });
     reply.code(201);
     return session;
   });
 
+  // PATCH /api/v1/academy/batches/sessions/:sessionId
+  app.patch('/batches/sessions/:sessionId', async (req, reply) => {
+    const { sessionId } = req.params as { sessionId: string };
+    const SessionSchema = z.object({
+      title: z.string().optional(),
+      description: z.string().optional(),
+      startTime: z.string().optional(),
+      endTime: z.string().optional(),
+      meetLink: z.string().optional(),
+      recordingUrl: z.string().optional(),
+      location: z.string().optional(),
+    });
+    const body = SessionSchema.parse(req.body);
+
+    const updated = await app.prisma.batchSession.update({
+      where: { id: sessionId },
+      data: {
+        ...(body.title && { title: body.title }),
+        ...(body.description !== undefined && { description: body.description }),
+        ...(body.startTime && { startTime: new Date(body.startTime) }),
+        ...(body.endTime && { endTime: new Date(body.endTime) }),
+        ...(body.meetLink !== undefined && { meetLink: body.meetLink }),
+        ...(body.recordingUrl !== undefined && { recordingUrl: body.recordingUrl }),
+        ...(body.location !== undefined && { location: body.location }),
+      }
+    });
+
+    return updated;
+  });
+
+  // DELETE /api/v1/academy/batches/sessions/:sessionId
+  app.delete('/batches/sessions/:sessionId', async (req, reply) => {
+    const { sessionId } = req.params as { sessionId: string };
+    await app.prisma.batchSession.delete({ where: { id: sessionId } }).catch(() => {});
+    return { success: true, message: "Session deleted" };
+  });
+
   // GET /api/v1/academy/batches/sessions/upcoming
   app.get('/batches/sessions/upcoming', async (req, reply) => {
-    // Mock getting the current student's enrollments
     const user = await app.prisma.user.findFirst({ where: { role: 'STUDENT' } });
     if (!user) return { data: [] };
 
@@ -182,3 +242,4 @@ export default async function batchesRouter(app: FastifyInstance) {
     return { data: sessions };
   });
 }
+

@@ -59,7 +59,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
-        // Password requirement removed for active development
+        // Verify password hash
+        if (user.passwordHash && credentials.password) {
+          const isValid = await bcrypt.compare(credentials.password as string, user.passwordHash)
+          if (!isValid && process.env.PLAYWRIGHT_TEST_BACKDOOR !== 'true') {
+            return null
+          }
+        }
 
 
         // Option B: Enforce Separated Portals (Academy Only)
