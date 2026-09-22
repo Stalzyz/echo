@@ -28,7 +28,7 @@ export default function FeeManagementPage() {
   })
 
   const stats = feesData?.stats || { totalCollected: 0, totalOutstanding: 0, overdueCount: 0 }
-  const installments = feesData?.installments || []
+  const installments = feesData?.installments || (Array.isArray(feesData) ? feesData : [])
   const org = orgData || {}
 
   const getStatusConfig = (status: InvoiceStatus) => {
@@ -73,18 +73,22 @@ export default function FeeManagementPage() {
   }
 
   const handleSendWhatsAppInvoice = (invoice: any) => {
+    if (!invoice) return
     const student = invoice.enrollment?.student?.user
     const studentPhone = student?.phone || invoice.enrollment?.student?.phone || ""
     const cleanPhone = studentPhone.replace(/\D/g, "")
     const courseName = invoice.enrollment?.batch?.course?.name || "Course Fee"
-    const totalAmount = (invoice.amount + (invoice.amount * (invoice.taxRate || 0)) / 100).toFixed(2)
+    const amountVal = Number(invoice.amount || 0)
+    const taxVal = Number(invoice.taxRate || 0)
+    const totalAmount = (amountVal + (amountVal * taxVal) / 100).toFixed(2)
+    const invId = (invoice.id || "").slice(-6).toUpperCase()
 
     const message = `🧾 *INVOICE ACKNOWLEDGEMENT - ${org.name || "Echo Academy"}*\n\n` +
-      `*Invoice #:* ${invoice.id.slice(-6).toUpperCase()}\n` +
+      `*Invoice #:* ${invId}\n` +
       `*Student:* ${student?.firstName || ""} ${student?.lastName || ""}\n` +
       `*Course:* ${courseName}\n` +
       `*Amount:* ₹${totalAmount}\n` +
-      `*Status:* ${invoice.status}\n` +
+      `*Status:* ${invoice.status || "PENDING"}\n` +
       (invoice.dueDate ? `*Due Date:* ${new Date(invoice.dueDate).toLocaleDateString("en-IN")}\n\n` : "\n") +
       `Thank you for choosing ${org.name || "Echo Academy"}!`
 
@@ -96,11 +100,21 @@ export default function FeeManagementPage() {
     toast.success("Opening WhatsApp with invoice details...")
   }
 
-  const filteredInstallments = installments.filter((item: any) => {
+  const filteredInstallments = (Array.isArray(installments) ? installments : []).filter((item: any) => {
+    if (!item) return false
     const name = `${item.enrollment?.student?.user?.firstName || ''} ${item.enrollment?.student?.user?.lastName || ''}`.toLowerCase()
-    const id = item.id.toLowerCase()
+    const id = (item.id || '').toLowerCase()
     return name.includes(searchQuery.toLowerCase()) || id.includes(searchQuery.toLowerCase())
   })
+
+  // Selected Invoice helpers
+  const invAmt = Number(selectedInvoice?.amount || 0)
+  const invTax = Number(selectedInvoice?.taxRate || 18)
+  const invPaid = Number(selectedInvoice?.paidAmount || (selectedInvoice?.status === 'PAID' ? invAmt : 0))
+  const invRem = Math.max(0, invAmt - invPaid)
+  const taxAmt = (invAmt * invTax) / 100
+  const totalPayable = invAmt + taxAmt
+  const selectedInvId = (selectedInvoice?.id || '').slice(-6).toUpperCase()
 
   return (
     <div className="flex flex-col h-full bg-slate-50 text-slate-900 overflow-y-auto p-8 relative">
@@ -158,7 +172,7 @@ export default function FeeManagementPage() {
           </div>
           <div>
             <h3 className="text-slate-500 text-xs font-black uppercase tracking-wider mb-1">Total Collected</h3>
-            <div className="text-2xl font-black text-slate-900">₹{stats.totalCollected.toLocaleString()}</div>
+            <div className="text-2xl font-black text-slate-900">₹{Number(stats?.totalCollected || 0).toLocaleString()}</div>
           </div>
         </div>
 
@@ -168,7 +182,7 @@ export default function FeeManagementPage() {
           </div>
           <div>
             <h3 className="text-slate-500 text-xs font-black uppercase tracking-wider mb-1">Outstanding Balance</h3>
-            <div className="text-2xl font-black text-slate-900">₹{stats.totalOutstanding.toLocaleString()}</div>
+            <div className="text-2xl font-black text-slate-900">₹{Number(stats?.totalOutstanding || 0).toLocaleString()}</div>
           </div>
         </div>
 
@@ -179,7 +193,7 @@ export default function FeeManagementPage() {
           <div>
             <h3 className="text-slate-500 text-xs font-black uppercase tracking-wider mb-1">Overdue Invoices</h3>
             <div className="text-2xl font-black text-slate-900">
-              <span className="text-rose-600 mr-2">{stats.overdueCount}</span> Invoices
+              <span className="text-rose-600 mr-2">{stats?.overdueCount || 0}</span> Invoices
             </div>
           </div>
         </div>
@@ -218,31 +232,36 @@ export default function FeeManagementPage() {
                 <tr><td colSpan={6} className="px-6 py-8 text-center text-slate-500 font-medium"><Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-teal-600" />Loading Invoices...</td></tr>
               ) : filteredInstallments.length === 0 ? (
                 <tr><td colSpan={6} className="px-6 py-8 text-center text-slate-500 font-medium">No invoices found.</td></tr>
-              ) : filteredInstallments.map((invoice: any) => {
-                const statusConfig = getStatusConfig(invoice.status)
+              ) : filteredInstallments.map((invoice: any, idx: number) => {
+                const statusConfig = getStatusConfig(invoice.status || 'PENDING')
                 const StatusIcon = statusConfig.icon
+                const amountVal = Number(invoice.amount || 0)
+                const paidVal = Number(invoice.paidAmount || 0)
+                const invId = (invoice.id || `INV${idx}`).slice(-6).toUpperCase()
                 
                 return (
-                  <tr key={invoice.id} className="hover:bg-slate-50 transition-colors">
+                  <tr key={invoice.id || idx} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4 font-mono font-bold text-slate-800">
-                      #{invoice.id.slice(-6).toUpperCase()}
+                      #{invId}
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-extrabold text-slate-900">{invoice.enrollment?.student?.user?.firstName} {invoice.enrollment?.student?.user?.lastName}</div>
+                      <div className="font-extrabold text-slate-900">
+                        {invoice.enrollment?.student?.user?.firstName || 'Student'} {invoice.enrollment?.student?.user?.lastName || ''}
+                      </div>
                       <div className="text-slate-500 text-xs mt-0.5 font-medium">{invoice.enrollment?.batch?.course?.name || "Unknown Course"}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-black text-slate-900">₹{invoice.amount.toLocaleString()}</div>
-                      {invoice.paidAmount > 0 && <div className="text-[10px] text-emerald-700 font-bold mt-0.5">Paid: ₹{invoice.paidAmount}</div>}
+                      <div className="font-black text-slate-900">₹{amountVal.toLocaleString()}</div>
+                      {paidVal > 0 && <div className="text-[10px] text-emerald-700 font-bold mt-0.5">Paid: ₹{paidVal.toLocaleString()}</div>}
                     </td>
                     <td className="px-6 py-4 text-slate-600 text-xs">
-                      <div>{new Date(invoice.createdAt || Date.now()).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric'})}</div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">Due: {new Date(invoice.dueDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric'})}</div>
+                      <div>{invoice.createdAt ? new Date(invoice.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric'}) : '-'}</div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">Due: {invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric'}) : '-'}</div>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${statusConfig.bg}`}>
                         <StatusIcon className="w-3.5 h-3.5" />
-                        {invoice.status}
+                        {invoice.status || 'PENDING'}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -291,9 +310,9 @@ export default function FeeManagementPage() {
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:border-teal-500"
                 >
                   <option value="">-- Choose Student --</option>
-                  {(enrollData?.enrollments || enrollData || []).map((e: any) => (
+                  {(enrollData?.enrollments || (Array.isArray(enrollData) ? enrollData : [])).map((e: any) => (
                     <option key={e.id} value={e.id}>
-                      {e.student?.user?.firstName} {e.student?.user?.lastName} — {e.batch?.course?.name || "Course"}
+                      {e.student?.user?.firstName || 'Student'} {e.student?.user?.lastName || ''} — {e.batch?.course?.name || e.course?.name || "Course"}
                     </option>
                   ))}
                 </select>
@@ -409,7 +428,7 @@ export default function FeeManagementPage() {
                 </div>
                 <div className="text-right">
                   <h1 className="text-3xl font-black text-slate-900 tracking-tight">TAX INVOICE</h1>
-                  <p className="text-teal-700 font-mono font-bold text-sm mt-1">#{selectedInvoice.id.slice(-6).toUpperCase()}</p>
+                  <p className="text-teal-700 font-mono font-bold text-sm mt-1">#{selectedInvId}</p>
                   
                   <div className="mt-3 text-xs space-y-0.5 text-slate-600 font-mono">
                     {org.gstNumber && <p><strong className="text-slate-900">GSTIN:</strong> {org.gstNumber}</p>}
@@ -422,17 +441,19 @@ export default function FeeManagementPage() {
               <div className="grid grid-cols-2 gap-8 py-2">
                 <div>
                   <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Billed To (Student)</p>
-                  <p className="font-extrabold text-slate-900 text-base">{selectedInvoice.enrollment?.student?.user?.firstName} {selectedInvoice.enrollment?.student?.user?.lastName}</p>
-                  <p className="text-slate-600 text-xs font-mono">{selectedInvoice.enrollment?.student?.user?.email}</p>
+                  <p className="font-extrabold text-slate-900 text-base">
+                    {selectedInvoice.enrollment?.student?.user?.firstName || 'Student'} {selectedInvoice.enrollment?.student?.user?.lastName || ''}
+                  </p>
+                  <p className="text-slate-600 text-xs font-mono">{selectedInvoice.enrollment?.student?.user?.email || ''}</p>
                   {selectedInvoice.enrollment?.student?.user?.phone && (
                     <p className="text-slate-600 text-xs font-mono">{selectedInvoice.enrollment?.student?.user?.phone}</p>
                   )}
                 </div>
                 <div className="text-right">
                   <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Invoice Details</p>
-                  <p className="text-slate-800 text-xs font-semibold">Issue Date: {new Date(selectedInvoice.createdAt || Date.now()).toLocaleDateString('en-IN')}</p>
-                  <p className="text-slate-800 text-xs font-semibold">Due Date: {new Date(selectedInvoice.dueDate).toLocaleDateString('en-IN')}</p>
-                  <p className="text-slate-800 text-xs font-semibold mt-1">Status: <span className="font-bold text-teal-700 uppercase">{selectedInvoice.status}</span></p>
+                  <p className="text-slate-800 text-xs font-semibold">Issue Date: {selectedInvoice.createdAt ? new Date(selectedInvoice.createdAt).toLocaleDateString('en-IN') : '-'}</p>
+                  <p className="text-slate-800 text-xs font-semibold">Due Date: {selectedInvoice.dueDate ? new Date(selectedInvoice.dueDate).toLocaleDateString('en-IN') : '-'}</p>
+                  <p className="text-slate-800 text-xs font-semibold mt-1">Status: <span className="font-bold text-teal-700 uppercase">{selectedInvoice.status || 'PENDING'}</span></p>
                 </div>
               </div>
 
@@ -450,7 +471,7 @@ export default function FeeManagementPage() {
                       <div className="font-bold text-slate-900">Course Fee — {selectedInvoice.enrollment?.batch?.course?.name || "LMS Course Enrollment"}</div>
                       <div className="text-xs text-slate-500 mt-0.5 font-medium">Batch: {selectedInvoice.enrollment?.batch?.name || "Standard Batch"}</div>
                     </td>
-                    <td className="py-4 text-right font-bold text-slate-900">₹{selectedInvoice.amount.toLocaleString()}</td>
+                    <td className="py-4 text-right font-bold text-slate-900">₹{invAmt.toLocaleString()}</td>
                   </tr>
                 </tbody>
               </table>
@@ -463,17 +484,17 @@ export default function FeeManagementPage() {
                 <div className="grid grid-cols-3 gap-4 text-xs">
                   <div>
                     <span className="text-slate-400 block font-medium">Amount Paid</span>
-                    <span className="font-black text-emerald-700 text-sm">₹{(selectedInvoice.paidAmount || (selectedInvoice.status === 'PAID' ? selectedInvoice.amount : 0)).toLocaleString()}</span>
+                    <span className="font-black text-emerald-700 text-sm">₹{invPaid.toLocaleString()}</span>
                   </div>
                   <div>
                     <span className="text-slate-400 block font-medium">Remaining Due</span>
                     <span className="font-black text-rose-600 text-sm">
-                      ₹{Math.max(0, selectedInvoice.amount - (selectedInvoice.paidAmount || (selectedInvoice.status === 'PAID' ? selectedInvoice.amount : 0))).toLocaleString()}
+                      ₹{invRem.toLocaleString()}
                     </span>
                   </div>
                   <div>
                     <span className="text-slate-400 block font-medium">Next Due Date</span>
-                    <span className="font-bold text-slate-800 text-sm">{new Date(selectedInvoice.dueDate).toLocaleDateString('en-IN')}</span>
+                    <span className="font-bold text-slate-800 text-sm">{selectedInvoice.dueDate ? new Date(selectedInvoice.dueDate).toLocaleDateString('en-IN') : '-'}</span>
                   </div>
                 </div>
               </div>
@@ -483,15 +504,15 @@ export default function FeeManagementPage() {
                 <div className="w-72 space-y-2 text-sm">
                   <div className="flex justify-between text-slate-600 font-medium">
                     <span>Subtotal</span>
-                    <span>₹{selectedInvoice.amount.toLocaleString()}</span>
+                    <span>₹{invAmt.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-slate-600 font-medium">
-                    <span>GST Tax ({selectedInvoice.taxRate || 18}%)</span>
-                    <span>₹{((selectedInvoice.amount * (selectedInvoice.taxRate || 18)) / 100).toFixed(2)}</span>
+                    <span>GST Tax ({invTax}%)</span>
+                    <span>₹{taxAmt.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between font-black text-xl pt-3 border-t-2 border-slate-900 text-slate-900">
                     <span>Total Payable</span>
-                    <span>₹{(selectedInvoice.amount + (selectedInvoice.amount * (selectedInvoice.taxRate || 18)) / 100).toFixed(2)}</span>
+                    <span>₹{totalPayable.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
