@@ -189,7 +189,7 @@ export default function AcademiesManagementPage() {
           role: "ADMIN"
         })
         toast.success(`Now logged in as Admin for ${acad.name}`)
-        router.push("/dashboard")
+        window.location.href = "/dashboard"
       } else {
         toast.error(data.error || "Failed to impersonate academy")
       }

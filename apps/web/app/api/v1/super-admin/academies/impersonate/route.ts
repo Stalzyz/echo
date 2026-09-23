@@ -1,11 +1,15 @@
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
+import { cookies } from "next/headers"
 
 export async function POST(req: Request) {
   try {
     const session = await auth()
-    if (!session?.user || session.user.role !== 'SUPER_ADMIN') {
+    const userRole = session?.user?.role
+    const isSuperAdmin = userRole === 'SUPER_ADMIN' || userRole === 'Super Admin'
+
+    if (!session?.user || !isSuperAdmin) {
       return NextResponse.json({ error: "Unauthorized. Super Admin access required." }, { status: 403 })
     }
 
@@ -29,6 +33,21 @@ export async function POST(req: Request) {
 
     const targetUser = organization.users[0] || await prisma.user.findFirst({
       where: { organizationId: academyId }
+    })
+
+    // Update Super Admin user's active organizationId in database for persistence
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: { organizationId: organization.id }
+    })
+
+    // Set HTTP cookie for tenant context
+    const cookieStore = await cookies()
+    cookieStore.set("echo_impersonate_tenant", organization.id, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 // 24 hours
     })
 
     return NextResponse.json({

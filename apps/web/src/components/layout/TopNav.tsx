@@ -189,6 +189,21 @@ export function TopNav() {
 
           <div className="h-6 w-px bg-slate-200 hidden md:block mx-1"></div>
 
+          {/* Exit Impersonation Banner/Button */}
+          {(session?.user?.impersonatedBySuperAdmin || (session?.user?.organizationId && (session?.user?.role === 'SUPER_ADMIN' || session?.user?.role === 'Super Admin'))) && (
+            <button
+              onClick={async () => {
+                await fetch("/api/v1/super-admin/academies/impersonate/exit", { method: "POST" })
+                toast.success("Exited tenant impersonation. Returned to Super Admin mode.")
+                window.location.href = "/dashboard/super-admin/academies"
+              }}
+              className="px-3 py-1.5 bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-black rounded-xl border border-amber-500 flex items-center gap-1 shadow-xs transition-colors"
+              title="Return to Super Admin Global View"
+            >
+              <LogOut className="w-3.5 h-3.5" /> Exit Tenant Mode
+            </button>
+          )}
+
           {/* User Profile */}
           <div className="hidden md:flex items-center gap-3 pl-1">
             <div className="flex flex-col items-end min-w-0">
