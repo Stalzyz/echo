@@ -35,40 +35,53 @@ const UpdateOrganizationSchema = z.object({
 });
 
 export default async function organizationRouter(app: FastifyInstance) {
-  // GET /api/v1/settings/organization — Get the global organization branding
+  // GET /api/v1/settings/organization — Get organization branding scoped to tenant
   app.get('/organization', async (req, reply) => {
-    let org = await app.prisma.organization.findFirst();
-    
-    // Auto-seed default config if none exists
+    const user = (req as any).user;
+    const cookies = require('cookie').parse(req.headers.cookie || '');
+    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
+    // Resolve the active tenant ID: impersonation cookie takes precedence,
+    // then the user's own organizationId (for Academy Admins)
+    const activeTenantId = impersonatedTenantId || user?.organizationId || null;
+
+    let org: any = null;
+
+    if (activeTenantId) {
+      // Tenant-scoped: return THIS academy's organization record
+      org = await app.prisma.organization.findUnique({
+        where: { id: activeTenantId }
+      });
+    }
+
+    // Fallback: Super Admin without impersonation → return first org (platform branding)
+    if (!org) {
+      org = await app.prisma.organization.findFirst();
+    }
+
+    // Auto-seed default config if none exists at all
     if (!org) {
       org = await app.prisma.organization.create({
         data: {
-          name: "Grekam Visuals",
-          companyName: "Grekam Visuals & Technologies Pvt Ltd",
-          logoUrl: "/visuals-logo.png",
-          academyLogoUrl: "/academy-logo.png",
+          name: "Echo LMS",
+          companyName: "Echo LMS Platform",
+          logoUrl: "/echo_logo.png",
+          academyLogoUrl: "/echo_logo.png",
           faviconUrl: "/favicon.ico",
           academyFaviconUrl: "/favicon.ico",
           primaryColor: "#0d9488",
           secondaryColor: "#f59e0b",
           accentColor: "#10b981",
-          darkModeDefault: true,
-          supportEmail: "contact@grekam.in",
-          billingAddress: "Coimbatore, Tamil Nadu, India",
-          website: "https://grekam.in",
-          instagramUrl: "https://instagram.com/grekamvisuals",
-          youtubeUrl: "https://youtube.com/@grekamvisuals",
-          linkedinUrl: "https://linkedin.com/company/grekam",
+          darkModeDefault: false,
+          supportEmail: "support@echolms.com",
         }
       });
     }
 
     return {
       ...org,
-      name: org.name || "Grekam Visuals",
-      companyName: org.companyName || "Grekam Visuals & Technologies Pvt Ltd",
-      logoUrl: org.logoUrl || "/visuals-logo.png",
-      academyLogoUrl: org.academyLogoUrl || "/academy-logo.png",
+      name: org.name || "Echo LMS",
+      logoUrl: org.logoUrl || "/echo_logo.png",
+      academyLogoUrl: org.academyLogoUrl || "/echo_logo.png",
       faviconUrl: org.faviconUrl || "/favicon.ico",
       academyFaviconUrl: org.academyFaviconUrl || "/favicon.ico",
       primaryColor: org.primaryColor || "#0d9488",

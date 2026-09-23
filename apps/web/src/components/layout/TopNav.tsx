@@ -40,7 +40,7 @@ function OrgHeader() {
 }
 
 export function TopNav() {
-  const { data: session } = useSession()
+  const { data: session, update: updateSession } = useSession()
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   
@@ -193,15 +193,25 @@ export function TopNav() {
           {(session?.user?.impersonatedBySuperAdmin || (session?.user?.organizationId && (session?.user?.role === 'SUPER_ADMIN' || session?.user?.role === 'Super Admin'))) && (
             <button
               onClick={async () => {
-                await fetch("/api/v1/super-admin/academies/impersonate/exit", { method: "POST" })
-                await updateSession({
-                  organizationId: null,
-                  tenantId: null,
-                  impersonatedBySuperAdmin: false,
-                  role: "SUPER_ADMIN"
-                })
-                toast.success("Exited tenant impersonation. Returned to Super Admin mode.")
-                window.location.href = "/dashboard/super-admin/academies"
+                try {
+                  // 1. Clear the server-side impersonation cookie
+                  await fetch("/api/v1/super-admin/academies/impersonate/exit", { method: "POST" })
+                  // 2. Flush the JWT session to remove stale organizationId/tenantMode state.
+                  //    Without this, the NextAuth JWT still carries the old tenant context
+                  //    even after the cookie is gone, until the user re-logs in.
+                  await updateSession({
+                    organizationId: null,
+                    tenantId: null,
+                    impersonatedBySuperAdmin: false,
+                    role: "SUPER_ADMIN"
+                  })
+                  toast.success("Exited tenant mode. Returned to Super Admin dashboard.")
+                } catch (err) {
+                  console.error("Error exiting tenant mode:", err)
+                  toast.error("Failed to exit tenant mode cleanly.")
+                } finally {
+                  window.location.href = "/dashboard/super-admin/academies"
+                }
               }}
               className="px-3 py-1.5 bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-black rounded-xl border border-amber-500 flex items-center gap-1 shadow-xs transition-colors"
               title="Return to Super Admin Global View"

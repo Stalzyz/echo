@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   try {
     const session = await auth()
     const userRole = session?.user?.role
-    const isSuperAdmin = userRole === 'SUPER_ADMIN' || userRole === 'Super Admin' || session?.user?.impersonatedBySuperAdmin
+    const isSuperAdmin = userRole === 'SUPER_ADMIN' || userRole === 'Super Admin'
 
     if (!session?.user || !isSuperAdmin) {
       return NextResponse.json({ error: "Unauthorized. Super Admin access required." }, { status: 403 })
@@ -35,13 +35,11 @@ export async function POST(req: Request) {
       where: { organizationId: academyId }
     })
 
-    // Update Super Admin user's active organizationId in database for persistence
-    await prisma.user.update({
-      where: { id: session.user.id },
-      data: { organizationId: organization.id }
-    })
+    // IMPORTANT: We do NOT mutate the Super Admin's user.organizationId in the database.
+    // Impersonation is purely cookie-driven (echo_impersonate_tenant).
+    // Writing to the DB would corrupt the Super Admin's identity on next login.
 
-    // Set HTTP cookie for tenant context
+    // Set HTTP cookie for tenant context — this is the ONLY mechanism for impersonation
     const cookieStore = await cookies()
     cookieStore.set("echo_impersonate_tenant", organization.id, {
       path: "/",

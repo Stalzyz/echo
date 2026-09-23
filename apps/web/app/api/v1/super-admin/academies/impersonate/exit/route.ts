@@ -1,4 +1,3 @@
-import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { cookies } from "next/headers"
@@ -10,13 +9,9 @@ export async function POST() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Reset Super Admin organizationId to null in DB
-    await prisma.user.update({
-      where: { id: session.user.id },
-      data: { organizationId: null }
-    })
-
-    // Clear impersonation cookie
+    // Clear impersonation cookie ONLY.
+    // We do NOT touch user.organizationId in the database —
+    // the Super Admin's record must remain with organizationId=null at all times.
     const cookieStore = await cookies()
     cookieStore.delete("echo_impersonate_tenant")
 
