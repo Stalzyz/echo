@@ -140,6 +140,20 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
         return
       }
 
+      // Check session to route appropriately
+      const sessionRes = await fetch("/api/auth/session")
+      const sessionData = await sessionRes.json()
+      const role = sessionData?.user?.role
+
+      if (role === "SUPER_ADMIN" || role === "Super Admin") {
+        setSuccess("Super Admin root identity verified. Redirecting to Platform Control Plane...")
+        setTimeout(() => {
+          router.push("/dashboard/super-admin")
+          router.refresh()
+        }, 600)
+        return
+      }
+
       setSuccess(`Authenticated successfully as ${currentRole.shortTitle}! Redirecting...`)
       setTimeout(() => {
         router.push(currentRole.targetPath)

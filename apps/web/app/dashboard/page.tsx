@@ -6,6 +6,7 @@ import {
   Activity, Users, DollarSign, TrendingUp, Calendar, AlertCircle, Briefcase, GraduationCap, 
   Layers, CheckCircle2, Clock, ShieldCheck, Video, MessageSquare, Plus, Sparkles, Rocket, Palette, Loader2
 } from "lucide-react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { toast } from "sonner"
 
@@ -21,10 +22,19 @@ interface AnalyticsData {
 }
 
 export default function DashboardHome() {
+  const router = useRouter()
   const { data: session } = useSession()
   const [data, setData] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [pendingCourses, setPendingCourses] = useState<any[]>([])
+
+  useEffect(() => {
+    // Super Admin outside tenant mode strictly belongs in the Platform Control Plane
+    const isSuperAdmin = session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "Super Admin"
+    if (isSuperAdmin && !session?.user?.impersonatedBySuperAdmin) {
+      router.replace("/dashboard/super-admin")
+    }
+  }, [session, router])
 
   const fetchOverview = async () => {
     try {

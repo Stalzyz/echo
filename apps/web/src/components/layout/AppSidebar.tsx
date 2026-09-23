@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useOrganization } from "@/context/OrganizationContext";
-import { signOut } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import {
   LayoutDashboard,
   GraduationCap,
@@ -234,6 +234,7 @@ const sidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const org = useOrganization();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
@@ -309,7 +310,20 @@ export function AppSidebar() {
     setOpenGroups((prev) => ({ ...prev, [title]: !prev[title] }));
   };
 
-  const orgName = org?.name && !org.name.includes("Grekam") ? org.name : "Echo LMS";
+  const isSuperAdminPlatform =
+    (session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "Super Admin") &&
+    !session?.user?.impersonatedBySuperAdmin;
+
+  const activeGroups =
+    isSuperAdminPlatform || pathname?.startsWith("/dashboard/super-admin")
+      ? superAdminSidebarGroups
+      : sidebarGroups;
+
+  const orgName = isSuperAdminPlatform
+    ? "Echo Super Admin"
+    : org?.name && !org.name.includes("Grekam")
+    ? org.name
+    : "Echo LMS";
 
   return (
     <aside
@@ -320,17 +334,29 @@ export function AppSidebar() {
     >
       {/* Sidebar Header */}
       <div className="h-16 border-b border-slate-200 flex items-center justify-between px-4 shrink-0">
-        <Link href="/dashboard" className="flex items-center gap-3 min-w-0">
+        <Link
+          href={isSuperAdminPlatform ? "/dashboard/super-admin" : "/dashboard"}
+          className="flex items-center gap-3 min-w-0"
+        >
           <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-xs overflow-hidden p-1">
-            <img src={org?.logoUrl || org?.academyLogoUrl || "/echo_logo.png"} alt={orgName} className="w-full h-full object-contain" />
+            <img
+              src={isSuperAdminPlatform ? "/echo_logo.png" : org?.logoUrl || org?.academyLogoUrl || "/echo_logo.png"}
+              alt={orgName}
+              className="w-full h-full object-contain"
+            />
           </div>
           {!isCollapsed && (
             <div className="flex flex-col min-w-0">
               <span className="text-base font-black tracking-tight text-slate-900 truncate">
                 {orgName}
               </span>
-              <span className="text-[10px] text-teal-600 font-bold uppercase tracking-wide truncate">
-                Enterprise LMS
+              <span
+                className={cn(
+                  "text-[10px] font-bold uppercase tracking-wide truncate",
+                  isSuperAdminPlatform ? "text-amber-600" : "text-teal-600"
+                )}
+              >
+                {isSuperAdminPlatform ? "Platform Control" : "Enterprise LMS"}
               </span>
             </div>
           )}
@@ -347,7 +373,7 @@ export function AppSidebar() {
 
       {/* Sidebar Navigation */}
       <div id="sidebar-scroll-container" className="flex-1 overflow-y-auto p-3 space-y-6 custom-scrollbar">
-        {(pathname?.startsWith("/dashboard/super-admin") ? superAdminSidebarGroups : sidebarGroups).map((group, idx) => {
+        {activeGroups.map((group, idx) => {
           const groupId = `sidebar-group-${group.groupName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
           return (
             <div key={idx} id={groupId} className="space-y-1 scroll-mt-4">
@@ -438,7 +464,7 @@ export function AppSidebar() {
       {!isCollapsed ? (
         <div className="p-3 border-t border-slate-200 bg-slate-50 shrink-0 space-y-2">
           <button
-            onClick={() => signOut({ callbackUrl: "/auth/login" })}
+            onClick={() => signOut({ callbackUrl: isSuperAdminPlatform ? "/super-admin/login" : "/auth/login" })}
             className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200/80 transition-colors shadow-2xs"
           >
             <LogOut className="w-4 h-4 shrink-0" />
@@ -446,13 +472,15 @@ export function AppSidebar() {
           </button>
           <div className="flex items-center gap-2 px-1">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-bold text-slate-500">Echo OS Engine v2.5</span>
+            <span className="text-[10px] font-bold text-slate-500">
+              {isSuperAdminPlatform ? "Echo Control Plane" : "Echo OS Engine v2.5"}
+            </span>
           </div>
         </div>
       ) : (
         <div className="p-2 border-t border-slate-200 bg-slate-50 flex flex-col items-center gap-2 shrink-0">
           <button
-            onClick={() => signOut({ callbackUrl: "/auth/login" })}
+            onClick={() => signOut({ callbackUrl: isSuperAdminPlatform ? "/super-admin/login" : "/auth/login" })}
             title="Sign Out"
             className="w-9 h-9 flex items-center justify-center rounded-xl text-rose-600 hover:bg-rose-50 border border-rose-200/80 transition-colors shadow-2xs"
           >

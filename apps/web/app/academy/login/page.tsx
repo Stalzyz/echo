@@ -75,10 +75,17 @@ export default function AcademyLoginPage() {
           </button>
         </form>
 
-        <div className="mt-6 text-center border-t border-slate-100 pt-4">
-          <Link href="/auth/login" className="text-xs font-semibold text-teal-700 hover:underline">
-            Are you a student? Switch to Student Login →
-          </Link>
+        <div className="mt-6 text-center border-t border-slate-100 pt-4 space-y-2">
+          <div>
+            <Link href="/auth/login" className="text-xs font-semibold text-teal-700 hover:underline">
+              Are you a student or educator? Switch to Unified Login →
+            </Link>
+          </div>
+          <div>
+            <Link href="/super-admin/login" className="text-xs font-semibold text-amber-700 hover:underline font-mono">
+              Platform Super Admin Login →
+            </Link>
+          </div>
         </div>
       </motion.div>
     </div>

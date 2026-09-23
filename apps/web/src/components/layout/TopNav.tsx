@@ -54,6 +54,9 @@ export function TopNav() {
   if (rawRole === "Intern") rawRole = "INTERN"
   
   const role = rawRole as Role
+  const isSuperAdminPlatform =
+    (role === "SUPER_ADMIN" || session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "Super Admin") &&
+    !session?.user?.impersonatedBySuperAdmin
 
   return (
     <>
@@ -62,11 +65,14 @@ export function TopNav() {
         
         {/* Left: Top Navigation Header Logo & Tabs */}
         <div className="flex items-center gap-3">
-          <Link href="/dashboard" className="flex items-center gap-2 shrink-0">
+          <Link
+            href={isSuperAdminPlatform ? "/dashboard/super-admin" : "/dashboard"}
+            className="flex items-center gap-2 shrink-0"
+          >
             <OrgHeader />
           </Link>
           <nav className="hidden lg:flex items-center gap-1 border-l border-slate-200 pl-3">
-            {pathname?.startsWith("/dashboard/super-admin") ? (
+            {isSuperAdminPlatform || pathname?.startsWith("/dashboard/super-admin") ? (
               <>
                 <Link
                   href="/dashboard/super-admin"
@@ -234,7 +240,7 @@ export function TopNav() {
                 {session?.user?.name?.charAt(0) || "S"}
               </div>
               <button 
-                onClick={() => signOut({ callbackUrl: "/auth/login" })} 
+                onClick={() => signOut({ callbackUrl: isSuperAdminPlatform ? "/super-admin/login" : "/auth/login" })} 
                 title="Sign Out" 
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200/80 transition-colors shadow-2xs"
               >

@@ -17,9 +17,12 @@ export default function LoginPage() {
           <ArrowLeft className="w-3.5 h-3.5" /> Return to Home
         </Link>
 
-        <span className="text-xs font-bold text-slate-500 bg-white px-3.5 py-2 rounded-full border border-slate-200 shadow-2xs">
-          Echo Single Window Access
-        </span>
+        <Link 
+          href="/super-admin/login" 
+          className="inline-flex items-center gap-2 text-xs font-bold text-amber-800 hover:text-amber-900 transition-colors bg-amber-50 hover:bg-amber-100 px-3.5 py-2 rounded-full border border-amber-200 shadow-2xs font-mono"
+        >
+          <span>Platform Super Admin Login →</span>
+        </Link>
       </div>
 
       {/* Main Login Window */}
