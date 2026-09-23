@@ -83,6 +83,101 @@ export default async function feesRouter(app: FastifyInstance) {
   });
 
   // ─────────────────────────────────────────────────────────────
+  // POST /api/v1/academy/fees — Admin creates an invoice / installments
+  // ─────────────────────────────────────────────────────────────
+  app.post('/fees', async (req, reply) => {
+    const schema = z.object({
+      enrollmentId: z.string(),
+      dueDate: z.string().optional(),
+      amount: z.number().positive(),
+      taxRate: z.number().nonnegative().optional(),
+      discount: z.number().nonnegative().optional(),
+      discountType: z.enum(['FLAT', 'PERCENTAGE']).optional(),
+      referralCode: z.string().optional(),
+      notes: z.string().optional(),
+      lineItems: z.array(z.object({
+        description: z.string(),
+        amount: z.number()
+      })).optional(),
+      installments: z.array(z.object({
+        amount: z.number().positive(),
+        dueDate: z.string()
+      })).optional()
+    });
+
+    const body = schema.parse(req.body);
+    const baseAmount = body.amount;
+    const lineItemsTotal = (body.lineItems || []).reduce((sum, item) => sum + (item.amount || 0), 0);
+    const grossTotal = baseAmount + lineItemsTotal;
+
+    const discountValue = body.discount || 0;
+    const calculatedDiscount = body.discountType === 'PERCENTAGE' 
+      ? (grossTotal * discountValue) / 100 
+      : discountValue;
+
+    const taxableAmount = Math.max(0, grossTotal - calculatedDiscount);
+    const taxRate = body.taxRate || 0;
+    const computedTax = (taxableAmount * taxRate) / 100;
+    const netPayable = taxableAmount + computedTax;
+
+    const lineItemsNote = (body.lineItems || []).length > 0
+      ? `Extras: ` + body.lineItems?.map(l => `${l.description} (₹${l.amount})`).join(', ')
+      : null;
+
+    const fullNotes = [
+      body.notes,
+      lineItemsNote,
+      body.referralCode ? `Referral Code: ${body.referralCode}` : null,
+      calculatedDiscount > 0 ? `Discount Applied: ₹${calculatedDiscount} (${body.discountType === 'PERCENTAGE' ? `${discountValue}%` : 'Flat'})` : null,
+      taxRate > 0 ? `GST Rate: ${taxRate}% (₹${computedTax.toFixed(2)})` : null
+    ].filter(Boolean).join(" | ");
+
+    // If multi-installments passed
+    if (body.installments && body.installments.length > 0) {
+      const createdInstallments: any[] = [];
+      for (let idx = 0; idx < body.installments.length; idx++) {
+        const inst = body.installments[idx];
+        const instTax = (inst.amount * taxRate) / (100 + taxRate); // Pro-rated tax
+        const item = await app.prisma.feeInstallment.create({
+          data: {
+            enrollmentId: body.enrollmentId,
+            dueDate: new Date(inst.dueDate),
+            amount: inst.amount,
+            taxAmount: Math.round(instTax * 100) / 100,
+            notes: `${fullNotes} [Installment ${idx + 1}/${body.installments.length}]`
+          }
+        });
+        createdInstallments.push(item);
+      }
+      reply.code(201);
+      return { success: true, count: createdInstallments.length, installments: createdInstallments };
+    }
+
+    // Single installment / invoice
+    const defaultDueDate = body.dueDate ? new Date(body.dueDate) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const installment = await app.prisma.feeInstallment.create({
+      data: {
+        enrollmentId: body.enrollmentId,
+        dueDate: defaultDueDate,
+        amount: Math.max(netPayable, 0),
+        taxAmount: computedTax,
+        notes: fullNotes
+      },
+      include: {
+        enrollment: {
+          include: {
+            student: { include: { user: true } },
+            batch: { select: { name: true, type: true } }
+          }
+        }
+      }
+    });
+
+    reply.code(201);
+    return installment;
+  });
+
+  // ─────────────────────────────────────────────────────────────
   // POST /api/v1/academy/fees/installment — Admin creates a due
   // ─────────────────────────────────────────────────────────────
   app.post('/fees/installment', async (req, reply) => {

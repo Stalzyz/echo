@@ -1,35 +1,162 @@
 "use client"
 
-import { useState } from "react"
-import { Search, Filter, Download, Plus, IndianRupee, TrendingUp, AlertCircle, FileText, CheckCircle2, Clock, XCircle, Loader2, X, Eye, Mail, Printer, MessageCircle, Building2 } from "lucide-react"
+import { useState, useMemo } from "react"
+import { Search, Filter, Download, Plus, IndianRupee, TrendingUp, AlertCircle, FileText, CheckCircle2, Clock, XCircle, Loader2, X, Eye, Mail, Printer, MessageCircle, Building2, Trash2, Calendar, CreditCard, Tag, Sparkles, UserCheck, BookOpen } from "lucide-react"
 import { useApi, fetchApi } from "@/lib/useApi"
 import { toast } from "sonner"
 
 // Types
 type InvoiceStatus = 'PAID' | 'PARTIAL' | 'PENDING' | 'OVERDUE' | 'CANCELLED'
+type DiscountType = 'FLAT' | 'PERCENTAGE'
+
+interface LineItem {
+  id: string
+  description: string
+  amount: number
+}
+
+interface InstallmentSchedule {
+  installmentNo: number
+  amount: number
+  dueDate: string
+}
 
 export default function FeeManagementPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const { data: feesData, mutate, isLoading } = useApi<any>("/academy/fees")
   const { data: enrollData } = useApi<any>("/academy/enroll/all")
+  const { data: studentsData } = useApi<any>("/academy/students")
+  const { data: batchesData } = useApi<any>("/academy/batches")
   const { data: orgData } = useApi<any>("/settings/organization")
   
   const [isSlideOverOpen, setIsSlideOverOpen] = useState(false)
   const [selectedInvoice, setSelectedInvoice] = useState<any | null>(null)
+  const [paymentModalInvoice, setPaymentModalInvoice] = useState<any | null>(null)
+  const [paymentAmount, setPaymentAmount] = useState("")
+  const [paymentRef, setPaymentRef] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [form, setForm] = useState({
-    enrollmentId: "",
-    amount: "",
-    taxRate: "18",
-    discount: "0",
-    referralCode: "",
-    dueDate: "",
-    notes: ""
+
+  // Smart Invoice Generator Form State
+  const [selectedStudentId, setSelectedStudentId] = useState("")
+  const [selectedBatchId, setSelectedBatchId] = useState("")
+  const [enrollmentId, setEnrollmentId] = useState("")
+  
+  const [baseCourseFee, setBaseCourseFee] = useState<number | string>("25000")
+  const [discountType, setDiscountType] = useState<DiscountType>("FLAT")
+  const [discountValue, setDiscountValue] = useState<number | string>("0")
+  const [taxRate, setTaxRate] = useState<number>(18)
+  const [referralCode, setReferralCode] = useState("")
+  const [dueDate, setDueDate] = useState(() => {
+    const d = new Date()
+    d.setDate(d.getDate() + 7)
+    return d.toISOString().split("T")[0]
   })
+  const [notes, setNotes] = useState("")
+  const [lineItems, setLineItems] = useState<LineItem[]>([])
+  
+  // EMI & Installment Plan
+  const [paymentPlan, setPaymentPlan] = useState<'FULL' | 'INSTALLMENTS'>('FULL')
+  const [installmentCount, setInstallmentCount] = useState<number>(2)
+  const [customSchedules, setCustomSchedules] = useState<InstallmentSchedule[]>([])
 
   const stats = feesData?.stats || { totalCollected: 0, totalOutstanding: 0, overdueCount: 0 }
   const installments = feesData?.installments || (Array.isArray(feesData) ? feesData : [])
   const org = orgData || {}
+
+  const allEnrollments = useMemo(() => {
+    return enrollData?.enrollments || (Array.isArray(enrollData) ? enrollData : [])
+  }, [enrollData])
+
+  const allStudents = useMemo(() => {
+    return studentsData?.students || (Array.isArray(studentsData) ? studentsData : [])
+  }, [studentsData])
+
+  const allBatches = useMemo(() => {
+    return Array.isArray(batchesData) ? batchesData : []
+  }, [batchesData])
+
+  // Handle Student Selection Change -> Auto Fill Active Enrollment & Batch
+  const handleStudentChange = (stId: string) => {
+    setSelectedStudentId(stId)
+    if (!stId) {
+      setEnrollmentId("")
+      return
+    }
+    const studentEnr = allEnrollments.find((e: any) => e.studentId === stId || e.student?.id === stId)
+    if (studentEnr) {
+      setEnrollmentId(studentEnr.id)
+      if (studentEnr.batchId) setSelectedBatchId(studentEnr.batchId)
+    }
+  }
+
+  // Handle Batch Change -> Filter Students or Set Base Price
+  const handleBatchChange = (batchId: string) => {
+    setSelectedBatchId(batchId)
+    const batch = allBatches.find((b: any) => b.id === batchId)
+    if (batch?.course?.price) {
+      setBaseCourseFee(batch.course.price)
+    }
+  }
+
+  // Live Invoice Calculations
+  const calculatedGross = useMemo(() => {
+    const base = Number(baseCourseFee || 0)
+    const extras = lineItems.reduce((acc, item) => acc + (Number(item.amount) || 0), 0)
+    return base + extras
+  }, [baseCourseFee, lineItems])
+
+  const calculatedDiscount = useMemo(() => {
+    const val = Number(discountValue || 0)
+    if (discountType === 'PERCENTAGE') {
+      return (calculatedGross * val) / 100
+    }
+    return val
+  }, [calculatedGross, discountType, discountValue])
+
+  const taxableAmount = useMemo(() => {
+    return Math.max(0, calculatedGross - calculatedDiscount)
+  }, [calculatedGross, calculatedDiscount])
+
+  const calculatedTax = useMemo(() => {
+    return (taxableAmount * Number(taxRate || 0)) / 100
+  }, [taxableAmount, taxRate])
+
+  const netPayable = useMemo(() => {
+    return taxableAmount + calculatedTax
+  }, [taxableAmount, calculatedTax])
+
+  // Auto Generate Installments Schedule
+  const generateInstallments = (count: number, total: number) => {
+    const perInst = Math.round(total / count)
+    const schedules: InstallmentSchedule[] = []
+    const today = new Date()
+
+    for (let i = 0; i < count; i++) {
+      const d = new Date(today)
+      d.setDate(d.getDate() + i * 30) // 30 day interval per installment
+      schedules.push({
+        installmentNo: i + 1,
+        amount: i === count - 1 ? total - perInst * (count - 1) : perInst,
+        dueDate: d.toISOString().split("T")[0]
+      })
+    }
+    setCustomSchedules(schedules)
+  }
+
+  const handleTogglePaymentPlan = (plan: 'FULL' | 'INSTALLMENTS') => {
+    setPaymentPlan(plan)
+    if (plan === 'INSTALLMENTS') {
+      generateInstallments(installmentCount, netPayable)
+    }
+  }
+
+  const handleAddLineItem = () => {
+    setLineItems([...lineItems, { id: Math.random().toString(), description: "", amount: 0 }])
+  }
+
+  const handleRemoveLineItem = (id: string) => {
+    setLineItems(lineItems.filter(i => i.id !== id))
+  }
 
   const getStatusConfig = (status: InvoiceStatus) => {
     switch (status) {
@@ -44,29 +171,81 @@ export default function FeeManagementPage() {
 
   const handleCreateInvoice = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!form.enrollmentId || !form.amount || !form.dueDate) {
-      toast.error("Please fill in all required fields")
+    
+    // Find active enrollment
+    let targetEnrollmentId = enrollmentId
+    if (!targetEnrollmentId && selectedStudentId) {
+      const match = allEnrollments.find((en: any) => en.studentId === selectedStudentId || en.student?.id === selectedStudentId)
+      if (match) targetEnrollmentId = match.id
+    }
+
+    if (!targetEnrollmentId) {
+      toast.error("Please select a student with an active course enrollment.")
       return
     }
+
+    if (!baseCourseFee || Number(baseCourseFee) <= 0) {
+      toast.error("Please enter a valid course fee amount.")
+      return
+    }
+
     setIsSubmitting(true)
     try {
+      const payload = {
+        enrollmentId: targetEnrollmentId,
+        amount: Number(baseCourseFee),
+        taxRate: Number(taxRate || 0),
+        discount: Number(discountValue || 0),
+        discountType,
+        referralCode,
+        dueDate: new Date(dueDate).toISOString(),
+        notes,
+        lineItems: lineItems.filter(item => item.description && item.amount > 0),
+        installments: paymentPlan === 'INSTALLMENTS' ? customSchedules : undefined
+      }
+
       await fetchApi("/academy/fees", {
         method: "POST",
-        body: JSON.stringify({
-          enrollmentId: form.enrollmentId,
-          amount: parseFloat(form.amount),
-          taxRate: parseFloat(form.taxRate || "0"),
-          discount: parseFloat(form.discount || "0"),
-          dueDate: new Date(form.dueDate).toISOString(),
-          notes: form.notes
-        })
+        body: JSON.stringify(payload)
       })
-      toast.success("Invoice created successfully")
+
+      toast.success(paymentPlan === 'INSTALLMENTS' ? `${customSchedules.length} Installments issued successfully!` : "Tax Invoice issued successfully!")
       setIsSlideOverOpen(false)
-      setForm({ enrollmentId: "", amount: "", taxRate: "18", discount: "0", referralCode: "", dueDate: "", notes: "" })
+      setSelectedStudentId("")
+      setSelectedBatchId("")
+      setEnrollmentId("")
+      setBaseCourseFee("25000")
+      setDiscountValue("0")
+      setNotes("")
+      setLineItems([])
       mutate()
     } catch (err: any) {
-      toast.error(err.message || "Failed to create invoice")
+      toast.error(err.message || "Failed to issue invoice")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleRecordPayment = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!paymentModalInvoice || !paymentAmount) return
+    setIsSubmitting(true)
+    try {
+      await fetchApi(`/academy/fees/installment/${paymentModalInvoice.id}/pay`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          amount: parseFloat(paymentAmount),
+          paymentRef,
+          notes: "Recorded by admin"
+        })
+      })
+      toast.success("Payment recorded successfully!")
+      setPaymentModalInvoice(null)
+      setPaymentAmount("")
+      setPaymentRef("")
+      mutate()
+    } catch (err: any) {
+      toast.error(err.message || "Failed to record payment")
     } finally {
       setIsSubmitting(false)
     }
@@ -115,6 +294,7 @@ export default function FeeManagementPage() {
   const taxAmt = (invAmt * invTax) / 100
   const totalPayable = invAmt + taxAmt
   const selectedInvId = (selectedInvoice?.id || '').slice(-6).toUpperCase()
+
 
   return (
     <div className="flex flex-col h-full bg-slate-50 text-slate-900 overflow-y-auto p-8 relative">
@@ -285,97 +465,410 @@ export default function FeeManagementPage() {
         </div>
       </div>
 
-      {/* SlideOver for Add Invoice */}
+      {/* TOPNOTCH INVOICE GENERATOR SLIDEOVER */}
       {isSlideOverOpen && (
         <div className="fixed inset-0 z-50 flex justify-end">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs" onClick={() => setIsSlideOverOpen(false)} />
-          <div className="w-full md:w-[480px] bg-white h-full border-l border-slate-200 relative flex flex-col shadow-2xl z-10 animate-in slide-in-from-right text-slate-900">
+          <div className="w-full md:w-[680px] bg-white h-full border-l border-slate-200 relative flex flex-col shadow-2xl z-10 animate-in slide-in-from-right text-slate-900">
+            
+            {/* Header */}
             <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-              <h2 className="text-lg font-bold flex items-center gap-2 text-slate-900">
-                <FileText className="w-5 h-5 text-teal-600" />
-                Create New Invoice
-              </h2>
+              <div>
+                <h2 className="text-lg font-bold flex items-center gap-2 text-slate-900">
+                  <Sparkles className="w-5 h-5 text-teal-600" />
+                  Topnotch Invoice Generator
+                </h2>
+                <p className="text-xs text-slate-500 font-medium">Issue customized tax invoices with flat deductions, extra line items, and EMI plans.</p>
+              </div>
               <button onClick={() => setIsSlideOverOpen(false)} className="p-2 hover:bg-slate-200 rounded-full transition-colors">
                 <X className="w-5 h-5 text-slate-500" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateInvoice} className="flex-1 overflow-y-auto p-6 space-y-4">
-              <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Select Student Enrollment *</label>
-                <select 
-                  required
-                  value={form.enrollmentId} 
-                  onChange={e => setForm(p => ({ ...p, enrollmentId: e.target.value }))}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:border-teal-500"
-                >
-                  <option value="">-- Choose Student --</option>
-                  {(enrollData?.enrollments || (Array.isArray(enrollData) ? enrollData : [])).map((e: any) => (
-                    <option key={e.id} value={e.id}>
-                      {e.student?.user?.firstName || 'Student'} {e.student?.user?.lastName || ''} — {e.batch?.course?.name || e.course?.name || "Course"}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <form onSubmit={handleCreateInvoice} className="flex-1 overflow-y-auto p-6 space-y-6">
+              
+              {/* Step 1: Student & Course Picker */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                  <UserCheck className="w-4 h-4 text-teal-600" /> 1. Student & Course Selection
+                </h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Select Student *</label>
+                    <select 
+                      required
+                      value={selectedStudentId} 
+                      onChange={e => handleStudentChange(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:border-teal-500 shadow-xs"
+                    >
+                      <option value="">-- Search & Choose Student --</option>
+                      {allStudents.map((st: any) => (
+                        <option key={st.id} value={st.id}>
+                          {st.user?.firstName} {st.user?.lastName} ({st.user?.email || st.user?.phone || 'No Contact'})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Fee Amount (₹) *</label>
-                  <input 
-                    required
-                    type="number"
-                    placeholder="e.g. 25000"
-                    value={form.amount}
-                    onChange={e => setForm(p => ({ ...p, amount: e.target.value }))}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:border-teal-500"
-                  />
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Select Batch / Course</label>
+                    <select 
+                      value={selectedBatchId} 
+                      onChange={e => handleBatchChange(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:border-teal-500 shadow-xs"
+                    >
+                      <option value="">-- Select Course / Cohort --</option>
+                      {allBatches.map((b: any) => (
+                        <option key={b.id} value={b.id}>
+                          {b.name} — {b.course?.name || "Course"} (₹{b.course?.price || "25,000"})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
+
+                {/* Enrollment selector fallback */}
                 <div>
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Tax Rate (%)</label>
-                  <input 
-                    type="number"
-                    placeholder="18"
-                    value={form.taxRate}
-                    onChange={e => setForm(p => ({ ...p, taxRate: e.target.value }))}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:border-teal-500"
-                  />
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Active Enrollment Context</label>
+                  <select 
+                    value={enrollmentId} 
+                    onChange={e => setEnrollmentId(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-teal-500"
+                  >
+                    <option value="">-- Choose Direct Enrollment --</option>
+                    {allEnrollments.map((en: any) => (
+                      <option key={en.id} value={en.id}>
+                        {en.student?.user?.firstName} {en.student?.user?.lastName} — {en.batch?.course?.name || "Course Enrollment"} ({en.id.slice(-6)})
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
-              <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Due Date *</label>
-                <input 
-                  required
-                  type="date"
-                  value={form.dueDate}
-                  onChange={e => setForm(p => ({ ...p, dueDate: e.target.value }))}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:border-teal-500"
-                />
+              {/* Step 2: Base Pricing & Flat Deduction Options */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                  <Tag className="w-4 h-4 text-teal-600" /> 2. Fee Amount, Flat Deduction & Discounts
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Base Course Fee (₹) *</label>
+                    <input 
+                      required
+                      type="number"
+                      placeholder="e.g. 25000"
+                      value={baseCourseFee}
+                      onChange={e => setBaseCourseFee(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:border-teal-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">GST Tax Rate (%)</label>
+                    <div className="flex gap-2">
+                      {[0, 5, 12, 18].map((rate) => (
+                        <button
+                          key={rate}
+                          type="button"
+                          onClick={() => setTaxRate(rate)}
+                          className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-colors ${taxRate === rate ? 'bg-teal-600 text-white border-teal-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'}`}
+                        >
+                          {rate}%
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Deduction / Discount Controls */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Deduction Type</label>
+                    <div className="flex bg-white rounded-xl border border-slate-200 p-1">
+                      <button 
+                        type="button" 
+                        onClick={() => setDiscountType('FLAT')} 
+                        className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${discountType === 'FLAT' ? 'bg-teal-600 text-white' : 'text-slate-600'}`}
+                      >
+                        Flat (₹)
+                      </button>
+                      <button 
+                        type="button" 
+                        onClick={() => setDiscountType('PERCENTAGE')} 
+                        className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${discountType === 'PERCENTAGE' ? 'bg-teal-600 text-white' : 'text-slate-600'}`}
+                      >
+                        Percent (%)
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                      {discountType === 'FLAT' ? 'Flat Deduction Amount (₹)' : 'Percentage Discount (%)'}
+                    </label>
+                    <input 
+                      type="number"
+                      placeholder={discountType === 'FLAT' ? "e.g. 5000" : "e.g. 10"}
+                      value={discountValue}
+                      onChange={e => setDiscountValue(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:border-teal-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Referral / Promo Code</label>
+                    <input 
+                      type="text"
+                      placeholder="e.g. REF100"
+                      value={referralCode}
+                      onChange={e => setReferralCode(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:border-teal-500 uppercase font-mono"
+                    />
+                  </div>
+                </div>
               </div>
 
+              {/* Step 3: Additional Line Items (Books, Exam, Kit Fees) */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-teal-600" /> 3. Additional Line Items & Materials
+                  </h3>
+                  <button type="button" onClick={handleAddLineItem} className="text-xs font-bold text-teal-600 hover:text-teal-700 flex items-center gap-1">
+                    <Plus className="w-3.5 h-3.5" /> Add Item
+                  </button>
+                </div>
+
+                {lineItems.length === 0 ? (
+                  <p className="text-xs text-slate-400 italic">No extra charges added (e.g., Exam Fee, Registration, Materials).</p>
+                ) : (
+                  <div className="space-y-2">
+                    {lineItems.map((item) => (
+                      <div key={item.id} className="flex gap-3 items-center">
+                        <input 
+                          placeholder="Item Description (e.g., Study Materials & Books)" 
+                          value={item.description} 
+                          onChange={e => {
+                            const updated = lineItems.map(i => i.id === item.id ? { ...i, description: e.target.value } : i)
+                            setLineItems(updated)
+                          }}
+                          className="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-900 focus:outline-none"
+                        />
+                        <input 
+                          type="number"
+                          placeholder="Amount (₹)" 
+                          value={item.amount || ''} 
+                          onChange={e => {
+                            const updated = lineItems.map(i => i.id === item.id ? { ...i, amount: parseFloat(e.target.value) || 0 } : i)
+                            setLineItems(updated)
+                          }}
+                          className="w-32 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-900 focus:outline-none"
+                        />
+                        <button type="button" onClick={() => handleRemoveLineItem(item.id)} className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Step 4: Payment Schedule / EMI Installments */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-teal-600" /> 4. Payment Plan & Installments (EMI)
+                  </h3>
+                  
+                  <div className="flex bg-white rounded-xl border border-slate-200 p-1">
+                    <button 
+                      type="button" 
+                      onClick={() => handleTogglePaymentPlan('FULL')} 
+                      className={`px-3 py-1 text-xs font-bold rounded-lg transition-colors ${paymentPlan === 'FULL' ? 'bg-teal-600 text-white' : 'text-slate-600'}`}
+                    >
+                      Single Invoice
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => handleTogglePaymentPlan('INSTALLMENTS')} 
+                      className={`px-3 py-1 text-xs font-bold rounded-lg transition-colors ${paymentPlan === 'INSTALLMENTS' ? 'bg-teal-600 text-white' : 'text-slate-600'}`}
+                    >
+                      EMI Installments
+                    </button>
+                  </div>
+                </div>
+
+                {paymentPlan === 'FULL' ? (
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Invoice Due Date *</label>
+                    <input 
+                      required
+                      type="date"
+                      value={dueDate}
+                      onChange={e => setDueDate(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:border-teal-500"
+                    />
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <label className="text-xs font-bold uppercase tracking-wider text-slate-500 shrink-0">Number of Installments:</label>
+                      {[2, 3, 4].map((count) => (
+                        <button
+                          key={count}
+                          type="button"
+                          onClick={() => {
+                            setInstallmentCount(count)
+                            generateInstallments(count, netPayable)
+                          }}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-colors ${installmentCount === count ? 'bg-teal-600 text-white border-teal-600' : 'bg-white text-slate-700 border-slate-200'}`}
+                        >
+                          {count} Installments
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="space-y-2 pt-2">
+                      {customSchedules.map((sch, idx) => (
+                        <div key={idx} className="flex gap-3 items-center bg-white p-3 border border-slate-200 rounded-xl">
+                          <span className="text-xs font-bold text-slate-700 w-24">Installment {sch.installmentNo}:</span>
+                          <div className="flex-1 flex gap-2">
+                            <input 
+                              type="number" 
+                              value={sch.amount} 
+                              onChange={e => {
+                                const val = parseFloat(e.target.value) || 0
+                                const updated = [...customSchedules]
+                                updated[idx].amount = val
+                                setCustomSchedules(updated)
+                              }}
+                              className="w-1/2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-900" 
+                            />
+                            <input 
+                              type="date" 
+                              value={sch.dueDate} 
+                              onChange={e => {
+                                const updated = [...customSchedules]
+                                updated[idx].dueDate = e.target.value
+                                setCustomSchedules(updated)
+                              }}
+                              className="w-1/2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-900" 
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Notes */}
               <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Notes / Payment Terms</label>
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Invoice Notes / Terms</label>
                 <textarea 
-                  rows={3}
-                  placeholder="e.g. First Installment for Web Development Course"
-                  value={form.notes}
-                  onChange={e => setForm(p => ({ ...p, notes: e.target.value }))}
+                  rows={2}
+                  placeholder="e.g. Non-refundable admission fee. Installments due strictly on scheduled dates."
+                  value={notes}
+                  onChange={e => setNotes(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-medium text-slate-900 focus:outline-none focus:border-teal-500"
                 />
               </div>
 
+              {/* Live Calculation Summary Box */}
+              <div className="bg-teal-900 text-white rounded-2xl p-6 shadow-xl space-y-3">
+                <h4 className="text-xs font-black uppercase tracking-wider text-teal-300">Live Fee Calculation Summary</h4>
+                <div className="space-y-1.5 text-xs text-teal-100 border-b border-teal-800/80 pb-3">
+                  <div className="flex justify-between">
+                    <span>Base Course Fee:</span>
+                    <span>₹{Number(baseCourseFee || 0).toLocaleString()}</span>
+                  </div>
+                  {lineItems.length > 0 && (
+                    <div className="flex justify-between text-amber-300 font-semibold">
+                      <span>Extra Line Items:</span>
+                      <span>+ ₹{lineItems.reduce((acc, i) => acc + (i.amount || 0), 0).toLocaleString()}</span>
+                    </div>
+                  )}
+                  {calculatedDiscount > 0 && (
+                    <div className="flex justify-between text-emerald-300 font-semibold">
+                      <span>Flat Deduction / Discount:</span>
+                      <span>- ₹{calculatedDiscount.toLocaleString()} ({discountType === 'PERCENTAGE' ? `${discountValue}%` : 'Flat'})</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-teal-200 font-semibold pt-1 border-t border-teal-800/50">
+                    <span>Taxable Base Amount:</span>
+                    <span>₹{taxableAmount.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-teal-200 font-semibold">
+                    <span>GST ({taxRate}%):</span>
+                    <span>₹{calculatedTax.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center text-lg font-black text-white pt-1">
+                  <span>Net Payable Total:</span>
+                  <span className="text-2xl font-black text-amber-300">₹{netPayable.toFixed(2)}</span>
+                </div>
+              </div>
+
+              {/* Submit Buttons */}
               <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">
-                <button type="button" onClick={() => setIsSlideOverOpen(false)} className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-bold transition-colors">
+                <button type="button" onClick={() => setIsSlideOverOpen(false)} className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-bold transition-colors">
                   Cancel
                 </button>
-                <button type="submit" disabled={isSubmitting} className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-bold transition-colors disabled:opacity-50 flex items-center gap-2">
-                  {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Issue Invoice"}
+                <button type="submit" disabled={isSubmitting} className="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-bold transition-colors shadow-md disabled:opacity-50 flex items-center gap-2">
+                  {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Sparkles className="w-4 h-4" /> Issue & Send Invoice</>}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      {/* QUICK RECORD PAYMENT MODAL */}
+      {paymentModalInvoice && (
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-md p-6 shadow-2xl text-slate-900">
+            <div className="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <CreditCard className="w-5 h-5 text-emerald-600" />
+                Record Payment
+              </h3>
+              <button onClick={() => setPaymentModalInvoice(null)}><X className="w-5 h-5 text-slate-400 hover:text-slate-700" /></button>
+            </div>
+
+            <form onSubmit={handleRecordPayment} className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1">Student</label>
+                <input disabled className="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-800"
+                  value={`${paymentModalInvoice.enrollment?.student?.user?.firstName || ''} ${paymentModalInvoice.enrollment?.student?.user?.lastName || ''}`} />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1">Payment Amount (₹) *</label>
+                <input required type="number" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-900 focus:border-teal-500 outline-none"
+                  value={paymentAmount} onChange={e => setPaymentAmount(e.target.value)} />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1">Payment Reference / UTR / Cheque No.</label>
+                <input className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:border-teal-500 outline-none font-mono"
+                  placeholder="e.g. UPI/12948102948 or Cash"
+                  value={paymentRef} onChange={e => setPaymentRef(e.target.value)} />
+              </div>
+
+              <div className="flex gap-3 pt-4 border-t border-slate-100">
+                <button type="button" onClick={() => setPaymentModalInvoice(null)} className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-colors">Cancel</button>
+                <button type="submit" disabled={isSubmitting} className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition-colors shadow-xs disabled:opacity-50">
+                  {isSubmitting ? "Recording..." : "Confirm Payment"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
 
       {/* SlideOver for View Detailed Invoice */}
       {selectedInvoice && (

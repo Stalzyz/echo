@@ -98,7 +98,7 @@ export default async function batchesRouter(app: FastifyInstance) {
     if (!batch) return reply.notFound('Batch not found');
 
     const startDate = new Date(batch.startDate);
-    const createdSessions = [];
+    const createdSessions: any[] = [];
 
     for (let i = 0; i < daysCount; i++) {
       const sessionStart = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
