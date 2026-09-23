@@ -97,35 +97,73 @@ const authPlugin: FastifyPluginAsync = async (fastify, opts) => {
         let defaultAdmin: any = null;
         try {
           defaultAdmin = await fastify.prisma.user.findFirst({
-            where: { role: { in: ['SUPER_ADMIN', 'STAFF'] } }
+            where: { role: { in: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] } }
           });
         } catch {}
 
+        const impersonatedTenantId = cookies['echo_impersonate_tenant'];
         request.user = {
           id: defaultAdmin?.id || 'dev-admin-id',
           email: defaultAdmin?.email || 'admin@echolms.com',
           name: defaultAdmin ? `${defaultAdmin.firstName || ''} ${defaultAdmin.lastName || ''}`.trim() || 'Academy Admin' : 'Academy Admin',
-          role: defaultAdmin?.role || 'SUPER_ADMIN'
-        };
+          role: defaultAdmin?.role || 'SUPER_ADMIN',
+          organizationId: impersonatedTenantId || defaultAdmin?.organizationId || null
+        } as any;
         return;
       }
 
-      request.user = decoded as any;
+      const decodedAny = decoded as any;
+      const userId = (decodedAny?.id || decodedAny?.sub) as string;
+      const impersonatedTenantId = cookies['echo_impersonate_tenant'];
+
+      let dbUser: any = null;
+      if (userId) {
+        try {
+          dbUser = await fastify.prisma.user.findUnique({
+            where: { id: userId },
+            select: { id: true, email: true, firstName: true, lastName: true, role: true, organizationId: true }
+          });
+        } catch {}
+      }
+      if (!dbUser && decodedAny?.email) {
+        try {
+          dbUser = await fastify.prisma.user.findUnique({
+            where: { email: decodedAny.email },
+            select: { id: true, email: true, firstName: true, lastName: true, role: true, organizationId: true }
+          });
+        } catch {}
+      }
+
+      const effectiveRole = dbUser?.role || decodedAny?.role || 'ADMIN';
+      const effectiveOrgId = (effectiveRole === 'SUPER_ADMIN' && impersonatedTenantId)
+        ? impersonatedTenantId
+        : (dbUser?.organizationId || decodedAny?.organizationId || decodedAny?.tenantId || impersonatedTenantId || null);
+
+      request.user = {
+        id: dbUser?.id || userId || 'dev-admin-id',
+        email: dbUser?.email || decodedAny?.email || 'admin@echolms.com',
+        name: dbUser ? `${dbUser.firstName} ${dbUser.lastName}` : (decodedAny?.name || 'Academy Admin'),
+        role: effectiveRole,
+        organizationId: effectiveOrgId
+      } as any;
     } catch (err) {
       request.log.error(err);
+      const parsedCookies = cookie.parse(request.headers.cookie || '');
       let defaultAdmin: any = null;
       try {
         defaultAdmin = await fastify.prisma.user.findFirst({
-          where: { role: { in: ['SUPER_ADMIN', 'STAFF'] } }
+          where: { role: { in: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] } }
         });
       } catch {}
 
+      const impersonatedTenantId = parsedCookies['echo_impersonate_tenant'];
       request.user = {
         id: defaultAdmin?.id || 'dev-admin-id',
         email: defaultAdmin?.email || 'admin@echolms.com',
         name: defaultAdmin ? `${defaultAdmin.firstName || ''} ${defaultAdmin.lastName || ''}`.trim() || 'Academy Admin' : 'Academy Admin',
-        role: defaultAdmin?.role || 'SUPER_ADMIN'
-      };
+        role: defaultAdmin?.role || 'SUPER_ADMIN',
+        organizationId: impersonatedTenantId || defaultAdmin?.organizationId || null
+      } as any;
       return;
     }
   });

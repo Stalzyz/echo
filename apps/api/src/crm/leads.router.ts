@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
+import * as cookie from 'cookie';
 import { EventBus, SystemEvents } from '../automations/event-bus';
 import { sendTemplatedEmail } from '../services/emailRenderer';
 import { whatsappService } from '../integrations/whatsapp.service';
@@ -106,8 +107,18 @@ export default async function leadsRouter(app: FastifyInstance) {
     });
     const dncPhones = dncList.map(d => d.phone.trim()).filter(Boolean);
 
+    const user = (req as any).user;
+    const cookies = cookie.parse(req.headers.cookie || '');
+    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
+    const tenantId = user?.organizationId || impersonatedTenantId;
+
+    const orgFilter = (user?.role === 'SUPER_ADMIN' && !impersonatedTenantId)
+      ? {}
+      : { organizationId: tenantId || '__NO_ACCESS__' };
+
     const leads = await app.prisma.lead.findMany({
       where: {
+        ...orgFilter,
         ...(status && { status: status as any }),
         ...(assignedToId && { assignedToId }),
         ...(businessUnit && { businessUnit }),
@@ -159,6 +170,10 @@ export default async function leadsRouter(app: FastifyInstance) {
 
     const score = calculateScore(body.estimatedBudget, body.source, body.projectType, body.businessUnit);
 
+    const user = (req as any).user;
+    const cookies = cookie.parse(req.headers.cookie || '');
+    const tenantId = user?.organizationId || cookies['echo_impersonate_tenant'] || null;
+
     const lead = await app.prisma.lead.create({
       data: { 
         ...body, 
@@ -166,7 +181,8 @@ export default async function leadsRouter(app: FastifyInstance) {
         phone: cleanPhone,
         source: body.source || 'WEBSITE',
         status: body.status || (body.businessUnit === 'ACADEMY' ? 'ENQUIRY' : 'NEW'),
-        score 
+        score,
+        organizationId: tenantId
       },
     });
     
