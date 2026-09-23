@@ -282,16 +282,16 @@ export function ClickToCallModal({ isOpen, onClose, lead, onCallEnded }: ClickTo
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-xs animate-in fade-in">
-      <div className="w-full max-w-lg bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/70 backdrop-blur-xs animate-in fade-in overflow-hidden">
+      <div className="w-full sm:max-w-lg bg-white rounded-t-3xl sm:rounded-3xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[85vh] relative">
         
         {/* Top Header */}
-        <div className="p-6 bg-slate-900 text-white flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-teal-400">
+        <div className="p-4 sm:p-6 bg-slate-900 text-white flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-2xl bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-teal-400 shrink-0">
               <Phone className="w-5 h-5 animate-pulse" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-1.5">
                 <span className="text-xs font-bold text-teal-400 uppercase tracking-widest font-mono">ECHO Softphone</span>
                 {isRecordingActive && (
@@ -300,21 +300,25 @@ export function ClickToCallModal({ isOpen, onClose, lead, onCallEnded }: ClickTo
                   </span>
                 )}
               </div>
-              <h3 className="text-base font-extrabold text-white">{lead.name}</h3>
+              <h3 className="text-base font-extrabold text-white truncate">{lead.name}</h3>
             </div>
           </div>
-          <span className="text-xs font-mono bg-slate-800 px-3 py-1 rounded-full text-slate-300 border border-slate-700">
-            {lead.phone || "+91 98765 43210"}
-          </span>
+          <button 
+            type="button" 
+            onClick={onClose}
+            className="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center shrink-0 ml-2"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Consent Announcement Banner */}
-        <div className="bg-amber-50 border-b border-amber-200 px-5 py-2.5 flex items-center justify-between text-xs text-amber-900">
+        <div className="bg-amber-50 border-b border-amber-200 px-4 sm:px-5 py-2.5 flex items-center justify-between text-xs text-amber-900 shrink-0">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0" />
-            <span>Call Recording Consent Enabled</span>
+            <span className="font-medium text-[11px] sm:text-xs">Call Recording Consent</span>
           </div>
-          <label className="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-amber-800">
+          <label className="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-amber-800 shrink-0">
             <input 
               type="checkbox" 
               checked={consentGiven} 
@@ -324,36 +328,40 @@ export function ClickToCallModal({ isOpen, onClose, lead, onCallEnded }: ClickTo
             Consent Active
           </label>
         </div>
-        {/* Cellular Mobile Dialer Trigger */}
+
+        {/* Cellular Mobile Dialer Trigger Button */}
         {lead.phone && (
-          <div className="p-3 bg-emerald-50 border-b border-emerald-200">
+          <div className="p-3 bg-emerald-50 border-b border-emerald-200 shrink-0">
             <a
               href={`tel:${lead.phone}`}
-              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs transition-all shadow-2xs"
+              onClick={() => {
+                try { window.location.href = `tel:${lead.phone}` } catch(e) {}
+              }}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-extrabold text-xs transition-all shadow-md touch-manipulation"
             >
-              <Phone className="w-4 h-4" />
-              <span>Dial via Smartphone Mobile SIM Network ({lead.phone})</span>
+              <Phone className="w-4 h-4 animate-bounce" />
+              <span>Dial via Smartphone SIM ({lead.phone})</span>
             </a>
           </div>
         )}
 
         {/* Mic Permission / Hardware Alert Banner */}
         {micError && (
-          <div className="bg-rose-50 border-b border-rose-200 px-5 py-2.5 flex items-center gap-2 text-xs text-rose-800">
+          <div className="bg-rose-50 border-b border-rose-200 px-4 sm:px-5 py-2.5 flex items-center gap-2 text-xs text-rose-800 shrink-0">
             <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
             <span>{micError}</span>
           </div>
         )}
 
-        {/* Main Softphone Interface */}
-        <div className="p-6 space-y-5 flex-1">
+        {/* Main Softphone Interface - Scrollable Middle Body */}
+        <div className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1 custom-scrollbar min-h-0">
 
           {/* Active Call Status & Live Volume Meter */}
-          <div className="flex flex-col items-center justify-center p-6 bg-slate-50 border border-slate-200 rounded-2xl text-center space-y-3">
+          <div className="flex flex-col items-center justify-center p-5 bg-slate-50 border border-slate-200 rounded-2xl text-center space-y-3">
             {callState === "DIALING" && (
               <div className="space-y-2">
-                <div className="w-16 h-16 rounded-full bg-teal-100 border border-teal-300 flex items-center justify-center text-teal-700 mx-auto animate-bounce">
-                  <Phone className="w-8 h-8" />
+                <div className="w-14 h-14 rounded-full bg-teal-100 border border-teal-300 flex items-center justify-center text-teal-700 mx-auto animate-bounce">
+                  <Phone className="w-7 h-7" />
                 </div>
                 <div className="text-sm font-bold text-slate-800">Connecting Call...</div>
                 <div className="text-xs text-slate-500">Initializing WebRTC Audio Recorder</div>
@@ -393,11 +401,11 @@ export function ClickToCallModal({ isOpen, onClose, lead, onCallEnded }: ClickTo
           </div>
 
           {/* Audio Controls */}
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-3">
             <button
               type="button"
               onClick={toggleMute}
-              className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-xs ${
+              className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all shadow-xs ${
                 isMuted 
                   ? "bg-rose-100 text-rose-700 border border-rose-300" 
                   : "bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300"
@@ -407,21 +415,21 @@ export function ClickToCallModal({ isOpen, onClose, lead, onCallEnded }: ClickTo
               {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
             </button>
             
-            <div className="text-xs font-bold text-slate-600 font-mono bg-slate-100 px-4 py-3 rounded-2xl border border-slate-200">
-              Target Course: {lead.courseInterest || "UI/UX Masterclass"}
+            <div className="text-xs font-bold text-slate-600 font-mono bg-slate-100 px-3 py-2.5 rounded-2xl border border-slate-200 truncate max-w-[240px]">
+              Course: {lead.courseInterest || "UI/UX Masterclass"}
             </div>
           </div>
 
           {/* Quick Call Outcome Selector */}
           <div className="space-y-2">
             <label className="text-xs font-bold text-slate-700 block">Call Status Outcome</label>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {(["CONNECTED", "MISSED", "BUSY", "NO_ANSWER"] as const).map(st => (
                 <button
                   key={st}
                   type="button"
                   onClick={() => setCallStatus(st)}
-                  className={`py-2 px-1 rounded-xl text-[11px] font-bold transition-all border text-center ${
+                  className={`py-2.5 px-2 rounded-xl text-xs font-extrabold transition-all border text-center ${
                     callStatus === st
                       ? "bg-teal-600 text-white border-teal-700 shadow-xs"
                       : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
@@ -434,7 +442,7 @@ export function ClickToCallModal({ isOpen, onClose, lead, onCallEnded }: ClickTo
           </div>
 
           {/* Live Notes During Call */}
-          <div className="space-y-2">
+          <div className="space-y-1.5 pb-2">
             <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
               <span>Live Counsellor Call Notes</span>
               <span className="text-[10px] text-teal-700 font-extrabold flex items-center gap-1">
@@ -451,12 +459,12 @@ export function ClickToCallModal({ isOpen, onClose, lead, onCallEnded }: ClickTo
           </div>
         </div>
 
-        {/* Footer Actions */}
-        <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+        {/* Sticky Footer Actions - Always Visible on Mobile */}
+        <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between gap-3 shrink-0 sticky bottom-0 z-20 shadow-lg">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200 transition-colors"
+            className="px-3.5 py-3 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200 transition-colors shrink-0"
           >
             Cancel
           </button>
@@ -465,10 +473,10 @@ export function ClickToCallModal({ isOpen, onClose, lead, onCallEnded }: ClickTo
             type="button"
             disabled={isSubmitting}
             onClick={() => handleEndCall()}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-extrabold text-white bg-rose-600 hover:bg-rose-700 transition-all shadow-md shadow-rose-600/20 disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-extrabold text-white bg-rose-600 hover:bg-rose-700 active:bg-rose-800 transition-all shadow-md shadow-rose-600/20 disabled:opacity-50 touch-manipulation"
           >
-            <PhoneOff className="w-4 h-4" />
-            <span>{isSubmitting ? "Uploading Audio & Analyzing..." : "End Call & Process AI Intel"}</span>
+            <PhoneOff className="w-4 h-4 shrink-0" />
+            <span className="truncate">{isSubmitting ? "Processing AI Intel..." : "End Call & Process AI Intel"}</span>
           </button>
         </div>
 

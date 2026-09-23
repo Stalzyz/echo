@@ -6,7 +6,7 @@ import { useState } from "react"
 import { getNavItemsByRole, Role } from "@/config/navigation"
 import { cn } from "@/lib/utils"
 import { useSession, signOut } from "next-auth/react"
-import { ShieldCheck, Moon, Sun, Menu, X, LogOut, Layers } from "lucide-react"
+import { ShieldCheck, Moon, Sun, Menu, X, LogOut, Layers, LayoutDashboard, Users, Phone, GraduationCap, CreditCard, Calendar, Video, Settings, Building2 } from "lucide-react"
 import dynamic from "next/dynamic"
 import Image from "next/image"
 import { useOrganization } from "@/context/OrganizationContext"
@@ -253,29 +253,37 @@ export function TopNav() {
                 </>
               ) : (
                 <div className="space-y-1">
-                  <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-teal-50 hover:text-teal-800">
-                    📊 Main Dashboard
+                  <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-teal-50 hover:text-teal-800 transition-colors">
+                    <LayoutDashboard className="w-4 h-4 text-teal-600 shrink-0" />
+                    <span>Main Dashboard</span>
                   </Link>
-                  <Link href="/dashboard/academy/admissions" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-teal-50 hover:text-teal-800">
-                    🎯 Admissions CRM (Leads)
+                  <Link href="/dashboard/academy/admissions" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-teal-50 hover:text-teal-800 transition-colors">
+                    <Users className="w-4 h-4 text-teal-600 shrink-0" />
+                    <span>Admissions CRM (Leads)</span>
                   </Link>
-                  <Link href="/dashboard/academy/calls" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-teal-50 hover:text-teal-800">
-                    📞 Call Intelligence
+                  <Link href="/dashboard/academy/calls" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-teal-50 hover:text-teal-800 transition-colors">
+                    <Phone className="w-4 h-4 text-teal-600 shrink-0" />
+                    <span>Call Intelligence</span>
                   </Link>
-                  <Link href="/dashboard/academy/students" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-teal-50 hover:text-teal-800">
-                    🎓 Student Directory
+                  <Link href="/dashboard/academy/students" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-teal-50 hover:text-teal-800 transition-colors">
+                    <GraduationCap className="w-4 h-4 text-teal-600 shrink-0" />
+                    <span>Student Directory</span>
                   </Link>
-                  <Link href="/dashboard/academy/fees" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-teal-50 hover:text-teal-800">
-                    💳 Fees & Payments
+                  <Link href="/dashboard/academy/fees" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-teal-50 hover:text-teal-800 transition-colors">
+                    <CreditCard className="w-4 h-4 text-teal-600 shrink-0" />
+                    <span>Fees & Payments</span>
                   </Link>
-                  <Link href="/dashboard/academy/batches" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-teal-50 hover:text-teal-800">
-                    📚 Batches & Schedule
+                  <Link href="/dashboard/academy/batches" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-teal-50 hover:text-teal-800 transition-colors">
+                    <Calendar className="w-4 h-4 text-teal-600 shrink-0" />
+                    <span>Batches & Schedule</span>
                   </Link>
-                  <Link href="/dashboard/studio" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-teal-50 hover:text-teal-800">
-                    🎬 Teaching Studio
+                  <Link href="/dashboard/studio" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-teal-50 hover:text-teal-800 transition-colors">
+                    <Video className="w-4 h-4 text-teal-600 shrink-0" />
+                    <span>Teaching Studio</span>
                   </Link>
-                  <Link href="/dashboard/settings" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-teal-50 hover:text-teal-800">
-                    ⚙️ Branding & Settings
+                  <Link href="/dashboard/settings" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-teal-50 hover:text-teal-800 transition-colors">
+                    <Settings className="w-4 h-4 text-teal-600 shrink-0" />
+                    <span>Branding & Settings</span>
                   </Link>
                 </div>
               )}
