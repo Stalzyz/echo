@@ -224,6 +224,12 @@ model Organization {
   bankBranch    String?
 
   users         User[]
+  courses       Course[]
+  leads         Lead[]
+  batches       Batch[]
+  proposals     Proposal[]
+  invoices      Invoice[]
+  projects      Project[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -322,7 +328,9 @@ model ClientSubscription {
 }
 
 model Lead {
-  id              String     @id @default(cuid())
+  id              String        @id @default(cuid())
+  organizationId  String?
+  organization    Organization? @relation(fields: [organizationId], references: [id])
   name            String
   email           String?
   phone           String?
@@ -555,8 +563,10 @@ enum ProposalStatus {
 }
 
 model Proposal {
-  id            String         @id @default(cuid())
-  leadId        String?
+  id             String        @id @default(cuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  leadId         String?
   contactId     String?
   title         String
   status        ProposalStatus @default(DRAFT)
@@ -642,8 +652,10 @@ enum ProjectType {
 }
 
 model Project {
-  id          String        @id @default(cuid())
-  name        String
+  id             String        @id @default(cuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  name           String
   type        ProjectType
   status      ProjectStatus @default(BRIEFING)
   companyId   String?
@@ -1254,8 +1266,10 @@ model EstimateItem {
 }
 
 model Invoice {
-  id              String        @id @default(cuid())
-  invoiceNumber   String        @unique
+  id             String        @id @default(cuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  invoiceNumber  String        @unique
   projectId       String?
   clientName      String
   clientEmail     String?
@@ -1484,27 +1498,33 @@ model Application {
 }
 
 model Course {
-  id          String   @id @default(cuid())
-  name        String
-  code        String   @unique
-  description String?
-  duration    String // e.g., "3 months", "6 months"
-  fee         Float
-  isPublished Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  id             String        @id @default(cuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  name           String
+  code           String
+  description    String?
+  duration       String // e.g., "3 months", "6 months"
+  fee            Float
+  isPublished    Boolean  @default(false)
+  createdAt      DateTime @default(now())
 
   batches     Batch[]
   lmsCourse   LMSCourse?
   Certificate Certificate[]
   Quiz        Quiz[]
 
+  @@unique([code, organizationId])
+  @@index([organizationId])
   @@map("courses")
 }
 
 model Batch {
-  id        String   @id @default(cuid())
-  courseId  String
-  educatorId String?
+  id             String        @id @default(cuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  courseId       String
+  educatorId     String?
   name      String // e.g., "GD-Batch-24-Morning"
   type      String // MORNING | EVENING | WEEKEND | ONLINE
   capacity  Int      @default(20)

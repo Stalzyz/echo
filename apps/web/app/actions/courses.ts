@@ -1,11 +1,16 @@
 "use server";
 
 import { prisma } from "../../src/lib/prisma";
+import { getTenantFilter } from "../../src/lib/tenant";
 
 export async function getCourses() {
   try {
+    const tenantFilter = await getTenantFilter();
     const dbCourses = await prisma.course.findMany({
-      where: { isPublished: true },
+      where: { 
+        isPublished: true,
+        ...tenantFilter
+      },
       select: { 
         id: true, 
         name: true,
@@ -42,9 +47,12 @@ export async function getHiringPartners() {
 
 export async function getEducators() {
   try {
+    const tenantFilter = await getTenantFilter();
+    const userFilter = tenantFilter.organizationId ? { user: { organizationId: tenantFilter.organizationId } } : {};
     const educators = await prisma.educator.findMany({
       where: {
-        verificationStatus: "VERIFIED"
+        verificationStatus: "VERIFIED",
+        ...userFilter
       },
       include: {
         user: {

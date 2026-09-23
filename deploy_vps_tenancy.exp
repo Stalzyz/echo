@@ -1,0 +1,19 @@
+#!/usr/bin/expect -f
+set timeout 600
+
+spawn ssh -o StrictHostKeyChecking=no -o PubkeyAuthentication=no root@72.61.231.187
+expect "assword:"
+send "Photoshop09@\r"
+expect "# "
+send "cd /root/grekam-os\r"
+expect "# "
+send "git pull origin main\r"
+expect "# "
+send "pnpm --filter @grekam/db exec prisma generate && pnpm --filter @grekam/db exec prisma db push --accept-data-loss\r"
+expect "# "
+send "pnpm --filter @grekam/academy-web build\r"
+expect "# "
+send "pm2 restart all\r"
+expect "# "
+send "exit\r"
+expect eof
