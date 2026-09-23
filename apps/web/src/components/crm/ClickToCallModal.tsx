@@ -12,7 +12,7 @@ interface ClickToCallModalProps {
     phone?: string | null
     courseInterest?: string | null
   }
-  onCallEnded?: (callRecordId: string) => void
+  onCallEnded?: (callRecordId: string, fullCallRecord?: any) => void
 }
 
 export function ClickToCallModal({ isOpen, onClose, lead, onCallEnded }: ClickToCallModalProps) {
@@ -259,10 +259,16 @@ export function ClickToCallModal({ isOpen, onClose, lead, onCallEnded }: ClickTo
       if (res.ok && data.data?.id) {
         // Trigger AI Call Intelligence processing
         const analyzeRes = await fetch(`/api/v1/calls/${data.data.id}/analyze`, { method: "POST" })
-        await analyzeRes.json()
+        const intelData = await analyzeRes.json()
+
+        // Fetch complete call record with intelligence
+        const fullRes = await fetch(`/api/v1/calls/${data.data.id}`)
+        const fullData = await fullRes.json()
+
+        const finalRecord = fullData.data || { ...data.data, intelligence: intelData.data }
 
         if (onCallEnded) {
-          onCallEnded(data.data.id)
+          onCallEnded(data.data.id, finalRecord)
         }
       }
     } catch (err) {
@@ -318,6 +324,18 @@ export function ClickToCallModal({ isOpen, onClose, lead, onCallEnded }: ClickTo
             Consent Active
           </label>
         </div>
+        {/* Cellular Mobile Dialer Trigger */}
+        {lead.phone && (
+          <div className="p-3 bg-emerald-50 border-b border-emerald-200">
+            <a
+              href={`tel:${lead.phone}`}
+              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs transition-all shadow-2xs"
+            >
+              <Phone className="w-4 h-4" />
+              <span>Dial via Smartphone Mobile SIM Network ({lead.phone})</span>
+            </a>
+          </div>
+        )}
 
         {/* Mic Permission / Hardware Alert Banner */}
         {micError && (

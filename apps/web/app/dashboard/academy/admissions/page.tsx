@@ -1204,8 +1204,11 @@ export default function AdmissionsPipelinePage() {
             phone: activeCallLead.phone,
             courseInterest: activeCallLead.courseInterest
           }}
-          onCallEnded={() => {
+          onCallEnded={(callId, fullRecord) => {
             mutate() // refresh lead list
+            if (fullRecord) {
+              setViewingCallIntel(fullRecord)
+            }
           }}
         />
       )}
