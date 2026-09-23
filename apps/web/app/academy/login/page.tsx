@@ -8,15 +8,8 @@ import Link from "next/link"
 
 export default function AcademyLoginPage() {
   const [errorMessage, dispatch] = useActionState(authenticate, undefined)
-  const [isClient, setIsClient] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
-
-  if (!isClient) return null
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 flex items-center justify-center p-4">

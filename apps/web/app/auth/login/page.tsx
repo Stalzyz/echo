@@ -28,7 +28,7 @@ export default function LoginPage() {
       </div>
 
       {/* Footer */}
-      <footer className="text-center py-4 text-xs font-medium text-slate-400">
+      <footer suppressHydrationWarning className="text-center py-4 text-xs font-medium text-slate-400">
         © {new Date().getFullYear()} Echo LMS Inc. All rights reserved. • Unified Authentication Portal
       </footer>
     </div>
