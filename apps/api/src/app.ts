@@ -268,6 +268,79 @@ export async function buildApp(opts: any = {}): Promise<any> {
   const csvExportsRouter = (await import('./exports/csv.router')).default;
   await app.register(csvExportsRouter, { prefix: '/api/v1/exports' });
 
+  // Public Pricing Plans Endpoint
+  app.get('/api/v1/plans', async () => {
+    return {
+      success: true,
+      plans: [
+        {
+          id: "plan-starter",
+          name: "STARTER ACADEMY",
+          monthlyPrice: 999,
+          yearlyPrice: 9990,
+          freeTrialDays: 14,
+          studentLimit: 500,
+          instructorLimit: 5,
+          courseLimit: 15,
+          storageLimitGB: 50,
+          features: [
+            "Up to 500 Active Students",
+            "5 Educator Accounts",
+            "Courses & Video Player",
+            "Razorpay & Stripe Integration",
+            "Basic Admissions CRM",
+            "Automated Email Alerts"
+          ],
+          status: "ACTIVE"
+        },
+        {
+          id: "plan-growth",
+          name: "GROWTH INSTITUTE",
+          monthlyPrice: 2499,
+          yearlyPrice: 24990,
+          freeTrialDays: 14,
+          studentLimit: 2500,
+          instructorLimit: 20,
+          courseLimit: 50,
+          storageLimitGB: 250,
+          features: [
+            "Up to 2,500 Active Students",
+            "20 Educator Accounts",
+            "Meta Lead Ads Webhook Receiver",
+            "WhatsApp Business API Reminders",
+            "Zoom & Google Meet Live Classes",
+            "Automated GST PDF Invoices",
+            "Custom Domain (CNAME) Support",
+            "Full Whitelabel Engine"
+          ],
+          status: "ACTIVE",
+          popular: true
+        },
+        {
+          id: "plan-enterprise",
+          name: "ENTERPRISE MULTI-BRANCH",
+          monthlyPrice: 9999,
+          yearlyPrice: 99990,
+          freeTrialDays: 30,
+          studentLimit: "Unlimited",
+          instructorLimit: "Unlimited",
+          courseLimit: "Unlimited",
+          storageLimitGB: "Unlimited",
+          features: [
+            "Unlimited Active Students & Staff",
+            "Multi-Branch Architecture",
+            "Dedicated Edge Database Isolation",
+            "Custom API & Webhook Dispatch",
+            "Custom SSO & SAML Auth",
+            "24/7 Dedicated Support & SLA"
+          ],
+          status: "ACTIVE"
+        }
+      ]
+    };
+  });
+
+
   // Google Calendar / Meet Integration
   const googleRouter = (await import('./integrations/google.router')).default;
   await app.register(googleRouter, { prefix: '/api/v1/google' });

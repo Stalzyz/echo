@@ -48,6 +48,7 @@ export default function AcademyLoginPage() {
                 type="email"
                 name="email"
                 required
+                autoComplete="username email"
                 placeholder="admin@echo.in"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -64,6 +65,7 @@ export default function AcademyLoginPage() {
                 type="password"
                 name="password"
                 required
+                autoComplete="current-password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

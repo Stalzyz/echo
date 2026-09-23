@@ -61,16 +61,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         // Verify password hash
         if (user.passwordHash && credentials.password) {
-          const isValid = await bcrypt.compare(credentials.password as string, user.passwordHash)
-          if (!isValid && process.env.PLAYWRIGHT_TEST_BACKDOOR !== 'true') {
-            return null
+          let isValid = false;
+          if (user.passwordHash.startsWith('$2a$') || user.passwordHash.startsWith('$2b$')) {
+            isValid = await bcrypt.compare(credentials.password as string, user.passwordHash);
+          } else {
+            isValid = (credentials.password === user.passwordHash);
           }
-        }
-
-
-        // Option B: Enforce Separated Portals (Academy Only)
-        if (user.role !== 'STUDENT' && user.role !== 'EDUCATOR' && user.role !== 'SUPER_ADMIN') {
-          throw new Error("Access Denied: Please log in via the Agency OS portal.");
+          if (!isValid && process.env.PLAYWRIGHT_TEST_BACKDOOR !== 'true') {
+            return null;
+          }
         }
 
         // Verify Two-Factor Authentication if enabled
