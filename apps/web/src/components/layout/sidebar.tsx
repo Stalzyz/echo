@@ -21,18 +21,13 @@ import { TimerWidget } from "./TimerWidget"
 
 function OrgHeader() {
   const org = useOrganization()
+  const logoSrc = org?.logoUrl || org?.academyLogoUrl || "/echo_logo.png"
 
   return (
     <div className="flex h-16 items-center px-6 gap-3 relative z-10 border-b border-slate-200 bg-white">
-      {org.logoUrl ? (
-        <div className="w-8 h-8 rounded-xl overflow-hidden shrink-0 border border-slate-200">
-          <Image src={org.logoUrl} alt={org.name} width={32} height={32} className="object-cover w-full h-full" />
-        </div>
-      ) : (
-        <div className="w-8 h-8 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center shrink-0">
-          <ShieldCheck className="w-4 h-4 text-teal-700" strokeWidth={2} />
-        </div>
-      )}
+      <div className="w-8 h-8 rounded-xl overflow-hidden shrink-0 border border-slate-200 p-0.5 bg-white flex items-center justify-center">
+        <img src={logoSrc} alt={org.name} className="object-contain w-full h-full" />
+      </div>
       <span className="text-base font-black tracking-tight text-slate-900">{org.name}</span>
       <div className="ml-auto flex items-center gap-2">
         <TimerWidget />
@@ -209,15 +204,9 @@ export function Sidebar() {
 
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-40 flex items-center justify-between px-5 shadow-xs">
         <div className="flex items-center gap-2.5">
-          {org.logoUrl ? (
-            <div className="w-7 h-7 rounded-lg overflow-hidden shrink-0 border border-slate-200 relative">
-              <Image src={org.logoUrl} alt={org.name} fill className="object-cover" />
-            </div>
-          ) : (
-            <div className="w-7 h-7 rounded-lg bg-teal-50 border border-teal-200 flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-4 h-4 text-teal-700" />
-            </div>
-          )}
+          <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 border border-slate-200 p-0.5 bg-white flex items-center justify-center">
+            <img src={org?.logoUrl || org?.academyLogoUrl || "/echo_logo.png"} alt={org.name} className="object-contain w-full h-full" />
+          </div>
           <span className="text-xs font-bold tracking-tight text-slate-900 truncate max-w-[120px]">{org.name}</span>
         </div>
         <div className="flex items-center gap-2.5">

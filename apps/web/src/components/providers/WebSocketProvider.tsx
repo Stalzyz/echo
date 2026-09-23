@@ -49,9 +49,17 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
           const userEmail = session?.user?.email;
           const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
           
-          if (isMobile && userEmail && email === userEmail) {
+          if (isMobile && userEmail && email === userEmail && leadPhone) {
             console.log('[WS] Mobile dialer activated for:', leadPhone);
-            window.location.href = `tel:${leadPhone}`;
+            const cleanPhone = leadPhone.replace(/[^0-9+]/g, '');
+            if (cleanPhone) {
+              const a = document.createElement('a');
+              a.href = `tel:${cleanPhone}`;
+              a.target = '_self';
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+            }
           }
         }
 

@@ -22,8 +22,8 @@ export interface Organization {
 const defaultOrg: Organization = {
   id: "echo-saas-org",
   name: "Echo LMS",
-  logoUrl: "/echo-logo.png",
-  academyLogoUrl: "/echo-logo.png",
+  logoUrl: "/echo_logo.png",
+  academyLogoUrl: "/echo_logo.png",
   faviconUrl: "/favicon.ico",
   academyFaviconUrl: "/favicon.ico",
   primaryColor: "#0d9488",

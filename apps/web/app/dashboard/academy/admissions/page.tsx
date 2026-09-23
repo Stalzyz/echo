@@ -220,7 +220,7 @@ function SortableLeadCard({ lead, onSelect }: { lead: Lead, onSelect: (lead: Lea
   }
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners} onClick={() => onSelect(lead, "CALL")}>
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} onClick={() => onSelect(lead, "DETAILS")}>
       <LeadCardContent lead={lead} onSelect={onSelect} />
     </div>
   )
@@ -274,12 +274,12 @@ export default function AdmissionsPipelinePage() {
   const [actionStatus, setActionStatus] = useState<ColumnType>("ENQUIRY")
   const [isSubmittingAction, setIsSubmittingAction] = useState(false)
 
-  const openLeadAction = (lead: Lead, action: string = "CALL") => {
+  const openLeadAction = (lead: Lead, action: string = "DETAILS") => {
     setSelectedLead(lead)
     if (action === "CALL") {
       setActiveCallLead(lead)
     }
-    setActionTab(action as any)
+    setActionTab(action === "CALL" ? "CALL" : action === "EMAIL" ? "EMAIL" : "CALL")
     setActionStatus(lead.status)
     setActionNote("")
   }
@@ -851,23 +851,42 @@ export default function AdmissionsPipelinePage() {
                   </div>
 
                   {/* Action Buttons Grid */}
-                  <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div className="grid grid-cols-3 gap-1.5 pt-1">
                     <button
                       onClick={() => setActiveCallLead(lead)}
-                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-teal-600 text-white font-extrabold text-xs shadow-xs"
+                      className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-[11px] shadow-2xs truncate"
+                      title="Open ECHO Softphone recorder"
                     >
-                      <Phone className="w-4 h-4" />
-                      <span>Call Lead</span>
+                      <Phone className="w-3.5 h-3.5 shrink-0" />
+                      <span className="truncate">Softphone</span>
                     </button>
+
+                    {lead.phone ? (
+                      <a
+                        href={`tel:${lead.phone.replace(/[^0-9+]/g, '')}`}
+                        className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[11px] shadow-2xs truncate"
+                        title="Dial directly via smartphone SIM"
+                      >
+                        <Phone className="w-3.5 h-3.5 shrink-0 animate-bounce" />
+                        <span className="truncate">SIM Dial</span>
+                      </a>
+                    ) : (
+                      <button
+                        disabled
+                        className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-slate-100 text-slate-400 font-bold text-[11px] cursor-not-allowed truncate"
+                      >
+                        No Phone
+                      </button>
+                    )}
                     
                     <a
                       href={`https://wa.me/${lead.phone?.replace(/[^0-9]/g, '') || ''}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-extrabold text-xs"
+                      className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-extrabold text-[11px] truncate"
                     >
-                      <MessageSquare className="w-4 h-4" />
-                      <span>WhatsApp</span>
+                      <MessageSquare className="w-3.5 h-3.5 shrink-0" />
+                      <span className="truncate">WhatsApp</span>
                     </a>
                   </div>
                 </div>
@@ -906,7 +925,7 @@ export default function AdmissionsPipelinePage() {
                       <tr 
                         key={lead.id} 
                         className="hover:bg-slate-50/80 transition-colors cursor-pointer group"
-                        onClick={() => openLeadAction(lead, "CALL")}
+                        onClick={() => openLeadAction(lead, "DETAILS")}
                       >
                         <td className="p-4">
                           <div className="font-extrabold text-slate-900 text-sm">{lead.name}</div>
@@ -953,7 +972,7 @@ export default function AdmissionsPipelinePage() {
 
                         <td className="p-4 text-right" onClick={e => e.stopPropagation()}>
                           <button 
-                            onClick={() => openLeadAction(lead, "CALL")}
+                            onClick={() => openLeadAction(lead, "DETAILS")}
                             className="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-xl text-xs font-bold border border-teal-200 transition-colors"
                           >
                             Manage Lead

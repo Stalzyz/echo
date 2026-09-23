@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Phone, PhoneOff, Mic, MicOff, ShieldCheck, Sparkles, AlertTriangle, CheckCircle2, Volume2, Radio } from "lucide-react"
+import { Phone, PhoneOff, Mic, MicOff, ShieldCheck, Sparkles, AlertTriangle, CheckCircle2, Volume2, Radio, X } from "lucide-react"
 
 interface ClickToCallModalProps {
   isOpen: boolean
@@ -330,18 +330,19 @@ export function ClickToCallModal({ isOpen, onClose, lead, onCallEnded }: ClickTo
         </div>
 
         {/* Cellular Mobile Dialer Trigger Button */}
-        {lead.phone && (
+        {lead.phone ? (
           <div className="p-3 bg-emerald-50 border-b border-emerald-200 shrink-0">
             <a
-              href={`tel:${lead.phone}`}
-              onClick={() => {
-                try { window.location.href = `tel:${lead.phone}` } catch(e) {}
-              }}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-extrabold text-xs transition-all shadow-md touch-manipulation"
+              href={`tel:${lead.phone.replace(/[^0-9+]/g, '')}`}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-extrabold text-xs transition-all shadow-md touch-manipulation cursor-pointer"
             >
-              <Phone className="w-4 h-4 animate-bounce" />
-              <span>Dial via Smartphone SIM ({lead.phone})</span>
+              <Phone className="w-4 h-4 animate-bounce shrink-0" />
+              <span>Dial via Smartphone SIM / Phone Dialer ({lead.phone})</span>
             </a>
+          </div>
+        ) : (
+          <div className="p-3 bg-slate-100 border-b border-slate-200 shrink-0 text-center">
+            <span className="text-xs font-bold text-slate-500">No phone number specified for this lead</span>
           </div>
         )}
 

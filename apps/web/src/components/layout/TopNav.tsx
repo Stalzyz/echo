@@ -18,19 +18,19 @@ const RealtimeIndicator = dynamic(() => import("@/components/RealtimeIndicator")
 function OrgHeader() {
   const org = useOrganization()
   const orgName = org?.name && !org.name.includes("Grekam") ? org.name : "Echo LMS"
+  const logoSrc = org?.logoUrl || org?.academyLogoUrl || "/echo_logo.png"
 
   return (
-    <div className="flex items-center gap-3 shrink-0">
+    <div className="flex items-center gap-2.5 shrink-0">
       <div 
-        className="w-9 h-9 rounded-xl bg-primary border border-white/20 flex items-center justify-center shrink-0 shadow-md shadow-primary/20 text-white"
-        style={{ backgroundColor: "var(--primary)" }}
+        className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-xs overflow-hidden p-1"
       >
-        <Layers className="w-4 h-4 text-white" strokeWidth={2.5} />
+        <img src={logoSrc} alt={orgName} className="w-full h-full object-contain" />
       </div>
       <div className="flex flex-col">
         <div className="flex items-center gap-2">
-          <span className="text-base font-black tracking-tight text-slate-900">{orgName}</span>
-          <span className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-800 text-[10px] font-extrabold border border-amber-400/40 uppercase tracking-wider flex items-center gap-1 shadow-sm">
+          <span className="text-sm md:text-base font-black tracking-tight text-slate-900 truncate max-w-[120px] sm:max-w-none">{orgName}</span>
+          <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-800 text-[10px] font-extrabold border border-amber-400/40 uppercase tracking-wider items-center gap-1 shadow-xs">
             PRO SAAS
           </span>
         </div>
@@ -60,9 +60,12 @@ export function TopNav() {
       {/* Top Header Bar */}
       <header className="h-16 w-full bg-white/90 backdrop-blur-xl border-b border-slate-200/80 flex items-center justify-between px-4 md:px-6 relative z-50 shrink-0 shadow-xs">
         
-        {/* Left: Top Navigation Header Tabs */}
-        <div className="flex items-center gap-2">
-          <nav className="hidden lg:flex items-center gap-1">
+        {/* Left: Top Navigation Header Logo & Tabs */}
+        <div className="flex items-center gap-3">
+          <Link href="/dashboard" className="flex items-center gap-2 shrink-0">
+            <OrgHeader />
+          </Link>
+          <nav className="hidden lg:flex items-center gap-1 border-l border-slate-200 pl-3">
             {pathname?.startsWith("/dashboard/super-admin") ? (
               <>
                 <Link
