@@ -417,6 +417,7 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
                     <input
                       type="email"
                       required
+                      autoComplete="email"
                       placeholder={currentRole.demoUser}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -441,6 +442,7 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
                     <input
                       type="password"
                       required
+                      autoComplete="current-password"
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -579,6 +581,7 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
                 <input
                   type="email"
                   required
+                  autoComplete="email"
                   placeholder="user@echo.in"
                   value={signupEmail}
                   onChange={(e) => setSignupEmail(e.target.value)}
@@ -594,6 +597,7 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
                 <input
                   type="password"
                   required
+                  autoComplete="new-password"
                   placeholder="••••••••"
                   value={signupPassword}
                   onChange={(e) => setSignupPassword(e.target.value)}
