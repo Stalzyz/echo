@@ -51,6 +51,10 @@ model User {
   twoFaSecret      String?
   twoFaBackupCodes String? // JSON array of backup codes
 
+  // Multi-Tenant Association
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
   // Relations
   customRoleId  String?
   customRole    Role?          @relation(fields: [customRoleId], references: [id])
@@ -168,15 +172,25 @@ model Organization {
   id   String @id @default(cuid())
   name String @default("My Agency OS")
 
+  // Multi-Tenant Academy Properties
+  slug         String? @unique
+  domain       String? @unique
+  cname        String? @unique
+  status       String  @default("ACTIVE") // ACTIVE | SUSPENDED | TRIAL
+  subscription String  @default("GROWTH") // FREE | STARTER | GROWTH | ENTERPRISE
+  ownerName    String?
+  ownerEmail   String?
+  ownerPhone   String?
+
   // Whitelabel Branding
   logoUrl           String? // Agency landscape logo (Invoices, Proposals, HR)
   faviconUrl        String? // Agency square favicon (Browser tab, Garage OS)
   academyLogoUrl    String? // Academy landscape logo (Fee Receipts, Certificates, LMS)
   academyFaviconUrl String? // Academy square favicon (Browser tab, Academy Web)
   primaryColor      String  @default("#2563eb") // Default Blue
-  secondaryColor  String  @default("#1e40af")
-  accentColor     String  @default("#10b981")
-  darkModeDefault Boolean @default(true)
+  secondaryColor    String  @default("#1e40af")
+  accentColor       String  @default("#10b981")
+  darkModeDefault   Boolean @default(true)
 
   // Contact Info
   supportEmail   String?
@@ -208,6 +222,8 @@ model Organization {
   ifscCode      String?
   swiftCode     String?
   bankBranch    String?
+
+  users         User[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

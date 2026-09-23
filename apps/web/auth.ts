@@ -52,6 +52,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               name: `${adminUser.firstName} ${adminUser.lastName}`,
               email: adminUser.email,
               role: adminUser.role,
+              organizationId: adminUser.organizationId,
+              tenantId: adminUser.organizationId,
               customRole: adminUser.customRole ? adminUser.customRole.name : null,
               permissions: adminUser.customRole ? adminUser.customRole.permissions.map(p => p.resource) : []
             };
@@ -113,6 +115,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: `${user.firstName} ${user.lastName}`, 
           email: user.email, 
           role: user.role,
+          organizationId: user.organizationId,
+          tenantId: user.organizationId,
           customRole: user.customRole ? user.customRole.name : null,
           permissions: user.customRole ? user.customRole.permissions.map(p => p.resource) : []
         };
@@ -120,12 +124,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     })
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.role = user.role
         token.id = user.id
+        token.organizationId = (user as any).organizationId
+        token.tenantId = (user as any).organizationId
         token.customRole = (user as any).customRole
         token.permissions = (user as any).permissions
+      }
+      if (trigger === "update" && session) {
+        if (session.organizationId !== undefined) token.organizationId = session.organizationId;
+        if (session.tenantId !== undefined) token.tenantId = session.tenantId;
+        if (session.impersonatedBySuperAdmin !== undefined) token.impersonatedBySuperAdmin = session.impersonatedBySuperAdmin;
+        if (session.originalSuperAdminId !== undefined) token.originalSuperAdminId = session.originalSuperAdminId;
+        if (session.role !== undefined) token.role = session.role;
       }
       return token
     },
@@ -133,6 +146,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (session.user) {
         session.user.role = token.role as string
         session.user.id = token.id as string
+        session.user.organizationId = token.organizationId as string | undefined
+        session.user.tenantId = (token.tenantId || token.organizationId) as string | undefined
+        session.user.impersonatedBySuperAdmin = token.impersonatedBySuperAdmin as boolean | undefined
+        session.user.originalSuperAdminId = token.originalSuperAdminId as string | undefined
         ;(session.user as any).customRole = token.customRole
         ;(session.user as any).permissions = token.permissions || []
       }
