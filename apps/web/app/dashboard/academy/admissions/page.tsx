@@ -115,30 +115,35 @@ function LeadCardContent({ lead, onSelect }: { lead: Lead, onSelect?: (lead: Lea
       
       <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-100">
         <div className="flex items-center gap-2">
-          <div className="flex -space-x-1">
+          <div className="flex items-center gap-1.5">
             <button 
-              className="w-7 h-7 rounded-full bg-teal-50 hover:bg-teal-100 border border-teal-200 flex items-center justify-center text-teal-700 transition-colors" 
+              className="w-9 h-9 rounded-xl bg-teal-600 hover:bg-teal-700 text-white flex items-center justify-center transition-colors shadow-2xs" 
               onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => { e.stopPropagation(); onSelect?.(lead, "CALL"); }}
-              title="Call Lead"
+              title="Call Lead & Record"
             >
-              <Phone className="w-3.5 h-3.5" />
+              <Phone className="w-4 h-4" />
             </button>
+            {lead.phone && (
+              <a 
+                href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi ${lead.name}! Following up on your inquiry for ${lead.courseInterest || 'our courses'} at Echo LMS.`)}`}
+                target="_blank"
+                rel="noreferrer"
+                className="w-9 h-9 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition-colors shadow-2xs" 
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
+                title="WhatsApp Lead"
+              >
+                <MessageSquare className="w-4 h-4" />
+              </a>
+            )}
             <button 
-              className="w-7 h-7 rounded-full bg-amber-50 hover:bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-700 transition-colors" 
+              className="w-9 h-9 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-800 transition-colors" 
               onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => { e.stopPropagation(); onSelect?.(lead, "EMAIL"); }}
               title="Email Lead"
             >
-              <Mail className="w-3.5 h-3.5" />
-            </button>
-            <button 
-              className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-700 transition-colors" 
-              onPointerDown={(e) => e.stopPropagation()}
-              onClick={(e) => { e.stopPropagation(); onSelect?.(lead, "MEETING"); }}
-              title="Schedule Followup"
-            >
-              <Calendar className="w-3.5 h-3.5" />
+              <Mail className="w-4 h-4" />
             </button>
           </div>
           {activityCount > 0 && (
@@ -225,6 +230,12 @@ function SortableLeadCard({ lead, onSelect }: { lead: Lead, onSelect: (lead: Lea
 export default function AdmissionsPipelinePage() {
   const [leads, setLeads] = useState<Lead[]>([])
   const [viewMode, setViewMode] = useState<'BOARD' | 'LIST'>('BOARD')
+  
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      setViewMode('LIST')
+    }
+  }, [])
   
   // Search & Filter State
   const [searchTerm, setSearchTerm] = useState("")
