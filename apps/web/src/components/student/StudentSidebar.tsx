@@ -89,7 +89,7 @@ export function StudentSidebar() {
 
       <div className="p-4 border-t border-slate-200 shrink-0 bg-slate-50">
         <button 
-          onClick={() => signOut()}
+          onClick={() => signOut({ callbackUrl: "/auth/login" })}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-rose-600 hover:bg-rose-50 border border-rose-200/60 transition-colors"
         >
           <LogOut className="w-4 h-4" /> Sign Out

@@ -188,7 +188,7 @@ export function Sidebar() {
       </div>
 
       <div className="p-4 relative z-10 border-t border-slate-200 bg-slate-50">
-        <div onClick={() => signOut()} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-200/60 transition-colors cursor-pointer border border-slate-200 bg-white shadow-xs" title="Click to logout">
+        <div onClick={() => signOut({ callbackUrl: "/auth/login" })} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-200/60 transition-colors cursor-pointer border border-slate-200 bg-white shadow-xs" title="Click to logout">
           <div className="h-10 w-10 rounded-full bg-teal-100 border border-teal-200 flex items-center justify-center text-teal-800 font-bold text-sm shrink-0">
             {session?.user?.name?.charAt(0) || "S"}
           </div>

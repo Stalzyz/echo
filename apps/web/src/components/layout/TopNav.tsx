@@ -192,14 +192,22 @@ export function TopNav() {
               <span className="text-sm font-bold leading-none text-slate-900">{session?.user?.name || "Stalin Kumar"}</span>
               <span className="text-[10px] uppercase tracking-wider text-primary font-bold mt-1 bg-primary/10 px-2 py-0.5 rounded border border-primary/20">{role}</span>
             </div>
-            <button 
-              onClick={() => signOut()} 
-              title="Logout" 
-              className="h-9 w-9 rounded-full bg-primary border border-primary/30 flex items-center justify-center text-white font-black text-sm shrink-0 shadow-sm hover:scale-105 transition-all"
-              style={{ backgroundColor: "var(--primary)" }}
-            >
-              {session?.user?.name?.charAt(0) || "S"}
-            </button>
+            <div className="flex items-center gap-2">
+              <div 
+                className="h-9 w-9 rounded-full bg-primary border border-primary/30 flex items-center justify-center text-white font-black text-sm shrink-0 shadow-sm"
+                style={{ backgroundColor: "var(--primary)" }}
+              >
+                {session?.user?.name?.charAt(0) || "S"}
+              </div>
+              <button 
+                onClick={() => signOut({ callbackUrl: "/auth/login" })} 
+                title="Sign Out" 
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200/80 transition-colors shadow-2xs"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Sign Out</span>
+              </button>
+            </div>
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -278,7 +286,7 @@ export function TopNav() {
                  <RealtimeIndicator />
                </div>
                
-               <button onClick={() => signOut()} className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 transition-colors">
+               <button onClick={() => signOut({ callbackUrl: "/auth/login" })} className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 transition-colors">
                   <LogOut className="w-4 h-4" /> Sign Out
                </button>
             </div>

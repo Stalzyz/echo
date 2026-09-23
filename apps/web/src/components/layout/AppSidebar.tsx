@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useOrganization } from "@/context/OrganizationContext";
+import { signOut } from "next-auth/react";
 import {
   LayoutDashboard,
   GraduationCap,
@@ -36,6 +37,7 @@ import {
   Palette,
   Cpu,
   BarChart3,
+  LogOut,
 } from "lucide-react";
 
 interface SidebarItem {
@@ -431,14 +433,28 @@ export function AppSidebar() {
 
       {/* Sidebar Footer */}
       {!isCollapsed ? (
-        <div className="p-4 border-t border-slate-200 bg-slate-50 shrink-0">
-          <div className="flex items-center gap-2">
+        <div className="p-3 border-t border-slate-200 bg-slate-50 shrink-0 space-y-2">
+          <button
+            onClick={() => signOut({ callbackUrl: "/auth/login" })}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200/80 transition-colors shadow-2xs"
+          >
+            <LogOut className="w-4 h-4 shrink-0" />
+            <span className="truncate">Sign Out</span>
+          </button>
+          <div className="flex items-center gap-2 px-1">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[11px] font-bold text-slate-600">Echo OS Engine v2.5</span>
+            <span className="text-[10px] font-bold text-slate-500">Echo OS Engine v2.5</span>
           </div>
         </div>
       ) : (
-        <div className="p-3 border-t border-slate-200 bg-slate-50 flex justify-center shrink-0">
+        <div className="p-2 border-t border-slate-200 bg-slate-50 flex flex-col items-center gap-2 shrink-0">
+          <button
+            onClick={() => signOut({ callbackUrl: "/auth/login" })}
+            title="Sign Out"
+            className="w-9 h-9 flex items-center justify-center rounded-xl text-rose-600 hover:bg-rose-50 border border-rose-200/80 transition-colors shadow-2xs"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="System Online" />
         </div>
       )}

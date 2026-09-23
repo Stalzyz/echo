@@ -7,18 +7,10 @@ export default async function EducatorLayout({
 }: {
   children: React.ReactNode
 }) {
-  let session = await auth()
+  const session = await auth()
   
   if (!session || !session.user) {
-    session = {
-      user: {
-        id: "dev-educator-id",
-        name: "Stalin Kumar",
-        email: "educator@echolms.com",
-        role: "SUPER_ADMIN",
-      },
-      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-    } as any
+    redirect("/auth/login")
   }
 
   return (

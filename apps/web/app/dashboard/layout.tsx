@@ -1,4 +1,5 @@
 import { auth } from "../../auth"
+import { redirect } from "next/navigation"
 import { SessionProvider } from "next-auth/react"
 import { CommandPalette } from "@/components/ui/CommandPalette"
 import { WebSocketProvider } from "@/components/providers/WebSocketProvider"
@@ -10,18 +11,10 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  let session = await auth()
+  const session = await auth()
   
   if (!session || !session.user) {
-    session = {
-      user: {
-        id: "dev-admin-id",
-        name: "Stalin Kumar",
-        email: "admin@echolms.com",
-        role: "SUPER_ADMIN",
-      },
-      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-    } as any
+    redirect("/auth/login")
   }
 
   return (

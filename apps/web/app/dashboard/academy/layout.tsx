@@ -7,18 +7,10 @@ export default async function AcademyAdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  let session = await auth()
+  const session = await auth()
   
   if (!session || !session.user) {
-    session = {
-      user: {
-        id: "dev-admin-id",
-        name: "Stalin Kumar",
-        email: "admin@grekam.in",
-        role: "SUPER_ADMIN",
-      },
-      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-    } as any
+    redirect("/auth/login")
   }
 
   return (
