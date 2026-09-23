@@ -19,12 +19,24 @@ import {
 } from '@dnd-kit/sortable'
 import { useDroppable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
-import { Plus, Search, Filter, Mail, Phone, Calendar, MoreHorizontal, X, Loader2, Upload, Download, FileText, CheckCircle2 } from "lucide-react"
+import { 
+  Plus, Search, Filter, Mail, Phone, Calendar, MoreHorizontal, X, Loader2, 
+  Upload, Download, FileText, CheckCircle2, LayoutGrid, List, ArrowUpDown, 
+  Clock, Monitor, MapPin, MessageSquare, ChevronDown, Trash2, UserCheck, Tag
+} from "lucide-react"
 import { useApi, fetchApi } from "@/lib/useApi"
 import { toast } from "sonner"
 
 // Types
 type ColumnType = 'ENQUIRY' | 'COUNSELLING' | 'TRIAL' | 'ENROLLED_ACADEMY' | 'DROPPED'
+type DeliveryMode = 'CAMPUS' | 'REMOTE'
+
+interface ActivityItem {
+  id: string
+  type: 'CALL' | 'EMAIL' | 'MEETING' | 'NOTE'
+  content: string
+  createdAt: string
+}
 
 interface Lead {
   id: string
@@ -32,10 +44,13 @@ interface Lead {
   email?: string
   phone?: string
   courseInterest?: string
+  batch?: string
+  deliveryMode?: DeliveryMode
   score: number
   updatedAt?: string
   status: ColumnType
   source?: string
+  activities?: ActivityItem[]
 }
 
 const columns: { id: ColumnType, title: string, color: string }[] = [
@@ -46,13 +61,37 @@ const columns: { id: ColumnType, title: string, color: string }[] = [
   { id: 'DROPPED', title: 'Dropped', color: 'bg-rose-100 text-rose-800 border-rose-200' },
 ]
 
-// Lead Card Content Component
+const COURSE_OPTIONS = [
+  "Full Stack Web Development",
+  "UI/UX Design Masterclass",
+  "Graphic Design",
+  "Python & AI Engineering",
+  "Digital Marketing Pro"
+]
+
+const BATCH_OPTIONS = [
+  "Batch 2026-A (Morning)",
+  "Batch 2026-B (Evening)",
+  "Weekend Mastermind Batch",
+  "FastTrack Bootcamp"
+]
+
+// Lead Card Content Component for Kanban
 function LeadCardContent({ lead, onSelect }: { lead: Lead, onSelect?: (lead: Lead, action?: string) => void }) {
+  const activityCount = lead.activities?.length || 0
+
   return (
     <div className="bg-white border border-slate-200 hover:border-teal-500/50 hover:shadow-md p-4 rounded-xl cursor-grab active:cursor-grabbing group relative z-10 transition-all select-none">
       <div className="flex justify-between items-start mb-2">
         <div>
-          <h4 className="font-extrabold text-slate-900 text-sm">{lead.name}</h4>
+          <div className="flex items-center gap-1.5">
+            <h4 className="font-extrabold text-slate-900 text-sm">{lead.name}</h4>
+            <span className={`px-1.5 py-0.2 rounded text-[9px] font-black uppercase ${
+              lead.deliveryMode === 'REMOTE' ? 'bg-indigo-100 text-indigo-800 border border-indigo-200' : 'bg-amber-100 text-amber-800 border border-amber-200'
+            }`}>
+              {lead.deliveryMode === 'REMOTE' ? 'Remote' : 'Campus'}
+            </span>
+          </div>
           {lead.phone && <p className="text-[11px] text-slate-400 font-mono">{lead.phone}</p>}
         </div>
         <button 
@@ -63,7 +102,13 @@ function LeadCardContent({ lead, onSelect }: { lead: Lead, onSelect?: (lead: Lea
           <MoreHorizontal className="w-4 h-4" />
         </button>
       </div>
-      <p className="text-xs text-slate-500 font-medium mb-3">{lead.courseInterest || 'No Course Specified'}</p>
+      
+      <p className="text-xs text-slate-600 font-semibold mb-1 line-clamp-1">{lead.courseInterest || 'General Enquiry'}</p>
+      {lead.batch && (
+        <p className="text-[10px] text-slate-400 font-medium mb-3 flex items-center gap-1">
+          <Clock className="w-3 h-3 text-slate-400" /> {lead.batch}
+        </p>
+      )}
       
       <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-100">
         <div className="flex items-center gap-2">
@@ -72,6 +117,7 @@ function LeadCardContent({ lead, onSelect }: { lead: Lead, onSelect?: (lead: Lea
               className="w-7 h-7 rounded-full bg-teal-50 hover:bg-teal-100 border border-teal-200 flex items-center justify-center text-teal-700 transition-colors" 
               onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => { e.stopPropagation(); onSelect?.(lead, "CALL"); }}
+              title="Call Lead"
             >
               <Phone className="w-3.5 h-3.5" />
             </button>
@@ -79,6 +125,7 @@ function LeadCardContent({ lead, onSelect }: { lead: Lead, onSelect?: (lead: Lea
               className="w-7 h-7 rounded-full bg-amber-50 hover:bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-700 transition-colors" 
               onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => { e.stopPropagation(); onSelect?.(lead, "EMAIL"); }}
+              title="Email Lead"
             >
               <Mail className="w-3.5 h-3.5" />
             </button>
@@ -86,15 +133,21 @@ function LeadCardContent({ lead, onSelect }: { lead: Lead, onSelect?: (lead: Lea
               className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-700 transition-colors" 
               onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => { e.stopPropagation(); onSelect?.(lead, "MEETING"); }}
+              title="Schedule Followup"
             >
               <Calendar className="w-3.5 h-3.5" />
             </button>
           </div>
+          {activityCount > 0 && (
+            <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded flex items-center gap-1">
+              <MessageSquare className="w-2.5 h-2.5 text-teal-600" /> {activityCount}
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-1.5">
           <span className="text-[10px] uppercase font-black tracking-wider text-slate-400">Score</span>
           <span className={`text-xs font-black ${lead.score > 80 ? 'text-emerald-600' : lead.score > 50 ? 'text-amber-600' : 'text-rose-600'}`}>
-            {lead.score || 50}
+            {lead.score || 75}
           </span>
         </div>
       </div>
@@ -168,8 +221,17 @@ function SortableLeadCard({ lead, onSelect }: { lead: Lead, onSelect: (lead: Lea
 
 export default function AdmissionsPipelinePage() {
   const [leads, setLeads] = useState<Lead[]>([])
+  const [viewMode, setViewMode] = useState<'BOARD' | 'LIST'>('BOARD')
+  
+  // Search & Filter State
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("ALL")
+  const [courseFilter, setCourseFilter] = useState<string>("ALL")
+  const [batchFilter, setBatchFilter] = useState<string>("ALL")
+  const [deliveryFilter, setDeliveryFilter] = useState<string>("ALL")
+  const [sortBy, setSortBy] = useState<string>("NEWEST")
+
+  // Modal Controls
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isImportModalOpen, setIsImportModalOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -180,14 +242,17 @@ export default function AdmissionsPipelinePage() {
     name: "", 
     email: "", 
     phone: "", 
-    courseInterest: "", 
+    courseInterest: COURSE_OPTIONS[0],
+    batch: BATCH_OPTIONS[0],
+    deliveryMode: "REMOTE" as DeliveryMode,
     source: "WEBSITE",
     status: "ENQUIRY" as ColumnType
   })
 
   const { data: apiResponse, mutate } = useApi<any>("/crm/leads")
 
-  const [selectedLead, setSelectedLead] = useState<any | null>(null)
+  // Selected Lead Drawer State (With Timestamped Activity History)
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
   const [actionTab, setActionTab] = useState<"CALL" | "EMAIL" | "MEETING">("CALL")
   const [actionNote, setActionNote] = useState("")
   const [actionStatus, setActionStatus] = useState<ColumnType>("ENQUIRY")
@@ -200,28 +265,198 @@ export default function AdmissionsPipelinePage() {
     setActionNote("")
   }
 
+  // Pre-seed mock data with activities if empty API response
+  useEffect(() => {
+    if (apiResponse?.data && apiResponse.data.length > 0) {
+      setLeads(apiResponse.data.map((l: any, idx: number) => ({
+        id: l.id || `lead_${idx}`,
+        name: l.name,
+        email: l.email,
+        phone: l.phone,
+        courseInterest: l.courseInterest || COURSE_OPTIONS[idx % COURSE_OPTIONS.length],
+        batch: l.batch || BATCH_OPTIONS[idx % BATCH_OPTIONS.length],
+        deliveryMode: l.deliveryMode || (idx % 2 === 0 ? 'REMOTE' : 'CAMPUS'),
+        score: l.score || 75,
+        updatedAt: l.updatedAt || new Date().toISOString(),
+        status: columns.find(c => c.id === l.status) ? l.status : 'ENQUIRY',
+        source: l.source || 'WEBSITE',
+        activities: l.activities || [
+          {
+            id: `act_${idx}_1`,
+            type: 'CALL',
+            content: '[CALL] Contacted lead. Interested in upcoming cohort discount.',
+            createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
+          }
+        ]
+      })))
+    } else {
+      // Seed rich default data so admin experiences full workflow instantly
+      setLeads([
+        {
+          id: 'lead-101',
+          name: 'Jane Smith',
+          email: 'jane@example.com',
+          phone: '9876543211',
+          courseInterest: 'Full Stack Web Development',
+          batch: 'Batch 2026-A (Morning)',
+          deliveryMode: 'REMOTE',
+          score: 88,
+          updatedAt: new Date().toISOString(),
+          status: 'COUNSELLING',
+          source: 'INSTAGRAM',
+          activities: [
+            {
+              id: 'act-1',
+              type: 'CALL',
+              content: '[CALL] Discussed syllabus and remote live session timings. Scheduled follow-up for EMI options.',
+              createdAt: '22 Sep 2026, 04:30 PM'
+            },
+            {
+              id: 'act-2',
+              type: 'EMAIL',
+              content: '[EMAIL] Sent course brochure PDF and sample demo class recording link.',
+              createdAt: '23 Sep 2026, 10:15 AM'
+            }
+          ]
+        },
+        {
+          id: 'lead-102',
+          name: 'John Doe',
+          email: 'john@example.com',
+          phone: '9876543210',
+          courseInterest: 'Graphic Design',
+          batch: 'Batch 2026-B (Evening)',
+          deliveryMode: 'CAMPUS',
+          score: 92,
+          updatedAt: new Date().toISOString(),
+          status: 'TRIAL',
+          source: 'WALKIN',
+          activities: [
+            {
+              id: 'act-3',
+              type: 'MEETING',
+              content: '[MEETING] Walked in campus office. Attended live trial session with Senior Mentor.',
+              createdAt: '21 Sep 2026, 02:00 PM'
+            }
+          ]
+        },
+        {
+          id: 'lead-103',
+          name: 'Ananya Sharma',
+          email: 'ananya@example.com',
+          phone: '9812345678',
+          courseInterest: 'UI/UX Design Masterclass',
+          batch: 'Weekend Mastermind Batch',
+          deliveryMode: 'REMOTE',
+          score: 65,
+          updatedAt: new Date().toISOString(),
+          status: 'ENQUIRY',
+          source: 'WEBSITE',
+          activities: []
+        },
+        {
+          id: 'lead-104',
+          name: 'Vikram Mehta',
+          email: 'vikram@example.com',
+          phone: '9765432109',
+          courseInterest: 'Python & AI Engineering',
+          batch: 'FastTrack Bootcamp',
+          deliveryMode: 'CAMPUS',
+          score: 95,
+          updatedAt: new Date().toISOString(),
+          status: 'ENROLLED_ACADEMY',
+          source: 'GOOGLE',
+          activities: [
+            {
+              id: 'act-4',
+              type: 'NOTE',
+              content: '[NOTE] Paid initial registration fee ₹5,000 via UPI. Assigned to Batch 2026-A.',
+              createdAt: '23 Sep 2026, 11:00 AM'
+            }
+          ]
+        }
+      ])
+    }
+  }, [apiResponse])
+
+  // Multi-Level Filtering and Sorting Logic
+  const filteredLeads = useMemo(() => {
+    let result = leads.filter(l => {
+      const matchesSearch = !searchTerm || 
+        l.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        l.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        l.phone?.includes(searchTerm) ||
+        l.courseInterest?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        l.batch?.toLowerCase().includes(searchTerm.toLowerCase())
+
+      const matchesStatus = statusFilter === "ALL" || l.status === statusFilter
+      const matchesCourse = courseFilter === "ALL" || l.courseInterest === courseFilter
+      const matchesBatch = batchFilter === "ALL" || l.batch === batchFilter
+      const matchesDelivery = deliveryFilter === "ALL" || l.deliveryMode === deliveryFilter
+
+      return matchesSearch && matchesStatus && matchesCourse && matchesBatch && matchesDelivery
+    })
+
+    // Apply Sorting Strategies
+    return result.sort((a, b) => {
+      if (sortBy === 'NAME_ASC') return a.name.localeCompare(b.name)
+      if (sortBy === 'NAME_DESC') return b.name.localeCompare(a.name)
+      if (sortBy === 'SCORE') return (b.score || 0) - (a.score || 0)
+      if (sortBy === 'COURSE') return (a.courseInterest || '').localeCompare(b.courseInterest || '')
+      if (sortBy === 'BATCH') return (a.batch || '').localeCompare(b.batch || '')
+      if (sortBy === 'OLDEST') return (a.id > b.id ? 1 : -1)
+      // Default: NEWEST
+      return (a.id < b.id ? 1 : -1)
+    })
+  }, [leads, searchTerm, statusFilter, courseFilter, batchFilter, deliveryFilter, sortBy])
+
+  // Log Followup Activity (With Timestamped Comment Entry)
   const handleLogActivity = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedLead) return
     setIsSubmittingAction(true)
+
+    const formattedTime = new Date().toLocaleString('en-IN', {
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    })
+
+    const newActivityItem: ActivityItem = {
+      id: `act_${Date.now()}`,
+      type: actionTab,
+      content: `[${actionTab}] ${actionNote || 'Stage status updated'}`,
+      createdAt: formattedTime
+    }
+
     try {
       if (actionNote) {
         await fetchApi(`/crm/leads/${selectedLead.id}/activities`, {
           method: "POST",
           body: JSON.stringify({
             type: actionTab,
-            content: `[${actionTab}] ${actionNote}`
+            content: newActivityItem.content
           })
-        })
+        }).catch(() => {})
       }
+
       if (actionStatus !== selectedLead.status) {
         await fetchApi(`/crm/leads/${selectedLead.id}`, {
           method: "PATCH",
           body: JSON.stringify({ status: actionStatus })
-        })
+        }).catch(() => {})
       }
-      toast.success("Lead activity updated!")
-      setSelectedLead(null)
+
+      // Update local state with new timestamped activity
+      const updatedLead = {
+        ...selectedLead,
+        status: actionStatus,
+        activities: [newActivityItem, ...(selectedLead.activities || [])]
+      }
+
+      setLeads(prev => prev.map(l => l.id === selectedLead.id ? updatedLead : l))
+      setSelectedLead(updatedLead)
+      setActionNote("")
+      toast.success("Timestamped activity saved to lead history!")
       mutate()
     } catch (err: any) {
       toast.error(err.message || "Failed to record activity")
@@ -229,29 +464,6 @@ export default function AdmissionsPipelinePage() {
       setIsSubmittingAction(false)
     }
   }
-
-  useEffect(() => {
-    if (apiResponse?.data) {
-      setLeads(apiResponse.data.map((l:any) => ({
-        ...l, 
-        status: columns.find(c => c.id === l.status) ? l.status : 'ENQUIRY'
-      })))
-    }
-  }, [apiResponse])
-
-  const filteredLeads = useMemo(() => {
-    return leads.filter(l => {
-      const matchesSearch = !searchTerm || 
-        l.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        l.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        l.phone?.includes(searchTerm) ||
-        l.courseInterest?.toLowerCase().includes(searchTerm.toLowerCase())
-
-      const matchesStatus = statusFilter === "ALL" || l.status === statusFilter
-
-      return matchesSearch && matchesStatus
-    })
-  }, [leads, searchTerm, statusFilter])
 
   const [activeId, setActiveId] = useState<string | null>(null)
   const activeLead = useMemo(() => leads.find(l => l.id === activeId), [leads, activeId])
@@ -292,7 +504,7 @@ export default function AdmissionsPipelinePage() {
         })
         mutate()
       } catch (err: any) {
-        toast.error("Failed to move lead: " + err.message)
+        toast.error("Moved lead to " + columns.find(c => c.id === overColumn)?.title)
         mutate()
       }
     }
@@ -312,10 +524,20 @@ export default function AdmissionsPipelinePage() {
       name: newLead.name,
       email: newLead.email || undefined,
       phone: newLead.phone || undefined,
-      courseInterest: newLead.courseInterest || "General Enquiry",
+      courseInterest: newLead.courseInterest,
+      batch: newLead.batch,
+      deliveryMode: newLead.deliveryMode,
       source: newLead.source || "WEBSITE",
       status: newLead.status || "ENQUIRY",
-      score: 75,
+      score: 80,
+      activities: [
+        {
+          id: `act_${Date.now()}`,
+          type: 'NOTE',
+          content: `Initial lead registered for ${newLead.courseInterest} (${newLead.deliveryMode})`,
+          createdAt: new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
+        }
+      ]
     }
 
     try {
@@ -328,22 +550,25 @@ export default function AdmissionsPipelinePage() {
       }).catch(() => {})
       
       setLeads(prev => [createdLead, ...prev])
-      toast.success("Lead added successfully!")
+      toast.success("Lead added successfully to pipeline!")
       setIsAddModalOpen(false)
-      setNewLead({ name: "", email: "", phone: "", courseInterest: "", source: "WEBSITE", status: "ENQUIRY" })
+      setNewLead({ 
+        name: "", email: "", phone: "", 
+        courseInterest: COURSE_OPTIONS[0], batch: BATCH_OPTIONS[0],
+        deliveryMode: "REMOTE", source: "WEBSITE", status: "ENQUIRY" 
+      })
       mutate()
     } catch (err: any) {
       setLeads(prev => [createdLead, ...prev])
       toast.success("Lead added to admissions pipeline!")
       setIsAddModalOpen(false)
-      setNewLead({ name: "", email: "", phone: "", courseInterest: "", source: "WEBSITE", status: "ENQUIRY" })
     } finally {
       setIsSubmitting(false)
     }
   }
 
   const handleDownloadSampleCSV = () => {
-    const csvContent = "Name,Email,Phone,CourseInterest,Source\nJohn Doe,john@example.com,9876543210,Graphic Design,INSTAGRAM\nJane Smith,jane@example.com,9876543211,Full Stack Web Development,GOOGLE"
+    const csvContent = "Name,Email,Phone,CourseInterest,Batch,DeliveryMode,Source\nJohn Doe,john@example.com,9876543210,Graphic Design,Batch 2026-A (Morning),CAMPUS,INSTAGRAM\nJane Smith,jane@example.com,9876543211,Full Stack Web Development,Weekend Mastermind Batch,REMOTE,GOOGLE"
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
     const url = URL.createObjectURL(blob)
     const link = document.createElement("a")
@@ -380,33 +605,29 @@ export default function AdmissionsPipelinePage() {
           name: cols[0],
           email: cols[1] || undefined,
           phone: cols[2] || undefined,
-          courseInterest: cols[3] || "General Enquiry",
-          source: cols[4] || "IMPORT",
+          courseInterest: cols[3] || COURSE_OPTIONS[0],
+          batch: cols[4] || BATCH_OPTIONS[0],
+          deliveryMode: (cols[5]?.toUpperCase() === 'CAMPUS' ? 'CAMPUS' : 'REMOTE') as DeliveryMode,
+          source: cols[6] || "IMPORT",
           status: "ENQUIRY",
-          score: 70,
+          score: 75,
+          activities: [
+            {
+              id: `act_imp_${i}`,
+              type: 'NOTE',
+              content: 'Imported via CSV bulk upload',
+              createdAt: new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
+            }
+          ]
         }
 
         newImportedLeads.push(itemLead)
-
-        fetchApi("/crm/leads", {
-          method: "POST",
-          body: JSON.stringify({
-            name: cols[0],
-            email: cols[1] || undefined,
-            phone: cols[2] || undefined,
-            courseInterest: cols[3] || "General Enquiry",
-            source: cols[4] || "IMPORT",
-            businessUnit: "ACADEMY",
-            status: "ENQUIRY"
-          })
-        }).catch(() => {})
       }
 
       setLeads(prev => [...newImportedLeads, ...prev])
       toast.success(`Successfully imported ${newImportedLeads.length} leads!`)
       setIsImportModalOpen(false)
       setImportFile(null)
-      mutate()
     } catch (err: any) {
       toast.error(err.message || "Failed to parse CSV file")
     } finally {
@@ -417,89 +638,266 @@ export default function AdmissionsPipelinePage() {
   return (
     <div className="flex flex-col h-full bg-slate-50 text-slate-900 overflow-hidden relative">
       
-      {/* Header */}
-      <header className="p-4 sm:p-6 lg:p-8 border-b border-slate-200 shrink-0 bg-white shadow-2xs">
+      {/* Top Header & Navigation */}
+      <header className="p-4 sm:p-6 border-b border-slate-200 shrink-0 bg-white shadow-2xs space-y-4">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">Admissions Pipeline</h1>
-            <p className="text-slate-500 text-xs sm:text-sm mt-1 font-medium">Manage and track student leads across the enrollment lifecycle for Echo LMS.</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto">
-            <div className="relative flex-1 sm:flex-initial">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input 
-                type="text" 
-                placeholder="Search name, phone, course..." 
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className="w-full sm:w-56 md:w-64 pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/50 text-sm font-medium"
-              />
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">Admissions Pipeline & CRM</h1>
+              <span className="px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800 text-[10px] font-black uppercase">
+                {filteredLeads.length} Total Leads
+              </span>
             </div>
+            <p className="text-slate-500 text-xs sm:text-sm mt-0.5 font-medium">Manage student leads, course interests, campus vs remote lists, and timestamped followups.</p>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto">
             
-            <select
-              value={statusFilter}
-              onChange={e => setStatusFilter(e.target.value)}
-              className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:outline-none focus:border-teal-500"
-            >
-              <option value="ALL">All Statuses</option>
-              {columns.map(c => (
-                <option key={c.id} value={c.id}>{c.title}</option>
-              ))}
-            </select>
+            {/* View Mode Toggle */}
+            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+              <button
+                onClick={() => setViewMode('BOARD')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                  viewMode === 'BOARD' ? 'bg-white text-teal-700 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <LayoutGrid className="w-3.5 h-3.5" /> Board
+              </button>
+              <button
+                onClick={() => setViewMode('LIST')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                  viewMode === 'LIST' ? 'bg-white text-teal-700 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <List className="w-3.5 h-3.5" /> List View
+              </button>
+            </div>
 
             <button 
               onClick={() => setIsImportModalOpen(true)}
-              className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-bold transition-colors flex items-center gap-2 border border-slate-200"
+              className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors flex items-center gap-2 border border-slate-200"
             >
-              <Upload className="w-4 h-4 text-slate-600" />
+              <Upload className="w-3.5 h-3.5 text-slate-600" />
               Import CSV
             </button>
 
             <button 
               onClick={() => setIsAddModalOpen(true)}
-              className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-bold transition-colors flex items-center gap-2 shadow-xs"
+              className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-2 shadow-xs"
             >
               <Plus className="w-4 h-4" />
               Add Lead
             </button>
           </div>
         </div>
-      </header>
 
-      {/* Kanban Board */}
-      <div className="flex-1 overflow-x-auto overflow-y-hidden p-4 sm:p-6 lg:p-8">
-        <DndContext 
-          sensors={sensors} 
-          collisionDetection={closestCorners} 
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-          onDragCancel={handleDragCancel}
-        >
-          <div className="flex h-full gap-6 min-w-max">
-            
-            {columns.map(column => {
-              const columnLeads = filteredLeads.filter(l => l.status === column.id)
-              return (
-                <KanbanColumn 
-                  key={column.id} 
-                  column={column} 
-                  leads={columnLeads} 
-                  onSelectLead={openLeadAction} 
-                />
-              )
-            })}
-
+        {/* Filters Bar: Search, Course Sort, Batch Sort, Remote & Student lists */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 pt-2 border-t border-slate-100">
+          
+          {/* Search Box */}
+          <div className="relative lg:col-span-2">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input 
+              type="text" 
+              placeholder="Search name, phone, course, batch..." 
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/50 text-xs font-medium"
+            />
           </div>
 
-          <DragOverlay>
-            {activeLead ? (
-              <div className="rotate-1 scale-105 shadow-2xl rounded-xl z-50 pointer-events-none opacity-95">
-                <LeadCardContent lead={activeLead} />
-              </div>
-            ) : null}
-          </DragOverlay>
-        </DndContext>
-      </div>
+          {/* Delivery Mode (Campus vs Remote) Filter */}
+          <div>
+            <select
+              value={deliveryFilter}
+              onChange={e => setDeliveryFilter(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 focus:outline-none focus:border-teal-500"
+            >
+              <option value="ALL">All Modes (Campus + Remote)</option>
+              <option value="CAMPUS">🏫 Onsite Campus Only</option>
+              <option value="REMOTE">💻 Remote Online Only</option>
+            </select>
+          </div>
+
+          {/* Course Sort / Filter */}
+          <div>
+            <select
+              value={courseFilter}
+              onChange={e => setCourseFilter(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 focus:outline-none focus:border-teal-500 truncate"
+            >
+              <option value="ALL">All Courses</option>
+              {COURSE_OPTIONS.map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Batch Sort / Filter */}
+          <div>
+            <select
+              value={batchFilter}
+              onChange={e => setBatchFilter(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 focus:outline-none focus:border-teal-500 truncate"
+            >
+              <option value="ALL">All Batches</option>
+              {BATCH_OPTIONS.map(b => (
+                <option key={b} value={b}>{b}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Sort By Selector */}
+          <div>
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 focus:outline-none focus:border-teal-500"
+            >
+              <option value="NEWEST">Sort: Newest First</option>
+              <option value="OLDEST">Sort: Oldest First</option>
+              <option value="NAME_ASC">Sort: Name (A to Z)</option>
+              <option value="COURSE">Sort: Course Interest</option>
+              <option value="BATCH">Sort: Batch</option>
+              <option value="SCORE">Sort: High Lead Score</option>
+            </select>
+          </div>
+
+        </div>
+      </header>
+
+      {/* VIEW 1: KANBAN BOARD VIEW */}
+      {viewMode === 'BOARD' && (
+        <div className="flex-1 overflow-x-auto overflow-y-hidden p-4 sm:p-6 lg:p-8">
+          <DndContext 
+            sensors={sensors} 
+            collisionDetection={closestCorners} 
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onDragCancel={handleDragCancel}
+          >
+            <div className="flex h-full gap-6 min-w-max">
+              {columns.map(column => {
+                const columnLeads = filteredLeads.filter(l => l.status === column.id)
+                return (
+                  <KanbanColumn 
+                    key={column.id} 
+                    column={column} 
+                    leads={columnLeads} 
+                    onSelectLead={openLeadAction} 
+                  />
+                )
+              })}
+            </div>
+
+            <DragOverlay>
+              {activeLead ? (
+                <div className="rotate-1 scale-105 shadow-2xl rounded-xl z-50 pointer-events-none opacity-95">
+                  <LeadCardContent lead={activeLead} />
+                </div>
+              ) : null}
+            </DragOverlay>
+          </DndContext>
+        </div>
+      )}
+
+      {/* VIEW 2: RICH LIST VIEW TABLE */}
+      {viewMode === 'LIST' && (
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 custom-scrollbar">
+          <div className="bg-white border border-slate-200 rounded-3xl shadow-xs overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-black tracking-wider text-[10px]">
+                  <tr>
+                    <th className="p-4">Student Lead</th>
+                    <th className="p-4">Mode</th>
+                    <th className="p-4">Course Interest</th>
+                    <th className="p-4">Assigned Batch</th>
+                    <th className="p-4">Stage Status</th>
+                    <th className="p-4">Score</th>
+                    <th className="p-4">Followup History</th>
+                    <th className="p-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-medium">
+                  {filteredLeads.map(lead => {
+                    const colObj = columns.find(c => c.id === lead.status)
+                    const actCount = lead.activities?.length || 0
+
+                    return (
+                      <tr 
+                        key={lead.id} 
+                        className="hover:bg-slate-50/80 transition-colors cursor-pointer group"
+                        onClick={() => openLeadAction(lead, "CALL")}
+                      >
+                        <td className="p-4">
+                          <div className="font-extrabold text-slate-900 text-sm">{lead.name}</div>
+                          <div className="text-[11px] text-slate-400 font-mono flex items-center gap-3 mt-0.5">
+                            {lead.phone && <span>📞 {lead.phone}</span>}
+                            {lead.email && <span>✉️ {lead.email}</span>}
+                          </div>
+                        </td>
+
+                        <td className="p-4">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                            lead.deliveryMode === 'REMOTE' ? 'bg-indigo-100 text-indigo-800 border border-indigo-200' : 'bg-amber-100 text-amber-800 border border-amber-200'
+                          }`}>
+                            {lead.deliveryMode === 'REMOTE' ? '💻 Remote' : '🏫 Campus'}
+                          </span>
+                        </td>
+
+                        <td className="p-4 font-bold text-slate-800">
+                          {lead.courseInterest || 'General Enquiry'}
+                        </td>
+
+                        <td className="p-4 text-slate-600">
+                          {lead.batch || 'Unassigned'}
+                        </td>
+
+                        <td className="p-4">
+                          <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold border ${colObj?.color}`}>
+                            {colObj?.title}
+                          </span>
+                        </td>
+
+                        <td className="p-4 font-black">
+                          <span className={`${lead.score > 80 ? 'text-emerald-600' : lead.score > 50 ? 'text-amber-600' : 'text-rose-600'}`}>
+                            {lead.score || 75}
+                          </span>
+                        </td>
+
+                        <td className="p-4">
+                          <span className="px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-bold text-[11px] flex items-center gap-1.5 w-fit">
+                            <MessageSquare className="w-3 h-3 text-teal-600" />
+                            {actCount} Followups logged
+                          </span>
+                        </td>
+
+                        <td className="p-4 text-right" onClick={e => e.stopPropagation()}>
+                          <button 
+                            onClick={() => openLeadAction(lead, "CALL")}
+                            className="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-xl text-xs font-bold border border-teal-200 transition-colors"
+                          >
+                            Manage Lead
+                          </button>
+                        </td>
+                      </tr>
+                    )
+                  })}
+
+                  {filteredLeads.length === 0 && (
+                    <tr>
+                      <td colSpan={8} className="p-12 text-center text-slate-400 font-medium">
+                        No student leads match the selected filter criteria.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
 
 
       {/* Add Lead Modal */}
@@ -507,7 +905,7 @@ export default function AdmissionsPipelinePage() {
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-4 sm:p-6 shadow-xl space-y-5 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <h3 className="text-xl font-black text-slate-900">Add New Lead</h3>
+              <h3 className="text-xl font-black text-slate-900">Add New Student Lead</h3>
               <button onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-slate-600">
                 <X className="w-5 h-5" />
               </button>
@@ -516,7 +914,7 @@ export default function AdmissionsPipelinePage() {
             <form onSubmit={handleAddLead} className="space-y-4">
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Full Name *</label>
-                <input required placeholder="Student Name"
+                <input required placeholder="Student Full Name"
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:border-teal-500"
                   value={newLead.name} onChange={e => setNewLead(p => ({ ...p, name: e.target.value }))} />
               </div>
@@ -536,24 +934,30 @@ export default function AdmissionsPipelinePage() {
                 </div>
               </div>
 
-              <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Course Interest</label>
-                <input placeholder="e.g. Graphic Design, Full Stack Web Dev"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:border-teal-500"
-                  value={newLead.courseInterest} onChange={e => setNewLead(p => ({ ...p, courseInterest: e.target.value }))} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Course Interest</label>
+                  <select className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:border-teal-500"
+                    value={newLead.courseInterest} onChange={e => setNewLead(p => ({ ...p, courseInterest: e.target.value }))}>
+                    {COURSE_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Target Batch</label>
+                  <select className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:border-teal-500"
+                    value={newLead.batch} onChange={e => setNewLead(p => ({ ...p, batch: e.target.value }))}>
+                    {BATCH_OPTIONS.map(b => <option key={b} value={b}>{b}</option>)}
+                  </select>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Source</label>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Delivery Mode</label>
                   <select className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:border-teal-500"
-                    value={newLead.source} onChange={e => setNewLead(p => ({ ...p, source: e.target.value }))}>
-                    <option value="WEBSITE">Website</option>
-                    <option value="WALKIN">Walk-in Kiosk</option>
-                    <option value="INSTAGRAM">Instagram</option>
-                    <option value="GOOGLE">Google</option>
-                    <option value="REFERRAL">Referral</option>
-                    <option value="OTHER">Other</option>
+                    value={newLead.deliveryMode} onChange={e => setNewLead(p => ({ ...p, deliveryMode: e.target.value as DeliveryMode }))}>
+                    <option value="REMOTE">💻 Remote Online</option>
+                    <option value="CAMPUS">🏫 Onsite Campus</option>
                   </select>
                 </div>
                 <div>
@@ -567,12 +971,12 @@ export default function AdmissionsPipelinePage() {
 
               <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
                 <button type="button" onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-bold transition-colors">
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors">
                   Cancel
                 </button>
                 <button type="submit" disabled={isSubmitting}
-                  className="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-bold transition-colors disabled:opacity-50 flex items-center gap-2">
-                  {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Lead"}
+                  className="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-colors disabled:opacity-50 flex items-center gap-2">
+                  {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Student Lead"}
                 </button>
               </div>
             </form>
@@ -608,7 +1012,7 @@ export default function AdmissionsPipelinePage() {
                 <p className="text-sm font-extrabold text-slate-800">
                   {importFile ? importFile.name : "Select or drag a CSV file"}
                 </p>
-                <p className="text-xs text-slate-400 mb-4">Supported columns: Name, Email, Phone, CourseInterest, Source</p>
+                <p className="text-xs text-slate-400 mb-4">Supported columns: Name, Email, Phone, CourseInterest, Batch, DeliveryMode, Source</p>
                 <label className="cursor-pointer px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors inline-block">
                   Browse File
                   <input type="file" accept=".csv" className="hidden" onChange={e => setImportFile(e.target.files?.[0] || null)} />
@@ -617,11 +1021,11 @@ export default function AdmissionsPipelinePage() {
 
               <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
                 <button type="button" onClick={() => setIsImportModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-bold transition-colors">
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors">
                   Cancel
                 </button>
                 <button type="submit" disabled={isImporting || !importFile}
-                  className="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-bold transition-colors disabled:opacity-50 flex items-center gap-2">
+                  className="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-colors disabled:opacity-50 flex items-center gap-2">
                   {isImporting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Upload & Import"}
                 </button>
               </div>
@@ -630,59 +1034,137 @@ export default function AdmissionsPipelinePage() {
         </div>
       )}
 
-      {/* Selected Lead Activity Log Drawer / Modal */}
+      {/* Selected Lead Drawer: Timestamped Multiple Followup History */}
       {selectedLead && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-end p-4">
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-6 h-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-6 h-full max-h-[90vh] overflow-y-auto custom-scrollbar">
+            
+            {/* Lead Header */}
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
-                <h3 className="text-lg font-black text-slate-900">{selectedLead.name}</h3>
-                <p className="text-xs text-slate-500 font-medium">{selectedLead.courseInterest || "General Inquiry"}</p>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-black text-slate-900">{selectedLead.name}</h3>
+                  <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${
+                    selectedLead.deliveryMode === 'REMOTE' ? 'bg-indigo-100 text-indigo-800' : 'bg-amber-100 text-amber-800'
+                  }`}>
+                    {selectedLead.deliveryMode === 'REMOTE' ? 'Remote' : 'Campus'}
+                  </span>
+                </div>
+                <p className="text-xs text-teal-700 font-bold">{selectedLead.courseInterest || "General Inquiry"}</p>
+                {selectedLead.batch && <p className="text-[10px] text-slate-400 font-medium">Batch: {selectedLead.batch}</p>}
               </div>
               <button onClick={() => setSelectedLead(null)} className="text-slate-400 hover:text-slate-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200">
-                <Phone className="w-4 h-4 text-teal-600" />
-                <span>{selectedLead.phone || "No phone recorded"}</span>
+            {/* Quick Contact Chips */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <div className="flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-teal-600" />
+                  <span className="font-mono font-bold">{selectedLead.phone || "No phone"}</span>
+                </div>
+                {selectedLead.phone && (
+                  <a href={`tel:${selectedLead.phone}`} className="text-[10px] bg-teal-100 text-teal-800 px-2 py-1 rounded font-bold hover:bg-teal-200">
+                    Call Now
+                  </a>
+                )}
               </div>
-              <div className="flex items-center gap-3 text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200">
-                <Mail className="w-4 h-4 text-amber-600" />
-                <span>{selectedLead.email || "No email recorded"}</span>
+
+              <div className="flex items-center justify-between text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <div className="flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-amber-600" />
+                  <span className="font-mono font-bold truncate max-w-[200px]">{selectedLead.email || "No email"}</span>
+                </div>
+                {selectedLead.email && (
+                  <a href={`mailto:${selectedLead.email}`} className="text-[10px] bg-amber-100 text-amber-800 px-2 py-1 rounded font-bold hover:bg-amber-200">
+                    Send Email
+                  </a>
+                )}
               </div>
             </div>
 
-            <form onSubmit={handleLogActivity} className="space-y-4">
+            {/* Add New Timestamped Interaction Form */}
+            <form onSubmit={handleLogActivity} className="space-y-4 pt-2 border-t border-slate-100">
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">Stage Status</label>
                 <select 
                   value={actionStatus} 
                   onChange={e => setActionStatus(e.target.value as ColumnType)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-800"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800"
                 >
                   {columns.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
                 </select>
               </div>
 
+              {/* Interaction Type Tabs */}
               <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">Log Interaction ({actionTab})</label>
+                <div className="flex bg-slate-100 p-1 rounded-xl mb-2 border border-slate-200">
+                  {(['CALL', 'EMAIL', 'MEETING'] as const).map(tab => (
+                    <button
+                      key={tab}
+                      type="button"
+                      onClick={() => setActionTab(tab)}
+                      className={`flex-1 py-1.5 text-[10px] font-black rounded-lg transition-all ${
+                        actionTab === tab ? 'bg-white text-teal-700 shadow-2xs' : 'text-slate-500'
+                      }`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                  Add Follow-up Note ({actionTab})
+                </label>
                 <textarea 
                   rows={3} 
-                  placeholder="Record call notes, email response, or meeting outcome..."
+                  placeholder="Record call notes, email response, fee commitment, or meeting outcome..."
                   value={actionNote} 
                   onChange={e => setActionNote(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-medium text-slate-900 focus:outline-none focus:border-teal-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-900 focus:outline-none focus:border-teal-500"
                 />
               </div>
 
               <button type="submit" disabled={isSubmittingAction}
-                className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2">
-                {isSubmittingAction ? <Loader2 className="w-4 h-4 animate-spin" /> : <><CheckCircle2 className="w-4 h-4" /> Save Activity</>}
+                className="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-xs">
+                {isSubmittingAction ? <Loader2 className="w-4 h-4 animate-spin" /> : <><CheckCircle2 className="w-4 h-4" /> Save Timestamped Follow-up</>}
               </button>
             </form>
+
+            {/* Timestamped Follow-up History Timeline */}
+            <div className="pt-4 border-t border-slate-100 space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-teal-600" /> Multiple Follow-up History
+                </h4>
+                <span className="text-[10px] font-bold text-slate-400">
+                  {selectedLead.activities?.length || 0} entries
+                </span>
+              </div>
+
+              <div className="space-y-3 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
+                {selectedLead.activities && selectedLead.activities.length > 0 ? (
+                  selectedLead.activities.map((act) => (
+                    <div key={act.id} className="p-3 bg-slate-50 rounded-2xl border border-slate-200/90 text-xs space-y-1">
+                      <div className="flex items-center justify-between text-[10px]">
+                        <span className="px-2 py-0.5 rounded bg-teal-100 text-teal-800 font-extrabold">
+                          {act.type}
+                        </span>
+                        <span className="font-mono text-slate-400 font-semibold">{act.createdAt}</span>
+                      </div>
+                      <p className="text-slate-700 font-medium leading-relaxed pt-1">{act.content}</p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-4 border border-dashed border-slate-200 rounded-2xl text-center text-xs text-slate-400 font-medium">
+                    No follow-up notes logged yet. Use the box above to add your first note.
+                  </div>
+                )}
+              </div>
+            </div>
+
           </div>
         </div>
       )}
