@@ -229,6 +229,42 @@ export async function buildApp(opts: any = {}): Promise<any> {
   const vendorsModule = (await import('./vendors')).default;
   await app.register(vendorsModule, { prefix: '/api/v1/vendors' });
 
+  // Telephony & Call Intelligence bridge endpoint
+  app.get('/api/v1/calls', async (req, reply) => {
+    const { leadId, counsellorId, status } = (req.query as any) || {};
+    const where: any = {};
+    if (leadId) where.leadId = leadId;
+    if (counsellorId) where.counsellorId = counsellorId;
+    if (status) where.status = status;
+
+    const calls = await app.prisma.callRecord.findMany({
+      where,
+      include: {
+        lead: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+            status: true,
+            courseInterest: true
+          }
+        },
+        counsellor: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatarUrl: true
+          }
+        },
+        intelligence: true
+      },
+      orderBy: { startedAt: 'desc' }
+    });
+    return { data: calls, calls, total: calls.length };
+  });
+
   const notificationsModule = (await import('./notifications')).default;
   await app.register(notificationsModule, { prefix: '/api/v1/notifications' });
 

@@ -3,19 +3,19 @@ import { z } from 'zod';
 
 export default async function dynamicFormsRouter(app: FastifyInstance) {
   
-  // ── GET /api/v1/academy/forms ──────────────────────────────────────────────
-  // List all forms for Admin
-  app.get('/forms', async (req, reply) => {
+  // ── GET /api/v1/academy/forms & /api/v1/academy/dynamic-forms ──────────────────
+  const listForms = async (req: any, reply: any) => {
     const forms = await app.prisma.enquiryForm.findMany({
       include: { _count: { select: { submissions: true } } },
       orderBy: { createdAt: 'desc' }
     });
     return forms;
-  });
+  };
+  app.get('/forms', listForms);
+  app.get('/dynamic-forms', listForms);
 
-  // ── POST /api/v1/academy/forms ─────────────────────────────────────────────
-  // Admin creates a new dynamic form
-  app.post('/forms', async (req, reply) => {
+  // ── POST /api/v1/academy/forms & /api/v1/academy/dynamic-forms ─────────────────
+  const createForm = async (req: any, reply: any) => {
     const schema = z.object({
       title: z.string(),
       description: z.string().optional(),
@@ -36,7 +36,9 @@ export default async function dynamicFormsRouter(app: FastifyInstance) {
       }
     });
     return form;
-  });
+  };
+  app.post('/forms', createForm);
+  app.post('/dynamic-forms', createForm);
 
   // ── GET /api/v1/academy/forms/:slug ────────────────────────────────────────
   // Public endpoint to fetch form schema

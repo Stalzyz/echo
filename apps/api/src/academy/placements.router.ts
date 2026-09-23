@@ -2,6 +2,19 @@ import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 
 export default async function placementsRouter(app: FastifyInstance) {
+  // GET /api/v1/academy/placements (Overview)
+  app.get('/placements', async (req, reply) => {
+    const companies = await app.prisma.placementCompany.findMany({
+      include: { _count: { select: { jobs: true } } },
+      orderBy: { name: 'asc' }
+    });
+    const jobs = await app.prisma.placementJob.findMany({
+      include: { company: true, _count: { select: { applications: true } } },
+      orderBy: { createdAt: 'desc' }
+    });
+    return { data: { companies, jobs }, totalCompanies: companies.length, totalJobs: jobs.length };
+  });
+
   // GET /api/v1/academy/placements/companies
   app.get('/placements/companies', async (req, reply) => {
     const companies = await app.prisma.placementCompany.findMany({

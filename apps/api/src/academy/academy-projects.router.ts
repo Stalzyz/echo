@@ -2,8 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 
 export default async function academyProjectsRouter(app: FastifyInstance) {
-  // GET /api/v1/academy/projects
-  app.get('/projects', async (req, reply) => {
+  const getProjectsHandler = async (req: any, reply: any) => {
     const projects = await app.prisma.academyProject.findMany({
       include: {
         members: { include: { student: { select: { id: true, user: { select: { firstName: true, lastName: true } } } } } },
@@ -12,10 +11,9 @@ export default async function academyProjectsRouter(app: FastifyInstance) {
       orderBy: { createdAt: 'desc' }
     });
     return projects;
-  });
+  };
 
-  // POST /api/v1/academy/projects
-  app.post('/projects', async (req, reply) => {
+  const createProjectHandler = async (req: any, reply: any) => {
     const schema = z.object({
       title: z.string(),
       type: z.enum(['INTERNAL', 'CLIENT', 'INDUSTRY', 'HACKATHON', 'RESEARCH', 'COMPETITION', 'FREELANCE']),
@@ -31,10 +29,9 @@ export default async function academyProjectsRouter(app: FastifyInstance) {
 
     reply.code(201);
     return project;
-  });
+  };
 
-  // GET /api/v1/academy/projects/:id
-  app.get('/projects/:id', async (req, reply) => {
+  const getProjectByIdHandler = async (req: any, reply: any) => {
     const { id } = req.params as { id: string };
     const project = await app.prisma.academyProject.findUnique({
       where: { id },
@@ -45,5 +42,15 @@ export default async function academyProjectsRouter(app: FastifyInstance) {
     });
     if (!project) return reply.notFound('Project not found');
     return project;
-  });
+  };
+
+  // GET & POST /api/v1/academy/projects
+  app.get('/projects', getProjectsHandler);
+  app.post('/projects', createProjectHandler);
+  app.get('/projects/:id', getProjectByIdHandler);
+
+  // Alias: GET & POST /api/v1/academy/academy-projects
+  app.get('/academy-projects', getProjectsHandler);
+  app.post('/academy-projects', createProjectHandler);
+  app.get('/academy-projects/:id', getProjectByIdHandler);
 }

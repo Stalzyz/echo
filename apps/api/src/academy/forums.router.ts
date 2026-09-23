@@ -2,6 +2,24 @@ import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 
 export default async function forumsRouter(app: FastifyInstance) {
+  // GET /api/v1/academy/forums (Overview)
+  app.get('/', async (req, reply) => {
+    const categories = await app.prisma.forumCategory.findMany({
+      include: { _count: { select: { posts: true } } },
+      orderBy: { name: 'asc' }
+    });
+    const recentPosts = await app.prisma.forumPost.findMany({
+      take: 20,
+      include: {
+        author: { select: { firstName: true, lastName: true, role: true } },
+        category: true,
+        _count: { select: { replies: true } }
+      },
+      orderBy: [{ isPinned: 'desc' }, { createdAt: 'desc' }]
+    });
+    return { data: { categories, recentPosts }, totalCategories: categories.length };
+  });
+
   // GET /api/v1/academy/forums/categories
   app.get('/categories', async (req, reply) => {
     const categories = await app.prisma.forumCategory.findMany({
