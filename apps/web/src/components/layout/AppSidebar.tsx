@@ -314,7 +314,7 @@ export function AppSidebar() {
   return (
     <aside
       className={cn(
-        "h-full bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 transition-all duration-300 relative z-40 select-none shadow-xs",
+        "hidden md:flex h-full bg-white border-r border-slate-200 flex-col justify-between shrink-0 transition-all duration-300 relative z-40 select-none shadow-xs",
         isCollapsed ? "w-20" : "w-64"
       )}
     >

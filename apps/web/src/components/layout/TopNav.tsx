@@ -252,20 +252,32 @@ export function TopNav() {
                   </Link>
                 </>
               ) : (
-                <>
+                <div className="space-y-1">
                   <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-teal-50 hover:text-teal-800">
-                    Main Dashboard
+                    📊 Main Dashboard
                   </Link>
                   <Link href="/dashboard/academy/admissions" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-teal-50 hover:text-teal-800">
-                    Academy Admin & CRM
+                    🎯 Admissions CRM (Leads)
+                  </Link>
+                  <Link href="/dashboard/academy/calls" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-teal-50 hover:text-teal-800">
+                    📞 Call Intelligence
+                  </Link>
+                  <Link href="/dashboard/academy/students" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-teal-50 hover:text-teal-800">
+                    🎓 Student Directory
+                  </Link>
+                  <Link href="/dashboard/academy/fees" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-teal-50 hover:text-teal-800">
+                    💳 Fees & Payments
+                  </Link>
+                  <Link href="/dashboard/academy/batches" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-teal-50 hover:text-teal-800">
+                    📚 Batches & Schedule
                   </Link>
                   <Link href="/dashboard/studio" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-teal-50 hover:text-teal-800">
-                    Teaching Studio
+                    🎬 Teaching Studio
                   </Link>
                   <Link href="/dashboard/settings" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-teal-50 hover:text-teal-800">
-                    Branding & Settings
+                    ⚙️ Branding & Settings
                   </Link>
-                </>
+                </div>
               )}
             </div>
 
