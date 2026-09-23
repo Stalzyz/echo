@@ -26,6 +26,9 @@ import {
 } from "lucide-react"
 import { useApi, fetchApi } from "@/lib/useApi"
 import { toast } from "sonner"
+import { ClickToCallModal } from "@/components/crm/ClickToCallModal"
+import { CallIntelligenceModal } from "@/components/crm/CallIntelligenceModal"
+import { LeadCallHistoryTab } from "@/components/crm/LeadCallHistoryTab"
 
 // Types
 type ColumnType = 'ENQUIRY' | 'COUNSELLING' | 'TRIAL' | 'ENROLLED_ACADEMY' | 'DROPPED'
@@ -253,6 +256,8 @@ export default function AdmissionsPipelinePage() {
 
   // Selected Lead Drawer State (With Timestamped Activity History)
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
+  const [activeCallLead, setActiveCallLead] = useState<Lead | null>(null)
+  const [viewingCallIntel, setViewingCallIntel] = useState<any | null>(null)
   const [actionTab, setActionTab] = useState<"CALL" | "EMAIL" | "MEETING">("CALL")
   const [actionNote, setActionNote] = useState("")
   const [actionStatus, setActionStatus] = useState<ColumnType>("ENQUIRY")
@@ -260,6 +265,9 @@ export default function AdmissionsPipelinePage() {
 
   const openLeadAction = (lead: Lead, action: string = "CALL") => {
     setSelectedLead(lead)
+    if (action === "CALL") {
+      setActiveCallLead(lead)
+    }
     setActionTab(action as any)
     setActionStatus(lead.status)
     setActionNote("")
@@ -1066,9 +1074,14 @@ export default function AdmissionsPipelinePage() {
                   <span className="font-mono font-bold">{selectedLead.phone || "No phone"}</span>
                 </div>
                 {selectedLead.phone && (
-                  <a href={`tel:${selectedLead.phone}`} className="text-[10px] bg-teal-100 text-teal-800 px-2 py-1 rounded font-bold hover:bg-teal-200">
-                    Call Now
-                  </a>
+                  <button
+                    type="button"
+                    onClick={() => setActiveCallLead(selectedLead)}
+                    className="text-[10px] bg-teal-600 text-white px-2.5 py-1.5 rounded-lg font-extrabold hover:bg-teal-700 transition-colors shadow-2xs flex items-center gap-1"
+                  >
+                    <Phone className="w-3 h-3" />
+                    <span>Softphone Call & Record</span>
+                  </button>
                 )}
               </div>
 
@@ -1167,6 +1180,33 @@ export default function AdmissionsPipelinePage() {
 
           </div>
         </div>
+      )}
+
+      {/* ECHO Softphone Call & Recorder Modal */}
+      {activeCallLead && (
+        <ClickToCallModal
+          isOpen={Boolean(activeCallLead)}
+          onClose={() => setActiveCallLead(null)}
+          lead={{
+            id: activeCallLead.id,
+            name: activeCallLead.name,
+            phone: activeCallLead.phone,
+            courseInterest: activeCallLead.courseInterest
+          }}
+          onCallEnded={() => {
+            mutate() // refresh lead list
+          }}
+        />
+      )}
+
+      {/* ECHO Call Intelligence Modal */}
+      {viewingCallIntel && (
+        <CallIntelligenceModal
+          isOpen={Boolean(viewingCallIntel)}
+          onClose={() => setViewingCallIntel(null)}
+          callRecord={viewingCallIntel}
+          onCrmSynced={() => mutate()}
+        />
       )}
 
     </div>
