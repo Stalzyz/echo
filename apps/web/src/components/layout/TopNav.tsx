@@ -194,6 +194,12 @@ export function TopNav() {
             <button
               onClick={async () => {
                 await fetch("/api/v1/super-admin/academies/impersonate/exit", { method: "POST" })
+                await updateSession({
+                  organizationId: null,
+                  tenantId: null,
+                  impersonatedBySuperAdmin: false,
+                  role: "SUPER_ADMIN"
+                })
                 toast.success("Exited tenant impersonation. Returned to Super Admin mode.")
                 window.location.href = "/dashboard/super-admin/academies"
               }}

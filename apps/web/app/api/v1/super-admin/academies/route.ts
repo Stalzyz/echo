@@ -5,7 +5,10 @@ import { auth } from "@/auth"
 export async function GET() {
   try {
     const session = await auth()
-    if (!session?.user || session.user.role !== 'SUPER_ADMIN') {
+    const userRole = session?.user?.role
+    const isSuperAdmin = userRole === 'SUPER_ADMIN' || userRole === 'Super Admin' || session?.user?.impersonatedBySuperAdmin
+
+    if (!session?.user || !isSuperAdmin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
     }
 

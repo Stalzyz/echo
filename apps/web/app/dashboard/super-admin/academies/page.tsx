@@ -186,7 +186,7 @@ export default function AcademiesManagementPage() {
           tenantId: data.organization.id,
           impersonatedBySuperAdmin: true,
           originalSuperAdminId: data.originalSuperAdmin.id,
-          role: "ADMIN"
+          role: session?.user?.role || "SUPER_ADMIN"
         })
         toast.success(`Now logged in as Admin for ${acad.name}`)
         window.location.href = "/dashboard"
