@@ -12,6 +12,7 @@ declare module '@fastify/jwt' {
       email: string;
       name: string;
       role: string;
+      organizationId?: string | null;
     };
   }
 }

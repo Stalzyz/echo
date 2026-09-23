@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
+import * as cookie from 'cookie';
 import { EventBus, SystemEvents } from '../automations/event-bus';
 
 // Helper to evaluate multi-role commission plan:
@@ -218,8 +219,18 @@ export default async function invoicesRouter(app: FastifyInstance) {
   // GET /api/v1/finance/invoices
   app.get('/invoices', async (req, reply) => {
     const { status, businessUnit } = req.query as { status?: string; businessUnit?: string };
+    const user = (req as any).user;
+    const cookies = cookie.parse(req.headers.cookie || '');
+    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
+    const tenantId = user?.organizationId || impersonatedTenantId;
+
+    const orgFilter = (user?.role === 'SUPER_ADMIN' && !impersonatedTenantId)
+      ? {}
+      : { organizationId: tenantId || '__NO_ACCESS__' };
+
     const invoices = await app.prisma.invoice.findMany({
       where: {
+        ...orgFilter,
         ...(status && { status: status as any }),
         ...(businessUnit && { businessUnit: businessUnit as any }),
       },

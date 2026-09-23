@@ -1,13 +1,26 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
+import * as cookie from 'cookie';
 
 export default async function coursesRoutes(app: FastifyInstance) {
   const server = app.withTypeProvider<ZodTypeProvider>();
 
   // GET /api/v1/lms/courses
   server.get('/', async (req, reply) => {
+    const user = (req as any).user;
+    const cookies = cookie.parse(req.headers.cookie || '');
+    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
+    const tenantId = user?.organizationId || impersonatedTenantId;
+
+    const orgFilter = (user?.role === 'SUPER_ADMIN' && !impersonatedTenantId)
+      ? {}
+      : { course: { organizationId: tenantId || '__NO_ACCESS__' } };
+
     const courses = await server.prisma.lMSCourse.findMany({
+      where: {
+        ...orgFilter
+      },
       include: {
         course: true,
         modules: {

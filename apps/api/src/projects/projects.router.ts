@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
+import * as cookie from 'cookie';
 import { sendTemplatedEmail } from '../services/emailRenderer';
 import { sendEmail, EmailTemplates } from '../integrations/email.service';
 
@@ -27,6 +28,14 @@ export default async function projectsRouter(app: FastifyInstance) {
   app.get('/', async (req, reply) => {
     const { status, managerId, companyId, includeFiles } = req.query as { status?: string; managerId?: string; companyId?: string; includeFiles?: string };
     const user = req.user;
+    const cookies = cookie.parse(req.headers.cookie || '');
+    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
+    const tenantId = user?.organizationId || impersonatedTenantId;
+
+    const orgFilter = (user?.role === 'SUPER_ADMIN' && !impersonatedTenantId)
+      ? {}
+      : { organizationId: tenantId || '__NO_ACCESS__' };
+
     let enforcedCompanyId = companyId;
 
     if (user.role === 'CLIENT') {
@@ -42,6 +51,7 @@ export default async function projectsRouter(app: FastifyInstance) {
 
     const projects = await app.prisma.project.findMany({
       where: {
+        ...orgFilter,
         ...(status && { status: status as any }),
         ...(managerId && { managerId }),
         ...(enforcedCompanyId && { companyId: enforcedCompanyId }),

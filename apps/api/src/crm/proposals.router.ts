@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
+import * as cookie from 'cookie';
 import { auditLog } from '../utils/audit';
 import OpenAI from 'openai';
 import { generateProposalPDF } from '../finance/pdf.service';
@@ -59,7 +60,17 @@ export default async function proposalsRouter(app: FastifyInstance) {
     const limitNum = parseInt(limit, 10);
     const skip = (pageNum - 1) * limitNum;
 
+    const user = (req as any).user;
+    const cookies = cookie.parse(req.headers.cookie || '');
+    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
+    const tenantId = user?.organizationId || impersonatedTenantId;
+
+    const orgFilter = (user?.role === 'SUPER_ADMIN' && !impersonatedTenantId)
+      ? {}
+      : { organizationId: tenantId || '__NO_ACCESS__' };
+
     const whereClause: any = {
+      ...orgFilter,
       ...(status && { status: status as any }),
       ...(leadId && { leadId }),
       ...(isTemplate !== undefined && { isTemplate: isTemplate === 'true' }),
@@ -333,6 +344,10 @@ Write a proposal with 3–4 phases that map directly to the client's goals. Make
     const cleanContactId = body.contactId && body.contactId.trim() !== "" ? body.contactId.trim() : null;
     const cleanValidUntil = body.validUntil && !isNaN(Date.parse(body.validUntil)) ? new Date(body.validUntil) : null;
 
+    const user = (req as any).user;
+    const cookies = cookie.parse(req.headers.cookie || '');
+    const tenantId = user?.organizationId || cookies['echo_impersonate_tenant'] || null;
+
     const generatedToken = `prop_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
     const proposal = await app.prisma.proposal.create({
@@ -349,6 +364,7 @@ Write a proposal with 3–4 phases that map directly to the client's goals. Make
         taxRate: body.taxRate || 0,
         tax,
         totalAmount,
+        organizationId: tenantId,
         items: {
           create: body.items.map(item => ({
             description: item.description,
