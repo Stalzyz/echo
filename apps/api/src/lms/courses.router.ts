@@ -65,10 +65,16 @@ export default async function coursesRoutes(app: FastifyInstance) {
     }
   }, async (req, reply) => {
     const { name, code, description, duration, fee, thumbnail, outcomes, prerequisites } = req.body;
+    const user = (req as any).user;
+    const cookies = cookie.parse(req.headers.cookie || '');
+    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
+    const tenantId = (user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin')
+      ? (impersonatedTenantId || null)
+      : (user?.organizationId || null);
 
-    // Create the base Course record
+    // Create the base Course record scoped to tenant
     const baseCourse = await server.prisma.course.create({
-      data: { name, code, description, duration, fee }
+      data: { name, code, description, duration, fee, organizationId: tenantId || null }
     });
 
     // Then create the LMS layer on top
@@ -102,10 +108,20 @@ export default async function coursesRoutes(app: FastifyInstance) {
       })
     }
   }, async (req, reply) => {
-    // If we want to update the base course fields (name, description, fee)
-    // we need to fetch the lmsCourse first to get the courseId
-    const existing = await server.prisma.lMSCourse.findUnique({ where: { id: req.params.id } });
+    const user = (req as any).user;
+    const cookies = cookie.parse(req.headers.cookie || '');
+    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
+    const isGlobalSuperAdmin = (user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin') && !impersonatedTenantId;
+    const tenantId = (user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin')
+      ? (impersonatedTenantId || null)
+      : (user?.organizationId || null);
+
+    const existing = await server.prisma.lMSCourse.findUnique({ where: { id: req.params.id }, include: { course: true } });
     if (!existing) return reply.status(404).send({ error: "Course not found" });
+
+    if (!isGlobalSuperAdmin && existing.course?.organizationId && existing.course?.organizationId !== tenantId) {
+      return reply.code(403).send({ error: "Forbidden: Access denied to course of another tenant" });
+    }
 
     const { name, code, description, fee, ...lmsData } = req.body;
     
@@ -241,12 +257,24 @@ export default async function coursesRoutes(app: FastifyInstance) {
   server.delete('/:id', {
     schema: { params: z.object({ id: z.string() }) }
   }, async (req, reply) => {
+    const user = (req as any).user;
+    const cookies = cookie.parse(req.headers.cookie || '');
+    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
+    const isGlobalSuperAdmin = (user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin') && !impersonatedTenantId;
+    const tenantId = (user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin')
+      ? (impersonatedTenantId || null)
+      : (user?.organizationId || null);
+
     const lmsCourseId = req.params.id;
     const lmsCourse = await server.prisma.lMSCourse.findUnique({
       where: { id: lmsCourseId },
-      include: { modules: { include: { lessons: true } } }
+      include: { course: true, modules: { include: { lessons: true } } }
     });
     if (!lmsCourse) return reply.status(404).send({ error: "Course not found" });
+
+    if (!isGlobalSuperAdmin && lmsCourse.course?.organizationId && lmsCourse.course?.organizationId !== tenantId) {
+      return reply.code(403).send({ error: "Forbidden: Access denied to course of another tenant" });
+    }
 
     const lessonIds = lmsCourse.modules.flatMap(m => m.lessons.map(l => l.id));
 

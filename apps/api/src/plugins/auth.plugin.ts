@@ -39,33 +39,25 @@ const authPlugin: FastifyPluginAsync = async (fastify, opts) => {
       let token = '';
       let detectedSalt = '';
 
-      for (const name of candidateCookies) {
-        if (cookies[name]) {
-          token = cookies[name];
-          detectedSalt = name;
-          break;
+      const authHeader = request.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7).trim();
+      }
+
+      if (!token) {
+        for (const name of candidateCookies) {
+          if (cookies[name]) {
+            token = cookies[name];
+            detectedSalt = name;
+            break;
+          }
         }
       }
 
       if (!token) {
-        let defaultAdmin: any = null;
-        try {
-          defaultAdmin = await fastify.prisma.user.findFirst({
-            where: { role: { in: ['SUPER_ADMIN', 'STAFF'] } }
-          });
-        } catch {}
-
-        request.user = {
-          id: defaultAdmin?.id || 'dev-admin-id',
-          email: defaultAdmin?.email || 'admin@echolms.com',
-          name: defaultAdmin ? `${defaultAdmin.firstName || ''} ${defaultAdmin.lastName || ''}`.trim() || 'Academy Admin' : 'Academy Admin',
-          role: defaultAdmin?.role || 'SUPER_ADMIN'
-        };
-        return;
+        return reply.code(401).send({ error: 'Unauthorized', message: 'Authentication required' });
       }
 
-      request.log.info(`[Auth] Token received for salt ${detectedSalt}.`);
-      
       const secretsToTry = [
         process.env.AUTH_SECRET,
         process.env.NEXTAUTH_SECRET,
@@ -89,28 +81,13 @@ const authPlugin: FastifyPluginAsync = async (fastify, opts) => {
           try {
             decoded = await decode({ token, secret: s, salt });
           } catch (e) {
-            request.log.error(`[Auth] Decode failed with secret length ${s?.length} and salt ${salt}: ${e}`);
+            // continue trying other secrets/salts
           }
         }
       }
 
       if (!decoded) {
-        let defaultAdmin: any = null;
-        try {
-          defaultAdmin = await fastify.prisma.user.findFirst({
-            where: { role: { in: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] } }
-          });
-        } catch {}
-
-        const impersonatedTenantId = cookies['echo_impersonate_tenant'];
-        request.user = {
-          id: defaultAdmin?.id || 'dev-admin-id',
-          email: defaultAdmin?.email || 'admin@echolms.com',
-          name: defaultAdmin ? `${defaultAdmin.firstName || ''} ${defaultAdmin.lastName || ''}`.trim() || 'Academy Admin' : 'Academy Admin',
-          role: defaultAdmin?.role || 'SUPER_ADMIN',
-          organizationId: impersonatedTenantId || defaultAdmin?.organizationId || null
-        } as any;
-        return;
+        return reply.code(401).send({ error: 'Unauthorized', message: 'Invalid or expired authentication session' });
       }
 
       const decodedAny = decoded as any;
@@ -135,37 +112,27 @@ const authPlugin: FastifyPluginAsync = async (fastify, opts) => {
         } catch {}
       }
 
-      const effectiveRole = dbUser?.role || decodedAny?.role || 'ADMIN';
-      const effectiveOrgId = (effectiveRole === 'SUPER_ADMIN' && impersonatedTenantId)
-        ? impersonatedTenantId
-        : (dbUser?.organizationId || decodedAny?.organizationId || decodedAny?.tenantId || impersonatedTenantId || null);
+      const effectiveRole = dbUser?.role || decodedAny?.role || 'STUDENT';
+      
+      // CRITICAL SECURITY RULE: Only SUPER_ADMIN can impersonate a tenant!
+      // For any other role, they are strictly bound to their own DB organizationId!
+      let effectiveOrgId: string | null = null;
+      if (effectiveRole === 'SUPER_ADMIN') {
+        effectiveOrgId = impersonatedTenantId || null;
+      } else {
+        effectiveOrgId = dbUser?.organizationId || decodedAny?.organizationId || null;
+      }
 
       request.user = {
-        id: dbUser?.id || userId || 'dev-admin-id',
-        email: dbUser?.email || decodedAny?.email || 'admin@echolms.com',
-        name: dbUser ? `${dbUser.firstName} ${dbUser.lastName}` : (decodedAny?.name || 'Academy Admin'),
+        id: dbUser?.id || userId || 'unknown-user',
+        email: dbUser?.email || decodedAny?.email || '',
+        name: dbUser ? `${dbUser.firstName} ${dbUser.lastName}`.trim() : (decodedAny?.name || 'User'),
         role: effectiveRole,
         organizationId: effectiveOrgId
       } as any;
     } catch (err) {
       request.log.error(err);
-      const parsedCookies = cookie.parse(request.headers.cookie || '');
-      let defaultAdmin: any = null;
-      try {
-        defaultAdmin = await fastify.prisma.user.findFirst({
-          where: { role: { in: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] } }
-        });
-      } catch {}
-
-      const impersonatedTenantId = parsedCookies['echo_impersonate_tenant'];
-      request.user = {
-        id: defaultAdmin?.id || 'dev-admin-id',
-        email: defaultAdmin?.email || 'admin@echolms.com',
-        name: defaultAdmin ? `${defaultAdmin.firstName || ''} ${defaultAdmin.lastName || ''}`.trim() || 'Academy Admin' : 'Academy Admin',
-        role: defaultAdmin?.role || 'SUPER_ADMIN',
-        organizationId: impersonatedTenantId || defaultAdmin?.organizationId || null
-      } as any;
-      return;
+      return reply.code(401).send({ error: 'Unauthorized', message: 'Authentication failure' });
     }
   });
 

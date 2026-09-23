@@ -209,9 +209,20 @@ export default async function leadsRouter(app: FastifyInstance) {
   // PATCH /api/v1/crm/leads/:id — update lead / move stage
   app.patch('/leads/:id', async (req, reply) => {
     const { id } = req.params as { id: string };
+    const user = (req as any).user;
+    const cookies = cookie.parse(req.headers.cookie || '');
+    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
+    const isGlobalSuperAdmin = (user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin') && !impersonatedTenantId;
+    const tenantId = (user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin')
+      ? (impersonatedTenantId || null)
+      : (user?.organizationId || null);
     
     const originalLead = await app.prisma.lead.findUnique({ where: { id } });
     if (!originalLead) return reply.notFound('Lead not found');
+
+    if (!isGlobalSuperAdmin && originalLead.organizationId && originalLead.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to lead of another tenant' });
+    }
 
     const body = UpdateLeadSchema.parse(req.body);
     const score = calculateScore(
@@ -252,6 +263,21 @@ export default async function leadsRouter(app: FastifyInstance) {
   // DELETE /api/v1/crm/leads/:id
   app.delete('/leads/:id', async (req, reply) => {
     const { id } = req.params as { id: string };
+    const user = (req as any).user;
+    const cookies = cookie.parse(req.headers.cookie || '');
+    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
+    const isGlobalSuperAdmin = (user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin') && !impersonatedTenantId;
+    const tenantId = (user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin')
+      ? (impersonatedTenantId || null)
+      : (user?.organizationId || null);
+
+    const originalLead = await app.prisma.lead.findUnique({ where: { id } });
+    if (!originalLead) return reply.notFound('Lead not found');
+
+    if (!isGlobalSuperAdmin && originalLead.organizationId && originalLead.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to lead of another tenant' });
+    }
+
     await app.prisma.lead.delete({ where: { id } });
     reply.code(204);
   });

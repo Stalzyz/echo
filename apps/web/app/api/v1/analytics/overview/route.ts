@@ -59,9 +59,13 @@ export async function GET() {
 
     // 5. Fetch Organization details for branding header
     let organizationName = "Echo LMS"
-    if (session.user.organizationId) {
+    const targetOrgId = (tenantFilter.organizationId && tenantFilter.organizationId !== '__NO_ACCESS__')
+      ? tenantFilter.organizationId
+      : session.user.organizationId
+
+    if (targetOrgId) {
       const org = await prisma.organization.findUnique({
-        where: { id: session.user.organizationId },
+        where: { id: targetOrgId },
         select: { name: true }
       })
       if (org?.name) organizationName = org.name
@@ -69,7 +73,7 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      tenantId: session.user.organizationId || null,
+      tenantId: targetOrgId || null,
       organizationName,
       metrics: {
         revenueCollected: totalRevenue,

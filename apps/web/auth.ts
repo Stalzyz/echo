@@ -41,23 +41,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         });
         
         if (!user) {
-          // Fallback to super admin if specified email is not found
-          const adminUser = await prisma.user.findFirst({
-            where: { role: 'SUPER_ADMIN' },
-            include: { customRole: { include: { permissions: true } } }
-          });
-          if (adminUser) {
-            return {
-              id: adminUser.id,
-              name: `${adminUser.firstName} ${adminUser.lastName}`,
-              email: adminUser.email,
-              role: adminUser.role,
-              organizationId: adminUser.organizationId,
-              tenantId: adminUser.organizationId,
-              customRole: adminUser.customRole ? adminUser.customRole.name : null,
-              permissions: adminUser.customRole ? adminUser.customRole.permissions.map(p => p.resource) : []
-            };
-          }
           return null;
         }
 

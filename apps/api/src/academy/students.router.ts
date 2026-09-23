@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
+import * as cookie from 'cookie';
 
 const CreateStudentSchema = z.object({
   firstName: z.string().min(1),
@@ -21,11 +22,31 @@ const CreateStudentSchema = z.object({
 });
 
 export default async function studentsRouter(app: FastifyInstance) {
+  // Helper to extract active tenant
+  const getTenantContext = (req: any) => {
+    const user = req.user;
+    const cookies = cookie.parse(req.headers.cookie || '');
+    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
+    const isGlobalSuperAdmin = (user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin') && !impersonatedTenantId;
+    const tenantId = (user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin')
+      ? (impersonatedTenantId || null)
+      : (user?.organizationId || null);
+
+    return { user, tenantId, isGlobalSuperAdmin };
+  };
+
   // GET /api/v1/academy/students
   app.get('/students', async (req, reply) => {
     const { isAlumni, deliveryMode } = req.query as { isAlumni?: string, deliveryMode?: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
+    const orgFilter = isGlobalSuperAdmin
+      ? {}
+      : { user: { organizationId: tenantId || '__NO_ACCESS__' } };
     
-    let whereClause: any = {};
+    let whereClause: any = {
+      ...orgFilter
+    };
     if (isAlumni === 'true') whereClause.isAlumni = true;
     if (isAlumni === 'false') whereClause.isAlumni = false;
     if (deliveryMode) whereClause.deliveryMode = deliveryMode;
@@ -33,7 +54,7 @@ export default async function studentsRouter(app: FastifyInstance) {
     const students = await app.prisma.student.findMany({
       where: whereClause,
       include: {
-        user: { select: { firstName: true, lastName: true, email: true, phone: true, avatarUrl: true } },
+        user: { select: { firstName: true, lastName: true, email: true, phone: true, avatarUrl: true, organizationId: true } },
         enrollments: { 
           include: { batch: { select: { name: true, course: { select: { name: true } } } } } 
         },
@@ -46,6 +67,8 @@ export default async function studentsRouter(app: FastifyInstance) {
   // GET /api/v1/academy/students/:id
   app.get('/students/:id', async (req, reply) => {
     const { id } = req.params as { id: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
     const student = await app.prisma.student.findUnique({
       where: { id },
       include: {
@@ -55,12 +78,18 @@ export default async function studentsRouter(app: FastifyInstance) {
       },
     });
     if (!student) return reply.notFound('Student not found');
+
+    if (!isGlobalSuperAdmin && student.user?.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to student of another tenant' });
+    }
+
     return student;
   });
 
   // POST /api/v1/academy/students
   app.post('/students', async (req, reply) => {
     const body = CreateStudentSchema.parse(req.body);
+    const { tenantId } = getTenantContext(req);
     
     const cleanBatchId = body.batchId && body.batchId.trim() !== '' ? body.batchId : undefined;
     const cleanDob = body.dateOfBirth && body.dateOfBirth.trim() !== '' ? new Date(body.dateOfBirth) : undefined;
@@ -80,6 +109,7 @@ export default async function studentsRouter(app: FastifyInstance) {
             firstName: body.firstName,
             lastName: body.lastName,
             phone: body.phone || undefined,
+            organizationId: tenantId || null,
           }
         });
       }
@@ -144,6 +174,8 @@ export default async function studentsRouter(app: FastifyInstance) {
   // PATCH /api/v1/academy/students/:id
   app.patch('/students/:id', async (req, reply) => {
     const { id } = req.params as { id: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
     const schema = z.object({
       address: z.string().optional(),
       parentName: z.string().optional(),
@@ -161,6 +193,10 @@ export default async function studentsRouter(app: FastifyInstance) {
     const student = await app.prisma.$transaction(async (tx) => {
       const existingStudent = await tx.student.findUnique({ where: { id }, include: { user: true } });
       if (!existingStudent) throw new Error("Student not found");
+
+      if (!isGlobalSuperAdmin && existingStudent.user?.organizationId !== tenantId) {
+        throw new Error("Unauthorized to modify student of another tenant");
+      }
 
       // Update User if needed
       if (body.firstName || body.lastName || body.phone) {
@@ -192,7 +228,6 @@ export default async function studentsRouter(app: FastifyInstance) {
 
       // Update batch if provided
       if (body.batchId) {
-        // Find existing active enrollment
         const activeEnrollment = await tx.enrollment.findFirst({
           where: { studentId: id, status: 'ACTIVE' }
         });
@@ -200,12 +235,10 @@ export default async function studentsRouter(app: FastifyInstance) {
         const batch = await tx.batch.findUnique({ where: { id: body.batchId }, include: { course: true } });
         
         if (activeEnrollment && activeEnrollment.batchId !== body.batchId) {
-          // Drop existing
           await tx.enrollment.update({
             where: { id: activeEnrollment.id },
             data: { status: 'DROPPED' }
           });
-          // Create new
           await tx.enrollment.create({
             data: { studentId: id, batchId: body.batchId, status: 'ACTIVE', totalFee: batch?.course?.fee || 0 }
           });

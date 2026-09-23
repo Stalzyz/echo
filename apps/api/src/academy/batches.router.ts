@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
+import * as cookie from 'cookie';
 
 const CreateBatchSchema = z.object({
   courseId: z.string().min(1),
@@ -13,12 +14,31 @@ const CreateBatchSchema = z.object({
 });
 
 export default async function batchesRouter(app: FastifyInstance) {
+  // Helper to extract active tenant
+  const getTenantContext = (req: any) => {
+    const user = req.user;
+    const cookies = cookie.parse(req.headers.cookie || '');
+    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
+    const isGlobalSuperAdmin = (user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin') && !impersonatedTenantId;
+    const tenantId = (user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin')
+      ? (impersonatedTenantId || null)
+      : (user?.organizationId || null);
+
+    return { user, tenantId, isGlobalSuperAdmin };
+  };
 
   // GET /api/v1/academy/batches
   app.get('/batches', async (req, reply) => {
     const { isActive, courseId } = req.query as { isActive?: string; courseId?: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
+    const orgFilter = isGlobalSuperAdmin
+      ? {}
+      : { organizationId: tenantId || '__NO_ACCESS__' };
     
-    let whereClause: any = {};
+    let whereClause: any = {
+      ...orgFilter
+    };
     if (isActive === 'true') whereClause.isActive = true;
     if (isActive === 'false') whereClause.isActive = false;
     if (courseId) whereClause.courseId = courseId;
@@ -38,6 +58,8 @@ export default async function batchesRouter(app: FastifyInstance) {
   // GET /api/v1/academy/batches/:id
   app.get('/batches/:id', async (req, reply) => {
     const { id } = req.params as { id: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
     const batch = await app.prisma.batch.findUnique({
       where: { id },
       include: {
@@ -48,6 +70,10 @@ export default async function batchesRouter(app: FastifyInstance) {
       },
     });
     if (!batch) return reply.notFound('Batch not found');
+
+    if (!isGlobalSuperAdmin && batch.organizationId && batch.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to batch of another tenant' });
+    }
     
     const accessDays = (batch as any).recordingAccessDays || 7;
     const now = new Date();
@@ -74,6 +100,8 @@ export default async function batchesRouter(app: FastifyInstance) {
   // POST /api/v1/academy/batches
   app.post('/batches', async (req, reply) => {
     const body = CreateBatchSchema.parse(req.body);
+    const { tenantId } = getTenantContext(req);
+
     const batch = await app.prisma.batch.create({
       data: {
         courseId: body.courseId,
@@ -83,6 +111,7 @@ export default async function batchesRouter(app: FastifyInstance) {
         educatorId: body.educatorId || undefined,
         startDate: new Date(body.startDate),
         endDate: new Date(body.endDate),
+        organizationId: tenantId || null,
       },
     });
     reply.code(201);
@@ -93,9 +122,14 @@ export default async function batchesRouter(app: FastifyInstance) {
   app.post('/batches/:id/auto-schedule', async (req, reply) => {
     const { id } = req.params as { id: string };
     const { daysCount = 45, defaultMeetLink } = req.body as { daysCount?: number; defaultMeetLink?: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
     
     const batch = await app.prisma.batch.findUnique({ where: { id } });
     if (!batch) return reply.notFound('Batch not found');
+
+    if (!isGlobalSuperAdmin && batch.organizationId && batch.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to batch of another tenant' });
+    }
 
     const startDate = new Date(batch.startDate);
     const createdSessions: any[] = [];
@@ -125,6 +159,15 @@ export default async function batchesRouter(app: FastifyInstance) {
   // PATCH /api/v1/academy/batches/:id
   app.patch('/batches/:id', async (req, reply) => {
     const { id } = req.params as { id: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
+    const existing = await app.prisma.batch.findUnique({ where: { id } });
+    if (!existing) return reply.notFound('Batch not found');
+
+    if (!isGlobalSuperAdmin && existing.organizationId && existing.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to batch of another tenant' });
+    }
+
     const schema = CreateBatchSchema.partial().extend({ isActive: z.boolean().optional() });
     const body = schema.parse(req.body);
     const batch = await app.prisma.batch.update({
@@ -143,9 +186,34 @@ export default async function batchesRouter(app: FastifyInstance) {
     return batch;
   });
 
+  // DELETE /api/v1/academy/batches/:id
+  app.delete('/batches/:id', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
+    const existing = await app.prisma.batch.findUnique({ where: { id } });
+    if (!existing) return reply.notFound('Batch not found');
+
+    if (!isGlobalSuperAdmin && existing.organizationId && existing.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to batch of another tenant' });
+    }
+
+    await app.prisma.batch.delete({ where: { id } });
+    return reply.code(204).send();
+  });
+
   // POST /api/v1/academy/batches/:id/sessions
   app.post('/batches/:id/sessions', async (req, reply) => {
     const { id } = req.params as { id: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
+    const batch = await app.prisma.batch.findUnique({ where: { id } });
+    if (!batch) return reply.notFound('Batch not found');
+
+    if (!isGlobalSuperAdmin && batch.organizationId && batch.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to batch of another tenant' });
+    }
+
     const SessionSchema = z.object({
       title: z.string().min(1),
       description: z.string().optional(),
@@ -214,14 +282,24 @@ export default async function batchesRouter(app: FastifyInstance) {
 
   // GET /api/v1/academy/batches/sessions/upcoming
   app.get('/batches/sessions/upcoming', async (req, reply) => {
-    const user = await app.prisma.user.findFirst({ where: { role: 'STUDENT' } });
-    if (!user) return { data: [] };
+    const { user, tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+    
+    // Find students belonging to current tenant
+    const orgFilter = isGlobalSuperAdmin
+      ? {}
+      : { user: { organizationId: tenantId || '__NO_ACCESS__' } };
 
-    const student = await app.prisma.student.findUnique({ where: { userId: user.id } });
-    if (!student) return { data: [] };
+    const students = await app.prisma.student.findMany({
+      where: orgFilter,
+      select: { id: true }
+    });
+
+    if (students.length === 0) return { data: [] };
+
+    const studentIds = students.map(s => s.id);
 
     const enrollments = await app.prisma.enrollment.findMany({
-      where: { studentId: student.id },
+      where: { studentId: { in: studentIds } },
       select: { batchId: true }
     });
 
@@ -242,4 +320,3 @@ export default async function batchesRouter(app: FastifyInstance) {
     return { data: sessions };
   });
 }
-
