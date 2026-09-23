@@ -67,6 +67,7 @@ model User {
   ForumPost     ForumPost[]
   ForumReply    ForumReply[]
   OfficeHour    OfficeHour[]
+  callRecords   CallRecord[]
 
   // Chat Relations
   chatParticipants ChatParticipant[] @relation("UserChatParticipants")
@@ -330,6 +331,7 @@ model Lead {
   proposals  Proposal[]
   clientMeetings ClientMeeting[]
   commissions Commission[]
+  callRecords CallRecord[]
   referredBy Employee? @relation(fields: [referredById], references: [id])
 
   @@index([status])
@@ -348,6 +350,72 @@ model LeadActivity {
   lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
 
   @@map("lead_activities")
+}
+
+enum CallDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum CallStatus {
+  CONNECTED
+  MISSED
+  BUSY
+  NO_ANSWER
+  FAILED
+}
+
+enum LeadTemperature {
+  HOT
+  WARM
+  COLD
+}
+
+model CallRecord {
+  id              String         @id @default(cuid())
+  leadId          String?
+  counsellorId    String
+  direction       CallDirection  @default(OUTBOUND)
+  status          CallStatus     @default(CONNECTED)
+  durationSeconds Int            @default(0)
+  startedAt       DateTime       @default(now())
+  endedAt         DateTime?
+  recordingUrl    String?
+  consentGiven    Boolean        @default(true)
+  transcriptText  String?        @db.Text
+  transcriptJson  Json?
+  notes           String?        @db.Text
+  createdAt       DateTime       @default(now())
+
+  lead            Lead?          @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  counsellor      User           @relation(fields: [counsellorId], references: [id])
+  intelligence    CallIntelligence?
+
+  @@index([leadId])
+  @@index([counsellorId])
+  @@index([startedAt])
+  @@map("call_records")
+}
+
+model CallIntelligence {
+  id                     String          @id @default(cuid())
+  callRecordId           String          @unique
+  summary                String          @db.Text
+  intent                 String          @default("INFORMATION_SEEKING")
+  temperature            LeadTemperature @default(WARM)
+  score                  Int             @default(50)
+  scoreBreakdown         Json
+  requirements           Json
+  objections             Json
+  questionsAsked         Json
+  counsellorFeedback     Json
+  missedOpportunityRisks Json
+  suggestedFollowup      Json
+  createdAt              DateTime        @default(now())
+
+  callRecord             CallRecord      @relation(fields: [callRecordId], references: [id], onDelete: Cascade)
+
+  @@map("call_intelligences")
 }
 
 model Company {

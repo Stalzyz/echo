@@ -38,6 +38,7 @@ import {
   Cpu,
   BarChart3,
   LogOut,
+  Phone,
 } from "lucide-react";
 
 interface SidebarItem {
@@ -85,6 +86,11 @@ const sidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
         title: "Admissions CRM",
         href: "/dashboard/academy/admissions",
         icon: Users,
+      },
+      {
+        title: "Call Intelligence",
+        href: "/dashboard/academy/calls",
+        icon: Phone,
       },
       {
         title: "Form Builder",
