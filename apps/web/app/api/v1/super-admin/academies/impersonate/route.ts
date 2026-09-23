@@ -13,9 +13,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized. Super Admin access required." }, { status: 403 })
     }
 
-    const { academyId } = await req.json()
+    const body = await req.json()
+    const academyId = body.academyId || body.organizationId
     if (!academyId) {
-      return NextResponse.json({ error: "Academy ID is required" }, { status: 400 })
+      return NextResponse.json({ error: "Academy ID or organizationId is required" }, { status: 400 })
     }
 
     const organization = await prisma.organization.findUnique({
