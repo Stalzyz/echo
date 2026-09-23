@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   try {
     const session = await auth()
     const userRole = session?.user?.role
-    const isSuperAdmin = userRole === 'SUPER_ADMIN' || userRole === 'Super Admin'
+    const isSuperAdmin = userRole === 'SUPER_ADMIN' || userRole === 'Super Admin' || session?.user?.impersonatedBySuperAdmin
 
     if (!session?.user || !isSuperAdmin) {
       return NextResponse.json({ error: "Unauthorized. Super Admin access required." }, { status: 403 })
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
       where: { id: academyId },
       include: {
         users: {
-          where: { role: 'ADMIN' }
+          where: { OR: [{ role: 'ADMIN' }, { role: 'MANAGER' }] }
         }
       }
     })
