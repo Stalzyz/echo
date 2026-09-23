@@ -162,29 +162,57 @@ export function ClickToCallModal({ isOpen, onClose, lead, onCallEnded }: ClickTo
     }
   }
 
-  const stopMicrophoneAndRecorder = () => {
-    if (animFrameRef.current) {
-      cancelAnimationFrame(animFrameRef.current)
-      animFrameRef.current = null
-    }
+  const stopMicrophoneAndRecorder = (): Promise<Blob | null> => {
+    return new Promise((resolve) => {
+      if (animFrameRef.current) {
+        cancelAnimationFrame(animFrameRef.current)
+        animFrameRef.current = null
+      }
 
-    if (audioContextRef.current && audioContextRef.current.state !== "closed") {
-      audioContextRef.current.close().catch(() => {})
-      audioContextRef.current = null
-    }
+      if (audioContextRef.current && audioContextRef.current.state !== "closed") {
+        audioContextRef.current.close().catch(() => {})
+        audioContextRef.current = null
+      }
 
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
-      try {
-        mediaRecorderRef.current.stop()
-      } catch (e) {}
-    }
+      const recorder = mediaRecorderRef.current
+      if (recorder && recorder.state !== "inactive") {
+        recorder.onstop = () => {
+          if (audioChunksRef.current.length > 0) {
+            const mimeType = recorder.mimeType || "audio/webm"
+            resolve(new Blob(audioChunksRef.current, { type: mimeType }))
+          } else {
+            resolve(null)
+          }
+        }
+        try {
+          if (recorder.state === "recording") {
+            recorder.requestData()
+          }
+          recorder.stop()
+        } catch (e) {
+          if (audioChunksRef.current.length > 0) {
+            const mimeType = recorder.mimeType || "audio/webm"
+            resolve(new Blob(audioChunksRef.current, { type: mimeType }))
+          } else {
+            resolve(null)
+          }
+        }
+      } else {
+        if (audioChunksRef.current.length > 0) {
+          const mimeType = recorder?.mimeType || "audio/webm"
+          resolve(new Blob(audioChunksRef.current, { type: mimeType }))
+        } else {
+          resolve(null)
+        }
+      }
 
-    if (mediaStreamRef.current) {
-      mediaStreamRef.current.getTracks().forEach(track => track.stop())
-      mediaStreamRef.current = null
-    }
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach(track => track.stop())
+        mediaStreamRef.current = null
+      }
 
-    setIsRecordingActive(false)
+      setIsRecordingActive(false)
+    })
   }
 
   const toggleMute = () => {
@@ -210,30 +238,27 @@ export function ClickToCallModal({ isOpen, onClose, lead, onCallEnded }: ClickTo
       setIsSubmitting(true)
       const statusToUse = overrideStatus || callStatus
 
-      // Stop recorder and collect final audio blob
-      stopMicrophoneAndRecorder()
+      // Stop recorder and collect final audio blob via Promise
+      const audioBlob = await stopMicrophoneAndRecorder()
 
       let recordingUrl: string | null = null
 
-      // Upload recorded audio if chunks exist
-      if (audioChunksRef.current.length > 0 && statusToUse === "CONNECTED") {
+      // Upload recorded audio if blob exists
+      if (audioBlob && audioBlob.size > 100 && statusToUse === "CONNECTED") {
         try {
-          const mimeType = mediaRecorderRef.current?.mimeType || "audio/webm"
-          const audioBlob = new Blob(audioChunksRef.current, { type: mimeType })
-          
-          if (audioBlob.size > 1000) { // Only upload if audio captured
-            const uploadFormData = new FormData()
-            uploadFormData.append("file", audioBlob, `call_${Date.now()}.webm`)
-            uploadFormData.append("callId", `call_${lead.id}`)
+          const mimeType = audioBlob.type || "audio/webm"
+          const ext = mimeType.includes("mp4") ? "mp4" : mimeType.includes("ogg") ? "ogg" : "webm"
+          const uploadFormData = new FormData()
+          uploadFormData.append("file", audioBlob, `call_${Date.now()}.${ext}`)
+          uploadFormData.append("callId", `call_${lead.id}`)
 
-            const uploadRes = await fetch("/api/v1/calls/upload", {
-              method: "POST",
-              body: uploadFormData
-            })
-            const uploadData = await uploadRes.json()
-            if (uploadRes.ok && uploadData.recordingUrl) {
-              recordingUrl = uploadData.recordingUrl
-            }
+          const uploadRes = await fetch("/api/v1/calls/upload", {
+            method: "POST",
+            body: uploadFormData
+          })
+          const uploadData = await uploadRes.json()
+          if (uploadRes.ok && uploadData.recordingUrl) {
+            recordingUrl = uploadData.recordingUrl
           }
         } catch (uploadErr) {
           console.error("Audio recording upload error:", uploadErr)
