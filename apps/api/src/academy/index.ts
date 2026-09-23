@@ -1,4 +1,5 @@
 import { FastifyInstance } from 'fastify';
+import * as cookie from 'cookie';
 import admissionsRouter from './admissions.router';
 import educatorsRouter from './educators.router';
 import studentsRouter from './students.router';
@@ -28,6 +29,24 @@ import officeHoursRouter from './office-hours.router';
 import lmsStudentRoutes from './lms-student.router';
 
 export default async function academyModule(app: FastifyInstance) {
+  // Populate authenticated user context for all academy module routes
+  app.addHook('preHandler', async (req, reply) => {
+    const cookies = cookie.parse(req.headers.cookie || '');
+    const hasToken = req.headers.authorization || 
+      cookies['__Secure-authjs.session-token'] || 
+      cookies['authjs.session-token'] || 
+      cookies['__Secure-next-auth.session-token'] || 
+      cookies['next-auth.session-token'];
+
+    if (hasToken) {
+      try {
+        await app.requireAuth(req, reply);
+      } catch (e) {
+        // Allow unauthenticated requests for public kiosk/forms endpoints
+      }
+    }
+  });
+
   await app.register(admissionsRouter);
   await app.register(educatorsRouter);
 
