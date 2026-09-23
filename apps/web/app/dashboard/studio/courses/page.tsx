@@ -38,8 +38,8 @@ export default function OnsiteCoursesPage() {
         method: "POST",
         body: JSON.stringify({
           ...createForm,
-          courseFee: parseFloat(createForm.courseFee),
-          capacity: parseInt(createForm.capacity),
+          courseFee: parseFloat(createForm.courseFee) || 0,
+          capacity: parseInt(createForm.capacity, 10) || 20,
           startDate: createForm.startDate ? new Date(createForm.startDate).toISOString() : new Date().toISOString(),
           endDate: createForm.endDate ? new Date(createForm.endDate).toISOString() : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
         })

@@ -55,6 +55,107 @@ export default async function batchesRouter(app: FastifyInstance) {
     return { data: batches, total: batches.length };
   });
 
+  // POST /api/v1/academy/batches/with-course — Create a Course, LMSCourse, and Batch in one transaction
+  app.post('/batches/with-course', async (req, reply) => {
+    const schema = z.object({
+      courseName: z.string().min(1),
+      courseCode: z.string().min(1),
+      courseDuration: z.string().optional().default('3 Months'),
+      courseFee: z.union([z.number(), z.string()]).optional().transform(v => typeof v === 'string' ? parseFloat(v) || 0 : (v || 0)),
+      batchName: z.string().optional(),
+      batchType: z.string().optional().default('MORNING'),
+      startDate: z.string().optional(),
+      endDate: z.string().optional(),
+      capacity: z.union([z.number(), z.string()]).optional().transform(v => typeof v === 'string' ? parseInt(v, 10) || 20 : (v || 20)),
+      educatorId: z.string().optional(),
+    });
+
+    const body = schema.parse(req.body);
+    const { tenantId } = getTenantContext(req);
+
+    try {
+      const result = await app.prisma.$transaction(async (tx) => {
+        // 1. Create or find base course scoped to tenant
+        let course = await tx.course.findFirst({
+          where: {
+            code: body.courseCode,
+            organizationId: tenantId || null,
+          }
+        });
+
+        if (!course) {
+          course = await tx.course.create({
+            data: {
+              name: body.courseName,
+              code: body.courseCode,
+              duration: body.courseDuration || '3 Months',
+              fee: body.courseFee,
+              isPublished: true,
+              organizationId: tenantId || null,
+            }
+          });
+        }
+
+        // 2. Ensure LMS Course exists for curriculum builder & catalog
+        const existingLms = await tx.lMSCourse.findUnique({
+          where: { courseId: course.id }
+        });
+        if (!existingLms) {
+          await tx.lMSCourse.create({
+            data: {
+              courseId: course.id,
+              isPublished: true,
+              draftStatus: 'PUBLISHED',
+            }
+          });
+        }
+
+        // 3. Parse dates safely
+        const start = body.startDate ? new Date(body.startDate) : new Date();
+        const end = body.endDate ? new Date(body.endDate) : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
+        const validStart = isNaN(start.getTime()) ? new Date() : start;
+        const validEnd = isNaN(end.getTime()) ? new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) : end;
+
+        // 4. Create batch
+        const batchName = body.batchName?.trim() || `${body.courseName} - Batch 1`;
+        const batch = await tx.batch.create({
+          data: {
+            courseId: course.id,
+            name: batchName,
+            type: body.batchType || 'MORNING',
+            startDate: validStart,
+            endDate: validEnd,
+            capacity: body.capacity || 20,
+            educatorId: body.educatorId || undefined,
+            organizationId: tenantId || null,
+          },
+          include: {
+            course: { select: { name: true, code: true } },
+            educator: { select: { user: { select: { firstName: true, lastName: true, email: true } } } },
+            _count: { select: { enrollments: true, sessions: true } },
+          }
+        });
+
+        return batch;
+      });
+
+      reply.code(201);
+      return result;
+    } catch (err: any) {
+      if (err.code === 'P2002') {
+        return reply.code(400).send({
+          error: 'BadRequest',
+          message: `Course code "${body.courseCode}" already exists in your academy.`
+        });
+      }
+      app.log.error(err, 'Failed to create course with batch');
+      return reply.code(500).send({
+        error: 'InternalServerError',
+        message: err.message || 'Failed to create course and batch'
+      });
+    }
+  });
+
   // GET /api/v1/academy/batches/:id
   app.get('/batches/:id', async (req, reply) => {
     const { id } = req.params as { id: string };
