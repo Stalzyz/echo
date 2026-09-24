@@ -32,8 +32,18 @@ export const authConfig = {
       }
 
       if (isOnDashboard || isOnPortal || isOnStudent) {
-        if (isLoggedIn) return true
-        return false // Redirect unauthenticated users to login page
+        if (!isLoggedIn) return false
+
+        const user = auth?.user as any
+        const role = user?.role
+        const isSuperAdmin = (role === 'SUPER_ADMIN' || role === 'Super Admin') && !user?.impersonatedBySuperAdmin
+
+        // Super Admin without active impersonation belongs strictly in Platform Control Plane
+        if (isSuperAdmin && !isOnSuperAdmin) {
+          return Response.redirect(new URL('/dashboard/super-admin', nextUrl))
+        }
+
+        return true
       } else if (isLoggedIn) {
         if (
           nextUrl.pathname.startsWith('/auth/login') ||

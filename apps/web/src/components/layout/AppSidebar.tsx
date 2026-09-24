@@ -323,11 +323,18 @@ export function AppSidebar() {
   const plan = usePlan();
 
   const activeGroups =
-    pathname?.startsWith("/dashboard/super-admin")
+    isSuperAdminPlatform || pathname?.startsWith("/dashboard/super-admin")
       ? superAdminSidebarGroups
       : sidebarGroups.map(g => ({
           ...g,
-          items: g.items.filter(item => !item.requiredModule || plan.hasFeature(item.requiredModule))
+          items: g.items.filter(item => {
+            if (item.requiredModule && !plan.hasFeature(item.requiredModule)) return false;
+            if (org?.enabledModules && Array.isArray(org.enabledModules)) {
+              const key = item.requiredModule || item.title.toLowerCase().replace(/[^a-z0-9]/g, "_");
+              return org.enabledModules.includes(key) || org.enabledModules.includes(item.title);
+            }
+            return true;
+          })
         })).filter(g => g.items.length > 0);
 
   const orgName = isSuperAdminPlatform
