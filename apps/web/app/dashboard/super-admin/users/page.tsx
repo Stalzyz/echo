@@ -20,9 +20,29 @@ interface UserRecord {
 
 export default function PlatformUsersPage() {
   const [users, setUsers] = useState<UserRecord[]>([])
+  const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [roleFilter, setRoleFilter] = useState("ALL")
   const [selectedUser, setSelectedUser] = useState<UserRecord | null>(null)
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true)
+      const res = await fetch("/api/v1/super-admin/users")
+      if (res.ok) {
+        const json = await res.json()
+        setUsers(json.users || [])
+      }
+    } catch (err) {
+      console.error("Error fetching users:", err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchUsers()
+  }, [])
 
   const filteredUsers = users.filter(u => {
     const matchesSearch = u.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -32,15 +52,23 @@ export default function PlatformUsersPage() {
     return matchesSearch && matchesRole
   })
 
-  const toggleUserStatus = (id: string) => {
-    setUsers(prev => prev.map(u => {
-      if (u.id === id) {
-        const nextStatus = u.status === "SUSPENDED" ? "ACTIVE" : "SUSPENDED"
-        toast.success(`User ${u.name} status changed to ${nextStatus}`)
-        return { ...u, status: nextStatus }
+  const toggleUserStatus = async (id: string, currentStatus: string, name: string) => {
+    const nextStatus = currentStatus === "SUSPENDED" ? "ACTIVE" : "SUSPENDED"
+    try {
+      const res = await fetch("/api/v1/super-admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: id, status: nextStatus })
+      })
+      if (res.ok) {
+        toast.success(`User ${name} status updated to ${nextStatus}`)
+        fetchUsers()
+      } else {
+        toast.error("Failed to update status")
       }
-      return u
-    }))
+    } catch (err) {
+      toast.error("Error updating user status")
+    }
   }
 
   return (
@@ -153,7 +181,7 @@ export default function PlatformUsersPage() {
                       </button>
 
                       <button 
-                        onClick={() => toggleUserStatus(u.id)}
+                        onClick={() => toggleUserStatus(u.id, u.status, u.name)}
                         className={`text-xs font-bold px-3 py-1 rounded-lg border transition-colors ${
                           u.status === "SUSPENDED"
                             ? "bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700"
