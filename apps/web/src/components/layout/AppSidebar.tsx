@@ -245,6 +245,7 @@ export function AppSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     Settings: true,
+    "Teaching Studio": true,
   });
 
   useEffect(() => {
@@ -320,24 +321,26 @@ export function AppSidebar() {
     (session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "Super Admin") &&
     !session?.user?.impersonatedBySuperAdmin;
 
+  const isSuperAdminRoute = pathname?.startsWith("/dashboard/super-admin");
+
   const plan = usePlan();
 
-  const activeGroups =
-    isSuperAdminPlatform || pathname?.startsWith("/dashboard/super-admin")
-      ? superAdminSidebarGroups
-      : sidebarGroups.map(g => ({
+  const activeGroups = isSuperAdminRoute
+    ? superAdminSidebarGroups
+    : sidebarGroups
+        .map((g) => ({
           ...g,
-          items: g.items.filter(item => {
+          items: g.items.filter((item) => {
             if (item.requiredModule && !plan.hasFeature(item.requiredModule)) return false;
-            if (org?.enabledModules && Array.isArray(org.enabledModules)) {
-              const key = item.requiredModule || item.title.toLowerCase().replace(/[^a-z0-9]/g, "_");
-              return org.enabledModules.includes(key) || org.enabledModules.includes(item.title);
+            if (item.requiredModule && org?.enabledModules && Array.isArray(org.enabledModules)) {
+              return org.enabledModules.includes(item.requiredModule);
             }
             return true;
-          })
-        })).filter(g => g.items.length > 0);
+          }),
+        }))
+        .filter((g) => g.items.length > 0);
 
-  const orgName = isSuperAdminPlatform
+  const orgName = isSuperAdminRoute
     ? "Echo Super Admin"
     : org?.name || "Echo LMS";
 
@@ -351,12 +354,12 @@ export function AppSidebar() {
       {/* Sidebar Header */}
       <div className="h-16 border-b border-slate-200 flex items-center justify-between px-4 shrink-0">
         <Link
-          href={isSuperAdminPlatform ? "/dashboard/super-admin" : "/dashboard"}
+          href={isSuperAdminRoute ? "/dashboard/super-admin" : "/dashboard"}
           className="flex items-center gap-3 min-w-0"
         >
           <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-xs overflow-hidden p-1">
             <img
-              src={isSuperAdminPlatform ? "/echo_logo.png" : org?.logoUrl || org?.academyLogoUrl || "/echo_logo.png"}
+              src={isSuperAdminRoute ? "/echo_logo.png" : org?.logoUrl || org?.academyLogoUrl || "/echo_logo.png"}
               alt={orgName}
               className="w-full h-full object-contain"
             />
@@ -369,10 +372,10 @@ export function AppSidebar() {
               <span
                 className={cn(
                   "text-[10px] font-bold uppercase tracking-wide truncate",
-                  isSuperAdminPlatform ? "text-amber-600" : "text-teal-600"
+                  isSuperAdminRoute ? "text-amber-600" : "text-teal-600"
                 )}
               >
-                {isSuperAdminPlatform ? "Platform Control" : "Enterprise LMS"}
+                {isSuperAdminRoute ? "Platform Control" : "Enterprise LMS"}
               </span>
             </div>
           )}
@@ -480,7 +483,7 @@ export function AppSidebar() {
       {!isCollapsed ? (
         <div className="p-3 border-t border-slate-200 bg-slate-50 shrink-0 space-y-2">
           <button
-            onClick={() => signOut({ callbackUrl: isSuperAdminPlatform ? "/super-admin/login" : "/auth/login" })}
+            onClick={() => signOut({ callbackUrl: isSuperAdminRoute ? "/super-admin/login" : "/auth/login" })}
             className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200/80 transition-colors shadow-2xs"
           >
             <LogOut className="w-4 h-4 shrink-0" />
@@ -489,14 +492,14 @@ export function AppSidebar() {
           <div className="flex items-center gap-2 px-1">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-[10px] font-bold text-slate-500">
-              {isSuperAdminPlatform ? "Echo Control Plane" : "Echo OS Engine v2.5"}
+              {isSuperAdminRoute ? "Echo Control Plane" : "Echo OS Engine v2.5"}
             </span>
           </div>
         </div>
       ) : (
         <div className="p-2 border-t border-slate-200 bg-slate-50 flex flex-col items-center gap-2 shrink-0">
           <button
-            onClick={() => signOut({ callbackUrl: isSuperAdminPlatform ? "/super-admin/login" : "/auth/login" })}
+            onClick={() => signOut({ callbackUrl: isSuperAdminRoute ? "/super-admin/login" : "/auth/login" })}
             title="Sign Out"
             className="w-9 h-9 flex items-center justify-center rounded-xl text-rose-600 hover:bg-rose-50 border border-rose-200/80 transition-colors shadow-2xs"
           >

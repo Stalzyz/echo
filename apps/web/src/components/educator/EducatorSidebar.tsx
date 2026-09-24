@@ -42,11 +42,19 @@ export function EducatorSidebar() {
 
   return (
     <div className="w-64 h-full bg-white border-r border-slate-200 flex flex-col text-slate-900 flex-shrink-0 relative z-40 hidden md:flex shadow-xs">
-      <div className="h-16 flex items-center px-6 gap-3 border-b border-slate-200 bg-white">
-        <div className="w-8 h-8 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center">
-          <GraduationCap className="w-4 h-4 text-teal-700" />
+      <div className="h-16 flex items-center justify-between px-4 border-b border-slate-200 bg-white">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center">
+            <GraduationCap className="w-4 h-4 text-teal-700" />
+          </div>
+          <span className="font-extrabold tracking-tight text-slate-900 text-sm">Teaching Studio</span>
         </div>
-        <span className="font-extrabold tracking-tight text-slate-900">Teaching Studio</span>
+        <Link
+          href="/dashboard"
+          className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors"
+        >
+          ← LMS
+        </Link>
       </div>
 
       <div className="p-6 pb-2 border-b border-slate-100 bg-slate-50/50">
