@@ -284,117 +284,25 @@ export default function AdmissionsPipelinePage() {
     setActionNote("")
   }
 
-  // Pre-seed mock data with activities if empty API response
+  // Set leads from API response or empty array
   useEffect(() => {
-    if (apiResponse?.data && apiResponse.data.length > 0) {
+    if (apiResponse?.data && Array.isArray(apiResponse.data)) {
       setLeads(apiResponse.data.map((l: any, idx: number) => ({
         id: l.id || `lead_${idx}`,
         name: l.name,
         email: l.email,
         phone: l.phone,
-        courseInterest: l.courseInterest || COURSE_OPTIONS[idx % COURSE_OPTIONS.length],
-        batch: l.batch || BATCH_OPTIONS[idx % BATCH_OPTIONS.length],
-        deliveryMode: l.deliveryMode || (idx % 2 === 0 ? 'REMOTE' : 'CAMPUS'),
-        score: l.score || 75,
+        courseInterest: l.courseInterest || 'General Enquiry',
+        batch: l.batch || 'Unassigned',
+        deliveryMode: l.deliveryMode || 'CAMPUS',
+        score: l.score || 0,
         updatedAt: l.updatedAt || new Date().toISOString(),
         status: columns.find(c => c.id === l.status) ? l.status : 'ENQUIRY',
         source: l.source || 'WEBSITE',
-        activities: l.activities || [
-          {
-            id: `act_${idx}_1`,
-            type: 'CALL',
-            content: '[CALL] Contacted lead. Interested in upcoming cohort discount.',
-            createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
-          }
-        ]
+        activities: l.activities || []
       })))
     } else {
-      // Seed rich default data so admin experiences full workflow instantly
-      setLeads([
-        {
-          id: 'lead-101',
-          name: 'Jane Smith',
-          email: 'jane@example.com',
-          phone: '9876543211',
-          courseInterest: 'Full Stack Web Development',
-          batch: 'Batch 2026-A (Morning)',
-          deliveryMode: 'REMOTE',
-          score: 88,
-          updatedAt: new Date().toISOString(),
-          status: 'COUNSELLING',
-          source: 'INSTAGRAM',
-          activities: [
-            {
-              id: 'act-1',
-              type: 'CALL',
-              content: '[CALL] Discussed syllabus and remote live session timings. Scheduled follow-up for EMI options.',
-              createdAt: '22 Sep 2026, 04:30 PM'
-            },
-            {
-              id: 'act-2',
-              type: 'EMAIL',
-              content: '[EMAIL] Sent course brochure PDF and sample demo class recording link.',
-              createdAt: '23 Sep 2026, 10:15 AM'
-            }
-          ]
-        },
-        {
-          id: 'lead-102',
-          name: 'John Doe',
-          email: 'john@example.com',
-          phone: '9876543210',
-          courseInterest: 'Graphic Design',
-          batch: 'Batch 2026-B (Evening)',
-          deliveryMode: 'CAMPUS',
-          score: 92,
-          updatedAt: new Date().toISOString(),
-          status: 'TRIAL',
-          source: 'WALKIN',
-          activities: [
-            {
-              id: 'act-3',
-              type: 'MEETING',
-              content: '[MEETING] Walked in campus office. Attended live trial session with Senior Mentor.',
-              createdAt: '21 Sep 2026, 02:00 PM'
-            }
-          ]
-        },
-        {
-          id: 'lead-103',
-          name: 'Ananya Sharma',
-          email: 'ananya@example.com',
-          phone: '9812345678',
-          courseInterest: 'UI/UX Design Masterclass',
-          batch: 'Weekend Mastermind Batch',
-          deliveryMode: 'REMOTE',
-          score: 65,
-          updatedAt: new Date().toISOString(),
-          status: 'ENQUIRY',
-          source: 'WEBSITE',
-          activities: []
-        },
-        {
-          id: 'lead-104',
-          name: 'Vikram Mehta',
-          email: 'vikram@example.com',
-          phone: '9765432109',
-          courseInterest: 'Python & AI Engineering',
-          batch: 'FastTrack Bootcamp',
-          deliveryMode: 'CAMPUS',
-          score: 95,
-          updatedAt: new Date().toISOString(),
-          status: 'ENROLLED_ACADEMY',
-          source: 'GOOGLE',
-          activities: [
-            {
-              id: 'act-4',
-              type: 'NOTE',
-              content: '[NOTE] Paid initial registration fee ₹5,000 via UPI. Assigned to Batch 2026-A.',
-              createdAt: '23 Sep 2026, 11:00 AM'
-            }
-          ]
-        }
-      ])
+      setLeads([])
     }
   }, [apiResponse])
 

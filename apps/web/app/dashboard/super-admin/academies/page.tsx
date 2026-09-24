@@ -63,7 +63,8 @@ export default function AcademiesManagementPage() {
     adminPassword: "",
     subscription: "GROWTH",
     domain: "",
-    sendCredentialsEmail: true
+    sendCredentialsEmail: true,
+    withDemoData: false
   })
 
   const fetchAcademies = async () => {
@@ -216,7 +217,7 @@ export default function AcademiesManagementPage() {
         <button 
           onClick={() => {
             setForm({
-              name: "", slug: "", ownerName: "", ownerEmail: "", ownerPhone: "", adminPassword: generateRandomPassword(), subscription: "GROWTH", domain: "", sendCredentialsEmail: true
+              name: "", slug: "", ownerName: "", ownerEmail: "", ownerPhone: "", adminPassword: generateRandomPassword(), subscription: "GROWTH", domain: "", sendCredentialsEmail: true, withDemoData: false
             })
             setProvisionSteps([])
             setProvisionResult(null)
@@ -593,6 +594,22 @@ export default function AcademiesManagementPage() {
                         <option value="ENTERPRISE">ENTERPRISE Plan</option>
                       </select>
                     </div>
+                  </div>
+
+                  <div className="p-3.5 bg-amber-50/70 border border-amber-200/80 rounded-2xl flex items-start gap-3">
+                    <input 
+                      type="checkbox" 
+                      id="withDemoData"
+                      checked={form.withDemoData}
+                      onChange={e => setForm(p => ({ ...p, withDemoData: e.target.checked }))}
+                      className="mt-0.5 w-4 h-4 rounded text-teal-700 focus:ring-teal-600 border-amber-300"
+                    />
+                    <label htmlFor="withDemoData" className="text-xs font-bold text-amber-950 cursor-pointer select-none">
+                      Pre-load sample demo dataset (Optional)
+                      <span className="block font-medium text-amber-800/90 text-[11px] mt-0.5">
+                        Leave UNCHECKED (default) so this academy receives a completely clean 0-record workspace.
+                      </span>
+                    </label>
                   </div>
 
                   <div className="pt-4 border-t border-slate-200">
