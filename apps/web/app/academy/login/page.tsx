@@ -1,15 +1,17 @@
 "use client"
 
-import { useActionState, useState, useEffect } from "react"
+import { useActionState, useState } from "react"
 import { authenticate } from "./actions"
-import { AlertCircle, Lock, Mail, ArrowRight, ShieldCheck, Loader2 } from "lucide-react"
+import { AlertCircle, Lock, Mail, ArrowRight, ShieldCheck, Sparkles } from "lucide-react"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import { DemoLoginModal } from "@/components/auth/DemoLoginModal"
 
 export default function AcademyLoginPage() {
   const [errorMessage, dispatch] = useActionState(authenticate, undefined)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false)
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 flex items-center justify-center p-4">
@@ -33,27 +35,6 @@ export default function AcademyLoginPage() {
         )}
 
         <form action={dispatch} className="space-y-4">
-          
-          {/* 1-CLICK AUTOFILL HELPER */}
-          <div className="p-3 bg-amber-50/80 border border-amber-200 rounded-2xl flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
-              <span className="text-[11px] font-bold text-amber-950 truncate">
-                Demo Admin: <strong className="font-mono">admin@echo.in</strong> (pw: <span className="font-mono">echo123</span>)
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setEmail("admin@echo.in")
-                setPassword("echo123")
-              }}
-              className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-[10px] rounded-lg transition-all shrink-0 uppercase shadow-2xs"
-            >
-              Auto-Fill
-            </button>
-          </div>
-
           <div>
             <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1.5 font-mono">Email Address</label>
             <div className="relative">
@@ -99,34 +80,22 @@ export default function AcademyLoginPage() {
         {/* 1-CLICK DEMO ACCESS BAR */}
         <div className="mt-6 pt-5 border-t border-slate-100 space-y-2.5">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest font-mono">
-              ⚡ LIVE MARKETING DEMOS:
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest font-mono flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" /> LIVE DEMO DASHBOARDS:
             </span>
             <span className="text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
-              Instant Preview
+              Auto-Fill
             </span>
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
-            <Link
-              href="/demo/admin"
-              className="p-2.5 rounded-xl bg-slate-50 hover:bg-amber-50 hover:border-amber-200 border border-slate-200 text-slate-800 text-[11px] font-bold text-center transition-colors"
-            >
-              Admin Demo
-            </Link>
-            <Link
-              href="/demo/student"
-              className="p-2.5 rounded-xl bg-slate-50 hover:bg-teal-50 hover:border-teal-200 border border-slate-200 text-slate-800 text-[11px] font-bold text-center transition-colors"
-            >
-              Student Demo
-            </Link>
-            <Link
-              href="/demo/educator"
-              className="p-2.5 rounded-xl bg-slate-50 hover:bg-indigo-50 hover:border-indigo-200 border border-slate-200 text-slate-800 text-[11px] font-bold text-center transition-colors"
-            >
-              Educator Demo
-            </Link>
-          </div>
+          <button
+            type="button"
+            onClick={() => setIsDemoModalOpen(true)}
+            className="w-full p-3 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 text-xs font-bold transition-all flex items-center justify-between shadow-2xs hover:shadow-xs group"
+          >
+            <span className="truncate">⚡ Choose Demo Experience (Admin / Student / Faculty)</span>
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+          </button>
         </div>
 
         <div className="mt-6 text-center border-t border-slate-100 pt-4 space-y-2">
@@ -141,6 +110,12 @@ export default function AcademyLoginPage() {
             </Link>
           </div>
         </div>
+
+        {/* DEMO POPUP MODAL */}
+        <DemoLoginModal
+          isOpen={isDemoModalOpen}
+          onClose={() => setIsDemoModalOpen(false)}
+        />
       </motion.div>
     </div>
   )

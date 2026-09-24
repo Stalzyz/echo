@@ -8,9 +8,10 @@ import { motion, AnimatePresence } from "framer-motion"
 import { 
   GraduationCap, Video, Building2, Mail, Lock, 
   Smartphone, MessageSquare, ArrowRight, Loader2, CheckCircle2, 
-  AlertCircle, X, User, Briefcase, Award, Info
+  AlertCircle, X, User, Briefcase, Award, Info, Sparkles
 } from "lucide-react"
 import { firebaseAuth, RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult } from "@/lib/firebase"
+import { DemoLoginModal } from "./DemoLoginModal"
 
 export type RoleType = "student" | "educator" | "admin"
 export type ModeType = "signin" | "signup"
@@ -25,6 +26,7 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
   const [mode, setMode] = useState<ModeType>("signin")
   const [selectedRole, setSelectedRole] = useState<RoleType>(defaultRole)
   const [authMethod, setAuthMethod] = useState<"email" | "otp">("email")
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false)
 
   // Form states (Sign In)
   const [email, setEmail] = useState("")
@@ -436,27 +438,6 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
             {/* EMAIL SIGN IN */}
             {authMethod === "email" && (
               <form onSubmit={handleSignInSubmit} className="space-y-4">
-                
-                {/* 1-CLICK PREFILL DEMO CREDENTIALS HELPER */}
-                <div className="p-3 bg-amber-50/80 border border-amber-200 rounded-2xl flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
-                    <span className="text-[11px] font-bold text-amber-950 truncate">
-                      Demo Account: <strong className="font-mono">{currentRole.demoUser}</strong> (pw: <span className="font-mono">echo123</span>)
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEmail(currentRole.demoUser)
-                      setPassword("echo123")
-                    }}
-                    className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-[10px] rounded-lg transition-all shrink-0 uppercase shadow-2xs"
-                  >
-                    Auto-Fill
-                  </button>
-                </div>
-
                 <div>
                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1.5 font-mono">
                     {selectedRole === "student" ? "Student Email" : selectedRole === "educator" ? "Educator Email" : "Corporate Email"}
@@ -739,30 +720,37 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
         {/* 1-CLICK DEMO ACCESS BAR */}
         <div className="mt-8 pt-6 border-t border-slate-100 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest font-mono flex items-center gap-1">
-              ⚡ 1-CLICK MARKETING DEMO PREVIEW:
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest font-mono flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" /> TRY LIVE DEMO DASHBOARDS:
             </span>
-            <span className="text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">Instant Access</span>
+            <span className="text-[10px] font-bold text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">
+              Auto-Fill & Select Role
+            </span>
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
-            {(Object.keys(roleConfig) as RoleType[]).map((rKey) => {
-              const r = roleConfig[rKey]
-              const Icon = r.icon
-              return (
-                <button
-                  key={`demo-${rKey}`}
-                  type="button"
-                  onClick={() => handleDirectDemoLogin(r.demoPath, r.title)}
-                  className="px-2.5 py-3 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 text-xs font-bold transition-all text-center flex flex-col sm:flex-row items-center justify-center gap-1.5 hover:border-slate-300 shadow-2xs hover:shadow-xs group"
-                >
-                  <Icon className="w-3.5 h-3.5 text-slate-500 group-hover:text-slate-900 transition-colors shrink-0" />
-                  <span className="truncate">{r.shortTitle}</span>
-                </button>
-              )
-            })}
-          </div>
+          <button
+            type="button"
+            onClick={() => setIsDemoModalOpen(true)}
+            className="w-full p-3.5 rounded-2xl bg-gradient-to-r from-teal-50 via-indigo-50 to-amber-50 hover:from-teal-100 hover:to-amber-100 border border-teal-200/80 text-slate-900 text-xs font-black transition-all flex items-center justify-between shadow-2xs hover:shadow-xs group"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center font-black text-xs shadow-xs">
+                ⚡
+              </div>
+              <div className="text-left">
+                <div className="font-extrabold text-xs text-slate-900">Choose Demo Experience (Auto-Login)</div>
+                <div className="text-[10px] text-slate-500 font-medium">Academy Admin • Student LMS • Educator Studio</div>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-teal-700 group-hover:translate-x-0.5 transition-transform" />
+          </button>
         </div>
+
+        {/* DEMO POPUP MODAL */}
+        <DemoLoginModal
+          isOpen={isDemoModalOpen}
+          onClose={() => setIsDemoModalOpen(false)}
+        />
 
       </motion.div>
 
