@@ -487,6 +487,16 @@ export default function StudentCoursePlayerPage({ params }: { params: Promise<{ 
                     </p>
                   </div>
 
+                  {activeLesson?.richText && !activeLesson.richText.startsWith("{\"questions\"") && (
+                    <div className="pt-3 border-t border-slate-100">
+                      <h4 className="text-xs font-bold text-slate-900 mb-2">Lesson Material & Notes</h4>
+                      <div 
+                        className="prose prose-sm max-w-none text-slate-800 bg-slate-50 p-4 rounded-xl border border-slate-200 leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: activeLesson.richText }}
+                      />
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-slate-100">
                     <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
                       <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider font-mono">Key Topics</span>
