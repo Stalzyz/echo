@@ -4,13 +4,27 @@ import { useState } from "react"
 import { 
   Settings, ShieldCheck, Key, Mail, Bell, CreditCard, 
   HardDrive, Code, FileText, Save, CheckCircle2, AlertTriangle, 
-  RefreshCw, Lock, Send, Plus, Eye, EyeOff, ShieldAlert, Check, Copy, Search
+  RefreshCw, Lock, Send, Plus, Eye, EyeOff, ShieldAlert, Check, Copy, Search, Building2
 } from "lucide-react"
 import { toast } from "sonner"
 
 export default function PlatformSettingsPage() {
-  const [activeTab, setActiveTab] = useState("general")
+  const [activeTab, setActiveTab] = useState("vendor")
   const [isSaving, setIsSaving] = useState(false)
+
+  // 0. Vendor Management Settings State
+  const [vendorSettings, setVendorSettings] = useState({
+    autoProvisioning: true,
+    defaultPlan: "GROWTH",
+    maxAcademiesPerVendor: 10,
+    defaultStorageGB: 50,
+    allowCustomDomains: true,
+    requireCnameApproval: false,
+    strictTenantIsolation: true,
+    enableWalkInKioskGlobal: true,
+    enableWebinarsGlobal: true,
+    enableWhatsappAutoGlobal: true,
+  })
 
   // 1. General Settings State
   const [general, setGeneral] = useState({
@@ -143,6 +157,7 @@ export default function PlatformSettingsPage() {
   }
 
   const tabs = [
+    { id: "vendor", label: "Vendor Management", icon: Building2 },
     { id: "general", label: "General", icon: Settings },
     { id: "security", label: "Security", icon: ShieldCheck },
     { id: "roles", label: "Roles & Permissions", icon: Key },
@@ -206,6 +221,110 @@ export default function PlatformSettingsPage() {
         {/* Tab Content Panels */}
         <div className="lg:col-span-3 bg-white border border-slate-200 rounded-3xl p-8 shadow-xs">
           
+          {/* 0. VENDOR MANAGEMENT SETTINGS TAB */}
+          {activeTab === "vendor" && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-black text-slate-900 pb-4 border-b border-slate-100 flex items-center justify-between">
+                <span>Vendor & Academy Management Controls</span>
+                <span className="px-2.5 py-1 rounded-full bg-teal-100 text-teal-900 text-xs font-black uppercase">
+                  Global Multi-Tenancy Policy
+                </span>
+              </h2>
+              
+              <div className="space-y-5 text-xs">
+                <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+                  <div>
+                    <span className="font-extrabold text-slate-900 block text-sm">Automatic Vendor Provisioning</span>
+                    <span className="text-slate-500 text-xs">Allow new vendors to auto-provision isolated 8-step LMS databases instantly on sign-up.</span>
+                  </div>
+                  <button 
+                    onClick={() => setVendorSettings(p => ({ ...p, autoProvisioning: !p.autoProvisioning }))}
+                    className={`w-12 h-6 rounded-full transition-colors relative p-0.5 ${vendorSettings.autoProvisioning ? "bg-teal-600" : "bg-slate-300"}`}
+                  >
+                    <div className={`w-5 h-5 rounded-full bg-white shadow-xs transition-transform ${vendorSettings.autoProvisioning ? "translate-x-6" : "translate-x-0"}`} />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+                    <label className="font-extrabold text-slate-900 block text-sm mb-1">Default Subscription Plan for New Vendors</label>
+                    <span className="text-slate-500 text-xs block mb-3">Tiers determine feature limits & maximum active learners.</span>
+                    <select value={vendorSettings.defaultPlan} onChange={e => setVendorSettings(p => ({ ...p, defaultPlan: e.target.value }))} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800">
+                      <option value="FREE">FREE Tier (100 Students)</option>
+                      <option value="STARTER">STARTER Plan (1,000 Students)</option>
+                      <option value="GROWTH">GROWTH Plan (5,000 Students)</option>
+                      <option value="ENTERPRISE">ENTERPRISE Plan (Unlimited)</option>
+                    </select>
+                  </div>
+
+                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+                    <label className="font-extrabold text-slate-900 block text-sm mb-1">Default Storage Quota Per Vendor</label>
+                    <span className="text-slate-500 text-xs block mb-3">Allocated media & course asset cloud storage capacity.</span>
+                    <select value={vendorSettings.defaultStorageGB} onChange={e => setVendorSettings(p => ({ ...p, defaultStorageGB: Number(e.target.value) }))} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800">
+                      <option value="10">10 GB per Vendor</option>
+                      <option value="50">50 GB per Vendor (Recommended)</option>
+                      <option value="100">100 GB per Vendor</option>
+                      <option value="500">500 GB per Vendor</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+                  <div>
+                    <span className="font-extrabold text-slate-900 block text-sm">Strict Multi-Tenant Database Isolation</span>
+                    <span className="text-slate-500 text-xs">Enforces organizationId scoping on all query resolvers & REST endpoints.</span>
+                  </div>
+                  <button 
+                    onClick={() => setVendorSettings(p => ({ ...p, strictTenantIsolation: !p.strictTenantIsolation }))}
+                    className={`w-12 h-6 rounded-full transition-colors relative p-0.5 ${vendorSettings.strictTenantIsolation ? "bg-emerald-600" : "bg-slate-300"}`}
+                  >
+                    <div className={`w-5 h-5 rounded-full bg-white shadow-xs transition-transform ${vendorSettings.strictTenantIsolation ? "translate-x-6" : "translate-x-0"}`} />
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+                  <div>
+                    <span className="font-extrabold text-slate-900 block text-sm">Custom CNAME Domain Verification Policy</span>
+                    <span className="text-slate-500 text-xs">Require manual Super Admin approval before custom vendor domains go live.</span>
+                  </div>
+                  <button 
+                    onClick={() => setVendorSettings(p => ({ ...p, requireCnameApproval: !p.requireCnameApproval }))}
+                    className={`w-12 h-6 rounded-full transition-colors relative p-0.5 ${vendorSettings.requireCnameApproval ? "bg-teal-600" : "bg-slate-300"}`}
+                  >
+                    <div className={`w-5 h-5 rounded-full bg-white shadow-xs transition-transform ${vendorSettings.requireCnameApproval ? "translate-x-6" : "translate-x-0"}`} />
+                  </button>
+                </div>
+
+                <div className="pt-4 border-t border-slate-200 space-y-3">
+                  <h3 className="font-black text-slate-900 text-sm">Global Vendor Add-on Module Overrides</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between">
+                      <span className="font-extrabold text-slate-800 text-xs">Walk-ins Kiosk</span>
+                      <button onClick={() => setVendorSettings(p => ({ ...p, enableWalkInKioskGlobal: !p.enableWalkInKioskGlobal }))} className={`w-9 h-5 rounded-full p-0.5 transition-colors ${vendorSettings.enableWalkInKioskGlobal ? "bg-teal-600" : "bg-slate-300"}`}>
+                        <div className={`w-4 h-4 rounded-full bg-white shadow-xs transition-transform ${vendorSettings.enableWalkInKioskGlobal ? "translate-x-4" : "translate-x-0"}`} />
+                      </button>
+                    </div>
+
+                    <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between">
+                      <span className="font-extrabold text-slate-800 text-xs">Webinars & Funnels</span>
+                      <button onClick={() => setVendorSettings(p => ({ ...p, enableWebinarsGlobal: !p.enableWebinarsGlobal }))} className={`w-9 h-5 rounded-full p-0.5 transition-colors ${vendorSettings.enableWebinarsGlobal ? "bg-teal-600" : "bg-slate-300"}`}>
+                        <div className={`w-4 h-4 rounded-full bg-white shadow-xs transition-transform ${vendorSettings.enableWebinarsGlobal ? "translate-x-4" : "translate-x-0"}`} />
+                      </button>
+                    </div>
+
+                    <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between">
+                      <span className="font-extrabold text-slate-800 text-xs">WhatsApp Auto-Bot</span>
+                      <button onClick={() => setVendorSettings(p => ({ ...p, enableWhatsappAutoGlobal: !p.enableWhatsappAutoGlobal }))} className={`w-9 h-5 rounded-full p-0.5 transition-colors ${vendorSettings.enableWhatsappAutoGlobal ? "bg-teal-600" : "bg-slate-300"}`}>
+                        <div className={`w-4 h-4 rounded-full bg-white shadow-xs transition-transform ${vendorSettings.enableWhatsappAutoGlobal ? "translate-x-4" : "translate-x-0"}`} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          )}
+
           {/* 1. GENERAL TAB */}
           {activeTab === "general" && (
             <div className="space-y-6">

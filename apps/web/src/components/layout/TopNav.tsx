@@ -95,7 +95,7 @@ export function TopNav() {
                       : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
                   )}
                 >
-                  Academies
+                  Vendor Management
                 </Link>
                 <Link
                   href="/dashboard/super-admin/plans"

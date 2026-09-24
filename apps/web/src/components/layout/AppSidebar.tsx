@@ -56,7 +56,7 @@ const superAdminSidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
     groupName: "GECHO Super Admin",
     items: [
       { title: "Dashboard", href: "/dashboard/super-admin", icon: LayoutDashboard },
-      { title: "Academies", href: "/dashboard/super-admin/academies", icon: Building2 },
+      { title: "Vendor Management", href: "/dashboard/super-admin/academies", icon: Building2 },
       { title: "Users", href: "/dashboard/super-admin/users", icon: Users },
       { title: "Plans & Billing", href: "/dashboard/super-admin/plans", icon: CreditCard },
       { title: "Subscriptions", href: "/dashboard/super-admin/subscriptions", icon: RefreshCw },
