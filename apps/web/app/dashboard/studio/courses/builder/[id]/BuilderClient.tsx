@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition, useEffect } from "react"
+import { useState, useTransition, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
   Plus, 
@@ -223,6 +223,30 @@ export default function BuilderClient({ initialCourse }: { initialCourse: any })
   const [courseDescription, setCourseDescription] = useState<string>(initialCourse.course?.description || "")
   const [thumbnailUrl, setThumbnailUrl] = useState<string>(initialCourse?.thumbnail || initialCourse?.course?.thumbnail || "")
   const [trailerUrl, setTrailerUrl] = useState<string>(initialCourse?.trailerUrl || initialCourse?.course?.trailerUrl || "")
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload a valid image file (PNG, JPG, WebP)")
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image file size should be less than 5MB")
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      const result = reader.result as string
+      setThumbnailUrl(result)
+      toast.success("Image loaded from your local drive! Click 'Save Thumbnail & Trailer' to apply.")
+    }
+    reader.readAsDataURL(file)
+  }
 
   const handleTogglePublish = () => {
     startTransition(async () => {
@@ -581,10 +605,23 @@ export default function BuilderClient({ initialCourse }: { initialCourse: any })
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                    {/* Live Preview Card */}
+                    {/* Live Preview Card & Local File Upload */}
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-700 block">Live Preview Card</label>
-                      <div className="aspect-video w-full rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 relative group shadow-sm flex items-center justify-center">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-bold text-slate-700 block">Cover Image</label>
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="text-xs font-bold text-teal-700 hover:text-teal-800 flex items-center gap-1"
+                        >
+                          <Upload className="w-3.5 h-3.5" /> Upload from Computer
+                        </button>
+                      </div>
+
+                      <div 
+                        onClick={() => fileInputRef.current?.click()}
+                        className="aspect-video w-full rounded-2xl overflow-hidden border-2 border-dashed border-slate-300 hover:border-teal-500 bg-slate-50 relative group shadow-sm flex flex-col items-center justify-center cursor-pointer transition-all"
+                      >
                         {thumbnailUrl ? (
                           <img 
                             src={thumbnailUrl} 
@@ -596,16 +633,29 @@ export default function BuilderClient({ initialCourse }: { initialCourse: any })
                           />
                         ) : (
                           <div className="text-center p-6 space-y-2">
-                            <ImageIcon className="w-12 h-12 text-slate-300 mx-auto" />
-                            <p className="text-xs text-slate-400 font-medium">No thumbnail set. Paste image URL or upload.</p>
+                            <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto">
+                              <Upload className="w-6 h-6" />
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold text-slate-800">Click to upload image from local drive</p>
+                              <p className="text-[11px] text-slate-400 mt-0.5">PNG, JPG, WebP up to 5MB</p>
+                            </div>
                           </div>
                         )}
-                        <div className="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <span className="px-3 py-1.5 rounded-lg bg-white/90 text-slate-900 text-xs font-bold shadow-xs">
-                            16:9 Aspect Ratio
+                        <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          <span className="px-3 py-1.5 rounded-xl bg-white text-slate-900 text-xs font-bold shadow-xs flex items-center gap-1.5">
+                            <Upload className="w-3.5 h-3.5 text-teal-600" /> Change Image
                           </span>
                         </div>
                       </div>
+
+                      <input 
+                        ref={fileInputRef} 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleFileUpload} 
+                        className="hidden" 
+                      />
                     </div>
 
                     {/* Inputs & Quick Preset Selectors */}

@@ -58,8 +58,26 @@ export async function GET(
       }
     }
 
+    // Fallback: if courseId is 'default-course' or not found, find the most relevant existing course
     if (!lmsCourse) {
-      return NextResponse.json({ error: "Course not found" }, { status: 404 })
+      lmsCourse = await prisma.lMSCourse.findFirst({
+        orderBy: { updatedAt: 'desc' },
+        include: {
+          course: true,
+          modules: {
+            orderBy: { sortOrder: 'asc' },
+            include: {
+              lessons: {
+                orderBy: { sortOrder: 'asc' }
+              }
+            }
+          }
+        }
+      })
+    }
+
+    if (!lmsCourse) {
+      return NextResponse.json({ error: "No courses found" }, { status: 404 })
     }
 
     // Format modules and lessons for player

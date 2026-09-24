@@ -112,23 +112,30 @@ export default function StudentCoursePlayerPage({ params }: { params: Promise<{ 
     }
   ]
 
-  const course = courseData?.course || courseData || { title: "Course Learning Studio" }
-  const rawModules = courseData?.modules && courseData.modules.length > 0 ? courseData.modules : defaultModules
-  const overallProgress = courseData?.progress ?? 35
+  const course = courseData?.course || (courseData?.title ? courseData : null) || { title: "Course Learning Studio" }
+  const rawModules = (courseData?.modules && courseData.modules.length > 0) 
+    ? courseData.modules 
+    : (courseData?.course?.modules && courseData.course.modules.length > 0) 
+    ? courseData.course.modules 
+    : (courseData ? (courseData.modules || []) : defaultModules)
+  const overallProgress = courseData?.progress ?? 0
 
   useEffect(() => {
-    if (rawModules.length > 0) {
+    if (rawModules && rawModules.length > 0) {
       const initialExpanded: Record<string, boolean> = {}
       rawModules.forEach((m: any, idx: number) => {
         initialExpanded[m.id || `mod-${idx}`] = true
       })
       setExpandedModules(initialExpanded)
 
-      if (!activeLesson && rawModules[0]?.lessons?.[0]) {
-        setActiveLesson(rawModules[0].lessons[0])
+      const allLessons = rawModules.flatMap((m: any) => m.lessons || [])
+      if (allLessons.length > 0) {
+        if (!activeLesson || !allLessons.some((l: any) => l.id === activeLesson.id)) {
+          setActiveLesson(allLessons[0])
+        }
       }
     }
-  }, [courseData])
+  }, [courseData, rawModules])
 
   const handleSpeedChange = (speed: number) => {
     setPlaybackSpeed(speed)
