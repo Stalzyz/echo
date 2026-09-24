@@ -10,10 +10,12 @@ import { toast } from "sonner"
 interface Vendor {
   id: string
   name: string
+  slug?: string
   ownerName: string
   ownerEmail: string
   subscription: string
   domain: string
+  portalUrl?: string
   studentsCount: number
   coursesCount: number
   status: string
@@ -321,8 +323,14 @@ export default function VendorManagementPage() {
                     </td>
 
                     <td className="py-4 px-6">
-                      <a href={`https://${vendor.domain}`} target="_blank" rel="noreferrer" className="text-xs font-mono text-teal-700 font-bold hover:underline flex items-center gap-1">
-                        {vendor.domain} <ExternalLink className="w-3.5 h-3.5" />
+                      <a 
+                        href={vendor.portalUrl || `/w/${vendor.slug || vendor.id}`} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="text-xs font-mono text-teal-700 font-bold hover:underline flex items-center gap-1"
+                        title={`Vendor ID: ${vendor.id}`}
+                      >
+                        {vendor.portalUrl || `/w/${vendor.slug || vendor.id}`} <ExternalLink className="w-3.5 h-3.5" />
                       </a>
                     </td>
 

@@ -21,6 +21,7 @@ interface Academy {
   name: string
   slug: string
   domain: string
+  portalUrl?: string
   status: string
   subscription: string
   ownerName: string
@@ -393,8 +394,14 @@ export default function AcademiesManagementPage() {
                     </td>
 
                     <td className="py-4 px-6">
-                      <a href={`https://${a.domain}`} target="_blank" rel="noreferrer" className="text-xs font-mono text-teal-700 font-bold hover:underline flex items-center gap-1">
-                        {a.domain} <ExternalLink className="w-3.5 h-3.5" />
+                      <a 
+                        href={a.portalUrl || `/w/${a.slug || a.id}`} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="text-xs font-mono text-teal-700 font-bold hover:underline flex items-center gap-1"
+                        title={`Vendor ID: ${a.id}`}
+                      >
+                        {a.portalUrl || `/w/${a.slug || a.id}`} <ExternalLink className="w-3.5 h-3.5" />
                       </a>
                     </td>
 

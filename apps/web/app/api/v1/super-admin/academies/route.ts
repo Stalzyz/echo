@@ -41,6 +41,7 @@ export async function GET() {
         name: org.name,
         slug: org.slug,
         domain: org.domain || `${org.slug}.echolms.com`,
+        portalUrl: `/w/${org.slug || org.id}`,
         status: org.status || 'ACTIVE',
         subscription: org.subscription || 'PRO',
         ownerName: org.ownerName || (admin ? `${admin.firstName} ${admin.lastName}` : 'N/A'),
