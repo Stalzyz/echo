@@ -25,7 +25,13 @@ const CreateEducatorSchema = z.object({
 export default async function educatorsRouter(app: FastifyInstance) {
   // GET /api/v1/academy/educators
   app.get('/educators', async (req, reply) => {
+    const user = (req as any).user;
+    const tenantId = user?.organizationId;
+    const isGlobalSuperAdmin = user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin';
+    const orgFilter = isGlobalSuperAdmin ? {} : { user: { organizationId: tenantId || '__NO_ACCESS__' } };
+
     const educators = await app.prisma.educator.findMany({
+      where: orgFilter,
       include: { user: true },
       orderBy: { user: { firstName: 'asc' } },
     });
@@ -34,6 +40,9 @@ export default async function educatorsRouter(app: FastifyInstance) {
 
   // POST /api/v1/academy/educators
   app.post('/educators', async (req, reply) => {
+    const reqUser = (req as any).user;
+    const tenantId = reqUser?.organizationId;
+
     const body = CreateEducatorSchema.parse(req.body);
     
     let tempPassword = '';
@@ -54,6 +63,7 @@ export default async function educatorsRouter(app: FastifyInstance) {
             phone: body.phone || undefined,
             role: 'EDUCATOR',
             passwordHash,
+            organizationId: tenantId || null,
           }
         });
       }

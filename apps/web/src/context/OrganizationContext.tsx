@@ -5,6 +5,8 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 export interface Organization {
   id: string;
   name: string;
+  slug?: string | null;
+  domain?: string | null;
   logoUrl?: string | null;
   academyLogoUrl?: string | null;
   faviconUrl?: string | null;
@@ -17,11 +19,13 @@ export interface Organization {
   billingAddress?: string | null;
   website?: string | null;
   phone?: string | null;
+  enabledModules?: string[] | null;
 }
 
 const defaultOrg: Organization = {
   id: "echo-saas-org",
   name: "Echo LMS",
+  slug: "echo",
   logoUrl: "/echo_logo.png",
   academyLogoUrl: "/echo_logo.png",
   faviconUrl: "/favicon.ico",
@@ -34,6 +38,7 @@ const defaultOrg: Organization = {
   billingAddress: "SaaS Cloud Infrastructure",
   website: "https://echolms.com",
   phone: null,
+  enabledModules: null,
 };
 
 const OrganizationContext = createContext<Organization>(defaultOrg);
@@ -68,8 +73,39 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
       root.style.setProperty("--chart-3", accent);
     };
 
+    const detectTenantSlug = (): string | null => {
+      if (typeof window === "undefined") return null;
+      
+      const pathname = window.location.pathname;
+      if (pathname.startsWith("/w/")) {
+        const parts = pathname.split("/").filter(Boolean);
+        if (parts.length >= 2) return parts[1];
+      }
+
+      const hostname = window.location.hostname;
+      const parts = hostname.split(".");
+      if (parts.length >= 3) {
+        const sub = parts[0].toLowerCase();
+        if (!["www", "app", "echo", "localhost", "admin"].includes(sub)) {
+          return sub;
+        }
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("slug")) return params.get("slug");
+
+      return null;
+    };
+
     const fetchOrg = () => {
-      fetch(`${API_BASE}/settings/organization`)
+      const slug = detectTenantSlug();
+      const url = slug 
+        ? `${API_BASE}/settings/organization?slug=${encodeURIComponent(slug)}`
+        : `${API_BASE}/settings/organization`;
+
+      fetch(url, {
+        headers: slug ? { "x-tenant-slug": slug } : {}
+      })
         .then((r) => (r.ok ? r.json() : null))
         .then((data) => {
           if (data) {
@@ -83,6 +119,7 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
               primaryColor: orgData.primaryColor || "#0d9488",
               secondaryColor: orgData.secondaryColor || "#f59e0b",
               accentColor: orgData.accentColor || "#10b981",
+              enabledModules: Array.isArray(orgData.enabledModules) ? orgData.enabledModules : null
             };
             setOrg(finalOrg);
             applyThemeVariables(finalOrg);

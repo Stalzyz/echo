@@ -5,6 +5,24 @@ import { useState, useEffect } from 'react';
 // Central API URL config (now relative because of Next.js rewrites)
 export const API_BASE_URL = '/api/v1';
 
+const getTenantSlugFromLocation = (): string | null => {
+  if (typeof window === "undefined") return null;
+  const pathname = window.location.pathname;
+  if (pathname.startsWith("/w/")) {
+    const parts = pathname.split("/").filter(Boolean);
+    if (parts.length >= 2) return parts[1];
+  }
+  const hostname = window.location.hostname;
+  const parts = hostname.split(".");
+  if (parts.length >= 3) {
+    const sub = parts[0].toLowerCase();
+    if (!["www", "app", "echo", "localhost", "admin"].includes(sub)) {
+      return sub;
+    }
+  }
+  return null;
+};
+
 export function useApi<T>(endpoint: string | null, options?: RequestInit) {
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(endpoint ? true : false);
@@ -29,6 +47,11 @@ export function useApi<T>(endpoint: string | null, options?: RequestInit) {
         const headers: Record<string, string> = {
           ...(options?.headers as Record<string, string> || {})
         };
+
+        const slug = getTenantSlugFromLocation();
+        if (slug && !headers['x-tenant-slug']) {
+          headers['x-tenant-slug'] = slug;
+        }
         
         if (options?.body || (options?.method && !['GET', 'DELETE'].includes(options.method.toUpperCase()))) {
           headers['Content-Type'] = headers['Content-Type'] || 'application/json';
@@ -83,6 +106,11 @@ export async function fetchApi<T>(endpoint: string, options?: RequestInit): Prom
     ...(options?.headers as Record<string, string> || {})
   };
   
+  const slug = getTenantSlugFromLocation();
+  if (slug && !headers['x-tenant-slug']) {
+    headers['x-tenant-slug'] = slug;
+  }
+
   const method = (options?.method || 'GET').toUpperCase();
 
   if (options?.body || !['GET', 'DELETE'].includes(method)) {

@@ -3,30 +3,41 @@ import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { getTenantFilter } from "@/lib/tenant"
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
     const session = await auth()
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const tenantFilter = await getTenantFilter()
-    let activeTenantId = tenantFilter.organizationId !== '__NO_ACCESS__' ? tenantFilter.organizationId : null
+    const { searchParams } = new URL(req.url)
+    const slugParam = searchParams.get("slug") || req.headers.get("x-tenant-slug")
 
-    if (!activeTenantId && session.user.organizationId) {
-      activeTenantId = session.user.organizationId
-    }
+    let org: any = null
 
-    let org: any = null;
-
-    if (activeTenantId) {
-      org = await prisma.organization.findUnique({
-        where: { id: activeTenantId }
+    if (slugParam) {
+      org = await prisma.organization.findFirst({
+        where: { OR: [{ slug: slugParam }, { domain: slugParam }] }
       })
     }
 
-    // Fallback ONLY for Super Admin
-    if (!org && session.user.role === 'SUPER_ADMIN') {
+    if (!org) {
+      const tenantFilter = await getTenantFilter()
+      let activeTenantId = tenantFilter.organizationId !== '__NO_ACCESS__' ? tenantFilter.organizationId : null
+
+      if (!activeTenantId && session.user.organizationId) {
+        activeTenantId = session.user.organizationId
+      }
+
+      if (activeTenantId) {
+        org = await prisma.organization.findUnique({
+          where: { id: activeTenantId }
+        })
+      }
+    }
+
+    // Fallback ONLY for Super Admin outside tenant context
+    if (!org && (session.user.role === 'SUPER_ADMIN' || session.user.role === 'Super Admin')) {
       org = await prisma.organization.findFirst()
     }
 

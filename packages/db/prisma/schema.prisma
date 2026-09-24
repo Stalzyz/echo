@@ -183,7 +183,7 @@ model Organization {
   ownerEmail   String?
   ownerPhone   String?
 
-  // Whitelabel Branding
+  // Whitelabel Branding & Customization
   logoUrl           String? // Agency landscape logo (Invoices, Proposals, HR)
   faviconUrl        String? // Agency square favicon (Browser tab, Garage OS)
   academyLogoUrl    String? // Academy landscape logo (Fee Receipts, Certificates, LMS)
@@ -192,6 +192,7 @@ model Organization {
   secondaryColor    String  @default("#1e40af")
   accentColor       String  @default("#10b981")
   darkModeDefault   Boolean @default(true)
+  enabledModules    Json?   // Dynamic sidebar modules list per vendor
 
   // Contact Info
   supportEmail   String?
