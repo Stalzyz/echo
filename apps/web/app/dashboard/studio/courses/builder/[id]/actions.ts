@@ -310,3 +310,28 @@ export async function updateCourseGeneralSettings(lmsCourseId: string, data: { n
     return null
   }
 }
+
+export async function updateCourseMedia(lmsCourseId: string, data: { thumbnail?: string, trailerUrl?: string }) {
+  try {
+    const lmsCourse = await getOrCreateLmsCourse(lmsCourseId)
+    if (!lmsCourse) return null
+
+    await prisma.lMSCourse.update({
+      where: { id: lmsCourse.id },
+      data: {
+        ...(data.thumbnail !== undefined && { thumbnail: data.thumbnail }),
+        ...(data.trailerUrl !== undefined && { trailerVideoId: data.trailerUrl }),
+      }
+    })
+
+    try {
+      revalidatePath(`/dashboard/studio/courses/builder/${lmsCourseId}`)
+      revalidatePath(`/dashboard/studio/courses/builder/${lmsCourse.courseId}`)
+    } catch {}
+
+    return true
+  } catch (err) {
+    console.error("Error updating course media:", err)
+    return null
+  }
+}

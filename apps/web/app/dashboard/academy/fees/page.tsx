@@ -295,6 +295,24 @@ export default function FeeManagementPage() {
   const totalPayable = invAmt + taxAmt
   const selectedInvId = (selectedInvoice?.id || '').slice(-6).toUpperCase()
 
+  const handleDownloadPdf = async () => {
+    try {
+      const element = document.getElementById("invoice-printable-area")
+      if (!element) return
+      const html2pdf = (await import("html2pdf.js")).default
+      const opt = {
+        margin: 10,
+        filename: `tax_invoice_${selectedInvId || 'fee'}.pdf`,
+        image: { type: 'jpeg' as const, quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
+      }
+      html2pdf().from(element).set(opt).save()
+      toast.success("PDF Invoice downloaded successfully!")
+    } catch {
+      window.print()
+    }
+  }
 
   return (
     <div className="flex flex-col h-full bg-slate-50 text-slate-900 overflow-y-auto p-8 relative">
@@ -884,6 +902,13 @@ export default function FeeManagementPage() {
               </h2>
               <div className="flex gap-2">
                 <button 
+                  onClick={handleDownloadPdf} 
+                  className="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 rounded-lg text-sm font-bold transition-colors flex items-center gap-1.5"
+                  title="Export PDF Tax Invoice"
+                >
+                  <Download className="w-4 h-4 text-teal-600" /> Export PDF
+                </button>
+                <button 
                   onClick={() => handleSendWhatsAppInvoice(selectedInvoice)} 
                   className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-sm font-bold transition-colors flex items-center gap-2"
                 >
@@ -893,7 +918,7 @@ export default function FeeManagementPage() {
                   onClick={() => window.print()} 
                   className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-sm font-bold transition-colors flex items-center gap-2 shadow-xs"
                 >
-                  <Printer className="w-4 h-4" /> Print Invoice
+                  <Printer className="w-4 h-4" /> Print
                 </button>
                 <button onClick={() => setSelectedInvoice(null)} className="p-2 hover:bg-slate-200 rounded-full transition-colors">
                   <X className="w-5 h-5 text-slate-500" />

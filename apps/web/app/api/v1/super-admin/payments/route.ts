@@ -28,7 +28,11 @@ export async function GET() {
                 }
               }
             },
-            course: { select: { name: true } }
+            batch: {
+              include: {
+                course: { select: { name: true } }
+              }
+            }
           }
         }
       },
@@ -39,7 +43,7 @@ export async function GET() {
       id: inst.id,
       academyName: inst.enrollment?.student?.user?.organization?.name || 'Academy',
       studentName: inst.enrollment?.student?.user ? `${inst.enrollment.student.user.firstName} ${inst.enrollment.student.user.lastName}` : 'Student',
-      courseName: inst.enrollment?.course?.name || 'Course',
+      courseName: inst.enrollment?.batch?.course?.name || 'Course',
       amount: inst.amount,
       paidAmount: inst.paidAmount,
       paymentStatus: inst.status,

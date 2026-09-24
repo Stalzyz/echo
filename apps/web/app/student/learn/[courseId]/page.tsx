@@ -11,6 +11,7 @@ import {
   Send, ThumbsUp, Check, Clock, FastForward,
   ChevronDown, BookOpen, User
 } from "lucide-react"
+import { StudentQuizView } from "./StudentQuizView"
 
 export default function StudentCoursePlayerPage({ params }: { params: Promise<{ courseId: string }> }) {
   const resolvedParams = use(params)
@@ -287,9 +288,15 @@ export default function StudentCoursePlayerPage({ params }: { params: Promise<{ 
         {/* LEFT AREA: Video Player & Tabs */}
         <div className={`flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 ${isTheaterMode ? 'w-full' : ''}`}>
           
-          {/* VIDEO CANVAS CONTAINER */}
+          {/* VIDEO / QUIZ CANVAS CONTAINER */}
           <div className="relative aspect-video rounded-2xl overflow-hidden bg-slate-900 border border-slate-300 shadow-md flex items-center justify-center group">
-            {activeLesson?.videoUrl ? (
+            {activeLesson?.type === 'quiz' || activeLesson?.type === 'QUIZ' ? (
+              <StudentQuizView 
+                quizDataRaw={activeLesson.richText} 
+                title={activeLesson.title} 
+                onPassed={handleMarkComplete} 
+              />
+            ) : activeLesson?.videoUrl ? (
               (() => {
                 const url = activeLesson.videoUrl
                 const isYouTube = url.includes("youtube.com") || url.includes("youtu.be")
@@ -331,8 +338,6 @@ export default function StudentCoursePlayerPage({ params }: { params: Promise<{ 
                 <div className="w-14 h-14 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto mb-3">
                   {activeLesson?.type === 'article' ? (
                     <BookOpen className="w-7 h-7 text-teal-400" />
-                  ) : activeLesson?.type === 'quiz' ? (
-                    <HelpCircle className="w-7 h-7 text-amber-400" />
                   ) : (
                     <Video className="w-7 h-7 text-teal-400" />
                   )}

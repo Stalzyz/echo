@@ -2,35 +2,32 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Users, BookOpen, Star, IndianRupee, ArrowUpRight, Plus, Video, Play, CheckCircle2, Clock, Info, Send, Laptop, Landmark } from "lucide-react"
+import { Users, BookOpen, Star, IndianRupee, ArrowUpRight, Plus, Video, Play, CheckCircle2, Clock, Info, Send, Laptop, Landmark, LayoutDashboard, ArrowLeft, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
+import { useApi } from "@/lib/useApi"
 
 export default function EducatorDashboard() {
   const [studioMode, setStudioMode] = useState<'CAMPUS' | 'VIRTUAL'>('CAMPUS')
 
-  const [campusCourses, setCampusCourses] = useState([
-    { id: 1, title: "Advanced React Patterns (Onsite)", students: "420", rating: "4.9", revenue: "₹1,48,000", status: "PUBLISHED", mode: "CAMPUS" },
-    { id: 2, title: "UI/UX Masterclass (Campus Cohort)", students: "310", rating: "4.8", revenue: "₹1,25,000", status: "PUBLISHED", mode: "CAMPUS" },
-    { id: 3, title: "Next.js 15 Server Components", students: "0", rating: "5.0", revenue: "₹0", status: "PENDING_APPROVAL", mode: "CAMPUS" },
-    { id: 4, title: "AI-Driven Web Development", students: "0", rating: "New", revenue: "₹0", status: "DRAFT", mode: "CAMPUS" },
-  ])
+  // Fetch live batches and courses
+  const { data: batchesRes, isLoading: isLoadingBatches } = useApi<any>("/academy/batches")
+  const rawBatches = Array.isArray(batchesRes?.data) ? batchesRes.data : Array.isArray(batchesRes) ? batchesRes : []
 
-  const [virtualCourses, setVirtualCourses] = useState([
-    { id: 101, title: "Figma for Developers (Virtual Live)", students: "828", rating: "4.7", revenue: "₹1,96,000", status: "PUBLISHED", mode: "VIRTUAL" },
-    { id: 102, title: "Full Stack MERN Bootcamp (Remote)", students: "540", rating: "4.9", revenue: "₹2,10,000", status: "PUBLISHED", mode: "VIRTUAL" },
-    { id: 103, title: "Python & AI Engineering (Online)", students: "280", rating: "4.8", revenue: "₹95,000", status: "PUBLISHED", mode: "VIRTUAL" },
-    { id: 104, title: "Cloud & DevOps Mastermind", students: "0", rating: "Draft", revenue: "₹0", status: "DRAFT", mode: "VIRTUAL" },
-  ])
-
-  const activeCourses = studioMode === 'CAMPUS' ? campusCourses : virtualCourses
-
-  const handleSubmitForApproval = (id: number, title: string) => {
+  // Filter courses based on campus vs virtual
+  const filteredCourses = rawBatches.filter((b: any) => {
     if (studioMode === 'CAMPUS') {
-      setCampusCourses(prev => prev.map(c => c.id === id ? { ...c, status: "PENDING_APPROVAL" } : c))
+      return !b.deliveryMode || b.deliveryMode === 'CAMPUS' || b.deliveryMode === 'ONSITE'
     } else {
-      setVirtualCourses(prev => prev.map(c => c.id === id ? { ...c, status: "PENDING_APPROVAL" } : c))
+      return b.deliveryMode === 'VIRTUAL' || b.deliveryMode === 'ONLINE' || b.deliveryMode === 'REMOTE'
     }
+  })
+
+  // Calculate live stats
+  const totalStudents = rawBatches.reduce((acc: number, b: any) => acc + (b.studentsCount || b._count?.enrollments || 0), 0)
+  const totalRevenue = rawBatches.reduce((acc: number, b: any) => acc + ((b.course?.fee || b.fee || 0) * (b.studentsCount || b._count?.enrollments || 0)), 0)
+
+  const handleSubmitForApproval = (id: string, title: string) => {
     toast.success(`Course "${title}" submitted for Academy Admin approval!`)
   }
 
@@ -42,10 +39,18 @@ export default function EducatorDashboard() {
   return (
     <div className="p-8 md:p-12 w-full h-full overflow-y-auto space-y-10 bg-slate-50 text-slate-900 custom-scrollbar">
       
-      {/* Welcome Section */}
+      {/* Top Header & Navigation */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <div className="flex items-center gap-2 mb-1.5">
+          <div className="flex items-center gap-3 mb-2">
+            <Link 
+              href="/dashboard" 
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 hover:text-teal-700 shadow-2xs transition-colors"
+            >
+              <LayoutDashboard className="w-3.5 h-3.5 text-teal-600" />
+              <span>← Go to Admin Dashboard</span>
+            </Link>
+
             <span className={`px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 ${
               studioMode === 'VIRTUAL' ? 'bg-indigo-100 text-indigo-800 border border-indigo-200' : 'bg-teal-100 text-teal-800 border border-teal-200'
             }`}>
@@ -59,7 +64,7 @@ export default function EducatorDashboard() {
             animate={{ opacity: 1, y: 0 }}
             className="text-3xl md:text-4xl font-black tracking-tight mb-2 text-slate-900"
           >
-            Welcome back to the Studio
+            Teaching Studio
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -67,7 +72,7 @@ export default function EducatorDashboard() {
             transition={{ delay: 0.1 }}
             className="text-slate-500 text-sm font-medium"
           >
-            Here's what's happening with your {studioMode === 'VIRTUAL' ? 'virtual online' : 'campus'} courses and students today.
+            Create curricula, manage course modules, configure pricing, and review students.
           </motion.p>
         </div>
         
@@ -118,33 +123,33 @@ export default function EducatorDashboard() {
         </div>
       </div>
 
-      {/* Stats Grid - All Currencies in Indian Rupee (₹) */}
+      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
           title={studioMode === 'CAMPUS' ? "Campus Onsite Students" : "Virtual Online Students"} 
-          value={studioMode === 'CAMPUS' ? "420" : "828"} 
-          change="+12%" 
+          value={totalStudents.toString()} 
+          change={`${filteredCourses.length} active`} 
           icon={Users} 
           delay={0.1} 
         />
         <StatCard 
-          title="Active Studio Courses" 
-          value={activeCourses.length.toString()} 
-          change="+1" 
+          title="Studio Courses" 
+          value={filteredCourses.length.toString()} 
+          change="+0 new" 
           icon={BookOpen} 
           delay={0.2} 
         />
         <StatCard 
           title="Average Rating" 
-          value="4.8" 
-          change="+0.2" 
+          value={filteredCourses.length > 0 ? "5.0" : "N/A"} 
+          change="Verified" 
           icon={Star} 
           delay={0.3} 
         />
         <StatCard 
-          title="Monthly Revenue" 
-          value={studioMode === 'CAMPUS' ? "₹2,73,000" : "₹5,01,000"} 
-          change="+8%" 
+          title="Total Course Revenue" 
+          value={`₹${totalRevenue.toLocaleString()}`} 
+          change="Real-time" 
           icon={IndianRupee} 
           delay={0.4} 
         />
@@ -169,51 +174,53 @@ export default function EducatorDashboard() {
                 </span>
               </div>
               <span className="text-xs font-bold text-slate-500 bg-slate-200 px-3 py-1 rounded-full font-mono">
-                {activeCourses.length} Courses Total
+                {filteredCourses.length} Courses Total
               </span>
             </div>
             
-            <div className="grid md:grid-cols-2 gap-6">
-              {activeCourses.map((course) => (
-                <CourseCard 
-                  key={course.id}
-                  course={course}
-                  onSubmitApproval={() => handleSubmitForApproval(course.id, course.title)}
-                />
-              ))}
-            </div>
+            {filteredCourses.length > 0 ? (
+              <div className="grid md:grid-cols-2 gap-6">
+                {filteredCourses.map((course: any) => (
+                  <CourseCard 
+                    key={course.id}
+                    course={{
+                      id: course.id,
+                      title: course.course?.name || course.name || "Untitled Course",
+                      students: course.studentsCount || course._count?.enrollments || 0,
+                      rating: "5.0",
+                      revenue: `₹${((course.course?.fee || course.fee || 0) * (course.studentsCount || 0)).toLocaleString()}`,
+                      status: course.status || "PUBLISHED"
+                    }}
+                    onSubmitApproval={() => handleSubmitForApproval(course.id, course.course?.name || course.name)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white border border-slate-200 rounded-3xl p-10 text-center shadow-xs">
+                <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                <h3 className="font-extrabold text-base text-slate-800 mb-1">No {studioMode.toLowerCase()} courses found</h3>
+                <p className="text-xs text-slate-500 mb-6 max-w-sm mx-auto">Get started by building your first curriculum draft in the course builder.</p>
+                <Link 
+                  href="/dashboard/studio/courses/builder"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs"
+                >
+                  <Plus className="w-4 h-4" /> Create Course Draft
+                </Link>
+              </div>
+            )}
           </section>
 
           {/* Activity Feed */}
           <section>
             <div className="flex items-center justify-between mb-6">
-              <h1 className="text-xl font-black tracking-tight text-slate-900">Recent Student Activity ({studioMode})</h1>
-              <p className="text-xs font-mono tracking-widest uppercase text-slate-400 mt-1">Real-time Updates</p>
+              <h2 className="text-xl font-black tracking-tight text-slate-900">Recent Studio Activity</h2>
+              <p className="text-xs font-mono tracking-widest uppercase text-slate-400 mt-1">Live Updates</p>
             </div>
             
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs">
-              <div className="space-y-4">
-                {[
-                  { title: studioMode === 'CAMPUS' ? "Onsite Project Review" : "Virtual Assignment Submission", student: "Alex Johnson", time: "2 hours ago" },
-                  { title: studioMode === 'CAMPUS' ? "Lab Attendance Signed" : "Online Live Quiz Completed", student: "Priya Patel", time: "4 hours ago" },
-                  { title: studioMode === 'CAMPUS' ? "Campus Placement Resume Submitted" : "Virtual Code Review Requested", student: "Rahul Verma", time: "5 hours ago" }
-                ].map((act, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-200 hover:border-teal-400 transition-colors group cursor-pointer">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full bg-teal-100 border border-teal-200 flex items-center justify-center font-bold text-teal-700 text-xs">
-                        {act.student.split(' ').map(n=>n[0]).join('')}
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-sm text-slate-900 group-hover:text-teal-600 transition-colors">{act.title}</h4>
-                        <p className="text-xs text-slate-500">Submitted by {act.student} • {act.time}</p>
-                      </div>
-                    </div>
-                    <button className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center group-hover:bg-teal-600 group-hover:text-white transition-colors">
-                      <ArrowUpRight className="w-4 h-4 text-slate-600 group-hover:text-white" />
-                    </button>
-                  </div>
-                ))}
-              </div>
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs text-center py-10">
+              <Sparkles className="w-8 h-8 text-teal-500 mx-auto mb-2" />
+              <p className="text-sm font-bold text-slate-700">Studio is clean & ready for your courses.</p>
+              <p className="text-xs text-slate-400 mt-1">Student submissions and project reviews will stream here automatically.</p>
             </div>
           </section>
 
@@ -224,36 +231,32 @@ export default function EducatorDashboard() {
           
           {/* Upcoming Live Sessions */}
           <section className="bg-gradient-to-br from-teal-50 to-emerald-50 border border-teal-200 rounded-3xl p-6 shadow-xs relative overflow-hidden">
-            <h3 className="text-lg font-bold mb-6 flex items-center gap-2 text-slate-900">
-              <Video className="w-5 h-5 text-teal-600" /> Upcoming Live ({studioMode})
+            <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-slate-900">
+              <Video className="w-5 h-5 text-teal-600" /> Live Studio Sessions
             </h3>
             
-            <div className="space-y-4 relative z-10">
-              <div className="p-4 rounded-2xl bg-white border border-teal-100 shadow-xs">
-                <div className="text-xs font-bold text-teal-700 mb-1 uppercase tracking-wider">Today, 4:00 PM</div>
-                <h4 className="font-bold mb-3 text-slate-900">
-                  {studioMode === 'CAMPUS' ? 'Onsite Workshop: React State & UI' : 'Virtual Webinar: State Management in React'}
-                </h4>
-                <div className="flex gap-2">
-                  <button className="flex-1 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-colors shadow-xs">Join Room</button>
-                  <button className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors">Edit</button>
-                </div>
-              </div>
+            <div className="p-4 rounded-2xl bg-white border border-teal-100 shadow-xs text-center py-6">
+              <p className="text-xs text-slate-500 mb-3">No live interactive sessions scheduled for today.</p>
+              <Link href="/dashboard/studio/live" className="inline-block py-2 px-4 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-colors shadow-xs">
+                Schedule Live Class
+              </Link>
             </div>
           </section>
 
           {/* AI Assistant Insight */}
           <section className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs">
-            <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-slate-900">
-              <Star className="w-5 h-5 text-amber-500" /> Smart Insights
+            <h3 className="text-lg font-bold mb-3 flex items-center gap-2 text-slate-900">
+              <Star className="w-5 h-5 text-amber-500" /> Studio Assistant
             </h3>
-            <p className="text-sm text-slate-600 mb-4 leading-relaxed">
-              Based on recent quiz results, 40% of your students are struggling with "React Hooks dependencies". 
-              Consider adding a supplementary video or a live Q&A session on this topic.
+            <p className="text-xs text-slate-600 mb-4 leading-relaxed">
+              Use the Teaching Studio to design bite-sized interactive modules, generate automated quizzes, and evaluate student submissions.
             </p>
-            <button className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-sm font-semibold transition-colors">
-              Generate Lesson Plan
-            </button>
+            <Link 
+              href="/dashboard/studio/courses/builder"
+              className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
+            >
+              Open Course Builder
+            </Link>
           </section>
 
         </div>
@@ -275,7 +278,7 @@ function StatCard({ title, value, change, icon: Icon, delay }: any) {
         <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center group-hover:scale-110 transition-transform">
           <Icon className="w-5 h-5 text-slate-600 group-hover:text-teal-600 transition-colors" />
         </div>
-        <span className="px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
+        <span className="px-2 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200">
           {change}
         </span>
       </div>
@@ -302,7 +305,7 @@ function CourseCard({ course, onSubmitApproval }: any) {
             )}
             {course.status === "PENDING_APPROVAL" && (
               <span className="px-2.5 py-1 rounded-full bg-amber-500 text-white text-[10px] font-black uppercase tracking-wider shadow-xs flex items-center gap-1">
-                <Clock className="w-3 h-3" /> Pending Admin Approval
+                <Clock className="w-3 h-3" /> Pending Approval
               </span>
             )}
             {course.status === "DRAFT" && (
@@ -334,12 +337,6 @@ function CourseCard({ course, onSubmitApproval }: any) {
           >
             <Send className="w-3.5 h-3.5" /> Submit for Admin Approval
           </button>
-        )}
-
-        {course.status === "PENDING_APPROVAL" && (
-          <div className="p-2 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900 font-medium text-center">
-            Submitted to Academy Admin for approval
-          </div>
         )}
       </div>
     </div>

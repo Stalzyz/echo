@@ -20,13 +20,20 @@ import {
   MoreVertical,
   Link as LinkIcon,
   Loader2,
-  Search
+  Search,
+  Upload,
+  Play,
+  Film,
+  CheckCircle2,
+  X
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 
 import { ApiClient } from "@/lib/api"
 import { createModule, updateModule, deleteModule, reorderModules, createLesson, updateLesson, deleteLesson, reorderLessons } from "./actions"
 import { RichTextEditor } from "./RichTextEditor"
+import { QuizBuilder } from "./QuizBuilder"
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
@@ -214,6 +221,8 @@ export default function BuilderClient({ initialCourse }: { initialCourse: any })
   const [courseName, setCourseName] = useState<string>(initialCourse.course?.name || "Masterclass Course")
   const [courseDuration, setCourseDuration] = useState<string>(initialCourse.course?.duration || "3 Months")
   const [courseDescription, setCourseDescription] = useState<string>(initialCourse.course?.description || "")
+  const [thumbnailUrl, setThumbnailUrl] = useState<string>(initialCourse?.thumbnail || initialCourse?.course?.thumbnail || "")
+  const [trailerUrl, setTrailerUrl] = useState<string>(initialCourse?.trailerUrl || initialCourse?.course?.trailerUrl || "")
 
   const handleTogglePublish = () => {
     startTransition(async () => {
@@ -222,7 +231,7 @@ export default function BuilderClient({ initialCourse }: { initialCourse: any })
       const res = await togglePublishCourse(targetId, !isPublished)
       if (res) {
         setIsPublished(!isPublished)
-        alert(isPublished ? "Course saved as Draft" : "Course Published successfully!")
+        toast.success(isPublished ? "Course saved as Draft" : "Course Published successfully!")
       }
     })
   }
@@ -232,7 +241,16 @@ export default function BuilderClient({ initialCourse }: { initialCourse: any })
       const targetId = initialCourse?.id || initialCourse?.courseId
       const updateCourseGeneralSettings = (await import("./actions")).updateCourseGeneralSettings
       await updateCourseGeneralSettings(targetId, { name: courseName, duration: courseDuration, description: courseDescription })
-      alert("General course settings saved successfully!")
+      toast.success("General course settings saved successfully!")
+    })
+  }
+
+  const handleSaveThumbnailTrailer = () => {
+    startTransition(async () => {
+      const targetId = initialCourse?.id || initialCourse?.courseId
+      const updateCourseMedia = (await import("./actions")).updateCourseMedia
+      await updateCourseMedia(targetId, { thumbnail: thumbnailUrl, trailerUrl })
+      toast.success("Thumbnail & Trailer settings saved successfully!")
     })
   }
 
@@ -474,61 +492,230 @@ export default function BuilderClient({ initialCourse }: { initialCourse: any })
 
                       {/* Lesson Content Builder */}
                       <div className="space-y-6">
-                        {lesson.type === "VIDEO" && (
-                          <div className="space-y-4">
-                            {!lesson.contentUrl ? (
-                              <div className="border-2 border-dashed border-slate-300 hover:border-teal-400 bg-white rounded-3xl p-12 flex flex-col items-center justify-center text-center transition-colors shadow-sm">
-                                <div className="w-16 h-16 rounded-2xl bg-teal-50 flex items-center justify-center mb-4">
-                                  <MonitorPlay className="w-8 h-8 text-teal-600" />
-                                </div>
-                                <h3 className="text-lg font-bold mb-1 text-slate-900">Add Video Content</h3>
-                                <p className="text-sm text-slate-500 mb-4">Paste a YouTube Unlisted Video URL, Vimeo, or Direct MP4 Link</p>
-                                <input 
-                                  type="text"
-                                  placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
-                                  className="w-full max-w-md bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-teal-500 font-mono text-xs"
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                      handleUpdateLessonVideo(mod.id, lesson.id, e.currentTarget.value)
-                                    }
-                                  }}
-                                />
-                                <p className="text-xs text-teal-700 font-medium mt-2">💡 Tip: Upload videos as <strong>Unlisted</strong> on YouTube so only enrolled students in your academy can view them!</p>
-                              </div>
-                            ) : (
-                              <div className="space-y-2">
-                                <div className="flex items-center justify-between">
-                                  <h3 className="font-bold text-sm text-slate-700">Video Content</h3>
-                                  <button onClick={() => handleUpdateLessonVideo(mod.id, lesson.id, "")} className="text-xs text-rose-600 font-bold hover:text-rose-700">Remove Video</button>
-                                </div>
-                                <div className="aspect-video w-full rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 shadow-sm">
-                                  <iframe 
-                                    src={lesson.contentUrl.includes('youtube') ? lesson.contentUrl.replace('watch?v=', 'embed/') : lesson.contentUrl} 
-                                    className="w-full h-full"
-                                    allowFullScreen
-                                  />
-                                </div>
+                        {lesson.type === "QUIZ" ? (
+                          <div className="group relative mt-2 bg-slate-50 border border-slate-200 rounded-3xl p-6 shadow-xs">
+                            <QuizBuilder 
+                              initialData={lesson.richText || ""}
+                              onSave={(quizData) => handleUpdateLessonContent(mod.id, lesson.id, JSON.stringify(quizData))}
+                              isSaving={isPending}
+                            />
+                          </div>
+                        ) : (
+                          <>
+                            {lesson.type === "VIDEO" && (
+                              <div className="space-y-4">
+                                {!lesson.contentUrl ? (
+                                  <div className="border-2 border-dashed border-slate-300 hover:border-teal-400 bg-white rounded-3xl p-12 flex flex-col items-center justify-center text-center transition-colors shadow-sm">
+                                    <div className="w-16 h-16 rounded-2xl bg-teal-50 flex items-center justify-center mb-4">
+                                      <MonitorPlay className="w-8 h-8 text-teal-600" />
+                                    </div>
+                                    <h3 className="text-lg font-bold mb-1 text-slate-900">Add Video Content</h3>
+                                    <p className="text-sm text-slate-500 mb-4">Paste a YouTube Unlisted Video URL, Vimeo, or Direct MP4 Link</p>
+                                    <input 
+                                      type="text"
+                                      placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
+                                      className="w-full max-w-md bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-teal-500 font-mono text-xs"
+                                      onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                          handleUpdateLessonVideo(mod.id, lesson.id, e.currentTarget.value)
+                                        }
+                                      }}
+                                    />
+                                    <p className="text-xs text-teal-700 font-medium mt-2">💡 Tip: Upload videos as <strong>Unlisted</strong> on YouTube so only enrolled students in your academy can view them!</p>
+                                  </div>
+                                ) : (
+                                  <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                      <h3 className="font-bold text-sm text-slate-700">Video Content</h3>
+                                      <button onClick={() => handleUpdateLessonVideo(mod.id, lesson.id, "")} className="text-xs text-rose-600 font-bold hover:text-rose-700">Remove Video</button>
+                                    </div>
+                                    <div className="aspect-video w-full rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 shadow-sm">
+                                      <iframe 
+                                        src={lesson.contentUrl.includes('youtube') ? lesson.contentUrl.replace('watch?v=', 'embed/') : lesson.contentUrl} 
+                                        className="w-full h-full"
+                                        allowFullScreen
+                                      />
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             )}
-                          </div>
-                        )}
 
-                        <div className="group relative mt-4 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
-                          <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
-                            <h3 className="font-bold text-sm text-slate-700">Lesson Content / Article</h3>
-                          </div>
-                          
-                          <RichTextEditor 
-                            initialContent={lesson.richText || ""}
-                            onChange={(content) => handleUpdateLessonContent(mod.id, lesson.id, content)}
-                            isSaving={isPending}
-                          />
-                        </div>
+                            <div className="group relative mt-4 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+                              <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
+                                <h3 className="font-bold text-sm text-slate-700">Lesson Content / Article</h3>
+                              </div>
+                              
+                              <RichTextEditor 
+                                initialContent={lesson.richText || ""}
+                                onChange={(content) => handleUpdateLessonContent(mod.id, lesson.id, content)}
+                                isSaving={isPending}
+                              />
+                            </div>
+                          </>
+                        )}
                       </div>
                     </>
                   )
                 })()}
 
+              </motion.div>
+            )}
+
+            {activeItem?.type === "THUMBNAIL" && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
+                <div>
+                  <h2 className="text-2xl font-bold mb-2 text-slate-900">Course Thumbnail & Promo Trailer</h2>
+                  <p className="text-slate-500 text-sm">Upload high-converting course cover art and attach a promotional trailer video to attract students.</p>
+                </div>
+
+                {/* Course Thumbnail Image Box */}
+                <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-bold text-lg text-slate-900 flex items-center gap-2">
+                        <ImageIcon className="w-5 h-5 text-teal-600" /> Course Cover Thumbnail
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-1">Recommended resolution: 1280x720 (16:9 ratio). Max 5MB (JPG, PNG, WebP).</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    {/* Live Preview Card */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-700 block">Live Preview Card</label>
+                      <div className="aspect-video w-full rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 relative group shadow-sm flex items-center justify-center">
+                        {thumbnailUrl ? (
+                          <img 
+                            src={thumbnailUrl} 
+                            alt="Course Thumbnail Preview" 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=80"
+                            }}
+                          />
+                        ) : (
+                          <div className="text-center p-6 space-y-2">
+                            <ImageIcon className="w-12 h-12 text-slate-300 mx-auto" />
+                            <p className="text-xs text-slate-400 font-medium">No thumbnail set. Paste image URL or upload.</p>
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <span className="px-3 py-1.5 rounded-lg bg-white/90 text-slate-900 text-xs font-bold shadow-xs">
+                            16:9 Aspect Ratio
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Inputs & Quick Preset Selectors */}
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-xs font-bold text-slate-700 block mb-2">Image URL / CDN Link</label>
+                        <div className="relative">
+                          <input 
+                            type="text" 
+                            placeholder="https://images.unsplash.com/... or uploaded URL"
+                            value={thumbnailUrl}
+                            onChange={(e) => setThumbnailUrl(e.target.value)}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-4 pr-10 py-3 text-sm text-slate-900 focus:outline-none focus:border-teal-500 font-medium"
+                          />
+                          {thumbnailUrl && (
+                            <button 
+                              type="button" 
+                              onClick={() => setThumbnailUrl("")}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-600"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-bold text-slate-700 block mb-2">Quick Sample Covers</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { name: "Tech & Code", url: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80" },
+                            { name: "UI/UX Design", url: "https://images.unsplash.com/photo-1581291518655-9523c932edcf?w=800&auto=format&fit=crop&q=80" },
+                            { name: "AI & ML", url: "https://images.unsplash.com/photo-1677442136019-21780efad99a?w=800&auto=format&fit=crop&q=80" },
+                            { name: "Business", url: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=80" },
+                          ].map((preset, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => setThumbnailUrl(preset.url)}
+                              className="text-left px-3 py-2 rounded-xl bg-slate-50 hover:bg-teal-50 border border-slate-200 hover:border-teal-300 text-xs font-bold text-slate-700 hover:text-teal-900 transition-colors"
+                            >
+                              + {preset.name}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="p-3 bg-teal-50/60 border border-teal-200 rounded-xl text-xs text-teal-900 space-y-1">
+                        <div className="font-bold flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" /> Recommended Guidelines:</div>
+                        <ul className="list-disc list-inside space-y-0.5 text-teal-800 text-[11px]">
+                          <li>High contrast with minimal distracting text</li>
+                          <li>Visible in mobile catalog grid and student portal</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Course Promo Trailer Box */}
+                <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-bold text-lg text-slate-900 flex items-center gap-2">
+                        <Film className="w-5 h-5 text-teal-600" /> Course Promotional Trailer Video
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-1">Students can watch this free teaser video on the course landing page before enrolling.</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 block mb-2">Video Trailer URL (YouTube / Vimeo / MP4)</label>
+                      <input 
+                        type="text" 
+                        placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                        value={trailerUrl}
+                        onChange={(e) => setTrailerUrl(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-teal-500 font-medium"
+                      />
+                    </div>
+
+                    {trailerUrl && (
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-700 block">Trailer Video Preview</label>
+                        <div className="aspect-video w-full rounded-2xl overflow-hidden border border-slate-200 bg-black shadow-sm">
+                          <iframe 
+                            src={trailerUrl.includes('youtube.com') || trailerUrl.includes('youtu.be') 
+                              ? trailerUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'www.youtube.com/embed/') 
+                              : trailerUrl} 
+                            className="w-full h-full"
+                            allowFullScreen
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Save Button */}
+                <div className="flex justify-end pt-2">
+                  <button 
+                    onClick={handleSaveThumbnailTrailer}
+                    disabled={isPending}
+                    className="px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold transition-all shadow-sm flex items-center gap-2 text-sm disabled:opacity-50"
+                  >
+                    {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    Save Thumbnail & Trailer
+                  </button>
+                </div>
               </motion.div>
             )}
 

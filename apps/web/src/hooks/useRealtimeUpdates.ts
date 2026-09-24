@@ -14,7 +14,11 @@ export function useRealtimeUpdates(onEvent?: (event: WsEvent) => void) {
   const [lastEvent, setLastEvent] = useState<WsEvent | null>(null)
   const reconnectTimer = useRef<NodeJS.Timeout | null>(null)
   const onEventRef = useRef(onEvent)
-  onEventRef.current = onEvent
+  const connectRef = useRef<() => void>(() => {})
+
+  useEffect(() => {
+    onEventRef.current = onEvent
+  }, [onEvent])
 
   const connect = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return
@@ -50,7 +54,9 @@ export function useRealtimeUpdates(onEvent?: (event: WsEvent) => void) {
       ws.onclose = () => {
         setConnected(false)
         // Auto-reconnect after 3 seconds
-        reconnectTimer.current = setTimeout(connect, 3000)
+        reconnectTimer.current = setTimeout(() => {
+          connectRef.current()
+        }, 3000)
       }
 
       ws.onerror = () => ws.close()
@@ -58,6 +64,10 @@ export function useRealtimeUpdates(onEvent?: (event: WsEvent) => void) {
       // WebSocket not available (SSR) — silently ignore
     }
   }, [])
+
+  useEffect(() => {
+    connectRef.current = connect
+  }, [connect])
 
   useEffect(() => {
     connect()

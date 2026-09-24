@@ -1,9 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, Users, CheckCircle2, XCircle, Clock, Maximize2, Loader2 } from "lucide-react"
+import { Search, Users, CheckCircle2, XCircle, Clock, Maximize2, Loader2, QrCode, GraduationCap, Sparkles } from "lucide-react"
 import { toast } from "sonner"
 import { useApi, fetchApi } from "@/lib/useApi"
+import { QrAttendanceScannerModal } from "./QrAttendanceScannerModal"
+import { StudentIdBadgeModal } from "./StudentIdBadgeModal"
 
 const FALLBACK_BATCHES = ["UI/UX Cohort 4", "Brand Design Int.", "Web Dev Basics"]
 
@@ -20,6 +22,8 @@ export default function AcademyAttendanceDashboard() {
   const [batchFilter, setBatchFilter] = useState("All Batches")
   const [search, setSearch] = useState("")
   const [isRollCallMode, setIsRollCallMode] = useState(false)
+  const [isQrScannerOpen, setIsQrScannerOpen] = useState(false)
+  const [badgeStudent, setBadgeStudent] = useState<any | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Live API Hooks
@@ -137,13 +141,22 @@ export default function AcademyAttendanceDashboard() {
             <h1 className="text-2xl font-bold text-foreground">Academy Attendance</h1>
             <p className="text-sm text-muted-foreground mt-1">Track student attendance across physical and virtual batches.</p>
           </div>
-          <button 
-            onClick={() => setIsRollCallMode(true)}
-            className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-all shadow-sm"
-          >
-            <Maximize2 className="w-4 h-4" />
-            Start Live Roll Call
-          </button>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setIsQrScannerOpen(true)}
+              className="flex items-center gap-1.5 bg-teal-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-teal-700 transition-all shadow-xs"
+            >
+              <QrCode className="w-3.5 h-3.5" />
+              Live QR Scanner
+            </button>
+            <button 
+              onClick={() => setIsRollCallMode(true)}
+              className="flex items-center gap-1.5 bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-slate-800 transition-all shadow-xs"
+            >
+              <Maximize2 className="w-3.5 h-3.5" />
+              Start Live Roll Call
+            </button>
+          </div>
         </div>
       </div>
 
@@ -239,7 +252,15 @@ export default function AcademyAttendanceDashboard() {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button className="text-primary hover:underline text-xs font-medium">View History</button>
+                        <div className="flex items-center justify-end gap-2">
+                          <button 
+                            onClick={() => setBadgeStudent(log)}
+                            className="text-teal-800 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 border border-teal-200 px-2.5 py-1 rounded-lg text-xs font-bold transition-colors flex items-center gap-1"
+                          >
+                            <QrCode className="w-3 h-3 text-teal-600" />
+                            ID Badge
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   )
@@ -256,6 +277,24 @@ export default function AcademyAttendanceDashboard() {
         </div>
 
       </div>
+
+      {/* Live QR Attendance Scanner Modal */}
+      <QrAttendanceScannerModal
+        isOpen={isQrScannerOpen}
+        onClose={() => setIsQrScannerOpen(false)}
+        existingStudents={liveLogs}
+        onScanSuccess={(id) => {
+          updateStatus(id, "PRESENT")
+        }}
+      />
+
+      {/* Digital Student QR ID Badge Modal */}
+      <StudentIdBadgeModal
+        isOpen={Boolean(badgeStudent)}
+        onClose={() => setBadgeStudent(null)}
+        student={badgeStudent}
+      />
+
     </div>
   )
 }

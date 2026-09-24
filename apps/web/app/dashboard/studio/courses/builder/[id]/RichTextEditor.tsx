@@ -70,31 +70,32 @@ export function RichTextEditor({ initialContent, onChange, isSaving }: RichTextE
   }
 
   return (
-    <div className="w-full border border-white/10 rounded-xl bg-white/5 overflow-hidden flex flex-col group focus-within:border-purple-500/50 transition-colors">
+    <div className="w-full border border-slate-200 rounded-2xl bg-white overflow-hidden flex flex-col group focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-500/20 transition-all shadow-xs">
       
       {/* Toolbar */}
-      <div className="h-12 border-b border-white/10 bg-black/40 flex items-center justify-between px-2 shrink-0">
+      <div className="h-12 border-b border-slate-200 bg-slate-50 flex items-center justify-between px-3 shrink-0">
         <div className="flex items-center gap-1">
           <ToolbarButton icon={<Bold className="w-4 h-4" />} onClick={() => execCommand("bold")} title="Bold" />
           <ToolbarButton icon={<Italic className="w-4 h-4" />} onClick={() => execCommand("italic")} title="Italic" />
           <ToolbarButton icon={<Underline className="w-4 h-4" />} onClick={() => execCommand("underline")} title="Underline" />
-          <div className="w-px h-4 bg-white/10 mx-1" />
+          <div className="w-px h-5 bg-slate-200 mx-1.5" />
           <ToolbarButton icon={<Heading1 className="w-4 h-4" />} onClick={() => execCommand("formatBlock", "H1")} title="Heading 1" />
           <ToolbarButton icon={<Heading2 className="w-4 h-4" />} onClick={() => execCommand("formatBlock", "H2")} title="Heading 2" />
-          <div className="w-px h-4 bg-white/10 mx-1" />
+          <div className="w-px h-5 bg-slate-200 mx-1.5" />
           <ToolbarButton icon={<List className="w-4 h-4" />} onClick={() => execCommand("insertUnorderedList")} title="Bullet List" />
           <ToolbarButton icon={<ListOrdered className="w-4 h-4" />} onClick={() => execCommand("insertOrderedList")} title="Numbered List" />
         </div>
 
         <div className="flex items-center gap-2">
-          {isSaving && <Loader2 className="w-4 h-4 animate-spin text-white/50" />}
+          {isSaving && <Loader2 className="w-4 h-4 animate-spin text-teal-600" />}
           
           <button 
+            type="button"
             onClick={handleGenerateAI}
             disabled={isGenerating}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/30 text-xs font-bold transition-colors border border-indigo-500/30 disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-50 text-teal-800 hover:bg-teal-100 text-xs font-bold transition-colors border border-teal-200 disabled:opacity-50"
           >
-            {isGenerating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
+            {isGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Wand2 className="w-3.5 h-3.5 text-teal-600" />}
             AI Write
           </button>
         </div>
@@ -104,7 +105,7 @@ export function RichTextEditor({ initialContent, onChange, isSaving }: RichTextE
       <div 
         ref={editorRef}
         onInput={handleInput}
-        className="min-h-[300px] max-h-[500px] overflow-y-auto p-6 text-white/80 focus:outline-none custom-scrollbar prose prose-invert prose-p:leading-relaxed prose-headings:font-bold prose-a:text-purple-400"
+        className="min-h-[300px] max-h-[500px] overflow-y-auto p-6 bg-white text-slate-900 focus:outline-none custom-scrollbar text-base font-normal leading-relaxed selection:bg-teal-100 selection:text-teal-900"
         contentEditable
         suppressContentEditableWarning
       />
@@ -118,7 +119,7 @@ function ToolbarButton({ icon, onClick, title }: { icon: React.ReactNode, onClic
       type="button"
       onClick={onClick}
       title={title}
-      className="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center text-white/70 hover:text-white transition-colors"
+      className="w-8 h-8 rounded-lg hover:bg-slate-200/80 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-colors"
     >
       {icon}
     </button>

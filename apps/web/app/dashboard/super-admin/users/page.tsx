@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { 
   Users, Search, Filter, ShieldCheck, UserCheck, GraduationCap, 
   Briefcase, Check, X, ShieldAlert, Eye, Mail, Phone, Building2

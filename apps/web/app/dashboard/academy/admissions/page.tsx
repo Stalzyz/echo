@@ -22,13 +22,15 @@ import { CSS } from '@dnd-kit/utilities'
 import { 
   Plus, Search, Filter, Mail, Phone, Calendar, MoreHorizontal, X, Loader2, 
   Upload, Download, FileText, CheckCircle2, LayoutGrid, List, ArrowUpDown, 
-  Clock, Monitor, MapPin, MessageSquare, ChevronDown, Trash2, UserCheck, Tag
+  Clock, Monitor, MapPin, MessageSquare, ChevronDown, Trash2, UserCheck, Tag,
+  Share2, FileSpreadsheet, Sparkles, Globe, RefreshCw, ExternalLink, Zap
 } from "lucide-react"
 import { useApi, fetchApi } from "@/lib/useApi"
 import { toast } from "sonner"
 import { ClickToCallModal } from "@/components/crm/ClickToCallModal"
 import { CallIntelligenceModal } from "@/components/crm/CallIntelligenceModal"
 import { LeadCallHistoryTab } from "@/components/crm/LeadCallHistoryTab"
+import { AutomationTriggersModal } from "./AutomationTriggersModal"
 
 // Types
 type ColumnType = 'ENQUIRY' | 'COUNSELLING' | 'TRIAL' | 'ENROLLED_ACADEMY' | 'DROPPED'
@@ -248,6 +250,37 @@ export default function AdmissionsPipelinePage() {
   // Modal Controls
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isImportModalOpen, setIsImportModalOpen] = useState(false)
+  const [isMetaModalOpen, setIsMetaModalOpen] = useState(false)
+  const [isGoogleAdsModalOpen, setIsGoogleAdsModalOpen] = useState(false)
+  const [isGoogleSheetsModalOpen, setIsGoogleSheetsModalOpen] = useState(false)
+  const [isAutomationsModalOpen, setIsAutomationsModalOpen] = useState(false)
+  const [isConnecting, setIsConnecting] = useState(false)
+
+  const [metaForm, setMetaForm] = useState({
+    pageId: "fb_page_89201948",
+    formId: "lead_gen_form_v2",
+    accessToken: "EAABwzL...",
+    defaultCourse: COURSE_OPTIONS[0],
+    autoAssignCounselor: true,
+    isConnected: true
+  })
+
+  const [googleAdsForm, setGoogleAdsForm] = useState({
+    customerId: "482-910-2391",
+    webhookKey: "echo_gads_sec_9841",
+    campaignName: "Search-Campuses-2026",
+    defaultDelivery: "CAMPUS",
+    isConnected: true
+  })
+
+  const [googleSheetsForm, setGoogleSheetsForm] = useState({
+    sheetUrl: "https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZj_...",
+    sheetName: "Leads_Live_Sync",
+    syncDirection: "TWO_WAY",
+    syncInterval: "REALTIME",
+    isConnected: true
+  })
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
   const [importFile, setImportFile] = useState<File | null>(null)
@@ -562,6 +595,36 @@ export default function AdmissionsPipelinePage() {
     }
   }
 
+  const handleExportLeads = () => {
+    if (filteredLeads.length === 0) {
+      toast.error("No leads available to export")
+      return
+    }
+    const headers = ["Name", "Email", "Phone", "Course Interest", "Batch", "Delivery Mode", "Status", "Score", "Source", "Updated At"]
+    const rows = filteredLeads.map(l => [
+      `"${(l.name || '').replace(/"/g, '""')}"`,
+      `"${(l.email || '').replace(/"/g, '""')}"`,
+      `"${(l.phone || '').replace(/"/g, '""')}"`,
+      `"${(l.courseInterest || '').replace(/"/g, '""')}"`,
+      `"${(l.batch || '').replace(/"/g, '""')}"`,
+      `"${(l.deliveryMode || '').replace(/"/g, '""')}"`,
+      `"${(l.status || '').replace(/"/g, '""')}"`,
+      l.score || 0,
+      `"${(l.source || '').replace(/"/g, '""')}"`,
+      `"${(l.updatedAt || '').replace(/"/g, '""')}"`
+    ])
+    const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n")
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.href = url
+    link.setAttribute("download", `crm_leads_export_${new Date().toISOString().split("T")[0]}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    toast.success(`Exported ${filteredLeads.length} leads to CSV successfully!`)
+  }
+
   return (
     <div className="flex flex-col h-full bg-slate-50 text-slate-900 overflow-hidden relative">
       
@@ -599,6 +662,54 @@ export default function AdmissionsPipelinePage() {
                 <List className="w-3.5 h-3.5" /> List View
               </button>
             </div>
+
+            {/* Integration Connectors */}
+            <button 
+              onClick={() => setIsMetaModalOpen(true)}
+              className="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-900 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 border border-blue-200"
+              title="Connect Facebook & Instagram Lead Ads"
+            >
+              <Share2 className="w-3.5 h-3.5 text-blue-600" />
+              Meta Leads
+              {metaForm.isConnected && <span className="w-2 h-2 rounded-full bg-emerald-500" />}
+            </button>
+
+            <button 
+              onClick={() => setIsGoogleAdsModalOpen(true)}
+              className="px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-950 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 border border-amber-200"
+              title="Connect Google Ads Lead Forms"
+            >
+              <Globe className="w-3.5 h-3.5 text-amber-600" />
+              Google Ads
+              {googleAdsForm.isConnected && <span className="w-2 h-2 rounded-full bg-emerald-500" />}
+            </button>
+
+            <button 
+              onClick={() => setIsGoogleSheetsModalOpen(true)}
+              className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 border border-emerald-200"
+              title="Connect Google Sheets 2-Way Sync"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+              Google Sheets
+              {googleSheetsForm.isConnected && <span className="w-2 h-2 rounded-full bg-emerald-500" />}
+            </button>
+
+            <button 
+              onClick={() => setIsAutomationsModalOpen(true)}
+              className="px-3 py-2 bg-purple-50 hover:bg-purple-100 text-purple-950 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 border border-purple-200"
+              title="Automated WhatsApp & Email Follow-up Triggers"
+            >
+              <Zap className="w-3.5 h-3.5 text-purple-600" />
+              Auto Triggers
+            </button>
+
+            <button 
+              onClick={handleExportLeads}
+              className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-colors flex items-center gap-2 border border-slate-200"
+            >
+              <Download className="w-3.5 h-3.5 text-teal-600" />
+              Export Leads
+            </button>
 
             <button 
               onClick={() => setIsImportModalOpen(true)}
@@ -1208,6 +1319,12 @@ export default function AdmissionsPipelinePage() {
           onCrmSynced={() => mutate()}
         />
       )}
+
+      {/* Automation & Communication Triggers Modal */}
+      <AutomationTriggersModal
+        isOpen={isAutomationsModalOpen}
+        onClose={() => setIsAutomationsModalOpen(false)}
+      />
 
     </div>
   )
