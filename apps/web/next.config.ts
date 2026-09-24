@@ -63,6 +63,11 @@ const nextConfig: NextConfig = {
         destination: '/academy/register',
         permanent: true,
       },
+      {
+        source: '/dashboard/super-admin',
+        destination: '/dashboard/super-admin/academies',
+        permanent: false,
+      },
     ];
   },
   async headers() {

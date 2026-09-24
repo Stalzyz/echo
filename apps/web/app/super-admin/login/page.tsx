@@ -61,9 +61,9 @@ export default function SuperAdminLoginPage() {
         return
       }
 
-      setSuccess("Super Admin root identity verified. Launching Platform Control Plane...")
+      setSuccess("Super Admin root identity verified. Launching Vendor Management...")
       setTimeout(() => {
-        router.push("/dashboard/super-admin")
+        router.push("/dashboard/super-admin/academies")
         router.refresh()
       }, 600)
     } catch (err: any) {

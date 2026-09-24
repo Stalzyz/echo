@@ -15,17 +15,25 @@ export const authConfig = {
 
       const isOnSuperAdmin = nextUrl.pathname.startsWith('/dashboard/super-admin')
 
+      const role = (auth?.user as any)?.role
+      const impersonated = (auth?.user as any)?.impersonatedBySuperAdmin
+      const isSuperAdmin = (role === 'SUPER_ADMIN' || role === 'Super Admin') && !impersonated
+
       if (isOnSuperAdmin) {
+        // Must be logged in
         if (!isLoggedIn) return false
-        const role = (auth?.user as any)?.role
-        if (role !== 'SUPER_ADMIN' && role !== 'Super Admin') {
-          // Academy Admins and students cannot access Super Admin control plane
+        // Only real (non-impersonating) super admins can access this area
+        if (!isSuperAdmin) {
+          // Non-super-admin tried to access super-admin — send to their own area
+          if (role === 'CLIENT') return Response.redirect(new URL('/portal', nextUrl))
+          if (role === 'STUDENT') return Response.redirect(new URL('/student', nextUrl))
+          if (role === 'EDUCATOR') return Response.redirect(new URL('/dashboard/studio', nextUrl))
           return Response.redirect(new URL('/dashboard', nextUrl))
         }
         return true
       }
 
-      // Protect /w/[slug] vendor workspace routes
+      // Protect /w/[slug] vendor workspace routes — require login
       if (isOnVendorWorkspace) {
         if (!isLoggedIn) return false
         return true
@@ -34,13 +42,9 @@ export const authConfig = {
       if (isOnDashboard || isOnPortal || isOnStudent) {
         if (!isLoggedIn) return false
 
-        const user = auth?.user as any
-        const role = user?.role
-        const isSuperAdmin = (role === 'SUPER_ADMIN' || role === 'Super Admin') && !user?.impersonatedBySuperAdmin
-
-        // Super Admin without active impersonation belongs strictly in Platform Control Plane
+        // Super Admin (without impersonation) must stay in their control plane
         if (isSuperAdmin && !isOnSuperAdmin) {
-          return Response.redirect(new URL('/dashboard/super-admin', nextUrl))
+          return Response.redirect(new URL('/dashboard/super-admin/academies', nextUrl))
         }
 
         return true
@@ -52,10 +56,9 @@ export const authConfig = {
           nextUrl.pathname.startsWith('/academy/login') ||
           nextUrl.pathname === '/login'
         ) {
-          const role = (auth?.user as any)?.role
           const slug = (auth?.user as any)?.slug
-          if (role === 'SUPER_ADMIN' || role === 'Super Admin') {
-            return Response.redirect(new URL('/dashboard/super-admin', nextUrl))
+          if (isSuperAdmin) {
+            return Response.redirect(new URL('/dashboard/super-admin/academies', nextUrl))
           } else if (role === 'CLIENT') {
             return Response.redirect(new URL('/portal', nextUrl))
           } else if (role === 'STUDENT') {
