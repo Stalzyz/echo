@@ -33,6 +33,27 @@ export default function AcademyLoginPage() {
         )}
 
         <form action={dispatch} className="space-y-4">
+          
+          {/* 1-CLICK AUTOFILL HELPER */}
+          <div className="p-3 bg-amber-50/80 border border-amber-200 rounded-2xl flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
+              <span className="text-[11px] font-bold text-amber-950 truncate">
+                Demo Admin: <strong className="font-mono">admin@echo.in</strong> (pw: <span className="font-mono">echo123</span>)
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail("admin@echo.in")
+                setPassword("echo123")
+              }}
+              className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-[10px] rounded-lg transition-all shrink-0 uppercase shadow-2xs"
+            >
+              Auto-Fill
+            </button>
+          </div>
+
           <div>
             <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1.5 font-mono">Email Address</label>
             <div className="relative">
