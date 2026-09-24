@@ -71,7 +71,7 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
       btnClass: "bg-teal-600 hover:bg-teal-700 text-white shadow-md shadow-teal-600/20",
       targetPath: "/student",
       demoPath: "/demo/student",
-      demoUser: "student@echo.in"
+      demoUser: "demo.student@echo.in"
     },
     educator: {
       id: "educator",
@@ -84,7 +84,7 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
       btnClass: "bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/20",
       targetPath: "/dashboard/studio",
       demoPath: "/demo/educator",
-      demoUser: "educator@echo.in"
+      demoUser: "demo.educator@echo.in"
     },
     admin: {
       id: "admin",
@@ -97,7 +97,7 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
       btnClass: "bg-amber-600 hover:bg-amber-700 text-white shadow-md shadow-amber-600/20",
       targetPath: "/dashboard",
       demoPath: "/demo/admin",
-      demoUser: "admin@echo.in"
+      demoUser: "demo.academy@echo.in"
     }
   }
 

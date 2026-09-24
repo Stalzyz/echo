@@ -35,11 +35,64 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const credPassword = credentials.password as string;
 
         // Built-in Demo Credentials Support (For Marketing & Preview Logins)
-        const isDemoAdmin = credEmail === 'admin@echo.in' && (credPassword === 'echo123' || credPassword === 'admin123');
-        const isDemoStudent = credEmail === 'student@echo.in' && (credPassword === 'echo123' || credPassword === 'student123');
-        const isDemoEducator = credEmail === 'educator@echo.in' && (credPassword === 'echo123' || credPassword === 'educator123');
-        const isDemoSuperAdmin = credEmail === 'superadmin@echo.in' && (credPassword === 'echo123' || credPassword === 'superadmin123');
-        const isDemoLogin = isDemoAdmin || isDemoStudent || isDemoEducator || isDemoSuperAdmin;
+        const isDemoAdmin = (
+          credEmail === 'demo.academy@echo.in' || 
+          credEmail === 'demo.admin@echo.in' || 
+          credEmail === 'academy.demo@echo.in'
+        ) && (credPassword === 'echo123' || credPassword === 'admin123' || credPassword === 'Photoshop09@');
+
+        const isDemoStudent = (
+          credEmail === 'demo.student@echo.in' || 
+          credEmail === 'student.demo@echo.in' ||
+          credEmail === 'student@echo.in'
+        ) && (credPassword === 'echo123' || credPassword === 'student123' || credPassword === 'Photoshop09@');
+
+        const isDemoEducator = (
+          credEmail === 'demo.educator@echo.in' || 
+          credEmail === 'educator.demo@echo.in' ||
+          credEmail === 'educator@echo.in'
+        ) && (credPassword === 'echo123' || credPassword === 'educator123' || credPassword === 'Photoshop09@');
+
+        const isDemoSuperAdmin = (
+          credEmail === 'demo.superadmin@echo.in' ||
+          credEmail === 'superadmin@echo.in' ||
+          credEmail === 'superadmin@grekam.in'
+        ) && (credPassword === 'echo123' || credPassword === 'superadmin123' || credPassword === 'Photoshop09@');
+
+        // Handle guaranteed demo authentication immediately
+        if (isDemoAdmin || isDemoStudent || isDemoEducator || isDemoSuperAdmin) {
+          const primaryOrg = await prisma.organization.findFirst({
+            orderBy: { createdAt: 'desc' }
+          });
+
+          const demoRole = isDemoSuperAdmin 
+            ? 'SUPER_ADMIN' 
+            : isDemoEducator 
+            ? 'EDUCATOR' 
+            : isDemoStudent 
+            ? 'STUDENT' 
+            : 'ADMIN';
+
+          const demoName = isDemoSuperAdmin 
+            ? 'Platform Super Admin' 
+            : isDemoEducator 
+            ? 'Dr. Priya Menon (Educator)' 
+            : isDemoStudent 
+            ? 'Alex Martin (Student)' 
+            : 'Apex Academy Director';
+
+          return {
+            id: `demo-${demoRole.toLowerCase()}-id`,
+            name: demoName,
+            email: credEmail,
+            role: demoRole,
+            organizationId: primaryOrg?.id || 'demo-org-id',
+            tenantId: primaryOrg?.id || 'demo-org-id',
+            slug: primaryOrg?.slug || 'apex-code',
+            customRole: demoRole === 'ADMIN' ? 'Academy Admin' : null,
+            permissions: ['ALL']
+          };
+        }
 
         let user = await prisma.user.findUnique({
           where: { email: credEmail },
@@ -52,39 +105,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             }
           }
         });
-        
-        if (!user && isDemoLogin) {
-          // Find first active academy or fallback
-          const primaryOrg = await prisma.organization.findFirst({
-            orderBy: { createdAt: 'desc' }
-          });
-
-          const demoRole = isDemoSuperAdmin ? 'SUPER_ADMIN' : isDemoEducator ? 'EDUCATOR' : isDemoStudent ? 'STUDENT' : 'ADMIN';
-          const demoName = isDemoSuperAdmin ? 'Platform Super Admin' : isDemoEducator ? 'Dr. Priya Menon (Educator)' : isDemoStudent ? 'Alex Martin (Student)' : 'Academy Director';
-
-          return {
-            id: `demo-${demoRole.toLowerCase()}-id`,
-            name: demoName,
-            email: credEmail,
-            role: demoRole,
-            organizationId: primaryOrg?.id || 'demo-org-id',
-            tenantId: primaryOrg?.id || 'demo-org-id',
-            slug: primaryOrg?.slug || 'apex-code',
-            customRole: null,
-            permissions: []
-          };
-        }
 
         if (!user) {
           return null;
         }
 
-        // Verify password hash (allow demo password for demo accounts if user exists)
+        // Verify password hash
         if (user.passwordHash && credentials.password) {
           let isValid = false;
-          if (isDemoLogin) {
-            isValid = true;
-          } else if (user.passwordHash.startsWith('$2a$') || user.passwordHash.startsWith('$2b$')) {
+          if (user.passwordHash.startsWith('$2a$') || user.passwordHash.startsWith('$2b$')) {
             isValid = await bcrypt.compare(credentials.password as string, user.passwordHash);
           } else {
             isValid = (credentials.password === user.passwordHash);

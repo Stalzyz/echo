@@ -44,7 +44,7 @@ export default function AcademyLoginPage() {
                 name="email"
                 required
                 autoComplete="username email"
-                placeholder="admin@echo.in"
+                placeholder="demo.academy@echo.in"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-600 focus:bg-white transition-all font-medium"
