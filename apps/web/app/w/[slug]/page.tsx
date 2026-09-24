@@ -161,7 +161,7 @@ export default function VendorWorkspacePage({ params }: { params: Promise<{ slug
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {plan.hasFeature("studentPortal") && (
             <Link 
-              href="/dashboard/crm/students"
+              href="/dashboard/academy/students/onsite"
               className="p-4 rounded-2xl border border-slate-200 hover:border-teal-500 hover:shadow-md transition-all group bg-slate-50/50"
             >
               <div className="flex items-center justify-between mb-2">

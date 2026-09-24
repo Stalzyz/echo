@@ -151,4 +151,24 @@ export default async function educatorsRouter(app: FastifyInstance) {
 
     return { data: educator };
   });
+
+  // DELETE /api/v1/academy/educators/:id
+  app.delete('/educators/:id', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const educator = await app.prisma.educator.findUnique({ where: { id } });
+    if (!educator) return reply.status(404).send({ error: "Educator not found" });
+
+    await app.prisma.$transaction(async (tx) => {
+      await tx.batch.updateMany({
+        where: { educatorId: id },
+        data: { educatorId: null }
+      });
+      await tx.educator.delete({ where: { id } });
+      if (educator.userId) {
+        await tx.user.delete({ where: { id: educator.userId } }).catch(() => {});
+      }
+    });
+
+    return { message: "Educator deleted successfully" };
+  });
 }

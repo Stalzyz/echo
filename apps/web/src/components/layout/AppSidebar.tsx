@@ -323,7 +323,7 @@ export function AppSidebar() {
   const plan = usePlan();
 
   const activeGroups =
-    isSuperAdminPlatform || pathname?.startsWith("/dashboard/super-admin")
+    pathname?.startsWith("/dashboard/super-admin")
       ? superAdminSidebarGroups
       : sidebarGroups.map(g => ({
           ...g,
@@ -394,7 +394,7 @@ export function AppSidebar() {
 
             {group.items.map((item) => {
               const isActive =
-                pathname === item.href || (item.href !== "/dashboard" && pathname?.startsWith(item.href));
+                pathname === item.href || (item.href !== "/dashboard" && item.href !== "/dashboard/super-admin" && pathname?.startsWith(item.href));
               const Icon = item.icon;
               const hasChildren = item.children && item.children.length > 0;
               const isSubOpen = openGroups[item.title];

@@ -73,7 +73,7 @@ export function TopNav() {
             <OrgHeader />
           </Link>
           <nav className="hidden lg:flex items-center gap-1 border-l border-slate-200 pl-3">
-            {isSuperAdminPlatform || pathname?.startsWith("/dashboard/super-admin") ? (
+            {pathname?.startsWith("/dashboard/super-admin") ? (
               <>
                 <Link
                   href="/dashboard/super-admin"
@@ -130,9 +130,23 @@ export function TopNav() {
                 >
                   Settings
                 </Link>
+                <Link
+                  href="/dashboard/academy/admissions"
+                  className="ml-2 px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all"
+                >
+                  Academy Mode →
+                </Link>
               </>
             ) : (
               <>
+                {isSuperAdminPlatform && (
+                  <Link
+                    href="/dashboard/super-admin"
+                    className="mr-1 px-3 py-1.5 rounded-xl text-xs font-extrabold bg-amber-100 text-amber-900 border border-amber-300 hover:bg-amber-200 transition-all flex items-center gap-1 shadow-2xs"
+                  >
+                    🛡️ Platform Control
+                  </Link>
+                )}
                 <Link
                   href="/dashboard"
                   onClick={() => window.dispatchEvent(new CustomEvent('anchor-sidebar', { detail: 'Main' }))}
