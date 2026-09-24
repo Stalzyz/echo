@@ -6,6 +6,19 @@ export const authConfig = {
     signIn: '/auth/login',
   },
   callbacks: {
+    // Edge-compatible session callback so the middleware can read role from JWT
+    async session({ session, token }) {
+      if (session.user && token) {
+        (session.user as any).role = token.role
+        ;(session.user as any).id = token.id
+        ;(session.user as any).organizationId = token.organizationId
+        ;(session.user as any).tenantId = token.tenantId || token.organizationId
+        ;(session.user as any).slug = token.slug
+        ;(session.user as any).impersonatedBySuperAdmin = token.impersonatedBySuperAdmin
+        ;(session.user as any).originalSuperAdminId = token.originalSuperAdminId
+      }
+      return session
+    },
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user
       const isOnDashboard = nextUrl.pathname.startsWith('/dashboard')
@@ -22,11 +35,8 @@ export const authConfig = {
       const isSuperAdmin = (role === 'SUPER_ADMIN' || role === 'Super Admin') && !impersonated
 
       if (isOnSuperAdmin) {
-        // Must be logged in
         if (!isLoggedIn) return false
-        // Only real (non-impersonating) super admins can access this area
         if (!isSuperAdmin) {
-          // Non-super-admin tried to access super-admin — send to their own dashboard
           if (role === 'CLIENT') return Response.redirect(new URL('/portal', nextUrl))
           if (role === 'STUDENT') return Response.redirect(new URL('/student', nextUrl))
           if (role === 'EDUCATOR') return Response.redirect(new URL('/dashboard/studio', nextUrl))
@@ -35,7 +45,6 @@ export const authConfig = {
         return true
       }
 
-      // Protect /w/[slug] vendor workspace routes — require login
       if (isOnVendorWorkspace) {
         if (!isLoggedIn) return false
         return true
@@ -44,7 +53,7 @@ export const authConfig = {
       if (isOnDashboard || isOnPortal || isOnStudent) {
         if (!isLoggedIn) return false
 
-        // Super Admin (without impersonation) must stay in their control plane
+        // Super Admin must always be in their control plane
         if (isSuperAdmin && !isOnSuperAdmin) {
           return Response.redirect(new URL('/dashboard/super-admin/academies', nextUrl))
         }
