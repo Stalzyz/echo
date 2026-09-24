@@ -17,16 +17,8 @@ interface Transaction {
   paymentDate: string
 }
 
-const INITIAL_TRANSACTIONS: Transaction[] = [
-  { id: "tx-901", invoiceNo: "INV-2026-001", academyName: "Apex Tech Institute", amount: 99990, paymentGateway: "Razorpay", status: "SUCCESSFUL", paymentDate: "2026-01-15 11:30" },
-  { id: "tx-902", invoiceNo: "INV-2026-002", academyName: "Stark Photography Academy", amount: 2499, paymentGateway: "Razorpay", status: "SUCCESSFUL", paymentDate: "2026-09-10 14:20" },
-  { id: "tx-903", invoiceNo: "INV-2026-003", academyName: "DesignCraft Studio Academy", amount: 999, paymentGateway: "Stripe", status: "FAILED", paymentDate: "2026-09-01 09:15" },
-  { id: "tx-904", invoiceNo: "INV-2026-004", academyName: "Global Civil Services Hub", amount: 24990, paymentGateway: "Razorpay", status: "SUCCESSFUL", paymentDate: "2026-04-20 16:45" },
-  { id: "tx-905", invoiceNo: "INV-2026-005", academyName: "Quantum Coding Labs", amount: 999, paymentGateway: "Stripe", status: "REFUNDED", paymentDate: "2026-08-15 18:00" },
-]
-
 export default function PlatformPaymentsPage() {
-  const [txs] = useState<Transaction[]>(INITIAL_TRANSACTIONS)
+  const [txs] = useState<Transaction[]>([])
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("ALL")
 

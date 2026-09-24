@@ -52,10 +52,10 @@ export default function CallIntelligenceDashboardPage() {
   }
 
   // Dashboard Stats Calculations
-  const totalCalls = calls.length || 186
-  const connectedCalls = calls.filter(c => c.status === "CONNECTED").length || 142
-  const missedCalls = calls.filter(c => c.status === "MISSED" || c.status === "NO_ANSWER").length || 44
-  const hotLeads = calls.filter(c => c.intelligence?.temperature === "HOT").length || 28
+  const totalCalls = calls.length
+  const connectedCalls = calls.filter(c => c.status === "CONNECTED").length
+  const missedCalls = calls.filter(c => c.status === "MISSED" || c.status === "NO_ANSWER").length
+  const hotLeads = calls.filter(c => c.intelligence?.temperature === "HOT").length
 
   return (
     <div className="p-6 md:p-8 space-y-8 max-w-7xl mx-auto">
@@ -250,58 +250,32 @@ export default function CallIntelligenceDashboardPage() {
               <p className="text-xs text-slate-500">Quality, call conversion, and follow-up completion rates</p>
             </div>
             <span className="text-xs font-bold text-teal-700 bg-teal-50 border border-teal-200 px-3 py-1 rounded-xl">
-              Team Total: 186 Calls
+              Team Total: {totalCalls} Calls
             </span>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase text-[10px]">
-                <tr>
-                  <th className="p-3">Counsellor</th>
-                  <th className="p-3">Calls</th>
-                  <th className="p-3">Connected</th>
-                  <th className="p-3">Qualified</th>
-                  <th className="p-3">Conversions</th>
-                  <th className="p-3">Follow-up %</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 font-medium text-slate-800">
-                <tr>
-                  <td className="p-3 font-bold text-slate-900 flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-teal-600 text-white text-[11px] font-black flex items-center justify-center">P</div>
-                    Priya Sharma
-                  </td>
-                  <td className="p-3">42</td>
-                  <td className="p-3 font-bold text-emerald-700">31</td>
-                  <td className="p-3">18</td>
-                  <td className="p-3 font-black text-slate-900">5</td>
-                  <td className="p-3"><span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[10px]">72%</span></td>
-                </tr>
-                <tr>
-                  <td className="p-3 font-bold text-slate-900 flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-blue-600 text-white text-[11px] font-black flex items-center justify-center">R</div>
-                    Rahul Verma
-                  </td>
-                  <td className="p-3">38</td>
-                  <td className="p-3 font-bold text-emerald-700">29</td>
-                  <td className="p-3">15</td>
-                  <td className="p-3 font-black text-slate-900">4</td>
-                  <td className="p-3"><span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[10px]">68%</span></td>
-                </tr>
-                <tr>
-                  <td className="p-3 font-bold text-slate-900 flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-purple-600 text-white text-[11px] font-black flex items-center justify-center">A</div>
-                    Ananya Patel
-                  </td>
-                  <td className="p-3">35</td>
-                  <td className="p-3 font-bold text-emerald-700">26</td>
-                  <td className="p-3">12</td>
-                  <td className="p-3 font-black text-slate-900">2</td>
-                  <td className="p-3"><span className="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold text-[10px]">61%</span></td>
-                </tr>
-              </tbody>
-            </table>
+            {calls.length === 0 ? (
+              <div className="p-8 text-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-2xl">
+                No call intelligence or counsellor data logged yet. Make a call from Admissions CRM to see real-time statistics!
+              </div>
+            ) : (
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase text-[10px]">
+                  <tr>
+                    <th className="p-3">Counsellor</th>
+                    <th className="p-3">Calls</th>
+                    <th className="p-3">Connected</th>
+                    <th className="p-3">Qualified</th>
+                    <th className="p-3">Conversions</th>
+                    <th className="p-3">Follow-up %</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-medium text-slate-800">
+                  {/* Dynamic call stats render here when calls are logged */}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
 

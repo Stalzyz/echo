@@ -31,50 +31,8 @@ interface EmiRule {
   isActive: boolean
 }
 
-const INITIAL_EMI_PLANS: StudentEmiPlan[] = [
-  {
-    id: "emi-201",
-    studentName: "Aditya Roy",
-    courseName: "Full Stack MERN Web Development",
-    totalFee: 30000,
-    paidFee: 10000,
-    installmentCount: 3,
-    installmentAmount: 10000,
-    nextDueDate: "2026-10-05",
-    status: "ACTIVE",
-    phone: "+91 98765 43210",
-    ruleApplied: "Zero Extra Charge (0%)"
-  },
-  {
-    id: "emi-202",
-    studentName: "Meera Krishnan",
-    courseName: "UI/UX Product Design Masterclass",
-    totalFee: 25200,
-    paidFee: 8400,
-    installmentCount: 3,
-    installmentAmount: 8400,
-    nextDueDate: "2026-09-15",
-    status: "OVERDUE",
-    phone: "+91 91234 56789",
-    ruleApplied: "Standard 5% Surcharge"
-  },
-  {
-    id: "emi-203",
-    studentName: "Siddharth Mehta",
-    courseName: "Data Science & AI Bootcamp",
-    totalFee: 45000,
-    paidFee: 45000,
-    installmentCount: 3,
-    installmentAmount: 15000,
-    nextDueDate: "2026-08-30",
-    status: "COMPLETED",
-    phone: "+91 99887 76655",
-    ruleApplied: "Zero Extra Charge (0%)"
-  }
-]
-
 export default function EmiSchedulePage() {
-  const [plans, setPlans] = useState<StudentEmiPlan[]>(INITIAL_EMI_PLANS)
+  const [plans, setPlans] = useState<StudentEmiPlan[]>([])
   const [activeTab, setActiveTab] = useState<"ALL" | "ACTIVE" | "OVERDUE" | "COMPLETED">("ALL")
   const [search, setSearch] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)

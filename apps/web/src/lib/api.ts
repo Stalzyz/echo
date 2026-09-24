@@ -35,14 +35,17 @@ export class ApiClient {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     
     const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
-    const headers: any = {
-      ...(!isFormData ? { 'Content-Type': 'application/json' } : {}),
+    const headers: Record<string, string> = {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
-    // Let user override headers, but if they pass Content-Type: multipart/form-data manually, remove it so browser adds boundary
+
+    if (!isFormData) {
+      headers['Content-Type'] = 'application/json';
+    }
+
     if (options.headers) {
       Object.entries(options.headers).forEach(([k, v]) => {
-        if (k.toLowerCase() === 'content-type' && v === 'multipart/form-data') return;
+        if (isFormData && k.toLowerCase() === 'content-type') return;
         headers[k] = v;
       });
     }

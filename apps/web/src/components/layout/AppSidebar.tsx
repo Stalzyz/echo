@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useOrganization } from "@/context/OrganizationContext";
 import { useSession, signOut } from "next-auth/react";
+import { usePlan } from "@/hooks/usePlan";
 import {
   LayoutDashboard,
   GraduationCap,
@@ -46,6 +47,7 @@ interface SidebarItem {
   href: string;
   icon: React.ElementType;
   badge?: string;
+  requiredModule?: string;
   children?: { title: string; href: string; icon?: React.ElementType }[];
 }
 
@@ -101,6 +103,7 @@ const sidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
         title: "Walk-ins Kiosk",
         href: "/dashboard/academy/walk-ins",
         icon: Laptop,
+        requiredModule: "walkInKiosk",
       },
       {
         title: "Demo Sessions",
@@ -161,6 +164,7 @@ const sidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
         title: "Webinars & Funnels",
         href: "/dashboard/academy/webinars",
         icon: Video,
+        requiredModule: "webinars",
       },
       {
         title: "Social Community",
@@ -171,11 +175,13 @@ const sidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
         title: "WhatsApp Messages",
         href: "/dashboard/academy/whatsapp",
         icon: MessageSquare,
+        requiredModule: "whatsappAuto",
       },
       {
         title: "Visual Automations",
         href: "/dashboard/academy/automation",
         icon: Layers,
+        requiredModule: "emailMarketing",
       },
       {
         title: "Global Leaderboard",
@@ -314,16 +320,19 @@ export function AppSidebar() {
     (session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "Super Admin") &&
     !session?.user?.impersonatedBySuperAdmin;
 
+  const plan = usePlan();
+
   const activeGroups =
     isSuperAdminPlatform || pathname?.startsWith("/dashboard/super-admin")
       ? superAdminSidebarGroups
-      : sidebarGroups;
+      : sidebarGroups.map(g => ({
+          ...g,
+          items: g.items.filter(item => !item.requiredModule || plan.hasFeature(item.requiredModule))
+        })).filter(g => g.items.length > 0);
 
   const orgName = isSuperAdminPlatform
     ? "Echo Super Admin"
-    : org?.name && !org.name.includes("Grekam")
-    ? org.name
-    : "Echo LMS";
+    : org?.name || "Echo LMS";
 
   return (
     <aside

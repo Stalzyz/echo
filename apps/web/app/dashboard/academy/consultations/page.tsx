@@ -21,50 +21,8 @@ interface ConsultationSession {
   meetingLink: string
 }
 
-const INITIAL_SESSIONS: ConsultationSession[] = [
-  {
-    id: "cs-101",
-    studentName: "Ananya Sharma",
-    studentEmail: "ananya.s@gmail.com",
-    instructorName: "Stalin Kumar",
-    topic: "UPSC Mock Interview & Answer Writing Feedback",
-    date: "2026-09-19",
-    time: "10:30 AM",
-    durationMins: 45,
-    fee: 1499,
-    status: "CONFIRMED",
-    meetingLink: "https://meet.google.com/gch-consult-101"
-  },
-  {
-    id: "cs-102",
-    studentName: "Rohan Verma",
-    studentEmail: "rohan.v@outlook.com",
-    instructorName: "Priya Nair",
-    topic: "1:1 Full Stack Career Guidance & Resume Review",
-    date: "2026-09-19",
-    time: "02:00 PM",
-    durationMins: 30,
-    fee: 999,
-    status: "CONFIRMED",
-    meetingLink: "https://meet.google.com/gch-consult-102"
-  },
-  {
-    id: "cs-103",
-    studentName: "Vikram Malhotra",
-    studentEmail: "vikram.m@techcorp.in",
-    instructorName: "Stalin Kumar",
-    topic: "System Design & Architecture 1:1 Mentorship",
-    date: "2026-09-18",
-    time: "04:00 PM",
-    durationMins: 60,
-    fee: 2499,
-    status: "COMPLETED",
-    meetingLink: "https://meet.google.com/gch-consult-103"
-  }
-]
-
 export default function ConsultationsPage() {
-  const [sessions, setSessions] = useState<ConsultationSession[]>(INITIAL_SESSIONS)
+  const [sessions, setSessions] = useState<ConsultationSession[]>([])
   const [activeTab, setActiveTab] = useState<"ALL" | "CONFIRMED" | "COMPLETED">("ALL")
   const [search, setSearch] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)

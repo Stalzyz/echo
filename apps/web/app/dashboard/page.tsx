@@ -29,10 +29,33 @@ export default function DashboardHome() {
   const [pendingCourses, setPendingCourses] = useState<any[]>([])
 
   useEffect(() => {
+    if (!session) return // Still loading
+
     // Super Admin outside tenant mode strictly belongs in the Platform Control Plane
     const isSuperAdmin = session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "Super Admin"
     if (isSuperAdmin && !session?.user?.impersonatedBySuperAdmin) {
       router.replace("/dashboard/super-admin")
+      return
+    }
+
+    // Vendor ADMIN gets redirected to their dedicated workspace at /w/[slug]
+    const isAdmin = session?.user?.role === "ADMIN" || session?.user?.role === "Admin"
+    if (isAdmin) {
+      if (session?.user?.slug) {
+        // Slug is in session (new login) — redirect directly
+        router.replace(`/w/${session.user.slug}`)
+      } else {
+        // Slug missing from old session — fetch from org settings as fallback
+        fetch("/api/v1/settings/organization")
+          .then(r => r.ok ? r.json() : null)
+          .then(org => {
+            if (org?.slug) {
+              router.replace(`/w/${org.slug}`)
+            }
+            // If no slug found at all, stay on /dashboard (allows setup)
+          })
+          .catch(() => {})
+      }
     }
   }, [session, router])
 

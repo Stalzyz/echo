@@ -77,8 +77,8 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
             const finalOrg: Organization = {
               ...defaultOrg,
               ...orgData,
-              logoUrl: orgData.logoUrl || "/visuals-logo.png",
-              academyLogoUrl: orgData.academyLogoUrl || "/academy-logo.png",
+              logoUrl: orgData.logoUrl || orgData.academyLogoUrl || "/echo_logo.png",
+              academyLogoUrl: orgData.academyLogoUrl || orgData.logoUrl || "/echo_logo.png",
               faviconUrl: orgData.faviconUrl || "/favicon.ico",
               primaryColor: orgData.primaryColor || "#0d9488",
               secondaryColor: orgData.secondaryColor || "#f59e0b",

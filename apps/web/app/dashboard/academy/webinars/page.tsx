@@ -32,77 +32,8 @@ interface Webinar {
   landingUrl: string
 }
 
-const INITIAL_WEBINARS: Webinar[] = [
-  {
-    id: "web-301",
-    title: "Cracking UPSC Prelims: 90-Day High-Impact Strategy",
-    slug: "upsc-strategy",
-    hostName: "Raj Malhotra & Stalin Kumar",
-    date: "2026-09-22",
-    time: "07:00 PM IST",
-    registeredAttendees: 1420,
-    conversionRate: "18.4%",
-    platform: "YOUTUBE_LIVE",
-    status: "UPCOMING",
-    isEvergreen: false,
-    timedPitch: {
-      enabled: true,
-      triggerMinute: 45,
-      headline: "50% OFF UPSC prelims Masterclass Pass",
-      couponCode: "UPSC50",
-      courseTitle: "UPSC Complete Fast-Track 2026",
-      discountPrice: "₹4,999"
-    },
-    landingUrl: "/w/upsc-strategy"
-  },
-  {
-    id: "web-302",
-    title: "Build & Deploy Full Stack SaaS Apps with Next.js & Fastify",
-    slug: "saas-masterclass",
-    hostName: "Stalin Kumar",
-    date: "2026-09-20",
-    time: "06:00 PM IST",
-    registeredAttendees: 2890,
-    conversionRate: "24.2%",
-    platform: "ZOOM_WEBINAR",
-    status: "LIVE_NOW",
-    isEvergreen: false,
-    timedPitch: {
-      enabled: true,
-      triggerMinute: 30,
-      headline: "Special Live Workshop Offer: Full-Stack Bootcamp",
-      couponCode: "WEBINAR20",
-      courseTitle: "Full Stack Next.js Masterclass",
-      discountPrice: "₹2,999"
-    },
-    landingUrl: "/w/saas-masterclass"
-  },
-  {
-    id: "web-303",
-    title: "AI & Machine Learning Career Roadmap 2026",
-    slug: "ai-roadmap",
-    hostName: "Dr. Ananya Ray",
-    date: "Evergreen (Every 15m)",
-    time: "Auto-Looping",
-    registeredAttendees: 5410,
-    conversionRate: "21.8%",
-    platform: "YOUTUBE_LIVE",
-    status: "EVERGREEN",
-    isEvergreen: true,
-    timedPitch: {
-      enabled: true,
-      triggerMinute: 20,
-      headline: "AI Engineer Certification Package - Instant Enrollment",
-      couponCode: "EVERGREEN30",
-      courseTitle: "AI & Machine Learning Engineering",
-      discountPrice: "₹6,999"
-    },
-    landingUrl: "/w/ai-roadmap"
-  }
-]
-
 export default function WebinarsPage() {
-  const [webinars, setWebinars] = useState<Webinar[]>(INITIAL_WEBINARS)
+  const [webinars, setWebinars] = useState<Webinar[]>([])
   const [activeTab, setActiveTab] = useState<"ALL" | "UPCOMING" | "LIVE_NOW" | "EVERGREEN" | "COMPLETED">("ALL")
   const [search, setSearch] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)

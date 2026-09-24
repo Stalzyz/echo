@@ -54,7 +54,7 @@ export default async function organizationRouter(app: FastifyInstance) {
     }
 
     // Fallback: Super Admin without impersonation → return first org (platform branding)
-    if (!org) {
+    if (!org && user?.role === 'SUPER_ADMIN') {
       org = await app.prisma.organization.findFirst();
     }
 

@@ -19,44 +19,8 @@ interface Coupon {
   isActive: boolean
 }
 
-const INITIAL_COUPONS: Coupon[] = [
-  {
-    id: "c-101",
-    code: "EARLYBIRD20",
-    discountType: "PERCENTAGE",
-    discountValue: 20,
-    targetCourse: "All Courses",
-    usageLimit: 100,
-    usedCount: 68,
-    expiryDate: "2026-10-31",
-    isActive: true
-  },
-  {
-    id: "c-102",
-    code: "Echo5000",
-    discountType: "FIXED",
-    discountValue: 5000,
-    targetCourse: "Full Stack Web Dev",
-    usageLimit: 50,
-    usedCount: 42,
-    expiryDate: "2026-12-15",
-    isActive: true
-  },
-  {
-    id: "c-103",
-    code: "VIPLEARNER50",
-    discountType: "PERCENTAGE",
-    discountValue: 50,
-    targetCourse: "UI/UX Masterclass",
-    usageLimit: 25,
-    usedCount: 25,
-    expiryDate: "2026-08-30",
-    isActive: false
-  }
-]
-
 export default function CouponsPage() {
-  const [coupons, setCoupons] = useState<Coupon[]>(INITIAL_COUPONS)
+  const [coupons, setCoupons] = useState<Coupon[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)

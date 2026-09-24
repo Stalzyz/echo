@@ -10,6 +10,7 @@ declare module "next-auth" {
       role: string
       organizationId?: string | null
       tenantId?: string | null
+      slug?: string | null
       impersonatedBySuperAdmin?: boolean
       originalSuperAdminId?: string | null
     } & DefaultSession["user"]
@@ -20,6 +21,7 @@ declare module "next-auth" {
     role: string
     organizationId?: string | null
     tenantId?: string | null
+    slug?: string | null
     impersonatedBySuperAdmin?: boolean
     originalSuperAdminId?: string | null
   }
@@ -31,6 +33,7 @@ declare module "next-auth/jwt" {
     role: string
     organizationId?: string | null
     tenantId?: string | null
+    slug?: string | null
     impersonatedBySuperAdmin?: boolean
     originalSuperAdminId?: string | null
   }

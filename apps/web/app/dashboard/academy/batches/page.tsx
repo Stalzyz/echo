@@ -40,6 +40,10 @@ export default function BatchesPage() {
   const [newBatch, setNewBatch] = useState({
     name: "",
     courseId: "",
+    inlineCourseName: "",
+    inlineCourseCode: "",
+    inlineCourseFee: 9999,
+    inlineCourseDuration: "3 Months",
     type: "ONLINE",
     capacity: 20,
     startDate: "",
@@ -65,20 +69,56 @@ export default function BatchesPage() {
     e.preventDefault()
     setIsSubmitting(true)
     try {
-      await fetchApi("/academy/batches", {
-        method: "POST",
-        body: JSON.stringify({
-          ...newBatch,
-          startDate: new Date(newBatch.startDate).toISOString(),
-          endDate: new Date(newBatch.endDate).toISOString(),
-          capacity: Number(newBatch.capacity),
-          recordingAccessDays: Number(newBatch.recordingAccessDays || 7),
-          educatorId: newBatch.educatorId || undefined
+      if (newBatch.courseId === "CREATE_NEW_COURSE") {
+        if (!newBatch.inlineCourseName || !newBatch.inlineCourseCode) {
+          toast.error("Please enter course name and course code for the new course")
+          setIsSubmitting(false)
+          return
+        }
+        await fetchApi("/academy/batches/with-course", {
+          method: "POST",
+          body: JSON.stringify({
+            courseName: newBatch.inlineCourseName,
+            courseCode: newBatch.inlineCourseCode,
+            courseFee: Number(newBatch.inlineCourseFee),
+            courseDuration: newBatch.inlineCourseDuration,
+            batchName: newBatch.name,
+            batchType: newBatch.type,
+            startDate: newBatch.startDate ? new Date(newBatch.startDate).toISOString() : undefined,
+            endDate: newBatch.endDate ? new Date(newBatch.endDate).toISOString() : undefined,
+            capacity: Number(newBatch.capacity),
+            educatorId: newBatch.educatorId || undefined
+          })
         })
-      })
+      } else {
+        await fetchApi("/academy/batches", {
+          method: "POST",
+          body: JSON.stringify({
+            ...newBatch,
+            startDate: new Date(newBatch.startDate).toISOString(),
+            endDate: new Date(newBatch.endDate).toISOString(),
+            capacity: Number(newBatch.capacity),
+            recordingAccessDays: Number(newBatch.recordingAccessDays || 7),
+            educatorId: newBatch.educatorId || undefined
+          })
+        })
+      }
       toast.success("Batch created successfully!")
       setIsCreateOpen(false)
-      setNewBatch({ name: "", courseId: "", type: "ONLINE", capacity: 20, startDate: "", endDate: "", educatorId: "", recordingAccessDays: 7 })
+      setNewBatch({
+        name: "",
+        courseId: "",
+        inlineCourseName: "",
+        inlineCourseCode: "",
+        inlineCourseFee: 9999,
+        inlineCourseDuration: "3 Months",
+        type: "ONLINE",
+        capacity: 20,
+        startDate: "",
+        endDate: "",
+        educatorId: "",
+        recordingAccessDays: 7
+      })
       mutate()
     } catch (err: any) {
       toast.error(err.message || "Failed to create batch")
@@ -322,11 +362,55 @@ export default function BatchesPage() {
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 outline-none focus:ring-2 focus:ring-teal-500/50"
             >
               <option value="">Select a course...</option>
+              <option value="CREATE_NEW_COURSE">➕ Create New Course (Inline)</option>
               {courses.map((c: any) => (
                 <option key={c.courseId || c.id} value={c.courseId || c.id}>{c.course?.name || c.name || "Unknown Course"}</option>
               ))}
             </select>
           </div>
+
+          {newBatch.courseId === "CREATE_NEW_COURSE" && (
+            <div className="p-4 bg-teal-50 border border-teal-200 rounded-2xl space-y-3">
+              <span className="text-xs font-bold text-teal-800 uppercase tracking-wider flex items-center gap-1.5 font-mono">
+                <Sparkles className="w-3.5 h-3.5 text-teal-600" /> New Course Setup
+              </span>
+              <div>
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-600 mb-1 block">Course Name *</label>
+                <input 
+                  type="text"
+                  required={newBatch.courseId === "CREATE_NEW_COURSE"}
+                  value={newBatch.inlineCourseName}
+                  onChange={e => setNewBatch({...newBatch, inlineCourseName: e.target.value})}
+                  className="w-full bg-white border border-teal-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:border-teal-500"
+                  placeholder="e.g. Full Stack Web Development"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-600 mb-1 block">Course Code *</label>
+                  <input 
+                    type="text"
+                    required={newBatch.courseId === "CREATE_NEW_COURSE"}
+                    value={newBatch.inlineCourseCode}
+                    onChange={e => setNewBatch({...newBatch, inlineCourseCode: e.target.value.toUpperCase()})}
+                    className="w-full bg-white border border-teal-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono font-bold uppercase placeholder:text-slate-400 focus:outline-none focus:border-teal-500"
+                    placeholder="e.g. FSD-101"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-600 mb-1 block">Course Fee (₹)</label>
+                  <input 
+                    type="number"
+                    value={newBatch.inlineCourseFee}
+                    onChange={e => setNewBatch({...newBatch, inlineCourseFee: parseFloat(e.target.value) || 0})}
+                    className="w-full bg-white border border-teal-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono font-bold focus:outline-none focus:border-teal-500"
+                    placeholder="9999"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-1 block">Batch Type</label>

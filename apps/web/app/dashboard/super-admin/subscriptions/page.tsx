@@ -20,16 +20,8 @@ interface Subscription {
   paymentStatus: "PAID" | "PENDING" | "FAILED"
 }
 
-const INITIAL_SUBSCRIPTIONS: Subscription[] = [
-  { id: "sub-101", academyName: "Apex Tech Institute", owner: "Dr. Rajesh Kumar", planName: "ENTERPRISE", billingCycle: "YEARLY", amount: 99990, status: "ACTIVE", startDate: "2026-01-15", renewalDate: "2027-01-15", paymentStatus: "PAID" },
-  { id: "sub-102", academyName: "Stark Photography Academy", owner: "Elena Rostova", planName: "GROWTH", billingCycle: "MONTHLY", amount: 2499, status: "ACTIVE", startDate: "2026-03-10", renewalDate: "2026-10-10", paymentStatus: "PAID" },
-  { id: "sub-103", academyName: "Quantum Coding Labs", owner: "Vikram Malhotra", planName: "STARTER", billingCycle: "MONTHLY", amount: 999, status: "TRIAL", startDate: "2026-09-02", renewalDate: "2026-09-16", paymentStatus: "PENDING" },
-  { id: "sub-104", academyName: "Global Civil Services Hub", owner: "Anjali Sharma", planName: "GROWTH", billingCycle: "YEARLY", amount: 24990, status: "ACTIVE", startDate: "2026-04-20", renewalDate: "2027-04-20", paymentStatus: "PAID" },
-  { id: "sub-105", academyName: "DesignCraft Studio", owner: "Marco Rossi", planName: "STARTER", billingCycle: "MONTHLY", amount: 999, status: "EXPIRED", startDate: "2026-02-01", renewalDate: "2026-03-01", paymentStatus: "FAILED" },
-]
-
 export default function SubscriptionsLifecyclePage() {
-  const [subs, setSubs] = useState<Subscription[]>(INITIAL_SUBSCRIPTIONS)
+  const [subs, setSubs] = useState<Subscription[]>([])
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("ALL")
 

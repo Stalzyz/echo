@@ -11,13 +11,20 @@ export default function middleware(req: any) {
 
   const hostname = req.headers.get("host") || ""
   const currentHost = hostname.replace(/:[0-9]+$/, "") // Strip port if local
+  const { pathname } = req.nextUrl
 
   let tenantSlug: string | null = null
 
-  // Check if subdomain under echolms.com or grekam.in
-  if (currentHost.endsWith(".echolms.com") || currentHost.endsWith(".grekam.in")) {
+  // 1. Extract slug from /w/[slug] path
+  const wMatch = pathname.match(/^\/w\/([^\/]+)/)
+  if (wMatch && wMatch[1]) {
+    tenantSlug = wMatch[1]
+  }
+
+  // 2. Check if subdomain under echolms.com or grekam.in
+  if (!tenantSlug && (currentHost.endsWith(".echolms.com") || currentHost.endsWith(".grekam.in"))) {
     const parts = currentHost.split(".")
-    if (parts.length > 2 && parts[0] !== "www" && parts[0] !== "academy") {
+    if (parts.length > 2 && parts[0] !== "www" && parts[0] !== "academy" && parts[0] !== "echo") {
       tenantSlug = parts[0]
     }
   }

@@ -24,75 +24,8 @@ interface Invoice {
   transactionId: string
 }
 
-const INITIAL_INVOICES: Invoice[] = [
-  {
-    id: "inv-1",
-    number: "INV-2026-0891",
-    vendorName: "Apex Tech Institute",
-    vendorEmail: "rajesh@apextech.edu",
-    vendorAddress: "Building 4, Tech Park, Bangalore, India",
-    planName: "Enterprise SaaS Plan (Annual)",
-    amount: 4990,
-    taxAmount: 898.2,
-    totalAmount: 5888.2,
-    issueDate: "2026-09-01",
-    dueDate: "2026-09-15",
-    status: "PAID",
-    paymentMethod: "Stripe / Credit Card",
-    transactionId: "ch_3M9xZ2eS9K3a"
-  },
-  {
-    id: "inv-2",
-    number: "INV-2026-0892",
-    vendorName: "Stark Photography Academy",
-    vendorEmail: "elena@starkphoto.com",
-    vendorAddress: "Suite 12, Studio Way, New York, USA",
-    planName: "Professional SaaS Plan (Monthly)",
-    amount: 149,
-    taxAmount: 26.82,
-    totalAmount: 175.82,
-    issueDate: "2026-09-10",
-    dueDate: "2026-09-24",
-    status: "PAID",
-    paymentMethod: "Razorpay / UPI",
-    transactionId: "pay_Kyz829aB7c"
-  },
-  {
-    id: "inv-3",
-    number: "INV-2026-0893",
-    vendorName: "Global Civil Services Hub",
-    vendorEmail: "admin@civilserviceshub.in",
-    vendorAddress: "Civil Lines, New Delhi, India",
-    planName: "Professional SaaS Plan (Monthly)",
-    amount: 149,
-    taxAmount: 26.82,
-    totalAmount: 175.82,
-    issueDate: "2026-09-12",
-    dueDate: "2026-09-26",
-    status: "PENDING",
-    paymentMethod: "Bank Transfer (NEFT)",
-    transactionId: "TXN-PENDING"
-  },
-  {
-    id: "inv-4",
-    number: "INV-2026-0884",
-    vendorName: "DesignCraft Studio Academy",
-    vendorEmail: "marco@designcraft.co",
-    vendorAddress: "Via Milano 44, Rome, Italy",
-    planName: "Starter SaaS Plan (Monthly)",
-    amount: 49,
-    taxAmount: 8.82,
-    totalAmount: 57.82,
-    issueDate: "2026-08-01",
-    dueDate: "2026-08-15",
-    status: "OVERDUE",
-    paymentMethod: "Credit Card (Failed)",
-    transactionId: "ERR_DECLINED"
-  }
-]
-
 export default function InvoicesPage() {
-  const [invoices, setInvoices] = useState<Invoice[]>(INITIAL_INVOICES)
+  const [invoices, setInvoices] = useState<Invoice[]>([])
   const [search, setSearch] = useState("")
   const [filterStatus, setFilterStatus] = useState("ALL")
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)

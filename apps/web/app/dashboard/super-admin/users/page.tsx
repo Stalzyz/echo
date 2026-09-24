@@ -18,17 +18,8 @@ interface UserRecord {
   createdAt: string
 }
 
-const INITIAL_USERS: UserRecord[] = [
-  { id: "u-1", name: "Dr. Rajesh Kumar", email: "rajesh@apextech.edu", phone: "+91 9876543210", role: "ACADEMY_ADMIN", academy: "Apex Tech Institute", status: "ACTIVE", createdAt: "2026-01-15" },
-  { id: "u-2", name: "Elena Rostova", email: "elena@starkphoto.com", phone: "+91 9812345678", role: "ACADEMY_ADMIN", academy: "Stark Photography Academy", status: "ACTIVE", createdAt: "2026-03-10" },
-  { id: "u-3", name: "Prof. Ananya Sen", email: "ananya@apextech.edu", phone: "+91 9778899001", role: "INSTRUCTOR", academy: "Apex Tech Institute", status: "ACTIVE", createdAt: "2026-02-01" },
-  { id: "u-4", name: "Rohan Verma", email: "rohan.v@gmail.com", phone: "+91 9822334455", role: "STUDENT", academy: "Stark Photography Academy", status: "ACTIVE", createdAt: "2026-05-12" },
-  { id: "u-5", name: "Priya Sharma", email: "priya@civilserviceshub.in", phone: "+91 9911223344", role: "STAFF", academy: "Global Civil Services Hub", status: "ACTIVE", createdAt: "2026-04-20" },
-  { id: "u-6", name: "Vikram Malhotra", email: "vikram@quantumlabs.io", phone: "+91 9988776655", role: "ACADEMY_ADMIN", academy: "Quantum Coding Labs", status: "SUSPENDED", createdAt: "2026-09-02" },
-]
-
 export default function PlatformUsersPage() {
-  const [users, setUsers] = useState<UserRecord[]>(INITIAL_USERS)
+  const [users, setUsers] = useState<UserRecord[]>([])
   const [search, setSearch] = useState("")
   const [roleFilter, setRoleFilter] = useState("ALL")
   const [selectedUser, setSelectedUser] = useState<UserRecord | null>(null)

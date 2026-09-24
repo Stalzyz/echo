@@ -21,45 +21,8 @@ interface Post {
   isPinned?: boolean
 }
 
-const INITIAL_POSTS: Post[] = [
-  {
-    id: "post-1",
-    authorName: "Stalin Kumar",
-    authorRole: "INSTRUCTOR",
-    authorAvatar: "SK",
-    channel: "ANNOUNCEMENTS",
-    timeAgo: "2 hours ago",
-    content: "📢 Batch 14 Announcement: The Module 4 Live Project guidelines for Full Stack MERN development have been published. Please review the repo template before tomorrow's live studio session!",
-    likes: 42,
-    commentsCount: 9,
-    isPinned: true
-  },
-  {
-    id: "post-2",
-    authorName: "Pooja Hegde",
-    authorRole: "STUDENT",
-    authorAvatar: "PH",
-    channel: "DOUBTS_QA",
-    timeAgo: "4 hours ago",
-    content: "Hey everyone! Having an issue with Next.js Turbopack hydration error on custom dynamic CSS variables. Anyone faced this in the Theme Editor assignment?",
-    likes: 12,
-    commentsCount: 5
-  },
-  {
-    id: "post-3",
-    authorName: "Rohan Verma",
-    authorRole: "STUDENT",
-    authorAvatar: "RV",
-    channel: "PROJECT_SHOWCASE",
-    timeAgo: "1 day ago",
-    content: "🚀 Just launched my capstone project: AI Resume Analyzer with Fastify API & Next.js 15! Check out the live demo and let me know your thoughts!",
-    likes: 89,
-    commentsCount: 14
-  }
-]
-
 export default function SocialCommunityPage() {
-  const [posts, setPosts] = useState<Post[]>(INITIAL_POSTS)
+  const [posts, setPosts] = useState<Post[]>([])
   const [activeChannel, setActiveChannel] = useState<"ALL" | "ANNOUNCEMENTS" | "DOUBTS_QA" | "PROJECT_SHOWCASE">("ALL")
   const [newPostText, setNewPostText] = useState("")
   const [selectedChannel, setSelectedChannel] = useState<"ANNOUNCEMENTS" | "DOUBTS_QA" | "PROJECT_SHOWCASE" | "GENERAL">("GENERAL")

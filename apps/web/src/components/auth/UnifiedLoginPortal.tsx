@@ -144,11 +144,22 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
       const sessionRes = await fetch("/api/auth/session")
       const sessionData = await sessionRes.json()
       const role = sessionData?.user?.role
+      const slug = sessionData?.user?.slug
 
       if (role === "SUPER_ADMIN" || role === "Super Admin") {
         setSuccess("Super Admin root identity verified. Redirecting to Platform Control Plane...")
         setTimeout(() => {
           router.push("/dashboard/super-admin")
+          router.refresh()
+        }, 600)
+        return
+      }
+
+      // Vendor ADMIN — redirect straight to their /w/[slug] workspace
+      if ((role === "ADMIN" || role === "Admin") && slug) {
+        setSuccess(`Welcome back! Redirecting to your workspace...`)
+        setTimeout(() => {
+          router.push(`/w/${slug}`)
           router.refresh()
         }, 600)
         return

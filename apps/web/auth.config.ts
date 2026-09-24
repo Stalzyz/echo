@@ -11,6 +11,7 @@ export const authConfig = {
       const isOnDashboard = nextUrl.pathname.startsWith('/dashboard')
       const isOnPortal = nextUrl.pathname.startsWith('/portal')
       const isOnStudent = nextUrl.pathname.startsWith('/student')
+      const isOnVendorWorkspace = nextUrl.pathname.startsWith('/w/')
 
       const isOnSuperAdmin = nextUrl.pathname.startsWith('/dashboard/super-admin')
 
@@ -21,6 +22,12 @@ export const authConfig = {
           // Academy Admins and students cannot access Super Admin control plane
           return Response.redirect(new URL('/dashboard', nextUrl))
         }
+        return true
+      }
+
+      // Protect /w/[slug] vendor workspace routes
+      if (isOnVendorWorkspace) {
+        if (!isLoggedIn) return false
         return true
       }
 
@@ -36,6 +43,7 @@ export const authConfig = {
           nextUrl.pathname === '/login'
         ) {
           const role = (auth?.user as any)?.role
+          const slug = (auth?.user as any)?.slug
           if (role === 'SUPER_ADMIN' || role === 'Super Admin') {
             return Response.redirect(new URL('/dashboard/super-admin', nextUrl))
           } else if (role === 'CLIENT') {
@@ -44,6 +52,8 @@ export const authConfig = {
             return Response.redirect(new URL('/student', nextUrl))
           } else if (role === 'EDUCATOR') {
             return Response.redirect(new URL('/dashboard/studio', nextUrl))
+          } else if ((role === 'ADMIN' || role === 'Admin') && slug) {
+            return Response.redirect(new URL(`/w/${slug}`, nextUrl))
           }
           return Response.redirect(new URL('/dashboard', nextUrl))
         }

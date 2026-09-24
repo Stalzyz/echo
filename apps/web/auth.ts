@@ -36,6 +36,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           include: {
             customRole: {
               include: { permissions: true }
+            },
+            organization: {
+              select: { slug: true }
             }
           }
         });
@@ -100,6 +103,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           role: user.role,
           organizationId: user.organizationId,
           tenantId: user.organizationId,
+          slug: user.organization?.slug || null,
           customRole: user.customRole ? user.customRole.name : null,
           permissions: user.customRole ? user.customRole.permissions.map(p => p.resource) : []
         };
@@ -113,12 +117,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.id = user.id
         token.organizationId = (user as any).organizationId
         token.tenantId = (user as any).organizationId
+        token.slug = (user as any).slug
         token.customRole = (user as any).customRole
         token.permissions = (user as any).permissions
       }
       if (trigger === "update" && session) {
         if (session.organizationId !== undefined) token.organizationId = session.organizationId;
         if (session.tenantId !== undefined) token.tenantId = session.tenantId;
+        if (session.slug !== undefined) token.slug = session.slug;
         if (session.impersonatedBySuperAdmin !== undefined) token.impersonatedBySuperAdmin = session.impersonatedBySuperAdmin;
         if (session.originalSuperAdminId !== undefined) token.originalSuperAdminId = session.originalSuperAdminId;
         if (session.role !== undefined) token.role = session.role;
@@ -131,6 +137,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.id as string
         session.user.organizationId = token.organizationId as string | undefined
         session.user.tenantId = (token.tenantId || token.organizationId) as string | undefined
+        session.user.slug = token.slug as string | undefined
         session.user.impersonatedBySuperAdmin = token.impersonatedBySuperAdmin as boolean | undefined
         session.user.originalSuperAdminId = token.originalSuperAdminId as string | undefined
         ;(session.user as any).customRole = token.customRole
