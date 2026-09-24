@@ -4,30 +4,15 @@ import { useState } from "react"
 import { 
   CreditCard, Plus, Edit3, CheckCircle2, ShieldCheck, X, 
   Users, BookOpen, HardDrive, Check, AlertCircle, ExternalLink,
-  MessageCircle, Mail, Zap
+  MessageCircle, Mail, Zap, RefreshCw, Trash2, Shield, Eye
 } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
+import { useApi, fetchApi } from "@/lib/useApi"
 import { ALL_PLATFORM_MODULES } from "../packages/page"
+import { PlanEditModal, SubscriptionPlan } from "./PlanEditModal"
 
-interface Plan {
-  id: string
-  name: string
-  originalPriceYearly: number
-  offerPriceYearly: number
-  gstText: string
-  studentLimit: number | "Unlimited"
-  instructorLimit: number | "Unlimited"
-  courseLimit: number | "Unlimited"
-  storageLimitGB: number | "Unlimited"
-  enabledModules: Record<string, boolean>
-  customPaymentLink: string
-  status: "ACTIVE" | "DISABLED"
-  popular?: boolean
-  badgeText?: string
-}
-
-const INITIAL_PLANS: Plan[] = [
+const INITIAL_PLANS: SubscriptionPlan[] = [
   {
     id: "plan-starter",
     name: "STARTER ACADEMY",
@@ -98,17 +83,57 @@ const INITIAL_PLANS: Plan[] = [
 ]
 
 export default function SaaSPlansAndBillingPage() {
-  const [plans, setPlans] = useState<Plan[]>(INITIAL_PLANS)
+  const { data, isLoading, mutate } = useApi<{ plans: SubscriptionPlan[] }>('/super-admin/plans')
+  const [editingPlan, setEditingPlan] = useState<SubscriptionPlan | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const togglePlanStatus = (id: string) => {
-    setPlans(prev => prev.map(p => {
-      if (p.id === id) {
-        const nextStatus = p.status === "DISABLED" ? "ACTIVE" : "DISABLED"
-        toast.success(`Package "${p.name}" is now ${nextStatus}`)
-        return { ...p, status: nextStatus }
-      }
-      return p
-    }))
+  const plans: SubscriptionPlan[] = (data?.plans && data.plans.length > 0) ? data.plans : INITIAL_PLANS
+
+  const togglePlanStatus = async (plan: SubscriptionPlan) => {
+    const nextStatus = plan.status === "DISABLED" ? "ACTIVE" : "DISABLED"
+    try {
+      toast.loading(`Setting "${plan.name}" to ${nextStatus}...`, { id: "toggle-plan" })
+      await fetchApi("/super-admin/plans", {
+        method: "PUT",
+        body: JSON.stringify({
+          ...plan,
+          status: nextStatus
+        })
+      })
+      toast.success(`Plan "${plan.name}" is now ${nextStatus}`, { id: "toggle-plan" })
+      mutate()
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update plan status", { id: "toggle-plan" })
+    }
+  }
+
+  const handleDeletePlan = async (plan: SubscriptionPlan) => {
+    if (plans.length <= 1) {
+      toast.error("At least one active plan must remain available.")
+      return
+    }
+    if (!confirm(`Are you sure you want to remove "${plan.name}"?`)) return
+
+    try {
+      toast.loading(`Deleting ${plan.name}...`, { id: "del-plan" })
+      await fetchApi(`/super-admin/plans?id=${encodeURIComponent(plan.id)}`, {
+        method: "DELETE"
+      })
+      toast.success(`Plan deleted successfully`, { id: "del-plan" })
+      mutate()
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete plan", { id: "del-plan" })
+    }
+  }
+
+  const handleCreateNew = () => {
+    setEditingPlan(null)
+    setIsModalOpen(true)
+  }
+
+  const handleEdit = (plan: SubscriptionPlan) => {
+    setEditingPlan(plan)
+    setIsModalOpen(true)
   }
 
   return (
@@ -126,19 +151,34 @@ export default function SaaSPlansAndBillingPage() {
           <p className="text-slate-500 mt-1 text-xs sm:text-sm font-medium">Manage yearly academy packages, custom payment link URLs, GST disclosure tags (+18% GST), and 12-module access permissions.</p>
         </div>
 
-        <Link 
-          href="/dashboard/super-admin/packages"
-          className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs sm:text-sm px-5 py-3 rounded-xl transition-all shadow-sm"
-        >
-          <Plus className="w-4 h-4" /> Open Full Package Builder
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              mutate()
+              toast.success("Plans refreshed")
+            }}
+            className="flex items-center gap-2 bg-white hover:bg-slate-100 border border-slate-200 text-slate-800 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all shadow-xs"
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-teal-600' : ''}`} /> Refresh
+          </button>
+
+          <button 
+            onClick={handleCreateNew}
+            className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all shadow-xs"
+          >
+            <Plus className="w-4 h-4" /> Create New Plan
+          </button>
+        </div>
       </div>
 
       {/* Plan Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {plans.map(p => {
-          const enabledCount = Object.values(p.enabledModules).filter(Boolean).length
-          const discountPct = Math.round(((p.originalPriceYearly - p.offerPriceYearly) / p.originalPriceYearly) * 100)
+          const enabledModulesObj = p.enabledModules || {}
+          const enabledCount = Object.values(enabledModulesObj).filter(Boolean).length
+          const discountPct = p.originalPriceYearly > p.offerPriceYearly
+            ? Math.round(((p.originalPriceYearly - p.offerPriceYearly) / p.originalPriceYearly) * 100)
+            : 0
 
           return (
             <div key={p.id} className={`bg-white border rounded-3xl p-6 shadow-xs relative flex flex-col justify-between transition-all ${
@@ -165,19 +205,24 @@ export default function SaaSPlansAndBillingPage() {
                   <div className="flex items-baseline justify-between">
                     <div>
                       <span className="text-2xl font-black text-slate-900 font-mono">₹{p.offerPriceYearly.toLocaleString()}</span>
-                      <span className="text-xs text-slate-400 font-mono line-through ml-2">₹{p.originalPriceYearly.toLocaleString()}</span>
+                      {p.originalPriceYearly > p.offerPriceYearly && (
+                        <span className="text-xs text-slate-400 font-mono line-through ml-2">₹{p.originalPriceYearly.toLocaleString()}</span>
+                      )}
                       <span className="text-xs text-slate-500 font-bold block">/ year</span>
                     </div>
-                    <span className="text-[10px] font-black bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">
-                      {discountPct}% OFF
-                    </span>
+                    {discountPct > 0 && (
+                      <span className="text-[10px] font-black bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">
+                        {discountPct}% OFF
+                      </span>
+                    )}
                   </div>
                   <div className="text-[11px] font-bold text-slate-600 pt-1 border-t border-slate-200/80 flex items-center justify-between">
-                    <span>{p.gstText}</span>
+                    <span>{p.gstText || "+ 18% GST"}</span>
                     <span className="text-teal-700 font-mono">Yearly Billed</span>
                   </div>
                 </div>
 
+                {/* Limits */}
                 <div className="space-y-2 pt-2 border-t border-slate-100 text-xs">
                   <div className="flex items-center justify-between font-bold">
                     <span className="text-slate-500">Student Limit</span>
@@ -197,15 +242,16 @@ export default function SaaSPlansAndBillingPage() {
                   </div>
                 </div>
 
+                {/* Enabled Modules */}
                 <div className="space-y-2 pt-2 border-t border-slate-100 text-xs">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Included Modules</span>
-                    <span className="text-[10px] font-bold text-teal-700">{enabledCount} / 12 Active</span>
+                    <span className="text-[10px] font-bold text-teal-700">{enabledCount} / {ALL_PLATFORM_MODULES.length} Active</span>
                   </div>
                   
                   <div className="grid grid-cols-1 gap-1 max-h-36 overflow-y-auto custom-scrollbar">
                     {ALL_PLATFORM_MODULES.map(m => {
-                      const active = !!p.enabledModules[m.key]
+                      const active = !!enabledModulesObj[m.key]
                       return (
                         <div key={m.key} className="flex items-center justify-between text-[11px] text-slate-700 font-medium">
                           <span className={active ? "text-slate-800 font-medium" : "text-slate-400 line-through"}>{m.name}</span>
@@ -215,18 +261,33 @@ export default function SaaSPlansAndBillingPage() {
                     })}
                   </div>
                 </div>
+
+                {/* Custom Payment Link */}
+                {p.customPaymentLink && (
+                  <div className="pt-2 border-t border-slate-100">
+                    <a
+                      href={p.customPaymentLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[11px] text-teal-600 hover:text-teal-700 font-bold flex items-center gap-1 truncate"
+                    >
+                      <ExternalLink className="w-3 h-3 shrink-0" /> Test Checkout Link
+                    </a>
+                  </div>
+                )}
               </div>
 
+              {/* Action Buttons */}
               <div className="pt-4 border-t border-slate-100 flex items-center gap-2 mt-4">
-                <Link 
-                  href="/dashboard/super-admin/packages"
+                <button 
+                  onClick={() => handleEdit(p)}
                   className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5"
                 >
-                  <Edit3 className="w-3.5 h-3.5" /> Customize Package
-                </Link>
+                  <Edit3 className="w-3.5 h-3.5" /> Edit Plan
+                </button>
 
                 <button 
-                  onClick={() => togglePlanStatus(p.id)}
+                  onClick={() => togglePlanStatus(p)}
                   className={`py-2 px-3 rounded-xl font-bold text-xs border transition-colors ${
                     p.status === "DISABLED"
                       ? "bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700"
@@ -235,12 +296,33 @@ export default function SaaSPlansAndBillingPage() {
                 >
                   {p.status === "DISABLED" ? "Enable" : "Disable"}
                 </button>
+
+                <button
+                  onClick={() => handleDeletePlan(p)}
+                  className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                  title="Delete Plan"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
 
             </div>
           )
         })}
       </div>
+
+      {/* Plan Edit / Create Modal */}
+      <PlanEditModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false)
+          setEditingPlan(null)
+        }}
+        plan={editingPlan}
+        onSuccess={() => {
+          mutate()
+        }}
+      />
 
     </div>
   )
