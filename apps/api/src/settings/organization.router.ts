@@ -90,8 +90,13 @@ export default async function organizationRouter(app: FastifyInstance) {
     };
   });
 
-  // PATCH /api/v1/settings/organization — Update the global organization branding
+  // PATCH /api/v1/settings/organization — Update the organization branding
   app.patch('/organization', async (req, reply) => {
+    const user = (req as any).user;
+    const cookies = require('cookie').parse(req.headers.cookie || '');
+    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
+    const activeTenantId = impersonatedTenantId || user?.organizationId || null;
+
     const body = UpdateOrganizationSchema.parse(req.body);
     
     const dataToSave: any = { ...body };
@@ -100,11 +105,20 @@ export default async function organizationRouter(app: FastifyInstance) {
     if (!dataToSave.accentColor) delete dataToSave.accentColor;
     if (!dataToSave.name) delete dataToSave.name;
 
-    let org = await app.prisma.organization.findFirst();
+    let org: any = null;
+    if (activeTenantId) {
+      org = await app.prisma.organization.findUnique({
+        where: { id: activeTenantId }
+      });
+    }
+
+    if (!org) {
+      org = await app.prisma.organization.findFirst();
+    }
     
     if (!org) {
       org = await app.prisma.organization.create({
-        data: { name: "Grekam OS", ...dataToSave }
+        data: { name: "Echo LMS", ...dataToSave }
       });
     } else {
       org = await app.prisma.organization.update({

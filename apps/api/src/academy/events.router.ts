@@ -1,10 +1,13 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
+import { getTenantContext } from '../utils/tenant';
 
 export default async function eventsRouter(app: FastifyInstance) {
   // GET /api/v1/academy/events
   app.get('/events', async (req, reply) => {
+    const { orgFilter } = getTenantContext(req);
     const events = await app.prisma.campusEvent.findMany({
+      where: orgFilter,
       include: { _count: { select: { registrations: true } } },
       orderBy: { date: 'asc' }
     });
@@ -13,6 +16,7 @@ export default async function eventsRouter(app: FastifyInstance) {
 
   // POST /api/v1/academy/events
   app.post('/events', async (req, reply) => {
+    const { tenantId } = getTenantContext(req);
     const schema = z.object({
       title: z.string(),
       description: z.string().optional(),
@@ -24,7 +28,11 @@ export default async function eventsRouter(app: FastifyInstance) {
     const body = schema.parse(req.body);
 
     const event = await app.prisma.campusEvent.create({
-      data: { ...body, date: new Date(body.date) }
+      data: {
+        ...body,
+        date: new Date(body.date),
+        ...(tenantId ? { organizationId: tenantId } : {})
+      }
     });
     reply.code(201);
     return event;

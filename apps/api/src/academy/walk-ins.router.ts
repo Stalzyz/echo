@@ -80,6 +80,8 @@ async function sendWalkInWhatsApp(phone: string, name: string, message: string, 
   }
 }
 
+import { getTenantContext } from '../utils/tenant';
+
 export default async function walkInsRouter(app: FastifyInstance) {
   const whatsappProvider = (process.env.WHATSAPP_PROVIDER || 'grafty') as 'grafty' | 'wati';
   const whatsappToken = process.env.GRAFTY_TOKEN || process.env.WATI_TOKEN;
@@ -87,8 +89,13 @@ export default async function walkInsRouter(app: FastifyInstance) {
   // ── GET /api/v1/academy/walk-ins ──────────────────────────────────────────
   app.get('/walk-ins', async (req, reply) => {
     const { status, date, counsellorId } = req.query as any;
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
 
-    const where: any = {};
+    const orgFilter = isGlobalSuperAdmin
+      ? {}
+      : { organizationId: tenantId || '__NO_ACCESS__' };
+
+    const where: any = { ...orgFilter };
     if (status) where.status = status;
     if (counsellorId) where.counsellorId = counsellorId;
     if (date) {
@@ -106,8 +113,6 @@ export default async function walkInsRouter(app: FastifyInstance) {
     return walkIns;
   });
 
-
-
   // ── POST /api/v1/academy/walk-ins (Kiosk submission) ─────────────────────
   app.post('/walk-ins', async (req, reply) => {
     const schema = z.object({
@@ -121,6 +126,7 @@ export default async function walkInsRouter(app: FastifyInstance) {
       notes: z.string().optional(),
     });
     const body = schema.parse(req.body);
+    const { tenantId } = getTenantContext(req);
 
     // Auto-assign counsellor
     const counsellorId = await autoAssignCounsellor(app.prisma);
@@ -137,6 +143,7 @@ export default async function walkInsRouter(app: FastifyInstance) {
         preferredDate: body.preferredDate ? new Date(body.preferredDate) : undefined,
         notes: body.notes,
         status: 'NEW',
+        organizationId: tenantId || null,
       }
     });
 
@@ -150,9 +157,10 @@ export default async function walkInsRouter(app: FastifyInstance) {
           courseInterest: body.interestArea,
           businessUnit: 'ACADEMY',
           status: 'ENQUIRY',
-          source: body.source as any || 'WEBSITE',
+          source: (body.source as any) || 'WEBSITE',
           assignedToId: counsellorId || undefined,
-          notes: `Kiosk Walk-In (${body.type}). Notes: ${body.notes || 'N/A'}`
+          notes: `Kiosk Walk-In (${body.type}). Notes: ${body.notes || 'N/A'}`,
+          organizationId: tenantId || null,
         }
       });
     } catch (crmErr) {
@@ -160,27 +168,11 @@ export default async function walkInsRouter(app: FastifyInstance) {
     }
 
     // Auto-send WhatsApp immediately
-    const welcomeMsg = `👋 Hi ${body.name}!\n\nThank you for visiting *Grekam Academy*! 🎓\n\nWe've registered your interest in *${body.interestArea}*.\n\nOne of our counsellors will reach out to you shortly.\n\n_We look forward to having you with us!_`;
+    const welcomeMsg = `👋 Hi ${body.name}!\n\nThank you for visiting! 🎓\n\nWe've registered your interest in *${body.interestArea}*.\n\nOne of our counsellors will reach out to you shortly.\n\n_We look forward to having you with us!_`;
     await sendWalkInWhatsApp(body.phone, body.name, welcomeMsg, whatsappProvider, whatsappToken);
 
     // Mark whatsapp sent
     await app.prisma.walkIn.update({ where: { id: walkIn.id }, data: { whatsappSent: true } });
-
-    // Also create a Lead in Admission CRM if email or phone doesn't exist
-    const existingLead = await app.prisma.lead.findFirst({ where: { phone: body.phone } });
-    if (!existingLead) {
-      await app.prisma.lead.create({
-        data: {
-          name: body.name,
-          phone: body.phone,
-          email: body.email,
-          source: 'OTHER',
-          status: 'ENQUIRY',
-          businessUnit: 'ACADEMY',
-          notes: `Walk-in: ${body.type}. Interest: ${body.interestArea}.`
-        }
-      });
-    }
 
     reply.code(201);
     return { success: true, walkIn, counsellorId };
@@ -210,17 +202,20 @@ export default async function walkInsRouter(app: FastifyInstance) {
 
   // ── GET /api/v1/academy/walk-ins/stats ───────────────────────────────────
   app.get('/walk-ins/stats', async (req, reply) => {
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+    const orgFilter = isGlobalSuperAdmin ? {} : { organizationId: tenantId || '__NO_ACCESS__' };
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const [todayCount, totalNew, totalConverted, bySource] = await Promise.all([
-      app.prisma.walkIn.count({ where: { createdAt: { gte: today } } }),
-      app.prisma.walkIn.count({ where: { status: 'NEW' } }),
-      app.prisma.walkIn.count({ where: { status: 'CONVERTED' } }),
-      app.prisma.walkIn.groupBy({ by: ['source'], _count: { source: true } }),
+    const [todayCount, totalNew, totalConverted, bySource, total] = await Promise.all([
+      app.prisma.walkIn.count({ where: { ...orgFilter, createdAt: { gte: today } } }),
+      app.prisma.walkIn.count({ where: { ...orgFilter, status: 'NEW' } }),
+      app.prisma.walkIn.count({ where: { ...orgFilter, status: 'CONVERTED' } }),
+      app.prisma.walkIn.groupBy({ by: ['source'], where: orgFilter, _count: { source: true } }),
+      app.prisma.walkIn.count({ where: orgFilter }),
     ]);
 
-    const total = await app.prisma.walkIn.count();
     const conversionRate = total > 0 ? Math.round((totalConverted / total) * 100) : 0;
 
     return { todayCount, totalNew, totalConverted, conversionRate, bySource };
@@ -228,8 +223,11 @@ export default async function walkInsRouter(app: FastifyInstance) {
 
   // ── GET /api/v1/academy/demo-sessions ─────────────────────────────────────
   app.get('/demo-sessions', async (req, reply) => {
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+    const orgFilter = isGlobalSuperAdmin ? {} : { organizationId: tenantId || '__NO_ACCESS__' };
+
     const sessions = await app.prisma.demoSession.findMany({
-      where: { isActive: true, scheduledAt: { gte: new Date() } },
+      where: { ...orgFilter, isActive: true, scheduledAt: { gte: new Date() } },
       include: { _count: { select: { registrations: true } } },
       orderBy: { scheduledAt: 'asc' }
     });
@@ -249,9 +247,14 @@ export default async function walkInsRouter(app: FastifyInstance) {
       mentorId: z.string().optional(),
     });
     const body = schema.parse(req.body);
+    const { tenantId } = getTenantContext(req);
 
     const session = await app.prisma.demoSession.create({
-      data: { ...body, scheduledAt: new Date(body.scheduledAt) }
+      data: {
+        ...body,
+        scheduledAt: new Date(body.scheduledAt),
+        organizationId: tenantId || null,
+      }
     });
     reply.code(201);
     return session;

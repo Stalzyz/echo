@@ -209,7 +209,7 @@ export default async function CMSPublicPage({ params }: { params: Promise<{ slug
   
   if (courseCode) {
     try {
-      const course = await prisma.course.findUnique({
+      const course: any = await (prisma as any).course.findFirst({
         where: { code: courseCode },
         include: {
           lmsCourse: {
@@ -232,7 +232,7 @@ export default async function CMSPublicPage({ params }: { params: Promise<{ slug
       trailerVideoId = course?.lmsCourse?.trailerVideoId || null;
 
       // Fetch 3 other courses
-      relatedCourses = await prisma.course.findMany({
+      relatedCourses = await (prisma as any).course.findMany({
         where: { code: { not: courseCode } },
         take: 3,
         include: {

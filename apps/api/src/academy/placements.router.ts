@@ -1,14 +1,18 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
+import { getTenantContext } from '../utils/tenant';
 
 export default async function placementsRouter(app: FastifyInstance) {
   // GET /api/v1/academy/placements (Overview)
   app.get('/placements', async (req, reply) => {
+    const { orgFilter } = getTenantContext(req);
     const companies = await app.prisma.placementCompany.findMany({
+      where: orgFilter,
       include: { _count: { select: { jobs: true } } },
       orderBy: { name: 'asc' }
     });
     const jobs = await app.prisma.placementJob.findMany({
+      where: orgFilter,
       include: { company: true, _count: { select: { applications: true } } },
       orderBy: { createdAt: 'desc' }
     });
@@ -17,7 +21,9 @@ export default async function placementsRouter(app: FastifyInstance) {
 
   // GET /api/v1/academy/placements/companies
   app.get('/placements/companies', async (req, reply) => {
+    const { orgFilter } = getTenantContext(req);
     const companies = await app.prisma.placementCompany.findMany({
+      where: orgFilter,
       include: { _count: { select: { jobs: true } } },
       orderBy: { name: 'asc' }
     });
@@ -26,6 +32,7 @@ export default async function placementsRouter(app: FastifyInstance) {
 
   // POST /api/v1/academy/placements/companies
   app.post('/placements/companies', async (req, reply) => {
+    const { tenantId } = getTenantContext(req);
     const schema = z.object({
       name: z.string(),
       industry: z.string().optional(),
@@ -33,14 +40,21 @@ export default async function placementsRouter(app: FastifyInstance) {
     });
     const body = schema.parse(req.body);
 
-    const company = await app.prisma.placementCompany.create({ data: body });
+    const company = await app.prisma.placementCompany.create({
+      data: {
+        ...body,
+        ...(tenantId ? { organizationId: tenantId } : {})
+      }
+    });
     reply.code(201);
     return company;
   });
 
   // GET /api/v1/academy/placements/jobs
   app.get('/placements/jobs', async (req, reply) => {
+    const { orgFilter } = getTenantContext(req);
     const jobs = await app.prisma.placementJob.findMany({
+      where: orgFilter,
       include: {
         company: true,
         _count: { select: { applications: true } }
@@ -52,6 +66,7 @@ export default async function placementsRouter(app: FastifyInstance) {
 
   // POST /api/v1/academy/placements/jobs
   app.post('/placements/jobs', async (req, reply) => {
+    const { tenantId } = getTenantContext(req);
     const schema = z.object({
       companyId: z.string(),
       title: z.string(),
@@ -60,8 +75,14 @@ export default async function placementsRouter(app: FastifyInstance) {
     });
     const body = schema.parse(req.body);
 
-    const job = await app.prisma.placementJob.create({ data: body });
+    const job = await app.prisma.placementJob.create({
+      data: {
+        ...body,
+        ...(tenantId ? { organizationId: tenantId } : {})
+      }
+    });
     reply.code(201);
     return job;
   });
 }
+

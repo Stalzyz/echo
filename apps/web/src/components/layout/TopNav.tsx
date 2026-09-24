@@ -10,6 +10,7 @@ import { ShieldCheck, Moon, Sun, Menu, X, LogOut, Layers, LayoutDashboard, Users
 import dynamic from "next/dynamic"
 import Image from "next/image"
 import { useOrganization } from "@/context/OrganizationContext"
+import { toast } from "sonner"
 import { NotificationMenu } from "./NotificationMenu"
 import { TimerWidget } from "./TimerWidget"
 

@@ -2,10 +2,12 @@
 
 import { GraduationCap, Plus, Mail, Building, Briefcase, Loader2, X } from "lucide-react"
 import { useApi, fetchApi } from "@/lib/useApi"
+import { useOrganization } from "@/context/OrganizationContext"
 import { useState } from "react"
 import { toast } from "sonner"
 
 export default function OnlineEducatorsPage() {
+  const org = useOrganization()
   const { data: educatorsData, mutate, isLoading } = useApi<any[]>("/academy/educators")
   const educators = educatorsData?.filter(e => e.deliveryMode === 'ONLINE') || []
   
@@ -163,7 +165,7 @@ export default function OnlineEducatorsPage() {
             </div>
             <div>
               <h1 className="text-3xl font-black text-slate-900 tracking-tight">Remote Faculty</h1>
-              <p className="text-sm text-slate-500 mt-1 font-medium">Manage all active online virtual learning educators for Echo LMS</p>
+              <p className="text-sm text-slate-500 mt-1 font-medium">Manage all active online virtual learning educators for {org?.name || 'your academy'}</p>
             </div>
           </div>
           <button 

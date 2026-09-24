@@ -1,4 +1,5 @@
 import { auth } from "../../../auth"
+import { redirect } from "next/navigation"
 import { EducatorSidebar } from "@/components/educator/EducatorSidebar"
 import { SessionProvider } from "next-auth/react"
 

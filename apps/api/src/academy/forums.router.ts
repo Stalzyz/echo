@@ -1,15 +1,21 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
+import { getTenantContext } from '../utils/tenant';
 
 export default async function forumsRouter(app: FastifyInstance) {
   // GET /api/v1/academy/forums (Overview)
   app.get('/', async (req, reply) => {
+    const { orgFilter, tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+    const postOrgFilter = isGlobalSuperAdmin ? {} : { category: { organizationId: tenantId || '__NO_ACCESS__' } };
+
     const categories = await app.prisma.forumCategory.findMany({
+      where: orgFilter,
       include: { _count: { select: { posts: true } } },
       orderBy: { name: 'asc' }
     });
     const recentPosts = await app.prisma.forumPost.findMany({
       take: 20,
+      where: postOrgFilter,
       include: {
         author: { select: { firstName: true, lastName: true, role: true } },
         category: true,
@@ -22,7 +28,9 @@ export default async function forumsRouter(app: FastifyInstance) {
 
   // GET /api/v1/academy/forums/categories
   app.get('/categories', async (req, reply) => {
+    const { orgFilter } = getTenantContext(req);
     const categories = await app.prisma.forumCategory.findMany({
+      where: orgFilter,
       include: {
         _count: { select: { posts: true } }
       }
@@ -30,12 +38,40 @@ export default async function forumsRouter(app: FastifyInstance) {
     return { data: categories };
   });
 
+  // POST /api/v1/academy/forums/categories
+  app.post('/categories', async (req, reply) => {
+    const { tenantId } = getTenantContext(req);
+    const schema = z.object({
+      name: z.string(),
+      description: z.string().optional(),
+      slug: z.string().optional(),
+    });
+    const body = schema.parse(req.body);
+    const slug = body.slug || body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+    const category = await app.prisma.forumCategory.create({
+      data: {
+        name: body.name,
+        description: body.description,
+        slug,
+        ...(tenantId ? { organizationId: tenantId } : {})
+      }
+    });
+    reply.code(201);
+    return { data: category };
+  });
+
   // GET /api/v1/academy/forums/posts
   app.get('/posts', async (req, reply) => {
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
     const { categoryId } = req.query as { categoryId?: string };
     
+    const postOrgFilter = isGlobalSuperAdmin ? {} : { category: { organizationId: tenantId || '__NO_ACCESS__' } };
     const posts = await app.prisma.forumPost.findMany({
-      where: categoryId ? { categoryId } : undefined,
+      where: {
+        ...(categoryId ? { categoryId } : {}),
+        ...postOrgFilter
+      },
       include: {
         author: { select: { firstName: true, lastName: true, role: true } },
         category: true,

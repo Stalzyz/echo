@@ -1,9 +1,12 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
+import { getTenantContext } from '../utils/tenant';
 
 export default async function academyProjectsRouter(app: FastifyInstance) {
   const getProjectsHandler = async (req: any, reply: any) => {
+    const { orgFilter } = getTenantContext(req);
     const projects = await app.prisma.academyProject.findMany({
+      where: orgFilter,
       include: {
         members: { include: { student: { select: { id: true, user: { select: { firstName: true, lastName: true } } } } } },
         _count: { select: { tasks: true } }
@@ -14,6 +17,7 @@ export default async function academyProjectsRouter(app: FastifyInstance) {
   };
 
   const createProjectHandler = async (req: any, reply: any) => {
+    const { tenantId } = getTenantContext(req);
     const schema = z.object({
       title: z.string(),
       type: z.enum(['INTERNAL', 'CLIENT', 'INDUSTRY', 'HACKATHON', 'RESEARCH', 'COMPETITION', 'FREELANCE']),
@@ -24,7 +28,10 @@ export default async function academyProjectsRouter(app: FastifyInstance) {
     const body = schema.parse(req.body);
 
     const project = await app.prisma.academyProject.create({
-      data: body
+      data: {
+        ...body,
+        ...(tenantId ? { organizationId: tenantId } : {})
+      }
     });
 
     reply.code(201);

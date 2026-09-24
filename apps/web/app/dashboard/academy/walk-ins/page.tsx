@@ -1,12 +1,14 @@
 "use client"
 
 import { useApi, fetchApi } from "@/lib/useApi"
+import { useOrganization } from "@/context/OrganizationContext"
 import { Users, Phone, MessageSquare, ArrowRight, Bot, Loader2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { formatDistanceToNow } from "date-fns"
 
 export default function WalkInsAdmin() {
+  const org = useOrganization()
   const { data: stats } = useApi<any>("/academy/walk-ins/stats")
   const { data: walkIns, mutate, isLoading } = useApi<any[]>("/academy/walk-ins")
   
@@ -77,7 +79,7 @@ export default function WalkInsAdmin() {
           <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3">
             <Users className="w-8 h-8 text-teal-600" /> Walk-In Tracker
           </h1>
-          <p className="text-slate-500 mt-1 font-medium">Manage campus visitors, demo requests, and walk-in leads for Echo LMS.</p>
+          <p className="text-slate-500 mt-1 font-medium">Manage campus visitors, demo requests, and walk-in leads for {org?.name || 'your academy'}.</p>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={() => setIsQRModalOpen(true)} className="flex items-center gap-2 bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 px-5 py-2.5 rounded-xl transition-colors font-bold text-sm shadow-xs">

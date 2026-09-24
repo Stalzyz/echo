@@ -2,10 +2,12 @@
 
 import { useState } from "react"
 import { useApi, fetchApi } from "@/lib/useApi"
+import { useOrganization } from "@/context/OrganizationContext"
 import { toast } from "sonner"
 import { FolderGit2, Plus, Users, Clock, X, Loader2 } from "lucide-react"
 
 export default function AcademyProjects() {
+  const org = useOrganization()
   const { data: projects, mutate: refreshProjects } = useApi<any[]>("/academy/projects")
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [form, setForm] = useState({ title: "", type: "INTERNAL", description: "" })
@@ -34,7 +36,7 @@ export default function AcademyProjects() {
           <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3">
             <FolderGit2 className="w-8 h-8 text-teal-600" /> Live Project Hub
           </h1>
-          <p className="text-slate-500 mt-1 font-medium">Manage internal, client, and hackathon projects for Echo LMS.</p>
+          <p className="text-slate-500 mt-1 font-medium">Manage internal, client, and hackathon projects for {org?.name || 'your academy'}.</p>
         </div>
         <button onClick={() => setIsAddOpen(true)} className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold px-5 py-2.5 rounded-xl transition-colors shadow-xs">
           <Plus className="w-4 h-4" /> New Project

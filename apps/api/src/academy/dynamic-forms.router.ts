@@ -1,11 +1,14 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
+import { getTenantContext } from '../utils/tenant';
 
 export default async function dynamicFormsRouter(app: FastifyInstance) {
   
   // ── GET /api/v1/academy/forms & /api/v1/academy/dynamic-forms ──────────────────
   const listForms = async (req: any, reply: any) => {
+    const { orgFilter } = getTenantContext(req);
     const forms = await app.prisma.enquiryForm.findMany({
+      where: orgFilter,
       include: { _count: { select: { submissions: true } } },
       orderBy: { createdAt: 'desc' }
     });
@@ -16,6 +19,7 @@ export default async function dynamicFormsRouter(app: FastifyInstance) {
 
   // ── POST /api/v1/academy/forms & /api/v1/academy/dynamic-forms ─────────────────
   const createForm = async (req: any, reply: any) => {
+    const { tenantId } = getTenantContext(req);
     const schema = z.object({
       title: z.string(),
       description: z.string().optional(),
@@ -32,7 +36,8 @@ export default async function dynamicFormsRouter(app: FastifyInstance) {
         slug,
         description: body.description,
         fields: body.fields,
-        createLead: body.createLead
+        createLead: body.createLead,
+        ...(tenantId ? { organizationId: tenantId } : {})
       }
     });
     return form;
@@ -94,7 +99,8 @@ export default async function dynamicFormsRouter(app: FastifyInstance) {
             source: 'OTHER',
             status: 'ENQUIRY',
             businessUnit: 'ACADEMY',
-            notes: `Auto-generated from form: ${form.title}`
+            notes: `Auto-generated from form: ${form.title}`,
+            ...((form as any).organizationId ? { organizationId: (form as any).organizationId } : {})
           }
         });
         leadId = lead.id;

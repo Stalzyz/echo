@@ -1,11 +1,13 @@
 "use client"
 
 import { useApi, fetchApi } from "@/lib/useApi"
+import { useOrganization } from "@/context/OrganizationContext"
 import { CalendarDays, Plus, MapPin, Users, Calendar, Loader2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
 export default function CampusEventsAdmin() {
+  const org = useOrganization()
   const { data: events, mutate } = useApi<any[]>("/academy/events")
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [form, setForm] = useState({ title: "", description: "", type: "WORKSHOP", date: "", location: "", maxCapacity: 50 })
@@ -35,7 +37,7 @@ export default function CampusEventsAdmin() {
           <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3">
             <CalendarDays className="w-8 h-8 text-teal-600" /> Event Management
           </h1>
-          <p className="text-slate-500 mt-1 font-medium">Manage workshops, hackathons, and guest sessions for Echo LMS.</p>
+          <p className="text-slate-500 mt-1 font-medium">Manage workshops, hackathons, and guest sessions for {org?.name || 'your academy'}.</p>
         </div>
         <button onClick={() => setIsAddOpen(true)} className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold px-5 py-2.5 rounded-xl transition-colors shadow-xs">
           <Plus className="w-4 h-4" /> Create Event

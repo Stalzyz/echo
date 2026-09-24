@@ -1,11 +1,13 @@
 "use client"
 
 import { useApi } from "@/lib/useApi"
+import { useOrganization } from "@/context/OrganizationContext"
 import { ShoppingBag, Plus, Tag, IndianRupee, Loader2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
 export default function MarketplaceAdmin() {
+  const org = useOrganization()
   const { data: items } = useApi<any[]>("/academy/marketplace")
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -28,7 +30,7 @@ export default function MarketplaceAdmin() {
           <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3">
             <ShoppingBag className="w-8 h-8 text-teal-600" /> Marketplace
           </h1>
-          <p className="text-slate-500 mt-1 font-medium">Manage courses, learning templates, and digital goods for Echo LMS.</p>
+          <p className="text-slate-500 mt-1 font-medium">Manage courses, learning templates, and digital goods for {org?.name || 'your academy'}.</p>
         </div>
         <button onClick={() => setIsAddOpen(true)} className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold px-5 py-2.5 rounded-xl transition-colors shadow-xs">
           <Plus className="w-4 h-4" /> Add Item

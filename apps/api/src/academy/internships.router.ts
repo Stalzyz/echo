@@ -1,11 +1,18 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
+import { getTenantContext } from '../utils/tenant';
 
 export default async function internshipsRouter(app: FastifyInstance) {
   // GET /api/v1/academy/internships
   app.get('/internships', async (req, reply) => {
     const { studentId } = req.query as { studentId?: string };
-    const where = studentId ? { studentId } : {};
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+    const orgFilter = isGlobalSuperAdmin ? {} : { student: { user: { organizationId: tenantId || '__NO_ACCESS__' } } };
+
+    const where: any = {
+      ...orgFilter,
+      ...(studentId ? { studentId } : {})
+    };
     
     const internships = await app.prisma.internship.findMany({
       where,
