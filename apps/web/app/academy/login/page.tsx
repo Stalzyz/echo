@@ -75,6 +75,39 @@ export default function AcademyLoginPage() {
           </button>
         </form>
 
+        {/* 1-CLICK DEMO ACCESS BAR */}
+        <div className="mt-6 pt-5 border-t border-slate-100 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest font-mono">
+              ⚡ LIVE MARKETING DEMOS:
+            </span>
+            <span className="text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
+              Instant Preview
+            </span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2">
+            <Link
+              href="/demo/admin"
+              className="p-2.5 rounded-xl bg-slate-50 hover:bg-amber-50 hover:border-amber-200 border border-slate-200 text-slate-800 text-[11px] font-bold text-center transition-colors"
+            >
+              Admin Demo
+            </Link>
+            <Link
+              href="/demo/student"
+              className="p-2.5 rounded-xl bg-slate-50 hover:bg-teal-50 hover:border-teal-200 border border-slate-200 text-slate-800 text-[11px] font-bold text-center transition-colors"
+            >
+              Student Demo
+            </Link>
+            <Link
+              href="/demo/educator"
+              className="p-2.5 rounded-xl bg-slate-50 hover:bg-indigo-50 hover:border-indigo-200 border border-slate-200 text-slate-800 text-[11px] font-bold text-center transition-colors"
+            >
+              Educator Demo
+            </Link>
+          </div>
+        </div>
+
         <div className="mt-6 text-center border-t border-slate-100 pt-4 space-y-2">
           <div>
             <Link href="/auth/login" className="text-xs font-semibold text-teal-700 hover:underline">
