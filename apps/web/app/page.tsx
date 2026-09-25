@@ -5,53 +5,490 @@ import Link from "next/link"
 import {
   Users, Bot, MessageSquare, ArrowRight, Play, ChevronDown, ChevronUp,
   Globe, Video, Laptop, BookOpen, PhoneCall, Workflow, ExternalLink, Mail, MapPin, Phone,
-  Sparkles, Megaphone, CheckCircle2, QrCode, Receipt, Mic
+  Sparkles, Megaphone, CheckCircle2, QrCode, Receipt, Mic, FileText, Calendar,
+  GraduationCap, Trophy, Briefcase, Award, ShieldAlert, Percent, CheckSquare,
+  HelpCircle, Layers, Sliders, Smartphone, Clock, ShieldCheck, Database, Compass
 } from "lucide-react"
-import { toast } from "sonner"
 import { DemoLoginModal } from "@/components/auth/DemoLoginModal"
+import { PricingInquiryModal } from "@/components/auth/PricingInquiryModal"
 
 export default function PublicHomePage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0)
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false)
-
-  // Contact / Pricing Lead Form State
-  const [inquiryForm, setInquiryForm] = useState({
-    name: "",
-    academyName: "",
-    phone: "",
-    email: "",
-    studentVolume: "100-500",
-    message: ""
-  })
-  const [isSubmittingInquiry, setIsSubmittingInquiry] = useState(false)
+  const [isPricingModalOpen, setIsPricingModalOpen] = useState(false)
+  const [activePipelineStep, setActivePipelineStep] = useState<number>(0)
+  const [activeModuleCategory, setActiveModuleCategory] = useState<string>("all")
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index)
   }
 
-  const handleInquirySubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmittingInquiry(true)
-    setTimeout(() => {
-      setIsSubmittingInquiry(false)
-      toast.success("Thank you! Your pricing inquiry has been received. A Grekam specialist will reach out on WhatsApp within 15 minutes.")
-      setInquiryForm({
-        name: "",
-        academyName: "",
-        phone: "",
-        email: "",
-        studentVolume: "100-500",
-        message: ""
-      })
-    }, 800)
-  }
-
-  const scrollToForm = () => {
-    const el = document.getElementById("pricing-inquiry-form")
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" })
+  // 8-Stage Admission Pipeline Journey
+  const PIPELINE_STEPS = [
+    {
+      id: "crm",
+      number: "01",
+      title: "Lead Ingestion (CRM)",
+      subtitle: "Catch it instantly",
+      badge: "Real-time Webhooks",
+      color: "bg-blue-500",
+      lightColor: "bg-blue-50 border-blue-200 text-blue-700",
+      icon: (
+        <svg className="w-5 h-5 text-blue-600 fill-current" viewBox="0 0 24 24">
+          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+        </svg>
+      ),
+      description: "Leads from Meta Ads, Google Ads, website forms and walk-in QR kiosks land directly into the Admissions CRM in sub-seconds with zero manual entry.",
+      highlight: "Sub-second Meta & Google sync"
+    },
+    {
+      id: "automation",
+      number: "02",
+      title: "WhatsApp Welcome",
+      subtitle: "Welcome msg sent",
+      badge: "Official Cloud API",
+      color: "bg-emerald-500",
+      lightColor: "bg-emerald-50 border-emerald-200 text-emerald-700",
+      icon: (
+        <svg className="w-5 h-5 text-emerald-600 fill-current" viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+      ),
+      description: "An automated verified WhatsApp welcome message delivers the course syllabus, fee structure, and video preview to the student's phone instantly.",
+      highlight: "98% open rates within 3 mins"
+    },
+    {
+      id: "followups",
+      number: "03",
+      title: "Counselor Follow-ups",
+      subtitle: "No one slips through",
+      badge: "Voice & Call Audit",
+      color: "bg-amber-500",
+      lightColor: "bg-amber-50 border-amber-200 text-amber-700",
+      icon: (
+        <svg className="w-5 h-5 text-amber-600 fill-current" viewBox="0 0 24 24">
+          <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.053 15.053 0 01-6.59-6.59l2.2-2.21a.96.96 0 00.25-1A11.36 11.36 0 018.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/>
+        </svg>
+      ),
+      description: "Counselors log call notes, record conversations for quality audits, set automated callback reminders, and manage lead stages on Kanban boards.",
+      highlight: "Call recording & smart disposition"
+    },
+    {
+      id: "demo",
+      number: "04",
+      title: "Demo & Reminders",
+      subtitle: "Lock in interest",
+      badge: "Meet & Zoom Sync",
+      color: "bg-teal-500",
+      lightColor: "bg-teal-50 border-teal-200 text-teal-700",
+      icon: (
+        <svg className="w-5 h-5 text-teal-600 fill-current" viewBox="0 0 24 24">
+          <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/>
+        </svg>
+      ),
+      description: "Automated 1-click live demo class or consultation scheduling with calendar sync, auto Zoom/Meet links, and WhatsApp nudge alerts before the session.",
+      highlight: "Zero no-shows with smart nudges"
+    },
+    {
+      id: "payment",
+      number: "05",
+      title: "Payments & EMI",
+      subtitle: "Easy & flexible",
+      badge: "Razorpay & PhonePe",
+      color: "bg-indigo-500",
+      lightColor: "bg-indigo-50 border-indigo-200 text-indigo-700",
+      icon: (
+        <svg className="w-5 h-5 text-indigo-600 fill-current" viewBox="0 0 24 24">
+          <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
+        </svg>
+      ),
+      description: "Students complete enrollment via instant UPI, credit cards, or split payments into automated monthly EMI installments with zero friction.",
+      highlight: "Auto EMI schedules & split fees"
+    },
+    {
+      id: "invoices",
+      number: "06",
+      title: "Invoices & Receipts",
+      subtitle: "Auto-generated",
+      badge: "100% GST Compliant",
+      color: "bg-purple-500",
+      lightColor: "bg-purple-50 border-purple-200 text-purple-700",
+      icon: (
+        <svg className="w-5 h-5 text-purple-600 fill-current" viewBox="0 0 24 24">
+          <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+        </svg>
+      ),
+      description: "The moment payment clears, a branded GST tax invoice and fee receipt is generated and dispatched to the student and parent via WhatsApp & Email.",
+      highlight: "Downloadable PDF tax receipts"
+    },
+    {
+      id: "communication",
+      number: "07",
+      title: "Communication & Alerts",
+      subtitle: "Stay connected",
+      badge: "Batch Broadcasting",
+      color: "bg-rose-500",
+      lightColor: "bg-rose-50 border-rose-200 text-rose-700",
+      icon: (
+        <svg className="w-5 h-5 text-rose-600 fill-current" viewBox="0 0 24 24">
+          <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
+        </svg>
+      ),
+      description: "Auto-add enrolled students to cohort batch channels, send daily timetable updates, homework notices, and automated absentee notifications to parents.",
+      highlight: "Multi-channel batch broadcasts"
+    },
+    {
+      id: "lms",
+      number: "08",
+      title: "LMS & Student Passport",
+      subtitle: "Learners ready",
+      badge: "Instant Provisioning",
+      color: "bg-teal-600",
+      lightColor: "bg-teal-50 border-teal-200 text-teal-800",
+      icon: (
+        <svg className="w-5 h-5 text-teal-700 fill-current" viewBox="0 0 24 24">
+          <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
+        </svg>
+      ),
+      description: "Student portal account is activated with access to video lessons, live classrooms, quizzes, verifiable QR certificates, and digital Student Passport ID.",
+      highlight: "QR attendance & verifiable certificates"
     }
-  }
+  ]
+
+  // All 24+ Dashboard Modules categorized with colorful minimal SVG icons
+  const MODULE_CATEGORIES = [
+    { id: "all", name: "All Modules (24)" },
+    { id: "lms", name: "Course Builder & Studio" },
+    { id: "crm", name: "Admissions & Leads" },
+    { id: "student", name: "Student & Faculty" },
+    { id: "operations", name: "Finance & Operations" }
+  ]
+
+  const DASHBOARD_MODULES = [
+    // Course Builder & Studio
+    {
+      category: "lms",
+      name: "Course Builder & Studio",
+      href: "/dashboard/studio/course-builder",
+      desc: "Visual drag-and-drop curriculum builder with video chapters, PDF handouts, coding sandboxes, and drip release schedules.",
+      badge: "Core Studio",
+      iconColor: "bg-indigo-50 border-indigo-200 text-indigo-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+        </svg>
+      )
+    },
+    {
+      category: "lms",
+      name: "Teaching Studio & Live Rooms",
+      href: "/dashboard/studio/live",
+      desc: "Host live classrooms directly integrated with Zoom & Google Meet, complete with student attendance capture and cloud recordings.",
+      badge: "Live Class",
+      iconColor: "bg-blue-50 border-blue-200 text-blue-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polygon points="23 7 16 12 23 17 23 7" /><rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+        </svg>
+      )
+    },
+    {
+      category: "lms",
+      name: "Interactive Quiz Runner",
+      href: "/dashboard/studio/quizzes",
+      desc: "Create timed tests, multiple choice assessments, negative marking schemes, and instant grading with automated ranking.",
+      badge: "Assessments",
+      iconColor: "bg-amber-50 border-amber-200 text-amber-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polyline points="9 11 12 14 22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+        </svg>
+      )
+    },
+    {
+      category: "lms",
+      name: "Assignments & Project Hub",
+      href: "/dashboard/studio/assignments",
+      desc: "Assign homework, capstone projects, and code tasks with student file uploads, educator rubrics, and feedback grading.",
+      badge: "Grading",
+      iconColor: "bg-teal-50 border-teal-200 text-teal-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" />
+        </svg>
+      )
+    },
+    {
+      category: "lms",
+      name: "Verifiable QR Certificates",
+      href: "/dashboard/studio/certificates",
+      desc: "Auto-issue tamper-proof digital completion certificates with unique public verification URLs and scannable QR codes.",
+      badge: "Credentials",
+      iconColor: "bg-purple-50 border-purple-200 text-purple-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="12" cy="8" r="7" /><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+        </svg>
+      )
+    },
+
+    // Admissions & CRM
+    {
+      category: "crm",
+      name: "Admissions CRM & Kanban",
+      href: "/dashboard/academy/admissions",
+      desc: "Visual lead pipeline from initial inquiry to enrollment with stages, assigned counselors, follow-up dates, and conversion metrics.",
+      badge: "Lead Pipeline",
+      iconColor: "bg-blue-50 border-blue-200 text-blue-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 3v18" /><path d="M15 3v18" />
+        </svg>
+      )
+    },
+    {
+      category: "crm",
+      name: "Meta & Google Ads Sync",
+      href: "/dashboard/settings/integrations",
+      desc: "Sub-second webhook ingestion of lead ad forms from Facebook, Instagram & Google Search campaigns with ROI attribution.",
+      badge: "Direct Sync",
+      iconColor: "bg-sky-50 border-sky-200 text-sky-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" />
+        </svg>
+      )
+    },
+    {
+      category: "crm",
+      name: "Call Intelligence & Voice Audio",
+      href: "/dashboard/academy/calls",
+      desc: "Counselor call recording audio player, duration logging, disposition tracking, and quality audit benchmarks.",
+      badge: "Voice Analytics",
+      iconColor: "bg-rose-50 border-rose-200 text-rose-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" y1="19" x2="12" y2="23" />
+        </svg>
+      )
+    },
+    {
+      category: "crm",
+      name: "Walk-ins Kiosk & Reception QR",
+      href: "/dashboard/academy/walk-ins",
+      desc: "Tablet-friendly kiosk station for physical academy visitors to register, scan QR, and get assigned to available counselors.",
+      badge: "Campus Kiosk",
+      iconColor: "bg-amber-50 border-amber-200 text-amber-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
+        </svg>
+      )
+    },
+    {
+      category: "crm",
+      name: "Demo Sessions & Consultations",
+      href: "/dashboard/academy/demo-sessions",
+      desc: "Book and schedule 1:1 counseling consultations or group masterclass demos with automated calendar links and reminders.",
+      badge: "Scheduling",
+      iconColor: "bg-emerald-50 border-emerald-200 text-emerald-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+      )
+    },
+    {
+      category: "crm",
+      name: "Dynamic Form Builder",
+      href: "/dashboard/academy/forms",
+      desc: "Create embeddable admission forms, survey questionnaires, and feedback polls with conditional logic and custom fields.",
+      badge: "Lead Forms",
+      iconColor: "bg-teal-50 border-teal-200 text-teal-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" />
+        </svg>
+      )
+    },
+
+    // Student & Faculty
+    {
+      category: "student",
+      name: "Student LMS Portal",
+      href: "/student",
+      desc: "Personalized student experience with interactive video lesson player, course progress tracking, notes, and discussion boards.",
+      badge: "Learner Hub",
+      iconColor: "bg-teal-50 border-teal-200 text-teal-700",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z" /><path d="M6 12v5c3 3 9 3 12 0v-5" />
+        </svg>
+      )
+    },
+    {
+      category: "student",
+      name: "Student Passport & QR ID",
+      href: "/dashboard/academy/students",
+      desc: "Digital student ID card with scannable QR code for campus biometric attendance scanning, library access, and exam hall entry.",
+      badge: "Digital ID",
+      iconColor: "bg-indigo-50 border-indigo-200 text-indigo-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="9" cy="10" r="2" /><line x1="15" y1="8" x2="17" y2="8" /><line x1="15" y1="12" x2="17" y2="12" />
+        </svg>
+      )
+    },
+    {
+      category: "student",
+      name: "Educator Studio & Faculty Hub",
+      href: "/dashboard/studio",
+      desc: "Dedicated workspace for faculty to manage live batches, publish teaching notes, review student tasks, and host office hours.",
+      badge: "Faculty Studio",
+      iconColor: "bg-purple-50 border-purple-200 text-purple-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      )
+    },
+    {
+      category: "student",
+      name: "Leaderboards & Gamification",
+      href: "/dashboard/academy/leaderboard",
+      desc: "Motivate students with XP points, streak counters, badges, and weekly batch rankings to maximize course completion rates.",
+      badge: "Gamification",
+      iconColor: "bg-amber-50 border-amber-200 text-amber-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.45 1-1 1H8v4h8v-4h-1c-.55 0-1-.45-1-1v-2.34c3.38-.85 5.5-4.04 5.5-7.66V4H6v7c0 3.62 2.12 6.81 5.5 7.66z" />
+        </svg>
+      )
+    },
+    {
+      category: "student",
+      name: "Social Community & Circles",
+      href: "/dashboard/academy/community",
+      desc: "Batch discussion circles, doubt resolution forums, peer networking, and direct educator messaging channels.",
+      badge: "Community",
+      iconColor: "bg-emerald-50 border-emerald-200 text-emerald-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+      )
+    },
+
+    // Finance & Operations
+    {
+      category: "operations",
+      name: "Automated EMI Invoicing & GST",
+      href: "/dashboard/academy/fees/emi",
+      desc: "Split course fees into monthly installment milestones with automated payment reminder links and GST tax receipts.",
+      badge: "Finance & EMI",
+      iconColor: "bg-teal-50 border-teal-200 text-teal-700",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" />
+        </svg>
+      )
+    },
+    {
+      category: "operations",
+      name: "AI Student Drop-out Risk Engine",
+      href: "/dashboard/academy/risk",
+      desc: "Algorithmic early-warning engine that flags inactive learners, falling quiz scores, or missed classes before students drop out.",
+      badge: "Predictive AI",
+      iconColor: "bg-purple-50 border-purple-200 text-purple-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
+        </svg>
+      )
+    },
+    {
+      category: "operations",
+      name: "Batches & Cohort Scheduling",
+      href: "/dashboard/academy/batches",
+      desc: "Organize students into structured weekday, weekend, or online cohorts with teacher allocation and capacity caps.",
+      badge: "Cohorts",
+      iconColor: "bg-blue-50 border-blue-200 text-blue-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" />
+        </svg>
+      )
+    },
+    {
+      category: "operations",
+      name: "Placements & Career Board",
+      href: "/dashboard/academy/placements",
+      desc: "Manage corporate hiring partners, student resume profiles, interview rounds, and job placement offers.",
+      badge: "Careers",
+      iconColor: "bg-amber-50 border-amber-200 text-amber-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+        </svg>
+      )
+    },
+    {
+      category: "operations",
+      name: "Coupons & Viral Referrals",
+      href: "/dashboard/academy/referrals",
+      desc: "Create coupon discount codes, track student affiliate referral payouts, and run promotional scholarship campaigns.",
+      badge: "Growth Engine",
+      iconColor: "bg-rose-50 border-rose-200 text-rose-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <line x1="19" y1="5" x2="5" y2="19" /><circle cx="6.5" cy="6.5" r="2.5" /><circle cx="17.5" cy="17.5" r="2.5" />
+        </svg>
+      )
+    },
+    {
+      category: "operations",
+      name: "White-Label & Custom Domain",
+      href: "/dashboard/super-admin/whitelabel",
+      desc: "Host academy under your custom CNAME (`learn.myacademy.com`) with custom brand palettes, logos, and branded notifications.",
+      badge: "Whitelabel",
+      iconColor: "bg-emerald-50 border-emerald-200 text-emerald-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+        </svg>
+      )
+    },
+    {
+      category: "operations",
+      name: "Campus Events & Masterclasses",
+      href: "/dashboard/academy/events",
+      desc: "Publish ticketed offline workshops, industry guest lectures, and live hackathons with RSVP attendance management.",
+      badge: "Events",
+      iconColor: "bg-sky-50 border-sky-200 text-sky-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
+        </svg>
+      )
+    },
+    {
+      category: "operations",
+      name: "Multi-Branch Campus Control",
+      href: "/dashboard/super-admin/academies",
+      desc: "Manage multiple city branches or franchise centers from one centralized Super Admin command console with isolated permissions.",
+      badge: "Enterprise",
+      iconColor: "bg-indigo-50 border-indigo-200 text-indigo-700",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M3 21h18" /><path d="M5 21V7l8-4v18" /><path d="M19 21V11l-6-3" /><line x1="9" y1="9" x2="9" y2="9.01" /><line x1="9" y1="13" x2="9" y2="13.01" /><line x1="9" y1="17" x2="9" y2="17.01" />
+        </svg>
+      )
+    }
+  ]
+
+  const filteredModules = activeModuleCategory === "all" 
+    ? DASHBOARD_MODULES 
+    : DASHBOARD_MODULES.filter(m => m.category === activeModuleCategory)
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-teal-500/20 selection:text-teal-900 antialiased relative">
@@ -75,14 +512,20 @@ export default function PublicHomePage() {
           </Link>
 
           <nav className="hidden lg:flex items-center gap-7 text-xs font-semibold text-slate-600">
-            <a href="#ecosystem" className="hover:text-teal-700 transition-colors">Ecosystem</a>
+            <a href="#pipeline" className="hover:text-teal-700 transition-colors">Admission Pipeline</a>
+            <a href="#modules" className="hover:text-teal-700 transition-colors">All Modules</a>
             <a href="#integrations" className="hover:text-teal-700 transition-colors">Integrations</a>
-            <a href="#modules" className="hover:text-teal-700 transition-colors">Modules</a>
             <a href="#about-grekam" className="hover:text-teal-700 transition-colors">About Grekam</a>
             <a href="#faq" className="hover:text-teal-700 transition-colors">FAQ</a>
           </nav>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsPricingModalOpen(true)}
+              className="px-3.5 py-2 rounded-xl text-slate-700 hover:text-slate-950 text-xs font-bold transition-all cursor-pointer"
+            >
+              View Pricing
+            </button>
             <Link 
               href="/auth/login" 
               className="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-900 text-xs font-bold transition-all"
@@ -109,7 +552,6 @@ export default function PublicHomePage() {
           {/* Left Column (Content) */}
           <div className="lg:col-span-6 space-y-6">
             
-            {/* Clean Subtitle - Without rounded pill, box, or circle icons */}
             <p className="text-xs sm:text-sm font-bold text-teal-700 tracking-wider uppercase">
               echo • ACADEMY OPERATING SYSTEM BY GREKAM
             </p>
@@ -119,18 +561,17 @@ export default function PublicHomePage() {
               <span className="text-teal-600">ONE CONNECTED SYSTEM.</span>
             </h1>
 
-            {/* Clean subtext without rounded boxes */}
             <p className="text-base sm:text-lg font-bold text-teal-700 tracking-wide">
               Teach. &bull; Manage. &bull; Sell. &bull; Grow.
             </p>
 
             <p className="text-sm sm:text-base text-slate-600 font-normal leading-relaxed max-w-xl">
-              <strong>echo</strong> brings your courses, students, educators, live classes, Meta & Google lead ingestion, Call Intelligence, automated WhatsApp communication, EMI invoicing and academy website into one connected platform.
+              <strong>echo</strong> brings your course builder, teaching studio, students, educators, live classes, Meta & Google lead ingestion, Call Intelligence, automated WhatsApp communication, and EMI invoicing into one connected platform.
             </p>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
               <button 
-                onClick={scrollToForm}
+                onClick={() => setIsPricingModalOpen(true)}
                 className="px-6 py-3.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs sm:text-sm text-center transition-all shadow-md shadow-teal-600/20 flex items-center justify-center gap-2 cursor-pointer"
               >
                 Start Your Academy <ArrowRight className="w-4 h-4" />
@@ -144,7 +585,7 @@ export default function PublicHomePage() {
               </button>
 
               <button 
-                onClick={scrollToForm}
+                onClick={() => setIsPricingModalOpen(true)}
                 className="px-5 py-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 View Pricing
@@ -158,7 +599,7 @@ export default function PublicHomePage() {
             </div>
           </div>
 
-          {/* Right Column (Hero Image Blended Naturally to Background - No Black Background) */}
+          {/* Right Column (Hero Image Blended Naturally to Background) */}
           <div className="lg:col-span-6 relative">
             <div className="relative rounded-2xl overflow-hidden border border-slate-200/80 shadow-2xl bg-white/40 backdrop-blur-xs transition-transform duration-500 hover:scale-[1.01]">
               <img 
@@ -173,7 +614,172 @@ export default function PublicHomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 02 — INTEGRATIONS ECOSYSTEM (Meta, Google, Grafty, WhatsApp, Payment Gateways) */}
+      {/* 02 — ADMISSION PIPELINE: FROM LEAD TO LEARNER (CODE-BASED & RESPONSIVE) */}
+      {/* ========================================================================= */}
+      <section id="pipeline" className="py-20 bg-white border-b border-slate-200 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
+          
+          <div className="max-w-3xl space-y-3">
+            <p className="text-xs font-bold text-teal-700 uppercase tracking-wider">
+              AUTOMATED LIFECYCLE ENGINE
+            </p>
+            <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+              From Lead to Learner,<br />
+              <span className="text-teal-600">Fully Automated.</span>
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-2xl">
+              Watch every step flow seamlessly into the next — one connected experience. Experience every step connecting smoothly into a unified journey. Manage leads, automate processes, and deliver learning effortlessly.
+            </p>
+          </div>
+
+          {/* Connected Step Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative">
+            {PIPELINE_STEPS.map((step, idx) => {
+              const isSelected = activePipelineStep === idx
+              return (
+                <div
+                  key={step.id}
+                  onClick={() => setActivePipelineStep(idx)}
+                  className={`p-5 rounded-2xl border transition-all duration-300 cursor-pointer text-left relative flex flex-col justify-between ${
+                    isSelected 
+                      ? "bg-teal-50/40 border-teal-500 shadow-md ring-1 ring-teal-500" 
+                      : "bg-slate-50/70 border-slate-200 hover:bg-white hover:border-slate-300 hover:shadow-xs"
+                  }`}
+                >
+                  <div className="space-y-3">
+                    {/* Top Row: Number & Icon */}
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-xs font-bold text-slate-400">
+                        {step.number}
+                      </span>
+                      <div className="p-2 rounded-xl bg-white border border-slate-200 shadow-2xs">
+                        {step.icon}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-sm font-black text-slate-900 leading-snug">
+                        {step.title}
+                      </h3>
+                      <p className="text-[11px] font-semibold text-teal-700 mt-0.5">
+                        {step.subtitle}
+                      </p>
+                    </div>
+
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      {step.description}
+                    </p>
+                  </div>
+
+                  <div className="pt-4 mt-3 border-t border-slate-200/60 flex items-center justify-between text-[10px]">
+                    <span className="font-semibold text-slate-500">{step.highlight}</span>
+                    <span className={`px-2 py-0.5 rounded font-bold border ${step.lightColor}`}>
+                      {step.badge}
+                    </span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Interactive Flow Summary Banner */}
+          <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+            <div className="space-y-1.5 text-left">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-teal-400">
+                ACTIVE STEP: {PIPELINE_STEPS[activePipelineStep].number} — {PIPELINE_STEPS[activePipelineStep].title}
+              </span>
+              <p className="text-xs sm:text-sm text-slate-200 max-w-2xl leading-relaxed">
+                {PIPELINE_STEPS[activePipelineStep].description}
+              </p>
+            </div>
+            <button
+              onClick={() => setIsDemoModalOpen(true)}
+              className="shrink-0 px-6 py-3 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <Play className="w-4 h-4 fill-slate-950" /> Test Live Pipeline
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
+      {/* 03 — COMPLETE MODULE MATRIX (COURSE BUILDER, STUDIO, STUDENT, EDUCATOR & ADMIN) */}
+      {/* ========================================================================= */}
+      <section id="modules" className="py-20 bg-slate-50 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
+          
+          <div className="text-center max-w-3xl mx-auto space-y-2">
+            <p className="text-xs font-bold text-teal-700 uppercase tracking-wider">
+              COMPLETE DASHBOARD CAPABILITY MATRIX
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+              Every Module You Need to Run Your Academy.
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              From course creation and live classroom streaming to CRM lead capture, automated EMI invoicing, and faculty management.
+            </p>
+
+            {/* Category Filter Tabs */}
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-4">
+              {MODULE_CATEGORIES.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveModuleCategory(cat.id)}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    activeModuleCategory === cat.id
+                      ? "bg-teal-600 text-white shadow-xs"
+                      : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Module Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredModules.map((mod, i) => (
+              <div
+                key={i}
+                className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs hover:shadow-md hover:border-teal-300 transition-all space-y-3.5 flex flex-col justify-between text-left group"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className={`w-10 h-10 rounded-xl border flex items-center justify-center group-hover:scale-105 transition-transform ${mod.iconColor}`}>
+                      {mod.icon}
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      {mod.badge}
+                    </span>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-black text-slate-900 group-hover:text-teal-700 transition-colors">
+                      {mod.name}
+                    </h3>
+                    <p className="text-xs text-slate-600 leading-relaxed mt-1">
+                      {mod.desc}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-teal-700 group-hover:text-teal-800">
+                  <span className="cursor-pointer flex items-center gap-1" onClick={() => setIsDemoModalOpen(true)}>
+                    Explore in Demo <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-mono">Module #{i + 1}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
+      {/* 04 — INTEGRATIONS ECOSYSTEM */}
       {/* ========================================================================= */}
       <section id="integrations" className="py-16 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-10">
@@ -368,347 +974,7 @@ export default function PublicHomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 03 — NEW CAPABILITIES & CORE MODULES */}
-      {/* ========================================================================= */}
-      <section id="modules" className="py-20 bg-slate-50 border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
-          
-          <div className="text-center max-w-3xl mx-auto space-y-2">
-            <p className="text-xs font-bold text-teal-700 uppercase tracking-wider">
-              NEXT-GENERATION ACADEMY MODULES
-            </p>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              Engineered for Revenue, Operations & Student Success.
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              echo consolidates disparate fragmented software into one robust, audit-ready operational hub.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            
-            {/* 1. Meta & Google Ads Sync */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs hover:shadow-lg transition-all space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
-                <Megaphone className="w-6 h-6" />
-              </div>
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600">Lead Pipeline</span>
-                <h3 className="text-base font-black text-slate-900">Meta & Google Ads Direct Sync</h3>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Connect Facebook, Instagram & Google lead forms directly into your CRM. Zero delays, instant counselor assignment, and automated WhatsApp welcome messages.
-              </p>
-              <ul className="text-[11px] space-y-1.5 text-slate-600 font-medium">
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" /> Sub-second webhook processing</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" /> Campaign & Ad-set ROI attribution</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" /> Automatic deduplication & routing</li>
-              </ul>
-            </div>
-
-            {/* 2. Call Intelligence */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs hover:shadow-lg transition-all space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600">
-                <PhoneCall className="w-6 h-6" />
-              </div>
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600">Counselor Audits</span>
-                <h3 className="text-base font-black text-slate-900">Call Intelligence & Voice Audio</h3>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Track counselor calls, log follow-up notes, listen to audio recordings, and benchmark conversion rates across admission executives.
-              </p>
-              <ul className="text-[11px] space-y-1.5 text-slate-600 font-medium">
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" /> Secure in-app audio player & transcripts</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" /> Call duration & disposition tracking</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" /> Counselor performance leaderboard</li>
-              </ul>
-            </div>
-
-            {/* 3. WhatsApp Cloud API Automation */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs hover:shadow-lg transition-all space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
-                <MessageSquare className="w-6 h-6" />
-              </div>
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Engagement</span>
-                <h3 className="text-base font-black text-slate-900">WhatsApp Automation & Drips</h3>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Send verified WhatsApp alerts for course logins, live class reminders, quiz results, payment receipts, and fee installment reminders.
-              </p>
-              <ul className="text-[11px] space-y-1.5 text-slate-600 font-medium">
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" /> 98% open rates with official templates</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" /> Automated absentee alert to parents</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" /> One-click payment link dispatch</li>
-              </ul>
-            </div>
-
-            {/* 4. AI Student Risk Engine */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs hover:shadow-lg transition-all space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-600">
-                <Bot className="w-6 h-6" />
-              </div>
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600">Predictive Retention</span>
-                <h3 className="text-base font-black text-slate-900">AI Student Drop-out Risk Engine</h3>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Smart algorithmic scoring that flags inactive learners, falling quiz scores, or missed classes before students drop out or fail.
-              </p>
-              <ul className="text-[11px] space-y-1.5 text-slate-600 font-medium">
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" /> Early-warning intervention alerts</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" /> AI quiz & curriculum generator</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" /> Automated study re-engagement nudges</li>
-              </ul>
-            </div>
-
-            {/* 5. Front Desk Walk-Ins Kiosk */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs hover:shadow-lg transition-all space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
-                <QrCode className="w-6 h-6" />
-              </div>
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600">Physical Campus</span>
-                <h3 className="text-base font-black text-slate-900">Walk-Ins Kiosk & QR Check-in</h3>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Tablet-friendly front desk kiosk for physical academy walk-ins. Parents and students scan QR, fill inquiries, and get matched to available counselors.
-              </p>
-              <ul className="text-[11px] space-y-1.5 text-slate-600 font-medium">
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" /> Instant SMS & WhatsApp brochure delivery</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" /> Counselor queue management</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" /> Daily physical footfall analytics</li>
-              </ul>
-            </div>
-
-            {/* 6. Automated EMI Invoicing & GST */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs hover:shadow-lg transition-all space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-700">
-                <Receipt className="w-6 h-6" />
-              </div>
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700">Finance & Billing</span>
-                <h3 className="text-base font-black text-slate-900">Automated EMI & GST Invoicing</h3>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Split high-ticket course fees into monthly installments. Automated payment reminders, instant GST tax receipts, and ledger reconciliation.
-              </p>
-              <ul className="text-[11px] space-y-1.5 text-slate-600 font-medium">
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" /> Downloadable branded PDF receipts</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" /> Partial payment & discount coupon rules</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" /> Multi-branch financial ledger export</li>
-              </ul>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 04 — ECOSYSTEM PILLARS & ARCHITECTURE */}
-      {/* ========================================================================= */}
-      <section id="ecosystem" className="py-20 bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
-          
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              One Unified System. Zero Redundancy.
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              Eliminate software chaos. echo integrates Learning Management (LMS), Customer Relationship Management (CRM), Live Streaming, Attendance Biometrics, and Invoicing into one unified OS.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 hover:border-teal-400 transition-all space-y-3">
-              <div className="p-3 w-fit rounded-xl bg-teal-100 text-teal-800">
-                <BookOpen className="w-6 h-6" />
-              </div>
-              <h3 className="text-base font-black text-slate-900">Modern LMS & Video Studio</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Host modular video lessons, downloadable PDFs, interactive coding sandboxes, timed quizzes, and verifiable completion certificates.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 hover:border-teal-400 transition-all space-y-3">
-              <div className="p-3 w-fit rounded-xl bg-blue-100 text-blue-800">
-                <Users className="w-6 h-6" />
-              </div>
-              <h3 className="text-base font-black text-slate-900">Admissions & Lead CRM</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Track enquiries from first contact to enrollment. Kanban lead pipeline, counselor call logs, follow-up dates, and conversion metrics.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 hover:border-teal-400 transition-all space-y-3">
-              <div className="p-3 w-fit rounded-xl bg-indigo-100 text-indigo-800">
-                <Video className="w-6 h-6" />
-              </div>
-              <h3 className="text-base font-black text-slate-900">Live Classes & Webinars</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Schedule batch sessions with Zoom & Google Meet. Automatic student attendance logging, classroom recording links, and calendar sync.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 hover:border-teal-400 transition-all space-y-3">
-              <div className="p-3 w-fit rounded-xl bg-emerald-100 text-emerald-800">
-                <Globe className="w-6 h-6" />
-              </div>
-              <h3 className="text-base font-black text-slate-900">White-Label & Custom Domain</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Deploy under your own domain (`academy.yourbrand.in`). Customize brand colors, custom logos, SSL certificates, and transactional email headers.
-              </p>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 05 — PRICING & INQUIRY LEAD FORM (REPLACED PRICING TABLE) */}
-      {/* ========================================================================= */}
-      <section id="pricing-inquiry-form" className="py-20 bg-slate-900 text-white border-b border-slate-800 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
-          
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <p className="text-xs font-bold text-teal-400 uppercase tracking-wider">
-              PRICING & CUSTOM PACKAGES
-            </p>
-            <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
-              Get Custom Pricing Built For Your Academy.
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Every academy is unique. Tell us about your student volume, branches, or migration requirements to receive tailored pricing and a live 1-on-1 walkthrough.
-            </p>
-          </div>
-
-          {/* Interactive Pricing & Demo Request Form */}
-          <div className="bg-slate-800/90 border border-slate-700 rounded-3xl p-6 sm:p-10 shadow-2xl max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              
-              <div className="lg:col-span-5 space-y-4 text-left">
-                <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                  Request Pricing & Live Walkthrough
-                </h3>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Whether you are starting with 100 students or managing 10,000+ across multi-branch campuses, we provide flexible, predictable packages with zero hidden per-transaction penalties.
-                </p>
-
-                <div className="space-y-2 pt-2 text-xs text-slate-300">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0" />
-                    <span>Free 1-on-1 Academy OS Architecture Tour</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0" />
-                    <span>Assisted Data & Student Migration</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0" />
-                    <span>WhatsApp Follow-up within 15 Minutes</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="lg:col-span-7">
-                <form onSubmit={handleInquirySubmit} className="space-y-4 bg-slate-900/90 p-6 rounded-2xl border border-slate-700 text-left">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-[11px] font-bold text-slate-300 block mb-1">Your Full Name *</label>
-                      <input 
-                        type="text"
-                        required
-                        value={inquiryForm.name}
-                        onChange={e => setInquiryForm(prev => ({ ...prev, name: e.target.value }))}
-                        placeholder="e.g. Dr. Rajesh Kumar"
-                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-teal-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[11px] font-bold text-slate-300 block mb-1">Academy / Institute Name *</label>
-                      <input 
-                        type="text"
-                        required
-                        value={inquiryForm.academyName}
-                        onChange={e => setInquiryForm(prev => ({ ...prev, academyName: e.target.value }))}
-                        placeholder="e.g. Coimbatore Skill Academy"
-                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-teal-500"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-[11px] font-bold text-slate-300 block mb-1">WhatsApp Phone Number *</label>
-                      <input 
-                        type="tel"
-                        required
-                        value={inquiryForm.phone}
-                        onChange={e => setInquiryForm(prev => ({ ...prev, phone: e.target.value }))}
-                        placeholder="+91 97893 59407"
-                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-teal-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[11px] font-bold text-slate-300 block mb-1">Work Email Address *</label>
-                      <input 
-                        type="email"
-                        required
-                        value={inquiryForm.email}
-                        onChange={e => setInquiryForm(prev => ({ ...prev, email: e.target.value }))}
-                        placeholder="admin@academy.in"
-                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-teal-500"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-300 block mb-1">Current Active Student Volume</label>
-                    <select
-                      value={inquiryForm.studentVolume}
-                      onChange={e => setInquiryForm(prev => ({ ...prev, studentVolume: e.target.value }))}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-teal-500"
-                    >
-                      <option value="50-200">50 – 200 Students</option>
-                      <option value="200-1000">200 – 1,000 Students</option>
-                      <option value="1000-5000">1,000 – 5,000 Students</option>
-                      <option value="5000+">5,000+ Multi-Branch Institution</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-300 block mb-1">Requirements / Modules Needed (Optional)</label>
-                    <textarea 
-                      rows={2}
-                      value={inquiryForm.message}
-                      onChange={e => setInquiryForm(prev => ({ ...prev, message: e.target.value }))}
-                      placeholder="e.g. Meta Ads integration, Call Intelligence, WhatsApp automation, or offline student migration..."
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-teal-500"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isSubmittingInquiry}
-                    className="w-full py-3.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-black text-xs sm:text-sm tracking-wide transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                  >
-                    {isSubmittingInquiry ? "Submitting Inquiry..." : "Get Pricing & Schedule Walkthrough →"}
-                  </button>
-                </form>
-              </div>
-
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 06 — ABOUT GREKAM & NETWORK SHOWCASE */}
+      {/* 05 — ABOUT GREKAM & NETWORK SHOWCASE */}
       {/* ========================================================================= */}
       <section id="about-grekam" className="py-20 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
@@ -821,7 +1087,7 @@ export default function PublicHomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 07 — FAQ SECTION */}
+      {/* 06 — FAQ SECTION */}
       {/* ========================================================================= */}
       <section id="faq" className="py-20 bg-slate-50 border-b border-slate-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-8">
@@ -847,7 +1113,7 @@ export default function PublicHomePage() {
               },
               { 
                 q: "Can I use my own domain name (e.g., learn.myacademy.com)?", 
-                a: "Absolutely. Growth and Enterprise plans allow complete CNAME whitelabeling with automatic SSL certification and custom branding." 
+                a: "Absolutely. echo allows complete CNAME whitelabeling with automatic SSL certification and custom branding." 
               },
               { 
                 q: "Is WhatsApp automation included or do I need my own API?", 
@@ -880,7 +1146,7 @@ export default function PublicHomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 08 — FINAL CTA & FOOTER */}
+      {/* 07 — FINAL CTA & FOOTER */}
       {/* ========================================================================= */}
       <section className="py-20 bg-slate-900 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center space-y-8">
@@ -894,7 +1160,7 @@ export default function PublicHomePage() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
             <button 
-              onClick={scrollToForm}
+              onClick={() => setIsPricingModalOpen(true)}
               className="w-full sm:w-auto px-8 py-4 bg-teal-500 hover:bg-teal-400 text-slate-950 font-black text-sm rounded-xl transition-all shadow-lg cursor-pointer"
             >
               Start Your Academy Free →
@@ -955,6 +1221,8 @@ export default function PublicHomePage() {
           <div className="space-y-2">
             <p className="font-bold text-white uppercase tracking-wider text-[10px]">MODULES</p>
             <ul className="space-y-1.5 font-medium">
+              <li><a href="#modules" className="hover:text-white">Course Builder & Studio</a></li>
+              <li><a href="#modules" className="hover:text-white">Teaching Studio & Live</a></li>
               <li><a href="#modules" className="hover:text-white">Meta & Google Ads Sync</a></li>
               <li><a href="#modules" className="hover:text-white">Call Intelligence</a></li>
               <li><a href="#modules" className="hover:text-white">WhatsApp Automation</a></li>
@@ -994,7 +1262,7 @@ export default function PublicHomePage() {
       </footer>
 
       {/* ========================================================================= */}
-      {/* 09 — MINIMAL MONOCHROME WHATSAPP FLOATING FAB */}
+      {/* 08 — MINIMAL MONOCHROME WHATSAPP FLOATING FAB */}
       {/* ========================================================================= */}
       <a
         href="https://wa.me/919789359407?text=Hi%20echo%20team,%20I%20would%20like%20to%20know%20more%20about%20echo%20LMS%20for%20my%20academy."
@@ -1003,7 +1271,6 @@ export default function PublicHomePage() {
         aria-label="Chat on WhatsApp"
         className="fixed bottom-6 right-6 z-50 group flex items-center gap-2 p-3.5 bg-slate-950 hover:bg-black text-white rounded-full shadow-2xl border border-slate-700 hover:border-teal-400 transition-all duration-300 hover:scale-105"
       >
-        {/* Minimal Monochrome SVG WhatsApp Icon */}
         <svg 
           className="w-5 h-5 fill-current text-white" 
           viewBox="0 0 24 24"
@@ -1017,11 +1284,19 @@ export default function PublicHomePage() {
       </a>
 
       {/* ========================================================================= */}
-      {/* 10 — DEMO MODAL (Prefilled Demo Academy Admin) */}
+      {/* 09 — DEMO MODAL (Prefilled Demo Academy Admin) */}
       {/* ========================================================================= */}
       <DemoLoginModal
         isOpen={isDemoModalOpen}
         onClose={() => setIsDemoModalOpen(false)}
+      />
+
+      {/* ========================================================================= */}
+      {/* 10 — PRICING & INQUIRY MODAL (LIGHT THEMED POPUP) */}
+      {/* ========================================================================= */}
+      <PricingInquiryModal
+        isOpen={isPricingModalOpen}
+        onClose={() => setIsPricingModalOpen(false)}
       />
 
     </div>
