@@ -198,6 +198,48 @@ export default function AcademiesManagementPage() {
     }
   }
 
+  const handleDeleteAcademy = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to PERMANENTLY delete "${name}"?\n\nThis will cascade delete all courses, batches, leads, students, and invoices. This action cannot be undone.`)) return
+
+    try {
+      toast.loading(`Permanently deleting "${name}"...`, { id: "del-acad" })
+      const res = await fetch(`/api/v1/super-admin/academies/${id}`, {
+        method: "DELETE"
+      })
+      const data = await res.json()
+
+      if (res.ok && data.success) {
+        toast.success(`"${name}" deleted permanently.`, { id: "del-acad" })
+        fetchAcademies()
+      } else {
+        toast.error(data.error || "Failed to delete academy", { id: "del-acad" })
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Network error deleting academy", { id: "del-acad" })
+    }
+  }
+
+  const handleCleanSlate = async () => {
+    if (!confirm("⚠️ RESET TO CLEAN SLATE?\n\nThis will keep ONLY the pristine Demo Academy (Apex Coding Academy) connected to the landing page and delete all other dummy vendors and test data. Continue?")) return
+
+    try {
+      toast.loading("Executing Clean Slate purge...", { id: "clean-slate" })
+      const res = await fetch("/api/v1/super-admin/academies/clean-slate", {
+        method: "POST"
+      })
+      const data = await res.json()
+
+      if (res.ok && data.success) {
+        toast.success(data.message || "Clean slate complete!", { id: "clean-slate" })
+        fetchAcademies()
+      } else {
+        toast.error(data.error || "Clean slate failed", { id: "clean-slate" })
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Network error during clean slate", { id: "clean-slate" })
+    }
+  }
+
   // Counts
   const counts = {
     total: academies.length,
@@ -223,17 +265,27 @@ export default function AcademiesManagementPage() {
             Provision, manage, and control all tenant academies from this control plane.
           </p>
         </div>
-        <button
-          onClick={() => {
-            setForm({ name: "", slug: "", ownerName: "", ownerEmail: "", ownerPhone: "", adminPassword: generateRandomPassword(), subscription: "GROWTH", domain: "", sendCredentialsEmail: true, withDemoData: false })
-            setProvisionSteps([])
-            setProvisionResult(null)
-            setIsAddModalOpen(true)
-          }}
-          className="w-full sm:w-auto min-h-[44px] flex items-center justify-center gap-2 bg-teal-700 hover:bg-teal-800 text-white font-extrabold text-sm px-6 py-3 rounded-xl transition-all shadow-sm"
-        >
-          <Plus className="w-5 h-5 shrink-0" /> Provision New Vendor
-        </button>
+        <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+          <button
+            type="button"
+            onClick={handleCleanSlate}
+            className="flex-1 sm:flex-none min-h-[44px] flex items-center justify-center gap-2 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-800 font-extrabold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all shadow-xs"
+            title="Purge dummy vendors and keep only the official Demo Academy"
+          >
+            <Trash2 className="w-4 h-4 text-rose-600" /> Clean Slate (Keep Only Demo)
+          </button>
+          <button
+            onClick={() => {
+              setForm({ name: "", slug: "", ownerName: "", ownerEmail: "", ownerPhone: "", adminPassword: generateRandomPassword(), subscription: "GROWTH", domain: "", sendCredentialsEmail: true, withDemoData: false })
+              setProvisionSteps([])
+              setProvisionResult(null)
+              setIsAddModalOpen(true)
+            }}
+            className="flex-1 sm:flex-none min-h-[44px] flex items-center justify-center gap-2 bg-teal-700 hover:bg-teal-800 text-white font-extrabold text-xs sm:text-sm px-5 py-2.5 rounded-xl transition-all shadow-sm"
+          >
+            <Plus className="w-4 h-4 shrink-0" /> Provision New Vendor
+          </button>
+        </div>
       </div>
 
       {/* KPI Cards */}
@@ -414,11 +466,13 @@ export default function AcademiesManagementPage() {
                                   className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
                                   <Archive className="w-3.5 h-3.5" /> Archive Vendor
                                 </button>
-                                <div className="border-t border-slate-100 my-1" />
-                                <Link href={`/dashboard/super-admin/academies/${a.id}?tab=danger`}
-                                  className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-rose-700 hover:bg-rose-50 transition-colors">
-                                  <Trash2 className="w-3.5 h-3.5" /> Delete Vendor
-                                </Link>
+                                <button 
+                                  type="button"
+                                  onClick={() => handleDeleteAcademy(a.id, a.name)}
+                                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-rose-700 hover:bg-rose-50 transition-colors text-left"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5 text-rose-600" /> Permanent Delete
+                                </button>
                               </div>
                             )}
                           </div>

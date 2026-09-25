@@ -3,9 +3,11 @@
 import { useState, useEffect } from "react"
 import { 
   Building2, Plus, Search, Filter, ShieldCheck, MoreVertical, 
-  UserCheck, AlertTriangle, ExternalLink, Check, X, Loader2, Layers, RefreshCw, CheckCircle2, AlertCircle
+  UserCheck, AlertTriangle, ExternalLink, Check, X, Loader2, Layers, RefreshCw, CheckCircle2, AlertCircle,
+  Trash2, LogIn, Sparkles
 } from "lucide-react"
 import { toast } from "sonner"
+import { useSession } from "next-auth/react"
 
 interface Vendor {
   id: string
@@ -31,6 +33,7 @@ interface ProvisionStep {
 }
 
 export default function VendorManagementPage() {
+  const { data: session, update: updateSession } = useSession()
   const [vendors, setVendors] = useState<Vendor[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
@@ -128,6 +131,75 @@ export default function VendorManagementPage() {
     }
   }
 
+  const handleDeleteVendor = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to PERMANENTLY delete "${name}"?\n\nThis will cascade delete all courses, batches, leads, students, and invoices. This action cannot be undone.`)) return
+
+    try {
+      toast.loading(`Permanently deleting "${name}"...`, { id: "del-vendor" })
+      const res = await fetch(`/api/v1/super-admin/academies/${id}`, {
+        method: "DELETE"
+      })
+      const data = await res.json()
+
+      if (res.ok && data.success) {
+        toast.success(`"${name}" deleted permanently.`, { id: "del-vendor" })
+        fetchVendors()
+      } else {
+        toast.error(data.error || "Failed to delete vendor", { id: "del-vendor" })
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Network error deleting vendor", { id: "del-vendor" })
+    }
+  }
+
+  const handleCleanSlate = async () => {
+    if (!confirm("⚠️ RESET TO CLEAN SLATE?\n\nThis will keep ONLY the pristine Demo Academy (Apex Coding Academy) connected to the landing page and delete all other dummy vendors and test data. Continue?")) return
+
+    try {
+      toast.loading("Executing Clean Slate purge...", { id: "clean-slate" })
+      const res = await fetch("/api/v1/super-admin/academies/clean-slate", {
+        method: "POST"
+      })
+      const data = await res.json()
+
+      if (res.ok && data.success) {
+        toast.success(data.message || "Clean slate complete!", { id: "clean-slate" })
+        fetchVendors()
+      } else {
+        toast.error(data.error || "Clean slate failed", { id: "clean-slate" })
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Network error during clean slate", { id: "clean-slate" })
+    }
+  }
+
+  const handleImpersonate = async (vendor: Vendor) => {
+    try {
+      toast.info(`Switching context to ${vendor.name}...`)
+      const res = await fetch("/api/v1/super-admin/academies/impersonate", {
+        method: "POST", 
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ academyId: vendor.id })
+      })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        await updateSession({
+          organizationId: data.organization.id,
+          tenantId: data.organization.id,
+          impersonatedBySuperAdmin: true,
+          originalSuperAdminId: data.originalSuperAdmin.id,
+          role: session?.user?.role || "SUPER_ADMIN"
+        })
+        toast.success(`Now viewing as Admin for ${vendor.name}`)
+        window.location.href = "/dashboard"
+      } else {
+        toast.error(data.error || "Failed to enter tenant mode")
+      }
+    } catch {
+      toast.error("Impersonation failed")
+    }
+  }
+
   return (
     <div className="flex flex-col h-full bg-slate-50 text-slate-950 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 space-y-6 pb-24 md:pb-8">
       
@@ -140,19 +212,31 @@ export default function VendorManagementPage() {
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-950">Vendor & Academy Management</h1>
-          <p className="text-slate-600 mt-1 text-xs sm:text-sm font-semibold">Provision isolated tenant academies, subscription tiers, and domain allocations.</p>
+          <p className="text-slate-600 mt-1 text-xs sm:text-sm font-semibold">Provision isolated tenant academies, manage subscriptions, and purge test vendors.</p>
         </div>
 
-        <button 
-          onClick={() => {
-            setForm({ name: "", slug: "", ownerName: "", ownerEmail: "", ownerPhone: "", adminPassword: "", subscription: "GROWTH", domain: "" })
-            setProvisionSteps([])
-            setIsOnboardModalOpen(true)
-          }}
-          className="w-full sm:w-auto min-h-[44px] flex items-center justify-center gap-2 bg-teal-700 hover:bg-teal-800 text-white font-extrabold text-sm px-6 py-3 rounded-xl transition-all shadow-sm shadow-teal-700/20"
-        >
-          <Plus className="w-5 h-5 shrink-0" /> Provision New Academy
-        </button>
+        <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+          <button
+            type="button"
+            onClick={handleCleanSlate}
+            className="flex-1 sm:flex-none min-h-[44px] flex items-center justify-center gap-2 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-800 font-extrabold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all shadow-xs"
+            title="Purge dummy vendors and keep only the official Demo Academy"
+          >
+            <Sparkles className="w-4 h-4 text-rose-600" /> Clean Slate (Keep Only Demo)
+          </button>
+
+          <button 
+            type="button"
+            onClick={() => {
+              setForm({ name: "", slug: "", ownerName: "", ownerEmail: "", ownerPhone: "", adminPassword: "", subscription: "GROWTH", domain: "" })
+              setProvisionSteps([])
+              setIsOnboardModalOpen(true)
+            }}
+            className="flex-1 sm:flex-none min-h-[44px] flex items-center justify-center gap-2 bg-teal-700 hover:bg-teal-800 text-white font-extrabold text-xs sm:text-sm px-5 py-2.5 rounded-xl transition-all shadow-sm shadow-teal-700/20"
+          >
+            <Plus className="w-4 h-4 shrink-0" /> Provision New Academy
+          </button>
+        </div>
       </div>
 
       {/* KPI Cards */}
@@ -252,16 +336,31 @@ export default function VendorManagementPage() {
                 </div>
               </div>
 
-              <div className="pt-1">
+              <div className="grid grid-cols-3 gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => handleImpersonate(vendor)}
+                  className="min-h-[40px] px-2 bg-teal-700 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1 shadow-xs"
+                >
+                  <LogIn className="w-3.5 h-3.5" /> Enter
+                </button>
                 <button 
+                  type="button"
                   onClick={() => toggleStatus(vendor.id, vendor.status)}
-                  className={`w-full min-h-[44px] text-xs font-extrabold rounded-xl border transition-colors ${
+                  className={`min-h-[40px] px-2 text-xs font-bold rounded-xl border transition-colors ${
                     vendor.status === "SUSPENDED" 
                       ? "bg-emerald-700 text-white border-emerald-700"
                       : "bg-slate-100 text-slate-800 border-slate-200"
                   }`}
                 >
-                  {vendor.status === "SUSPENDED" ? "Activate Academy" : "Suspend Academy"}
+                  {vendor.status === "SUSPENDED" ? "Activate" : "Suspend"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteVendor(vendor.id, vendor.name)}
+                  className="min-h-[40px] px-2 bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-600 hover:text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1 transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" /> Delete
                 </button>
               </div>
             </div>
@@ -276,6 +375,8 @@ export default function VendorManagementPage() {
             <Loader2 className="w-8 h-8 animate-spin text-teal-700" />
             <span className="text-sm font-bold">Loading Vendor Directory...</span>
           </div>
+        ) : filteredVendors.length === 0 ? (
+          <div className="p-12 text-center text-slate-500 text-xs font-bold">No vendors found. Click "Provision New Academy" to create one.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
@@ -349,16 +450,37 @@ export default function VendorManagementPage() {
                     </td>
 
                     <td className="py-4 px-6 text-right">
-                      <button 
-                        onClick={() => toggleStatus(vendor.id, vendor.status)}
-                        className={`min-h-[44px] text-xs font-extrabold px-4 py-2 rounded-xl border transition-colors ${
-                          vendor.status === "SUSPENDED" 
-                            ? "bg-emerald-700 text-white border-emerald-700 hover:bg-emerald-800"
-                            : "bg-slate-100 text-slate-800 border-slate-200 hover:bg-rose-50 hover:text-rose-800"
-                        }`}
-                      >
-                        {vendor.status === "SUSPENDED" ? "Activate" : "Suspend"}
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleImpersonate(vendor)}
+                          className="px-3 py-1.5 bg-teal-700 hover:bg-teal-800 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1 shadow-xs"
+                          title="Enter tenant workspace as Administrator"
+                        >
+                          <LogIn className="w-3.5 h-3.5" /> Enter
+                        </button>
+
+                        <button 
+                          type="button"
+                          onClick={() => toggleStatus(vendor.id, vendor.status)}
+                          className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-colors ${
+                            vendor.status === "SUSPENDED" 
+                              ? "bg-emerald-700 text-white border-emerald-700 hover:bg-emerald-800"
+                              : "bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-200"
+                          }`}
+                        >
+                          {vendor.status === "SUSPENDED" ? "Activate" : "Suspend"}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteVendor(vendor.id, vendor.name)}
+                          className="p-2 text-slate-400 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-colors"
+                          title="Permanently Delete Vendor"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
