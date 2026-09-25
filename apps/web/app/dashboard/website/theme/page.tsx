@@ -1,10 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { 
-  Palette, Save, Monitor, Smartphone, Layout, Type, Layers, Check, Image as ImageIcon, Eye, ArrowRight
-} from "lucide-react"
-import { toast } from "sonner"
+import { useState } from  "react"
+import { Palette, Save, Monitor, Smartphone, Layout, Type, Layers, Check, Image as ImageIcon, Eye, ArrowRight } from  "lucide-react"
+import { toast } from  "sonner"
 
 export default function ThemeCustomizerPage() {
   const [viewport, setViewport] = useState<"desktop" | "mobile">("desktop")

@@ -1,7 +1,7 @@
-import { prisma } from "@/lib/prisma"
-import { NextResponse } from "next/server"
-import { auth } from "@/auth"
-import { cookies } from "next/headers"
+import { prisma } from  "@/lib/prisma"
+import { NextResponse } from  "next/server"
+import { auth } from  "@/auth"
+import { cookies } from  "next/headers"
 
 export async function POST(req: Request) {
   try {

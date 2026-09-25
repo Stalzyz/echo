@@ -1,11 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { 
-  MessageSquare, Heart, Share2, Pin, CheckCircle2, User, 
-  Send, Plus, Image as ImageIcon, Code, Filter, Search, Award
-} from "lucide-react"
-import { toast } from "sonner"
+import { useState } from  "react"
+import { MessageSquare, Heart, Share2, Pin, CheckCircle2, User, Send, Plus, Image as ImageIcon, Code, Filter, Search, Award } from  "lucide-react"
+import { toast } from  "sonner"
 
 interface Post {
   id: string

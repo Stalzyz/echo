@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area } from "recharts"
-import { TrendingUp, Users, BookOpen, DollarSign, ArrowUpRight, ArrowDownRight } from "lucide-react"
+import { useState } from  "react"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area } from  "recharts"
+import { TrendingUp, Users, BookOpen, DollarSign, ArrowUpRight, ArrowDownRight } from  "lucide-react"
 
 const monthlyRevenue = [
   { name: "Jan", revenue: 4000, students: 240 },

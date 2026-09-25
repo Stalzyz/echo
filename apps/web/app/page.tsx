@@ -1,16 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState } from  "react"
 import Link from "next/link"
-import {
-  Users, Bot, MessageSquare, ArrowRight, Play, ChevronDown, ChevronUp,
-  Globe, Video, Laptop, BookOpen, PhoneCall, Workflow, ExternalLink, Mail, MapPin, Phone,
-  Sparkles, Megaphone, CheckCircle2, QrCode, Receipt, Mic, FileText, Calendar,
-  GraduationCap, Trophy, Briefcase, Award, ShieldAlert, Percent, CheckSquare,
-  HelpCircle, Layers, Sliders, Smartphone, Clock, ShieldCheck, Database, Compass
-} from "lucide-react"
-import { DemoLoginModal } from "@/components/auth/DemoLoginModal"
-import { PricingInquiryModal } from "@/components/auth/PricingInquiryModal"
+import { Users, Bot, MessageSquare, ArrowRight, Play, ChevronDown, ChevronUp, Globe, Video, Laptop, BookOpen, PhoneCall, Workflow, ExternalLink, Mail, MapPin, Phone, Megaphone, CheckCircle2, QrCode, Receipt, Mic, FileText, Calendar, GraduationCap, Trophy, Briefcase, Award, ShieldAlert, Percent, CheckSquare, HelpCircle, Layers, Sliders, Smartphone, Clock, ShieldCheck, Database, Compass } from  "lucide-react"
+import { DemoLoginModal } from  "@/components/auth/DemoLoginModal"
+import { PricingInquiryModal } from  "@/components/auth/PricingInquiryModal"
 
 export default function PublicHomePage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0)
@@ -536,7 +530,7 @@ export default function PublicHomePage() {
               onClick={() => setIsDemoModalOpen(true)}
               className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
             >
-              <Sparkles className="w-3.5 h-3.5" />
+              <Play className="w-3.5 h-3.5 fill-current" />
               Live Demo
             </button>
           </div>

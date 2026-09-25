@@ -1,11 +1,8 @@
 "use client"
 
 import React, { useState } from "react"
-import { motion } from "framer-motion"
-import { 
-  Award, AlertCircle, CheckCircle2, Clock, Check, 
-  HelpCircle, RotateCcw, ArrowRight, Sparkles 
-} from "lucide-react"
+import { motion } from  "framer-motion"
+import { Award, AlertCircle, CheckCircle2, Clock, Check, HelpCircle, RotateCcw, ArrowRight } from  "lucide-react"
 
 interface StudentQuizViewProps {
   quizDataRaw?: string | null

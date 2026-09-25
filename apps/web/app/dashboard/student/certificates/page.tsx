@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Award, Download, ExternalLink, Calendar, CheckCircle, Sparkles, Share2 } from "lucide-react"
-import { fetchApi } from "@/lib/useApi"
-import { toast } from "sonner"
-import { BragGeneratorModal, BragData } from "@/components/BragGeneratorModal"
+import { useState, useEffect } from  "react"
+import { Award, Download, ExternalLink, Calendar, CheckCircle, CheckCircle2, Share2 } from  "lucide-react"
+import { fetchApi } from  "@/lib/useApi"
+import { toast } from  "sonner"
+import { BragGeneratorModal, BragData } from  "@/components/BragGeneratorModal"
 
 const SAMPLE_CERTIFICATES = [
   {
@@ -75,7 +75,7 @@ export default function StudentCertificatesPage() {
           }
           className="flex items-center gap-2 bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 hover:from-purple-500 hover:to-pink-500 text-white font-bold px-5 py-3 rounded-2xl shadow-lg shadow-purple-600/30 transition-all hover:scale-105"
         >
-          <Sparkles className="w-4 h-4 animate-pulse" />
+          <CheckCircle2 className="w-4 h-4 animate-pulse" />
           ⚡ Create Social Launch Video
         </button>
       </div>
@@ -118,7 +118,7 @@ export default function StudentCertificatesPage() {
                       }
                       className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-purple-600/30 hover:scale-105 transition-transform"
                     >
-                      <Sparkles className="w-4 h-4" /> Brag Card
+                      <CheckCircle2 className="w-4 h-4" /> Credential Card
                     </button>
                     <a href={`/verify/${cert.verificationCode}`} target="_blank" rel="noopener noreferrer" className="p-2.5 bg-white/20 text-white rounded-xl hover:scale-110 transition-transform">
                       <ExternalLink className="w-4 h-4" />
@@ -162,7 +162,7 @@ export default function StudentCertificatesPage() {
                   }
                   className="w-full py-2.5 px-4 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/20 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-colors"
                 >
-                  <Share2 className="w-3.5 h-3.5" /> ⚡ Brag & Share Achievement
+                  <Share2 className="w-3.5 h-3.5" /> Share Credentials Achievement
                 </button>
               </div>
             </div>

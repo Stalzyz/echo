@@ -1,9 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { motion } from  "framer-motion";
+import { useState, useEffect } from  "react";
 import Link from "next/link";
-import { LeadCaptureModal } from "./LeadCaptureModal";
+import { LeadCaptureModal } from  "./LeadCaptureModal";
 
 export function Hero() {
   const [showSub, setShowSub] = useState(false);

@@ -1,13 +1,9 @@
 "use client"
 
-import { use, useState, useEffect } from "react"
+import { use, useState, useEffect } from  "react"
 import Link from "next/link"
-import { 
-  Video, Calendar, Clock, Users, ArrowRight, Play, CheckCircle2, 
-  Send, ThumbsUp, ShieldCheck, Sparkles, MessageSquare, DollarSign, 
-  Copy, Check, User, Share2, HelpCircle, Lock, Award, Heart, Gift
-} from "lucide-react"
-import { toast } from "sonner"
+import { Video, Calendar, Clock, Users, ArrowRight, Play, CheckCircle2, Send, ThumbsUp, ShieldCheck, MessageSquare, DollarSign, Copy, Check, User, Share2, HelpCircle, Lock, Award, Heart, Gift } from  "lucide-react"
+import { toast } from  "sonner"
 
 interface WebinarData {
   id: string
@@ -329,7 +325,7 @@ export default function PublicWebinarRoomPage({ params }: { params: Promise<{ sl
                 <div className="absolute top-4 inset-x-4 z-30 bg-slate-900/95 border border-teal-500/50 backdrop-blur-md rounded-2xl p-4 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 animate-in slide-in-from-top duration-300">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-teal-500 text-slate-950 flex items-center justify-center font-black shrink-0">
-                      <Sparkles className="w-5 h-5" />
+                      <CheckCircle2 className="w-5 h-5" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">

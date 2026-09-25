@@ -1,5 +1,5 @@
-import { prisma } from "../../src/lib/prisma";
-import { Bell, ArrowRight } from "lucide-react";
+import { prisma } from  "../../src/lib/prisma";
+import { Bell, ArrowRight } from  "lucide-react";
 import Link from "next/link";
 
 export async function AnnouncementsBanner() {

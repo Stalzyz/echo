@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
-import { CheckCircle2, Loader2, UserCheck, Camera } from "lucide-react"
-import { toast } from "sonner"
-import { useApi, fetchApi } from "@/lib/useApi"
+import { useState, useRef, useEffect } from  "react"
+import { CheckCircle2, Loader2, UserCheck, Camera } from  "lucide-react"
+import { toast } from  "sonner"
+import { useApi, fetchApi } from  "@/lib/useApi"
 
 export default function StaffKioskPage() {
   const { data } = useApi<{ employees: any[] }>("/hr/employees")

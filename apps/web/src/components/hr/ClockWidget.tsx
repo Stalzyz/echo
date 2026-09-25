@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Clock, Play, Square, Coffee } from "lucide-react"
-import { useApi, fetchApi } from "@/lib/useApi"
-import { toast } from "sonner"
+import { useState, useEffect } from  "react"
+import { Clock, Play, Square, Coffee } from  "lucide-react"
+import { useApi, fetchApi } from  "@/lib/useApi"
+import { toast } from  "sonner"
 
 export function ClockWidget({ employeeId }: { employeeId: string }) {
   const { data, mutate } = useApi<any>(`/hr/attendance/telemetry/${employeeId}`)

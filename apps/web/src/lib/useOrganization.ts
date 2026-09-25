@@ -1,6 +1,6 @@
 "use client";
 
-import { useApi } from "./useApi";
+import { useApi } from  "./useApi";
 
 export interface Organization {
   id: string;

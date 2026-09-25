@@ -1,14 +1,11 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
-import { 
-  Bell, CheckCircle2, Loader2, CreditCard, MessageSquare, 
-  Trophy, Clock, AlertCircle, Info, X, CheckCheck, ExternalLink
-} from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useCurrentUser } from "@/context/CurrentUserContext"
+import { useState, useRef, useEffect } from  "react"
+import { Bell, CheckCircle2, Loader2, CreditCard, MessageSquare, Trophy, Clock, AlertCircle, Info, X, CheckCheck, ExternalLink } from  "lucide-react"
+import { motion, AnimatePresence } from  "framer-motion"
+import { useCurrentUser } from  "@/context/CurrentUserContext"
 import Link from "next/link"
-import { formatDistanceToNow } from "date-fns"
+import { formatDistanceToNow } from  "date-fns"
 
 function getNotifIcon(type: string) {
   switch (type) {

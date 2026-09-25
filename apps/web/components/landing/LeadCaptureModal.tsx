@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, Loader2, Target, ArrowRight } from "lucide-react";
-import { fetchApi } from "@/lib/useApi";
+import { useState } from  "react";
+import { motion, AnimatePresence } from  "framer-motion";
+import { X, Loader2, Target, ArrowRight } from  "lucide-react";
+import { fetchApi } from  "@/lib/useApi";
 
 interface LeadCaptureModalProps {
   isOpen: boolean;

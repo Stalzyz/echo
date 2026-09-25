@@ -1,23 +1,20 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { useState } from "react"
-import { getNavItemsByRole, NavItem, Role } from "@/config/navigation"
-import { cn } from "@/lib/utils"
-import { useSession, signOut } from "next-auth/react"
-import { 
-  ChevronDown, ChevronRight, Menu, X, ShieldCheck, 
-  LayoutDashboard, BookOpen, Briefcase, MessageSquare, Layers, DollarSign, Bell 
-} from "lucide-react"
+import { usePathname } from  "next/navigation"
+import { useState } from  "react"
+import { getNavItemsByRole, NavItem, Role } from  "@/config/navigation"
+import { cn } from  "@/lib/utils"
+import { useSession, signOut } from  "next-auth/react"
+import { ChevronDown, ChevronRight, Menu, X, ShieldCheck, LayoutDashboard, BookOpen, Briefcase, MessageSquare, Layers, DollarSign, Bell } from  "lucide-react"
 import dynamic from "next/dynamic"
 import Image from "next/image"
-import { useOrganization } from "@/context/OrganizationContext"
+import { useOrganization } from  "@/context/OrganizationContext"
 
 const RealtimeIndicator = dynamic(() => import("@/components/RealtimeIndicator"), { ssr: false })
 
-import { NotificationMenu } from "./NotificationMenu"
-import { TimerWidget } from "./TimerWidget"
+import { NotificationMenu } from  "./NotificationMenu"
+import { TimerWidget } from  "./TimerWidget"
 
 function OrgHeader() {
   const org = useOrganization()

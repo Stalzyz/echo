@@ -1,11 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { 
-  Palette, Globe, ShieldCheck, Image as ImageIcon, Copy, Check, X, 
-  CheckCircle2, AlertCircle, ExternalLink, Save, Sliders
-} from "lucide-react"
-import { toast } from "sonner"
+import { useState } from  "react"
+import { Palette, Globe, ShieldCheck, Image as ImageIcon, Copy, Check, X, CheckCircle2, AlertCircle, ExternalLink, Save, Sliders } from  "lucide-react"
+import { toast } from  "sonner"
 
 export default function BrandingAndWhitelabelPage() {
   const [echoLogo, setEchoLogo] = useState("https://echo.grekam.in/logo.png")

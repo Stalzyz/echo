@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import { Search, Filter, Download, Plus, IndianRupee, TrendingUp, AlertCircle, FileText, CheckCircle2, Clock, XCircle, Loader2, X, Eye, Mail, Printer, MessageCircle, Building2, Trash2, Calendar, CreditCard, Tag, Sparkles, UserCheck, BookOpen } from "lucide-react"
-import { useApi, fetchApi } from "@/lib/useApi"
-import { toast } from "sonner"
+import { useState, useMemo } from  "react"
+import { Search, Filter, Download, Plus, IndianRupee, TrendingUp, AlertCircle, FileText, CheckCircle2, Clock, XCircle, Loader2, X, Eye, Mail, Printer, MessageCircle, Building2, Trash2, Calendar, CreditCard, Tag, UserCheck, BookOpen } from  "lucide-react"
+import { useApi, fetchApi } from  "@/lib/useApi"
+import { toast } from  "sonner"
 
 // Types
 type InvoiceStatus = 'PAID' | 'PARTIAL' | 'PENDING' | 'OVERDUE' | 'CANCELLED'
@@ -493,8 +493,8 @@ export default function FeeManagementPage() {
             <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
               <div>
                 <h2 className="text-lg font-bold flex items-center gap-2 text-slate-900">
-                  <Sparkles className="w-5 h-5 text-teal-600" />
-                  Topnotch Invoice Generator
+                  <FileText className="w-5 h-5 text-teal-600" />
+                  Tax Invoice Generator
                 </h2>
                 <p className="text-xs text-slate-500 font-medium">Issue customized tax invoices with flat deductions, extra line items, and EMI plans.</p>
               </div>
@@ -836,7 +836,7 @@ export default function FeeManagementPage() {
                   Cancel
                 </button>
                 <button type="submit" disabled={isSubmitting} className="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-bold transition-colors shadow-md disabled:opacity-50 flex items-center gap-2">
-                  {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Sparkles className="w-4 h-4" /> Issue & Send Invoice</>}
+                  {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><CheckCircle2 className="w-4 h-4" /> Issue & Send Invoice</>}
                 </button>
               </div>
             </form>

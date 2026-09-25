@@ -1,7 +1,7 @@
 "use server"
 
-import { prisma } from "@/lib/prisma"
-import { revalidatePath } from "next/cache"
+import { prisma } from  "@/lib/prisma"
+import { revalidatePath } from  "next/cache"
 export type LessonType = "VIDEO" | "RICH_TEXT" | "QUIZ" | "PDF" | string
 
 async function getOrCreateLmsCourse(courseOrLmsId: string) {

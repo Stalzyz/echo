@@ -1,8 +1,8 @@
 "use client";
 
-import { ReactNode } from "react";
-import { motion } from "framer-motion";
-import { SectionHeader } from "./SectionHeader";
+import { ReactNode } from  "react";
+import { motion } from  "framer-motion";
+import { SectionHeader } from  "./SectionHeader";
 
 export function NarrativeAct({
   id,

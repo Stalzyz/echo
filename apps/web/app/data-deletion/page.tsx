@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState } from  "react"
 import Link from "next/link"
-import { Trash2, ArrowLeft, Mail, Phone, MapPin, CheckCircle2, ShieldAlert } from "lucide-react"
-import { toast } from "sonner"
+import { Trash2, ArrowLeft, Mail, Phone, MapPin, CheckCircle2, ShieldAlert } from  "lucide-react"
+import { toast } from  "sonner"
 
 export default function DataDeletionPage() {
   const [email, setEmail] = useState("")

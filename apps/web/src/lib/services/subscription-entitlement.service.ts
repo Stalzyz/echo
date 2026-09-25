@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/prisma"
-import { SubscriptionStatus, BillingCycle, SubscriptionInvoiceStatus, PaymentStatus } from "@grekam/db"
+import { prisma } from  "@/lib/prisma"
+import { SubscriptionStatus, BillingCycle, SubscriptionInvoiceStatus, PaymentStatus } from  "@grekam/db"
 
 export interface PlanFeatureMap {
   coreLms?: boolean

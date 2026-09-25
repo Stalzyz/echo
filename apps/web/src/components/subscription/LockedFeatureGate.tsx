@@ -1,10 +1,10 @@
 "use client"
 
 import React from "react"
-import { Lock, Sparkles, ArrowRight, ShieldCheck } from "lucide-react"
-import { MODULE_UPGRADE_METADATA } from "./UpgradePlanModal"
-import { useOrganization } from "@/context/OrganizationContext"
-import { useRouter } from "next/navigation"
+import { Lock, ArrowRight, ShieldCheck } from  "lucide-react"
+import { MODULE_UPGRADE_METADATA } from  "./UpgradePlanModal"
+import { useOrganization } from  "@/context/OrganizationContext"
+import { useRouter } from  "next/navigation"
 
 interface LockedFeatureGateProps {
   featureKey: string
@@ -41,15 +41,14 @@ export function LockedFeatureGate({
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center max-w-2xl mx-auto space-y-6">
-      <div className="w-16 h-16 rounded-3xl bg-amber-100 text-amber-700 flex items-center justify-center shadow-lg shadow-amber-500/10 border border-amber-200">
+      <div className="w-16 h-16 rounded-3xl bg-amber-50 text-amber-700 flex items-center justify-center shadow-sm border border-amber-200">
         <Lock className="w-8 h-8" />
       </div>
 
       <div className="space-y-2">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-black uppercase tracking-wider border border-amber-300">
-          <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-          Requires {requiredTier === "ENTERPRISE" ? "Enterprise Pro" : "Growth Institute or Enterprise Pro"}
-        </div>
+        <p className="text-xs font-bold text-amber-800 uppercase tracking-wider">
+          Requires {requiredTier === "ENTERPRISE" ? "Enterprise Pro" : "Growth Institute or Enterprise Pro"} Plan
+        </p>
         <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">{displayTitle}</h1>
         <p className="text-sm text-slate-600 font-medium leading-relaxed max-w-lg mx-auto">
           {displayDesc}

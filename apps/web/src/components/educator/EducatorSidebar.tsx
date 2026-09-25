@@ -1,22 +1,10 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { 
-  LayoutDashboard, 
-  BookOpen, 
-  Video, 
-  Users, 
-  CheckSquare, 
-  HelpCircle, 
-  BarChart2, 
-  Folder, 
-  LogOut,
-  GraduationCap,
-  Award
-} from "lucide-react"
-import { useSession, signOut } from "next-auth/react"
+import { usePathname } from  "next/navigation"
+import { cn } from  "@/lib/utils"
+import { LayoutDashboard, BookOpen, Video, Users, CheckSquare, HelpCircle, BarChart2, Folder, LogOut, GraduationCap, Award } from  "lucide-react"
+import { useSession, signOut } from  "next-auth/react"
 
 const getEducatorNavigation = (basePath: string) => {
   return [

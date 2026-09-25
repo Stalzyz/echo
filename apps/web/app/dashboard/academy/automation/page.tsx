@@ -1,12 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState } from  "react"
 import Link from "next/link"
-import { 
-  Zap, Plus, Play, Pause, Trash2, ArrowDown, CheckCircle2, 
-  MessageSquare, Mail, Award, Tag, Send, Layers, X, Loader2, Sliders
-} from "lucide-react"
-import { toast } from "sonner"
+import { Workflow, Plus, Play, Pause, Trash2, ArrowDown, CheckCircle2, MessageSquare, Mail, Award, Tag, Send, Layers, X, Loader2, Sliders } from  "lucide-react"
+import { toast } from  "sonner"
 
 interface WorkflowRule {
   id: string
@@ -129,7 +126,7 @@ export default function AutomationEnginePage() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800 text-[10px] font-black uppercase tracking-wider border border-teal-200 flex items-center gap-1">
-              <Zap className="w-3 h-3 text-teal-600 fill-teal-600" /> Echo OS AUTOMATION ENGINE
+              <Workflow className="w-3 h-3 text-teal-600 fill-teal-600" /> Echo OS AUTOMATION ENGINE
             </span>
           </div>
           <h1 className="text-3xl font-black tracking-tight text-slate-900">Visual Workflow Automations</h1>
@@ -185,7 +182,7 @@ export default function AutomationEnginePage() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-slate-100">
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold shadow-xs ${wf.isActive ? "bg-teal-600 text-white" : "bg-slate-200 text-slate-500"}`}>
-                  <Zap className="w-5 h-5" />
+                  <Workflow className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="text-lg font-black text-slate-900">{wf.name}</h3>

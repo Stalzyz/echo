@@ -1,7 +1,7 @@
 "use server";
 
-import { prisma } from "../../src/lib/prisma";
-import { getTenantFilter } from "../../src/lib/tenant";
+import { prisma } from  "../../src/lib/prisma";
+import { getTenantFilter } from  "../../src/lib/tenant";
 
 export async function getCourses() {
   try {

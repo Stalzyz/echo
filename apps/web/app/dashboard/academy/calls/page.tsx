@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Phone, Sparkles, Search, Play, Flame, AlertCircle, CheckCircle2, TrendingUp, Users, Calendar, Filter, Download, ArrowUpRight, BarChart3, MessageSquare, ShieldCheck } from "lucide-react"
-import { CallIntelligenceModal } from "@/components/crm/CallIntelligenceModal"
+import { useState, useEffect } from  "react"
+import { Phone, CheckCircle2, Search, Play, Activity, AlertCircle, TrendingUp, Users, Calendar, Filter, Download, ArrowUpRight, BarChart3, MessageSquare, ShieldCheck } from  "lucide-react"
+import { CallIntelligenceModal } from  "@/components/crm/CallIntelligenceModal"
 
 export default function CallIntelligenceDashboardPage() {
   const [calls, setCalls] = useState<any[]>([])

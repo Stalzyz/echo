@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { MonitorPlay, Building2, Radio, Clock } from "lucide-react";
+import { useState } from  "react";
+import { motion, AnimatePresence } from  "framer-motion";
+import { MonitorPlay, Building2, Radio, Clock } from  "lucide-react";
 
 const modes = [
   {

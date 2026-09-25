@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Play, Square, Clock } from "lucide-react"
+import { useState, useEffect } from  "react"
+import { Play, Square, Clock } from  "lucide-react"
 
 export function TimerWidget() {
   const [isRunning, setIsRunning] = useState(false)

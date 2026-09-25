@@ -1,14 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useSession } from "next-auth/react"
-import { 
-  Activity, Users, DollarSign, TrendingUp, Calendar, AlertCircle, Briefcase, GraduationCap, 
-  Layers, CheckCircle2, Clock, ShieldCheck, Video, MessageSquare, Plus, Sparkles, Rocket, Palette, Loader2
-} from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from  "react"
+import { useSession } from  "next-auth/react"
+import { Activity, Users, DollarSign, TrendingUp, Calendar, AlertCircle, Briefcase, GraduationCap, Layers, CheckCircle2, Clock, ShieldCheck, Video, MessageSquare, Plus, Rocket, Palette, Loader2 } from  "lucide-react"
+import { useRouter } from  "next/navigation"
 import Link from "next/link"
-import { toast } from "sonner"
+import { toast } from  "sonner"
 
 interface AnalyticsData {
   organizationName?: string

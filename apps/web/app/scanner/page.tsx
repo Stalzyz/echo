@@ -1,8 +1,8 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import { ScanFace, UserCheck, XCircle, Loader2 } from "lucide-react"
-import { fetchApi } from "@/lib/useApi"
+import { useEffect, useRef, useState } from  "react"
+import { ScanFace, UserCheck, XCircle, Loader2 } from  "lucide-react"
+import { fetchApi } from  "@/lib/useApi"
 
 export default function ScannerApp() {
   const [status, setStatus] = useState<"IDLE" | "SCANNING" | "SUCCESS" | "ERROR">("IDLE")

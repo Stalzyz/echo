@@ -1,14 +1,11 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import { 
-  X, ShieldCheck, CreditCard, CheckCircle2, AlertCircle, 
-  Loader2, Sparkles, Layers, DollarSign, Users, BookOpen, HardDrive, Link as LinkIcon
-} from "lucide-react"
-import { toast } from "sonner"
-import { fetchApi } from "@/lib/useApi"
-import { ALL_PLATFORM_MODULES } from "../packages/page"
+import { motion } from  "framer-motion"
+import { X, ShieldCheck, CreditCard, CheckCircle2, AlertCircle, Loader2, Layers, DollarSign, Users, BookOpen, HardDrive, Link as LinkIcon } from  "lucide-react"
+import { toast } from  "sonner"
+import { fetchApi } from  "@/lib/useApi"
+import { ALL_PLATFORM_MODULES } from  "../packages/page"
 
 export interface SubscriptionPlan {
   id: string

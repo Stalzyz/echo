@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { getHiringPartners } from "../../app/actions/courses";
-import { TrustedByMarquee } from "./TrustedByMarquee";
-import { TrustedBy } from "./TrustedBy";
+import { useState, useEffect } from  "react";
+import { getHiringPartners } from  "../../app/actions/courses";
+import { TrustedByMarquee } from  "./TrustedByMarquee";
+import { TrustedBy } from  "./TrustedBy";
 
 export function HiringPartners() {
   const [partners, setPartners] = useState<any[]>([]);

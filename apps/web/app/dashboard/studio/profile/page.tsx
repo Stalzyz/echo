@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/prisma"
-import { auth } from "../../../../auth"
+import { prisma } from  "@/lib/prisma"
+import { auth } from  "../../../../auth"
 import ProfileBuilderClient from "./ProfileBuilderClient"
 
 export default async function ProfileBuilderPage() {

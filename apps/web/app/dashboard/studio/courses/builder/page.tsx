@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/prisma"
-import { redirect } from 'next/navigation'
+import { prisma } from  "@/lib/prisma"
+import { redirect } from  'next/navigation'
 
 export default async function CourseBuilderIndex() {
   let firstCourse = null

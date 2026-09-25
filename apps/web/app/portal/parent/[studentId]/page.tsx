@@ -1,7 +1,7 @@
 "use client"
 
-import { use, useState, useEffect } from "react"
-import { Shield, BookOpen, Clock, Activity, AlertCircle, CheckCircle2, IndianRupee, Trophy, Star } from "lucide-react"
+import { use, useState, useEffect } from  "react"
+import { Shield, BookOpen, Clock, Activity, AlertCircle, CheckCircle2, IndianRupee, Trophy, Star } from  "lucide-react"
 
 export default function ParentPortalPage({ params }: { params: Promise<{ studentId: string }> }) {
   const resolvedParams = use(params)

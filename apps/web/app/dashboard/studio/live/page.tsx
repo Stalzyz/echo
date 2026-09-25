@@ -1,9 +1,9 @@
 "use client"
 
-import { useApi, fetchApi } from "@/lib/useApi"
-import { Video, Plus, Loader2, Users, Calendar, Clock, ExternalLink, X, Pencil, Trash2 } from "lucide-react"
-import { useState } from "react"
-import { toast } from "sonner"
+import { useApi, fetchApi } from  "@/lib/useApi"
+import { Video, Plus, Loader2, Users, Calendar, Clock, ExternalLink, X, Pencil, Trash2 } from  "lucide-react"
+import { useState } from  "react"
+import { toast } from  "sonner"
 
 export default function OnsiteLiveSessionsPage() {
   const { data: sessions, isLoading, mutate } = useApi<any[]>("/academy/demo-sessions")

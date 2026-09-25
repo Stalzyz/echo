@@ -1,12 +1,9 @@
 "use client"
 
 import React, { useEffect, useRef, useState } from "react"
-import { motion } from "framer-motion"
-import { 
-  X, QrCode, Camera, CheckCircle2, UserCheck, AlertCircle, 
-  RefreshCw, Volume2, ShieldCheck, Sparkles, User, Search
-} from "lucide-react"
-import { toast } from "sonner"
+import { motion } from  "framer-motion"
+import { X, QrCode, Camera, CheckCircle2, UserCheck, AlertCircle, RefreshCw, Volume2, ShieldCheck, User, Search } from  "lucide-react"
+import { toast } from  "sonner"
 
 interface QrAttendanceScannerModalProps {
   isOpen: boolean

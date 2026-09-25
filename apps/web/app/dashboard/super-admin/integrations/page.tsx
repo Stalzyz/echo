@@ -1,11 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { 
-  Cpu, CheckCircle2, AlertCircle, Settings2, Key, 
-  Video, MessageSquare, Mail, HardDrive, BarChart3, DollarSign, ShieldCheck
-} from "lucide-react"
-import { toast } from "sonner"
+import { useState } from  "react"
+import { Cpu, CheckCircle2, AlertCircle, Settings2, Key, Video, MessageSquare, Mail, HardDrive, BarChart3, DollarSign, ShieldCheck } from  "lucide-react"
+import { toast } from  "sonner"
 
 interface IntegrationService {
   id: string

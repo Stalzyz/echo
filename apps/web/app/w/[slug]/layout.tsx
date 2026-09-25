@@ -1,10 +1,10 @@
-import { auth } from "@/auth"
-import { redirect } from "next/navigation"
-import { SessionProvider } from "next-auth/react"
-import { CommandPalette } from "@/components/ui/CommandPalette"
-import { WebSocketProvider } from "@/components/providers/WebSocketProvider"
-import { CurrentUserProvider } from "@/context/CurrentUserContext"
-import { DashboardShell } from "@/components/layout/DashboardShell"
+import { auth } from  "@/auth"
+import { redirect } from  "next/navigation"
+import { SessionProvider } from  "next-auth/react"
+import { CommandPalette } from  "@/components/ui/CommandPalette"
+import { WebSocketProvider } from  "@/components/providers/WebSocketProvider"
+import { CurrentUserProvider } from  "@/context/CurrentUserContext"
+import { DashboardShell } from  "@/components/layout/DashboardShell"
 
 export default async function VendorWorkspaceLayout({
   children,

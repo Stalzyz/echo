@@ -1,14 +1,10 @@
 "use client"
 
-import { useState, useRef } from "react"
-import { 
-  Palette, Building, Bell, Save, Image as ImageIcon, CheckCircle2, 
-  DollarSign, Plug, RefreshCw, Upload, Eye, Lock, Layers, RotateCcw, 
-  Check, Monitor, Smartphone, AlertCircle, Trash2, ArrowUpRight, History
-} from "lucide-react"
-import { toast } from "sonner"
-import { DEFAULT_TENANT_THEME } from "@/components/theme/TenantThemeProvider"
-import { DesignTokens, TenantTheme, ThemeVersionHistory } from "@/types/tenant-branding"
+import { useState, useRef } from  "react"
+import { Palette, Building, Bell, Save, Image as ImageIcon, CheckCircle2, DollarSign, Plug, RefreshCw, Upload, Eye, Lock, Layers, RotateCcw, Check, Monitor, Smartphone, AlertCircle, Trash2, ArrowUpRight, History } from  "lucide-react"
+import { toast } from  "sonner"
+import { DEFAULT_TENANT_THEME } from  "@/components/theme/TenantThemeProvider"
+import { DesignTokens, TenantTheme, ThemeVersionHistory } from  "@/types/tenant-branding"
 
 // Color Preset Themes
 const COLOR_PRESETS = [

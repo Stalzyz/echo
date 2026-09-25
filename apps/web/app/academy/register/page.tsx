@@ -1,28 +1,9 @@
 "use client"
 
 import React, { useState, useEffect, Suspense } from "react"
-import { useSearchParams } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
-import { 
-  ShieldCheck, 
-  ArrowRight, 
-  ArrowLeft,
-  GraduationCap, 
-  Briefcase,
-  Building, 
-  CheckCircle2,
-  Mail,
-  Lock,
-  User,
-  Phone,
-  MapPin,
-  Calendar,
-  BookOpen,
-  Code,
-  Globe,
-  UploadCloud,
-  FileText
-} from "lucide-react"
+import { useSearchParams } from  "next/navigation"
+import { motion, AnimatePresence } from  "framer-motion"
+import { ShieldCheck, ArrowRight, ArrowLeft, GraduationCap, Briefcase, Building, CheckCircle2, Mail, Lock, User, Phone, MapPin, Calendar, BookOpen, Code, Globe, UploadCloud, FileText } from  "lucide-react"
 import Link from "next/link"
 
 function RegisterWizard() {

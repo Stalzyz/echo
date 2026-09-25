@@ -1,9 +1,9 @@
 "use client";
 
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { ReactNode, useState, useEffect } from "react";
-import { LeadCaptureModal } from "./LeadCaptureModal";
-import { ArrowRight } from "lucide-react";
+import { motion, useScroll, useTransform, AnimatePresence } from  "framer-motion";
+import { ReactNode, useState, useEffect } from  "react";
+import { LeadCaptureModal } from  "./LeadCaptureModal";
+import { ArrowRight } from  "lucide-react";
 
 export function BackgroundWrapper({ children }: { children: ReactNode }) {
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -1,12 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState } from  "react"
 import Link from "next/link"
-import { 
-  Mail, Send, Eye, Edit3, CheckCircle2, ShieldAlert, 
-  Search, Filter, X, Save, RefreshCw, Copy, ExternalLink, Zap
-} from "lucide-react"
-import { toast } from "sonner"
+import { Mail, Send, Eye, Edit3, CheckCircle2, ShieldAlert, Search, Filter, X, Save, RefreshCw, Copy, ExternalLink, Workflow } from  "lucide-react"
+import { toast } from  "sonner"
 
 interface EmailTemplate {
   id: string
@@ -320,7 +317,7 @@ export default function EmailAutomationsHubPage() {
             href="/dashboard/academy/automation"
             className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors flex items-center gap-1.5"
           >
-            <Zap className="w-4 h-4 text-teal-600" /> Visual Workflows
+            <Workflow className="w-4 h-4 text-teal-600" /> Visual Workflows
           </Link>
         </div>
       </div>

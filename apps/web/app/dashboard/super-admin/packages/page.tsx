@@ -1,12 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { 
-  Package, Plus, Check, Edit3, Trash2, Layers, Zap, Users, 
-  BookOpen, Globe, Award, Shield, X, Loader2, DollarSign,
-  MessageCircle, Mail, ExternalLink, Tag, RefreshCw, CheckCircle2, AlertCircle
-} from "lucide-react"
-import { toast } from "sonner"
+import { useState } from  "react"
+import { Package, Plus, Check, Edit3, Trash2, Layers, Workflow, Users, BookOpen, Globe, Award, Shield, X, Loader2, DollarSign, MessageCircle, Mail, ExternalLink, Tag, RefreshCw, CheckCircle2, AlertCircle } from  "lucide-react"
+import { toast } from  "sonner"
 
 export interface PlatformModule {
   key: string

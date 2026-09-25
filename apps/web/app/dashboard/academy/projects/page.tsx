@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react"
-import { useApi, fetchApi } from "@/lib/useApi"
-import { useOrganization } from "@/context/OrganizationContext"
-import { toast } from "sonner"
-import { FolderGit2, Plus, Users, Clock, X, Loader2 } from "lucide-react"
+import { useState } from  "react"
+import { useApi, fetchApi } from  "@/lib/useApi"
+import { useOrganization } from  "@/context/OrganizationContext"
+import { toast } from  "sonner"
+import { FolderGit2, Plus, Users, Clock, X, Loader2 } from  "lucide-react"
 
 export default function AcademyProjects() {
   const org = useOrganization()

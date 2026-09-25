@@ -1,7 +1,7 @@
 "use client"
 
-import { FeaturedCourseCard } from "../../components/landing/FeaturedCourseCard"
-import { motion } from "framer-motion"
+import { FeaturedCourseCard } from  "../../components/landing/FeaturedCourseCard"
+import { motion } from  "framer-motion"
 
 type RelatedCoursesProps = {
   courses: any[]

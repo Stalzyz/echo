@@ -1,6 +1,6 @@
-import { auth } from "../../../auth"
-import { redirect } from "next/navigation"
-import { SessionProvider } from "next-auth/react"
+import { auth } from  "../../../auth"
+import { redirect } from  "next/navigation"
+import { SessionProvider } from  "next-auth/react"
 
 export default async function AcademyAdminLayout({
   children,

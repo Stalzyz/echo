@@ -1,10 +1,10 @@
 "use client"
 
-import { useApi, fetchApi } from "@/lib/useApi"
-import { useOrganization } from "@/context/OrganizationContext"
-import { CalendarDays, Plus, MapPin, Users, Calendar, Loader2 } from "lucide-react"
-import { useState } from "react"
-import { toast } from "sonner"
+import { useApi, fetchApi } from  "@/lib/useApi"
+import { useOrganization } from  "@/context/OrganizationContext"
+import { CalendarDays, Plus, MapPin, Users, Calendar, Loader2 } from  "lucide-react"
+import { useState } from  "react"
+import { toast } from  "sonner"
 
 export default function CampusEventsAdmin() {
   const org = useOrganization()

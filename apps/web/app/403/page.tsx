@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ShieldAlert, ArrowLeft } from "lucide-react"
+import { ShieldAlert, ArrowLeft } from  "lucide-react"
 
 export default function ForbiddenPage() {
   return (

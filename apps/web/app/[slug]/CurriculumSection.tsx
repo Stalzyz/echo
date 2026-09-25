@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { PlayCircle, FileText, MonitorPlay, Zap } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState } from  "react";
+import { PlayCircle, FileText, MonitorPlay, Workflow } from  "lucide-react";
+import { motion, AnimatePresence } from  "framer-motion";
 
 export function CurriculumSection({ modules }: { modules: any[] }) {
   const [activeTab, setActiveTab] = useState(0);
@@ -77,7 +77,7 @@ export function CurriculumSection({ modules }: { modules: any[] }) {
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6 mb-6">
                 <div>
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-950/50 border border-purple-500/20 text-xs font-bold text-purple-400 tracking-wider uppercase mb-3">
-                    <Zap className="w-3 h-3 fill-current" />
+                    <Workflow className="w-3 h-3 fill-current" />
                     Level {activeTab + 1}
                   </span>
                   <h3 className="text-2xl md:text-3xl font-bold tracking-tight font-editorial-display">

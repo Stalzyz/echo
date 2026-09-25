@@ -1,9 +1,9 @@
 "use client"
 
-import { useApi, fetchApi } from "@/lib/useApi"
-import { Calendar, Clock, Video, Users, Plus, Loader2 } from "lucide-react"
-import { useState } from "react"
-import { toast } from "sonner"
+import { useApi, fetchApi } from  "@/lib/useApi"
+import { Calendar, Clock, Video, Users, Plus, Loader2 } from  "lucide-react"
+import { useState } from  "react"
+import { toast } from  "sonner"
 
 export default function OfficeHoursPage() {
   const { data: slots, mutate, isLoading } = useApi<any[]>("/academy/office-hours")

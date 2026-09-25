@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useApi, fetchApi } from "@/lib/useApi"
-import { toast } from "sonner"
-import { Share2, IndianRupee, Clock, CheckCircle2, Loader2 } from "lucide-react"
+import { useState, useEffect } from  "react"
+import { useApi, fetchApi } from  "@/lib/useApi"
+import { toast } from  "sonner"
+import { Share2, IndianRupee, Clock, CheckCircle2, Loader2 } from  "lucide-react"
 
 export default function ReferralsAdmin() {
   const { data: payouts, mutate, isLoading } = useApi<any[]>("/academy/referrals/payouts")

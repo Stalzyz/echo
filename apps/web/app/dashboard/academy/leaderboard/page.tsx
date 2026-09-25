@@ -1,7 +1,7 @@
 "use client"
 
-import { useApi } from "@/lib/useApi"
-import { Trophy, Star, Shield, Crown } from "lucide-react"
+import { useApi } from  "@/lib/useApi"
+import { Trophy, Star, Shield, Crown } from  "lucide-react"
 
 export default function LeaderboardPage() {
   const { data, isLoading } = useApi<any>("/academy/leaderboard")

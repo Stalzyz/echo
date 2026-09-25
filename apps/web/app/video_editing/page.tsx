@@ -1,7 +1,7 @@
-import { prisma } from "@/lib/prisma"
-import { Footer } from "../../components/landing/Footer"
+import { prisma } from  "@/lib/prisma"
+import { Footer } from  "../../components/landing/Footer"
 import Link from "next/link"
-import { ArrowRight, Play, Clock, Users, Award, CheckCircle, Star, ChevronDown } from "lucide-react"
+import { ArrowRight, Play, Clock, Users, Award, CheckCircle, Star, ChevronDown } from  "lucide-react"
 
 export const revalidate = 60
 

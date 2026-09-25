@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState } from  "react"
 import Link from "next/link"
-import { CheckCircle2, Lock, User, ArrowRight, Loader2 } from "lucide-react"
+import { CheckCircle2, Lock, User, ArrowRight, Loader2 } from  "lucide-react"
 
 export default function AcceptInvitationPage() {
   const [password, setPassword] = useState("")

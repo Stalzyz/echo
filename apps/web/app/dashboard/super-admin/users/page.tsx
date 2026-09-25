@@ -1,11 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { 
-  Users, Search, Filter, ShieldCheck, UserCheck, GraduationCap, 
-  Briefcase, Check, X, ShieldAlert, Eye, Mail, Phone, Building2
-} from "lucide-react"
-import { toast } from "sonner"
+import { useState, useEffect } from  "react"
+import { Users, Search, Filter, ShieldCheck, UserCheck, GraduationCap, Briefcase, Check, X, ShieldAlert, Eye, Mail, Phone, Building2 } from  "lucide-react"
+import { toast } from  "sonner"
 
 interface UserRecord {
   id: string

@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { CourseDomain } from "./CategoryThemeMapper";
-import { PenTool, Code2, Film, TrendingUp } from "lucide-react";
+import { useEffect, useState } from  "react";
+import { motion } from  "framer-motion";
+import { CourseDomain } from  "./CategoryThemeMapper";
+import { PenTool, Code2, Film, TrendingUp } from  "lucide-react";
 
 export function CustomCursor({ domain }: { domain: CourseDomain }) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });

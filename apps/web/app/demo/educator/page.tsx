@@ -1,14 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { 
-  Video, PlayCircle, BookOpen, Users, Plus, 
-  Sparkles, CheckCircle2, Clock, Calendar, 
-  HelpCircle, Award, BarChart2, MessageSquare, 
-  ArrowRight, Shield, Flame, Upload, FileText,
-  Search, Bell, LayoutDashboard, CheckSquare
-} from "lucide-react"
-import { DemoPersonaSwitcher } from "@/components/demo/DemoPersonaSwitcher"
+import { useState } from  "react"
+import { Video, PlayCircle, BookOpen, Users, Plus, CheckCircle2, Clock, Calendar, HelpCircle, Award, BarChart2, MessageSquare, ArrowRight, Shield, Activity, Upload, FileText, Search, Bell, LayoutDashboard, CheckSquare } from  "lucide-react"
+import { DemoPersonaSwitcher } from  "@/components/demo/DemoPersonaSwitcher"
 import Link from "next/link"
 
 const EDUCATOR_SIDEBAR_ITEMS = [
@@ -92,7 +86,7 @@ export default function DemoEducatorStudioPage() {
               href="/pricing"
               className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5"
             >
-              <Sparkles className="w-3.5 h-3.5" /> Start Educator Studio
+              <CheckCircle2 className="w-3.5 h-3.5" /> Start Educator Studio
             </Link>
           </div>
         </aside>

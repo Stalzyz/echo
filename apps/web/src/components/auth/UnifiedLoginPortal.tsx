@@ -1,17 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from  "react"
+import { useRouter } from  "next/navigation"
 import Link from "next/link"
-import { signIn } from "next-auth/react"
-import { motion, AnimatePresence } from "framer-motion"
-import { 
-  GraduationCap, Video, Building2, Mail, Lock, 
-  Smartphone, MessageSquare, ArrowRight, Loader2, CheckCircle2, 
-  AlertCircle, X, User, Briefcase, Award, Info, Sparkles
-} from "lucide-react"
-import { firebaseAuth, RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult } from "@/lib/firebase"
-import { DemoLoginModal } from "./DemoLoginModal"
+import { signIn } from  "next-auth/react"
+import { motion, AnimatePresence } from  "framer-motion"
+import { GraduationCap, Video, Building2, Mail, Lock, Smartphone, MessageSquare, ArrowRight, Loader2, CheckCircle2, AlertCircle, X, User, Briefcase, Award, Info, Play } from  "lucide-react"
+import { firebaseAuth, RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult } from  "@/lib/firebase"
+import { DemoLoginModal } from  "./DemoLoginModal"
 
 export type RoleType = "student" | "educator" | "admin"
 export type ModeType = "signin" | "signup"
@@ -721,7 +717,7 @@ export function UnifiedLoginPortal({ defaultRole = "student", isStandalonePage =
         <div className="mt-8 pt-6 border-t border-slate-100 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest font-mono flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" /> TRY LIVE DEMO DASHBOARDS:
+              <Play className="w-3 h-3 fill-amber-500 text-amber-500" /> EXPLORE LIVE DEMO DASHBOARDS:
             </span>
             <span className="text-[10px] font-bold text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">
               Auto-Fill & Select Role

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from  "react";
 
 let cachedSymbol: string | null = null;
 let isFetching = false;

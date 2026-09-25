@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Phone, Sparkles, Clock, Play, FileText, CheckCircle2, ChevronRight } from "lucide-react"
+import { useState, useEffect } from  "react"
+import { Phone, Activity, Clock, Play, FileText, CheckCircle2, ChevronRight } from  "lucide-react"
 
 interface LeadCallHistoryTabProps {
   leadId: string
@@ -105,8 +105,8 @@ export function LeadCallHistoryTab({ leadId, onOpenCallIntel }: LeadCallHistoryT
                 onClick={() => onOpenCallIntel && onOpenCallIntel(call)}
                 className="flex items-center gap-1.5 text-xs font-bold text-teal-700 hover:text-teal-900 bg-teal-50 px-3 py-1.5 rounded-xl border border-teal-200 transition-colors"
               >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>View Full AI Intelligence</span>
+                <Activity className="w-3.5 h-3.5" />
+                <span>View Call Intelligence</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>

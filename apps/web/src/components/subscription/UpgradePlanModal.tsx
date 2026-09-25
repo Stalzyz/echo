@@ -1,14 +1,8 @@
-"use client"
-
 import React, { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import { 
-  X, Sparkles, CheckCircle2, Lock, ArrowRight, 
-  Zap, Phone, Video, MessageSquare, Layers, Award, Globe, 
-  Loader2
-} from "lucide-react"
-import { useOrganization } from "@/context/OrganizationContext"
-import { useRouter } from "next/navigation"
+import { motion } from  "framer-motion"
+import { X, CheckCircle2, Lock, ArrowRight, Phone, Video, MessageSquare, Layers, Award, Globe, Loader2, Megaphone, TrendingUp, BookOpen, ShieldCheck } from  "lucide-react"
+import { useOrganization } from  "@/context/OrganizationContext"
+import { useRouter } from  "next/navigation"
 
 export interface UpgradeModalDetail {
   featureKey?: string
@@ -23,7 +17,7 @@ export const MODULE_UPGRADE_METADATA: Record<string, { title: string; desc: stri
     title: "Meta Ads CRM Bridge",
     desc: "Sync Facebook & Instagram Lead Ads straight to your admissions pipeline with instant counsellor assignment.",
     requiredPlan: "GROWTH",
-    icon: Zap
+    icon: Megaphone
   },
   googleAdsSync: {
     title: "Google Ads Lead Sync",
@@ -33,12 +27,12 @@ export const MODULE_UPGRADE_METADATA: Record<string, { title: string; desc: stri
   },
   callIntelligence: {
     title: "Call Intelligence & Telephony",
-    desc: "1-Click browser dialer, automatic call recordings, AI speech-to-text transcripts, and caller sentiment analysis.",
+    desc: "1-Click browser dialer, automatic call recordings, speech-to-text transcripts, and conversation audits.",
     requiredPlan: "GROWTH",
     icon: Phone
   },
   whatsappAuto: {
-    title: "WhatsApp 1-Tap Automation",
+    title: "WhatsApp Cloud API Automation",
     desc: "Official WhatsApp Cloud API for automated fee alerts, class reminders, attendance warnings, and bulk broadcasts.",
     requiredPlan: "GROWTH",
     icon: MessageSquare
@@ -74,16 +68,16 @@ export const MODULE_UPGRADE_METADATA: Record<string, { title: string; desc: stri
     icon: Award
   },
   aiLessonWriter: {
-    title: "AI Studio Course Generator",
-    desc: "Generate complete curriculums, lesson scripts, summaries, and auto-graded quizzes in seconds using AI.",
+    title: "Curriculum & Course Studio",
+    desc: "Structured lesson planning, syllabus builders, resource attachments, and auto-graded assessments.",
     requiredPlan: "GROWTH",
-    icon: Sparkles
+    icon: BookOpen
   },
   aiRiskEngine: {
-    title: "AI Dropout & Payment Risk Engine",
-    desc: "Predict student dropouts and overdue fees before they happen using machine learning attendance and activity scoring.",
+    title: "Dropout & Payment Risk Engine",
+    desc: "Predict student dropouts and overdue fees before they happen using statistical attendance and activity scoring.",
     requiredPlan: "GROWTH",
-    icon: Zap
+    icon: TrendingUp
   },
   apiAccess: {
     title: "Developer REST API & Webhooks",
@@ -164,7 +158,7 @@ export function UpgradePlanModal() {
         <div className="p-6 space-y-5">
           <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200/80 flex items-start gap-3">
             <div className="p-2 rounded-xl bg-amber-100 text-amber-800 shrink-0">
-              <Sparkles className="w-5 h-5" />
+              <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
               <h4 className="text-xs font-black text-amber-950 uppercase tracking-wide">

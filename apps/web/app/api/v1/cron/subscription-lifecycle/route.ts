@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { SubscriptionStatus } from "@grekam/db"
+import { NextResponse } from  "next/server"
+import { prisma } from  "@/lib/prisma"
+import { SubscriptionStatus } from  "@grekam/db"
 
 export async function GET(req: Request) {
   try {

@@ -1,13 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { 
-  Users, BookOpen, GraduationCap, DollarSign, Trophy, 
-  Calendar, FileText, ClipboardList, TrendingUp, HelpCircle,
-  Briefcase, Percent, Award, ShieldAlert, Laptop, Video, MessageSquare
-} from "lucide-react"
+import { usePathname } from  "next/navigation"
+import { cn } from  "@/lib/utils"
+import { Users, BookOpen, GraduationCap, DollarSign, Trophy, Calendar, FileText, ClipboardList, TrendingUp, HelpCircle, Briefcase, Percent, Award, ShieldAlert, Laptop, Video, MessageSquare } from  "lucide-react"
 
 const academyAdminNavigation = [
   { title: "Admissions CRM", href: "/dashboard/academy/admissions", icon: Users },

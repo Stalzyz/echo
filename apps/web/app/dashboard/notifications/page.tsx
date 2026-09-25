@@ -1,14 +1,10 @@
 "use client"
 
-import { useState } from "react"
-import { 
-  Bell, CreditCard, MessageSquare, Trophy, Clock, AlertCircle, Info,
-  CheckCheck, Loader2, CheckCircle2, IndianRupee, GraduationCap, 
-  Users, Settings, Briefcase, X
-} from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useCurrentUser } from "@/context/CurrentUserContext"
-import { formatDistanceToNow, format } from "date-fns"
+import { useState } from  "react"
+import { Bell, CreditCard, MessageSquare, Trophy, Clock, AlertCircle, Info, CheckCheck, Loader2, CheckCircle2, IndianRupee, GraduationCap, Users, Settings, Briefcase, X } from  "lucide-react"
+import { motion, AnimatePresence } from  "framer-motion"
+import { useCurrentUser } from  "@/context/CurrentUserContext"
+import { formatDistanceToNow, format } from  "date-fns"
 
 const NOTIF_TYPE_LABELS: Record<string, string> = {
   PAYMENT_RECEIVED: "Payment",

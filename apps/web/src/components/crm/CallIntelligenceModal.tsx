@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { Play, Pause, Download, Trash2, Sparkles, Check, Copy, RefreshCw, Send, AlertTriangle, Flame, ShieldAlert, CheckCircle2, FileText, ArrowRight, UserCheck, MessageSquare, Mail } from "lucide-react"
+import { useState } from  "react"
+import { Play, Pause, Download, Trash2, Check, Copy, RefreshCw, Send, AlertTriangle, ShieldAlert, CheckCircle2, FileText, ArrowRight, UserCheck, MessageSquare, Mail, Mic, Activity, Headphones } from  "lucide-react"
 
 interface CallIntelligenceModalProps {
   isOpen: boolean
@@ -88,15 +88,15 @@ export function CallIntelligenceModal({ isOpen, onClose, callRecord, onCrmSynced
         <div className="p-6 bg-slate-900 text-white flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-teal-400">
-              <Sparkles className="w-5 h-5" />
+              <Mic className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-teal-400 uppercase tracking-widest font-mono">ECHO Call Intelligence</span>
+                <span className="text-xs font-bold text-teal-400 uppercase tracking-widest font-mono">Call Intelligence</span>
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
                   temperature === "HOT" ? "bg-rose-500/20 text-rose-400 border border-rose-500/40" : "bg-amber-500/20 text-amber-400 border border-amber-500/40"
                 }`}>
-                  {temperature === "HOT" ? "🔥 Hot Lead" : "🌤️ Warm Lead"}
+                  {temperature === "HOT" ? "Priority Lead" : "Warm Lead"}
                 </span>
               </div>
               <h2 className="text-lg font-extrabold text-white">Call with {lead.name || "Student"}</h2>
@@ -167,7 +167,7 @@ export function CallIntelligenceModal({ isOpen, onClose, callRecord, onCrmSynced
               activeTab === "INTEL" ? "border-teal-600 text-teal-800" : "border-transparent text-slate-500 hover:text-slate-900"
             }`}
           >
-            <Sparkles className="w-4 h-4" /> AI Call Intelligence
+            <Activity className="w-4 h-4" /> Call Analysis
           </button>
           <button
             onClick={() => setActiveTab("TRANSCRIPT")}
@@ -183,7 +183,7 @@ export function CallIntelligenceModal({ isOpen, onClose, callRecord, onCrmSynced
               activeTab === "FOLLOWUP" ? "border-teal-600 text-teal-800" : "border-transparent text-slate-500 hover:text-slate-900"
             }`}
           >
-            <MessageSquare className="w-4 h-4" /> AI Follow-up & CRM Sync
+            <MessageSquare className="w-4 h-4" /> Follow-up & CRM Sync
           </button>
         </div>
 
@@ -198,14 +198,14 @@ export function CallIntelligenceModal({ isOpen, onClose, callRecord, onCrmSynced
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-2 p-5 bg-teal-50/60 border border-teal-200/80 rounded-2xl space-y-2">
                   <div className="text-xs font-bold text-teal-800 uppercase tracking-wider flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5" /> Call Summary
+                    <Activity className="w-3.5 h-3.5" /> Call Summary
                   </div>
                   <p className="text-xs text-slate-800 leading-relaxed font-medium">{summary}</p>
                 </div>
 
                 <div className="p-5 bg-slate-900 text-white rounded-2xl flex flex-col justify-between">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">AI Lead Score</span>
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Lead Score</span>
                     <span className="px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-400 text-[10px] font-black uppercase">
                       {intent.replace("_", " ")}
                     </span>

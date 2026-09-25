@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { X, Play, Pause, Copy, Share2, Sparkles, Check, Download, Video, Smartphone, Monitor, MessageSquare, ExternalLink, Volume2, ShieldCheck, Flame, Globe } from "lucide-react"
-import { toast } from "sonner"
+import { useState, useEffect } from  "react"
+import { X, Play, Pause, Copy, Share2, Check, Download, Video, Smartphone, Monitor, MessageSquare, ExternalLink, Volume2, ShieldCheck, Globe, Award, Activity } from "lucide-react"
+import { toast } from  "sonner"
 
 export interface BragData {
   type: "COURSE" | "CERTIFICATE" | "PROJECT"
@@ -88,10 +88,8 @@ export function BragGeneratorModal({ isOpen, onClose, data }: BragGeneratorModal
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 via-pink-500 to-amber-400 p-0.5 shadow-lg shadow-purple-500/20">
-              <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-purple-400 animate-pulse" />
-              </div>
+            <div className="w-10 h-10 rounded-2xl bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-teal-400 shadow-sm">
+              <Share2 className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -165,7 +163,7 @@ export function BragGeneratorModal({ isOpen, onClose, data }: BragGeneratorModal
                 {/* Top Badge */}
                 <div className="relative z-10 flex items-center justify-between">
                   <div className="flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 px-2.5 py-1 rounded-full text-[10px] font-bold text-purple-300 font-mono">
-                    <Flame className="w-3 h-3 text-amber-400 animate-bounce" />
+                    <Activity className="w-3 h-3 text-amber-400 animate-bounce" />
                     {isCourse ? "NEW LAUNCH" : "VERIFIED CREDENTIAL"}
                   </div>
                   <span className="text-[10px] font-bold text-slate-400 font-mono tracking-widest uppercase">

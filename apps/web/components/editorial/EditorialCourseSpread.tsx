@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Calendar, Award, Code } from "lucide-react";
+import { useState, useRef } from  "react";
+import { motion, AnimatePresence } from  "framer-motion";
+import { ArrowRight, Calendar, Award, Code } from  "lucide-react";
 import Link from "next/link";
 
 interface CourseItem {

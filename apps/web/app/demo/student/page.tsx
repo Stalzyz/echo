@@ -1,13 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { 
-  GraduationCap, PlayCircle, BookOpen, Award, CheckCircle2, 
-  Clock, Calendar, Sparkles, Star, Flame, FileText, 
-  ArrowRight, ShieldCheck, QrCode, Check, HelpCircle,
-  Search, Bell, User, LayoutDashboard, CheckSquare
-} from "lucide-react"
-import { DemoPersonaSwitcher } from "@/components/demo/DemoPersonaSwitcher"
+import { useState } from  "react"
+import { GraduationCap, PlayCircle, BookOpen, Award, CheckCircle2, Clock, Calendar, Star, Activity, FileText, ArrowRight, ShieldCheck, QrCode, Check, HelpCircle, Search, Bell, User, LayoutDashboard, CheckSquare } from  "lucide-react"
+import { DemoPersonaSwitcher } from  "@/components/demo/DemoPersonaSwitcher"
 import Link from "next/link"
 
 const STUDENT_SIDEBAR_ITEMS = [
@@ -124,7 +119,7 @@ export default function DemoStudentPortalPage() {
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-400 font-bold">Study Streak</span>
                 <span className="text-amber-400 font-black flex items-center gap-1 font-mono">
-                  <Flame className="w-3.5 h-3.5" /> 14 Days
+                  <Activity className="w-3.5 h-3.5" /> 14 Days
                 </span>
               </div>
               <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-800">
@@ -141,7 +136,7 @@ export default function DemoStudentPortalPage() {
               href="/pricing"
               className="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5"
             >
-              <Sparkles className="w-3.5 h-3.5" /> Launch LMS for Students
+              <CheckCircle2 className="w-3.5 h-3.5" /> Launch LMS for Students
             </Link>
           </div>
         </aside>
@@ -365,7 +360,7 @@ export default function DemoStudentPortalPage() {
                   </div>
 
                   <button className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-xs">
-                    <Sparkles className="w-4 h-4" /> Download PDF Certificate
+                    <CheckCircle2 className="w-4 h-4" /> Download PDF Certificate
                   </button>
                 </div>
               </div>

@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { auth } from "../../../../../auth"
+import { NextRequest, NextResponse } from  "next/server"
+import { prisma } from  "@/lib/prisma"
+import { auth } from  "../../../../../auth"
 
 // GET /api/v1/calls/search?q=placement
 export async function GET(req: NextRequest) {

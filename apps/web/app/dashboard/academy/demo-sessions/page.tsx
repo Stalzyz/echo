@@ -1,9 +1,9 @@
 "use client"
 
-import { useApi, fetchApi } from "@/lib/useApi"
-import { CalendarDays, Plus, MapPin, Users, Calendar, Loader2, PlayCircle, Video, Pencil, Trash2, X } from "lucide-react"
-import { useState } from "react"
-import { toast } from "sonner"
+import { useApi, fetchApi } from  "@/lib/useApi"
+import { CalendarDays, Plus, MapPin, Users, Calendar, Loader2, PlayCircle, Video, Pencil, Trash2, X } from  "lucide-react"
+import { useState } from  "react"
+import { toast } from  "sonner"
 
 export default function DemoSessionsAdmin() {
   const { data: sessions, mutate } = useApi<any[]>("/academy/demo-sessions")

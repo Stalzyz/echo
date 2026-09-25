@@ -1,21 +1,8 @@
 "use client";
 
-import { useState, useRef, TouchEvent } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  ArrowRight,
-  ChevronRight,
-  ChevronLeft,
-  Briefcase,
-  Award,
-  GraduationCap,
-  Cpu,
-  Palette,
-  Film,
-  Clapperboard,
-  Globe,
-  Box,
-} from "lucide-react";
+import { useState, useRef, TouchEvent } from  "react";
+import { motion, AnimatePresence } from  "framer-motion";
+import { ArrowRight, ChevronRight, ChevronLeft, Briefcase, Award, GraduationCap, Cpu, Palette, Film, Clapperboard, Globe, Box } from  "lucide-react";
 import Link from "next/link";
 
 type StorySlide = {

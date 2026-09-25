@@ -1,7 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useEffect, useState } from "react"
-import { TenantTheme, DesignTokens } from "@/types/tenant-branding"
+import { TenantTheme, DesignTokens } from  "@/types/tenant-branding"
 
 export const DEFAULT_DESIGN_TOKENS: DesignTokens = {
   primary: "#0d9488",

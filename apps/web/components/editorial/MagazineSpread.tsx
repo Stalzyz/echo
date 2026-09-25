@@ -1,8 +1,8 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform } from  "framer-motion";
 import Image from "next/image";
-import { useRef } from "react";
+import { useRef } from  "react";
 
 export function MagazineSpread({
   imageSrc,

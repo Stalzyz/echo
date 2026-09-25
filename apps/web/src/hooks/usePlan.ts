@@ -1,7 +1,7 @@
 "use client"
 
-import { useOrganization } from "@/context/OrganizationContext"
-import { useSession } from "next-auth/react"
+import { useOrganization } from  "@/context/OrganizationContext"
+import { useSession } from  "next-auth/react"
 
 export interface PlanDetails {
   planName: string

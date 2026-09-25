@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { Bold, Italic, Underline, List, ListOrdered, Heading1, Heading2, Loader2, Wand2 } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { toast } from "sonner"
+import { useState, useEffect, useRef } from  "react"
+import { Bold, Italic, Underline, List, ListOrdered, Heading1, Heading2, Loader2, Wand2 } from  "lucide-react"
+import { cn } from  "@/lib/utils"
+import { toast } from  "sonner"
 
 interface RichTextEditorProps {
   initialContent: string

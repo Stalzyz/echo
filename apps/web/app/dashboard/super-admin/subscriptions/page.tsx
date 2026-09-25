@@ -1,14 +1,10 @@
 "use client"
 
-import { useState } from "react"
-import { 
-  RefreshCw, Search, Filter, ShieldCheck, ArrowUpRight, 
-  Calendar, Check, X, CreditCard, DollarSign, AlertCircle,
-  TrendingUp, Users, Building, ShieldAlert, Sparkles, ChevronRight
-} from "lucide-react"
-import { toast } from "sonner"
-import { useApi, fetchApi } from "@/lib/useApi"
-import { ModifySubscriptionModal } from "./ModifySubscriptionModal"
+import { useState } from  "react"
+import { RefreshCw, Search, Filter, ShieldCheck, ArrowUpRight, Calendar, Check, X, CreditCard, DollarSign, AlertCircle, TrendingUp, Users, Building, ShieldAlert, CheckCircle2, ChevronRight } from  "lucide-react"
+import { toast } from  "sonner"
+import { useApi, fetchApi } from  "@/lib/useApi"
+import { ModifySubscriptionModal } from  "./ModifySubscriptionModal"
 
 interface Subscription {
   id: string
@@ -162,7 +158,7 @@ export default function SubscriptionsLifecyclePage() {
         <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
           <div className="flex items-center justify-between text-slate-500 mb-2">
             <span className="text-xs font-bold uppercase tracking-wider">Active Trials</span>
-            <Sparkles className="w-4 h-4 text-amber-500" />
+            <CheckCircle2 className="w-4 h-4 text-amber-500" />
           </div>
           <div className="text-2xl font-black text-slate-900">{trialCount}</div>
           <p className="text-[11px] text-amber-700 font-bold mt-1">14-day evaluation</p>

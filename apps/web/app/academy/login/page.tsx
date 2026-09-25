@@ -1,11 +1,11 @@
 "use client"
 
-import { useActionState, useState } from "react"
-import { authenticate } from "./actions"
-import { AlertCircle, Lock, Mail, ArrowRight, ShieldCheck, Sparkles } from "lucide-react"
-import { motion } from "framer-motion"
+import { useActionState, useState } from  "react"
+import { authenticate } from  "./actions"
+import { AlertCircle, Lock, Mail, ArrowRight, ShieldCheck, CheckCircle2 } from  "lucide-react"
+import { motion } from  "framer-motion"
 import Link from "next/link"
-import { DemoLoginModal } from "@/components/auth/DemoLoginModal"
+import { DemoLoginModal } from  "@/components/auth/DemoLoginModal"
 
 export default function AcademyLoginPage() {
   const [errorMessage, dispatch] = useActionState(authenticate, undefined)
@@ -81,7 +81,7 @@ export default function AcademyLoginPage() {
         <div className="mt-6 pt-5 border-t border-slate-100 space-y-2.5">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest font-mono flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" /> LIVE DEMO DASHBOARDS:
+              <CheckCircle2 className="w-3.5 h-3.5 text-amber-500" /> LIVE DEMO DASHBOARDS:
             </span>
             <span className="text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
               Auto-Fill

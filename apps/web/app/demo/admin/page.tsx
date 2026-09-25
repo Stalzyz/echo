@@ -1,16 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { 
-  Building2, Users, BookOpen, CreditCard, Award, 
-  Video, PlayCircle, BarChart2, Calendar, UserCheck, 
-  MessageSquare, Sparkles, CheckCircle2, TrendingUp,
-  Inbox, Briefcase, Star, Search, Plus, QrCode,
-  Shield, Layers, Flame, DollarSign, Clock, Target, Activity,
-  Phone, FileText, Megaphone, Tag, Globe, Settings, ChevronRight,
-  Bell, ChevronDown, Check, AlertCircle, Filter, Download
-} from "lucide-react"
-import { DemoPersonaSwitcher } from "@/components/demo/DemoPersonaSwitcher"
+import { useState } from  "react"
+import { Building2, Users, BookOpen, CreditCard, Award, Video, PlayCircle, BarChart2, Calendar, UserCheck, MessageSquare, CheckCircle2, TrendingUp, Inbox, Briefcase, Star, Search, Plus, QrCode, Shield, Layers, Activity, DollarSign, Clock, Target, Phone, FileText, Megaphone, Tag, Globe, Settings, ChevronRight, Bell, ChevronDown, Check, AlertCircle, Filter, Download } from  "lucide-react"
+import { DemoPersonaSwitcher } from  "@/components/demo/DemoPersonaSwitcher"
 import Link from "next/link"
 
 interface NavItem {
@@ -139,7 +131,7 @@ export default function DemoAcademyAdminPage() {
               href="/pricing"
               className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5"
             >
-              <Sparkles className="w-3.5 h-3.5" /> Deploy Your Academy
+              <CheckCircle2 className="w-3.5 h-3.5" /> Deploy Your Academy
             </Link>
           </div>
         </aside>
@@ -532,7 +524,7 @@ export default function DemoAcademyAdminPage() {
                   href="/pricing"
                   className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
                 >
-                  <Sparkles className="w-3.5 h-3.5" /> Start 14-Day Free Trial
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Start 14-Day Free Trial
                 </Link>
               </div>
             )}

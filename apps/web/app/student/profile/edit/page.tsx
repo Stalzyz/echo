@@ -1,15 +1,10 @@
 "use client"
 
-import { useState } from "react"
-import { useApi } from "@/lib/useApi"
+import { useState } from  "react"
+import { useApi } from  "@/lib/useApi"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
-import {
-  User, Mail, Phone, MapPin, Calendar, Briefcase, 
-  GraduationCap, Award, Shield, CheckCircle2, Save, 
-  Globe, Bell, ArrowLeft, Loader2,
-  Check, RefreshCw, AlertCircle
-} from "lucide-react"
+import { useRouter } from  "next/navigation"
+import { User, Mail, Phone, MapPin, Calendar, Briefcase, GraduationCap, Award, Shield, CheckCircle2, Save, Globe, Bell, ArrowLeft, Loader2, Check, RefreshCw, AlertCircle } from  "lucide-react"
 
 export default function StudentProfileEditPage() {
   const router = useRouter()

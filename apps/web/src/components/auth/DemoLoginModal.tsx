@@ -1,14 +1,11 @@
 "use client"
 
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { 
-  X, Building2, GraduationCap, Video, ArrowRight, 
-  Loader2, Sparkles, CheckCircle2, ShieldCheck, Eye
-} from "lucide-react"
-import { signIn } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
+import { useState } from  "react"
+import { motion, AnimatePresence } from  "framer-motion"
+import { X, Building2, GraduationCap, Video, ArrowRight, Loader2, Play, CheckCircle2, ShieldCheck, Eye } from  "lucide-react"
+import { signIn } from  "next-auth/react"
+import { useRouter } from  "next/navigation"
+import { toast } from  "sonner"
 
 interface DemoLoginModalProps {
   isOpen: boolean
@@ -155,7 +152,7 @@ export function DemoLoginModal({ isOpen, onClose }: DemoLoginModalProps) {
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-teal-600 text-white flex items-center justify-center shadow-xs">
-              <Sparkles className="w-5 h-5" />
+              <Play className="w-5 h-5 fill-current" />
             </div>
             <div>
               <div className="flex items-center gap-2">

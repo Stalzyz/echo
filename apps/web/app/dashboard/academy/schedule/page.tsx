@@ -1,13 +1,13 @@
 "use client"
 
-import { useState } from "react"
-import { Calendar as CalendarIcon, Clock, MapPin, Video, Users, ChevronLeft, ChevronRight, Plus, ExternalLink } from "lucide-react"
+import { useState } from  "react"
+import { Calendar as CalendarIcon, Clock, MapPin, Video, Users, ChevronLeft, ChevronRight, Plus, ExternalLink } from  "lucide-react"
 
-import { SlideOver } from "@/components/SlideOver"
-import { toast } from "sonner"
+import { SlideOver } from  "@/components/SlideOver"
+import { toast } from  "sonner"
 
-import { useApi, fetchApi } from "@/lib/useApi"
-import { format } from "date-fns"
+import { useApi, fetchApi } from  "@/lib/useApi"
+import { format } from  "date-fns"
 
 export default function AcademyScheduleDashboard() {
   const { data: upcomingData, mutate } = useApi<any>("/academy/batches/sessions/upcoming")

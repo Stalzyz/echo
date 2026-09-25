@@ -1,13 +1,9 @@
 "use client"
 
-import { use, useState, useRef, useEffect } from "react"
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
+import { use, useState, useRef, useEffect } from  "react"
+import { motion, useScroll, useTransform, AnimatePresence } from  "framer-motion"
 import Link from "next/link"
-import { 
-  ArrowLeft, Clock, Calendar, Signal, Award, 
-  CheckCircle2, Play, ChevronDown, MonitorPlay, 
-  FileText, Download, User, ArrowUpRight, Code2
-} from "lucide-react"
+import { ArrowLeft, Clock, Calendar, Signal, Award, CheckCircle2, Play, ChevronDown, MonitorPlay, FileText, Download, User, ArrowUpRight, Code2 } from  "lucide-react"
 
 // Mock data for the dynamic course
 const COURSE_DATA: Record<string, any> = {

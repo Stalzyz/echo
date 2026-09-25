@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { AlertCircle, CheckCircle2, Mail, ArrowRight, ArrowLeft, Loader2, KeyRound, Lock, Eye, EyeOff, ShieldCheck } from "lucide-react"
-import { motion } from "framer-motion"
+import { useState } from  "react"
+import { AlertCircle, CheckCircle2, Mail, ArrowRight, ArrowLeft, Loader2, KeyRound, Lock, Eye, EyeOff, ShieldCheck } from  "lucide-react"
+import { motion } from  "framer-motion"
 import Link from "next/link"
 
 export default function ForgotPasswordPage() {

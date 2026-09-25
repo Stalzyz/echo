@@ -1,11 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { 
-  DollarSign, Calendar, AlertTriangle, CheckCircle2, Clock, 
-  Send, Plus, Search, Filter, Calculator, X, ArrowRight, User, Settings, ShieldCheck, Percent, HelpCircle
-} from "lucide-react"
-import { toast } from "sonner"
+import { useState } from  "react"
+import { DollarSign, Calendar, AlertTriangle, CheckCircle2, Clock, Send, Plus, Search, Filter, Calculator, X, ArrowRight, User, Settings, ShieldCheck, Percent, HelpCircle } from  "lucide-react"
+import { toast } from  "sonner"
 
 interface StudentEmiPlan {
   id: string

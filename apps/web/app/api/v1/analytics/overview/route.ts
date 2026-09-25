@@ -1,7 +1,7 @@
-import { prisma } from "@/lib/prisma"
-import { NextResponse } from "next/server"
-import { auth } from "@/auth"
-import { getTenantFilter } from "@/lib/tenant"
+import { prisma } from  "@/lib/prisma"
+import { NextResponse } from  "next/server"
+import { auth } from  "@/auth"
+import { getTenantFilter } from  "@/lib/tenant"
 
 export async function GET() {
   try {

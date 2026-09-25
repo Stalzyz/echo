@@ -1,7 +1,7 @@
-import { auth } from "../../../auth"
-import { redirect } from "next/navigation"
-import { EducatorSidebar } from "@/components/educator/EducatorSidebar"
-import { SessionProvider } from "next-auth/react"
+import { auth } from  "../../../auth"
+import { redirect } from  "next/navigation"
+import { EducatorSidebar } from  "@/components/educator/EducatorSidebar"
+import { SessionProvider } from  "next-auth/react"
 
 export default async function EducatorLayout({
   children,

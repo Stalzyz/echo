@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect, useState, use } from "react"
-import { useApi, fetchApi } from "@/lib/useApi"
-import { QRCodeSVG } from "qrcode.react"
-import { toast } from "sonner"
-import { CheckCircle2, XCircle, Clock, Maximize, Loader2 } from "lucide-react"
+import { useEffect, useState, use } from  "react"
+import { useApi, fetchApi } from  "@/lib/useApi"
+import { QRCodeSVG } from  "qrcode.react"
+import { toast } from  "sonner"
+import { CheckCircle2, XCircle, Clock, Maximize, Loader2 } from  "lucide-react"
 
 export default function LiveProjectorPage({ params }: { params: Promise<{ sessionId: string }> }) {
   const resolvedParams = use(params)

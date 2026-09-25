@@ -1,13 +1,10 @@
 "use client"
 
 import React, { useState } from "react"
-import { motion } from "framer-motion"
-import { 
-  X, ShieldCheck, CreditCard, TrendingUp, Calendar, 
-  CheckCircle2, AlertCircle, RefreshCw, Loader2, Award, Zap
-} from "lucide-react"
-import { toast } from "sonner"
-import { fetchApi } from "@/lib/useApi"
+import { motion } from  "framer-motion"
+import { X, ShieldCheck, CreditCard, TrendingUp, Calendar, CheckCircle2, AlertCircle, RefreshCw, Loader2, Award, Workflow } from  "lucide-react"
+import { toast } from  "sonner"
+import { fetchApi } from  "@/lib/useApi"
 
 interface ModifySubscriptionModalProps {
   isOpen: boolean

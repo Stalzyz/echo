@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { ShieldCheck, ArrowLeft, Mail, Phone, MapPin } from "lucide-react"
+import { ShieldCheck, ArrowLeft, Mail, Phone, MapPin } from  "lucide-react"
 
 export default function PrivacyPolicyPage() {
   return (

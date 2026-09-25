@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Lock, ArrowLeft, Phone, Mail, MapPin, KeyRound, ShieldAlert } from "lucide-react"
+import { Lock, ArrowLeft, Phone, Mail, MapPin, KeyRound, ShieldAlert } from  "lucide-react"
 
 export default function TermsOfAccessPage() {
   return (

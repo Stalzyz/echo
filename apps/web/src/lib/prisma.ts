@@ -1,4 +1,4 @@
-import { PrismaClient } from "@grekam/db"
+import { PrismaClient } from  "@grekam/db"
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined

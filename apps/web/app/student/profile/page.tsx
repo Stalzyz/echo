@@ -1,14 +1,9 @@
 "use client"
 
-import { useState } from "react"
-import { useApi } from "@/lib/useApi"
+import { useState } from  "react"
+import { useApi } from  "@/lib/useApi"
 import Link from "next/link"
-import {
-  User, Mail, Phone, MapPin, Calendar, Briefcase, 
-  GraduationCap, Award, Shield, CheckCircle2, Edit3, 
-  Globe, ExternalLink, Zap, Star, BookOpen, Clock, 
-  FileText, ArrowLeft, Code, Share2
-} from "lucide-react"
+import { User, Mail, Phone, MapPin, Calendar, Briefcase, GraduationCap, Award, Shield, CheckCircle2, Edit3, Globe, ExternalLink, Workflow, Star, BookOpen, Clock, FileText, ArrowLeft, Code, Share2 } from  "lucide-react"
 
 export default function StudentProfilePage() {
   const { data: userProfile, isLoading } = useApi<any>("/v1/auth/me")
@@ -202,7 +197,7 @@ export default function StudentProfilePage() {
             {/* Verified Skills Card */}
             <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-4">
               <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
-                <Zap className="w-4 h-4 text-teal-600" /> Verified Competencies & Skills
+                <Workflow className="w-4 h-4 text-teal-600" /> Verified Competencies & Skills
               </h3>
 
               <div className="space-y-3">

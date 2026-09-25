@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Shield, Users, Award, ArrowRight } from "lucide-react"
+import { Shield, Users, Award, ArrowRight } from  "lucide-react"
 
 export default function AboutPage() {
   return (

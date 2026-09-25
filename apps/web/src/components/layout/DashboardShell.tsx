@@ -1,9 +1,9 @@
 "use client"
 
-import { usePathname } from "next/navigation"
-import { TopNav } from "@/components/layout/TopNav"
-import { AppSidebar } from "@/components/layout/AppSidebar"
-import { UpgradePlanModal } from "@/components/subscription/UpgradePlanModal"
+import { usePathname } from  "next/navigation"
+import { TopNav } from  "@/components/layout/TopNav"
+import { AppSidebar } from  "@/components/layout/AppSidebar"
+import { UpgradePlanModal } from  "@/components/subscription/UpgradePlanModal"
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()

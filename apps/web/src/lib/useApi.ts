@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from  'react';
 
 // Central API URL config (now relative because of Next.js rewrites)
 export const API_BASE_URL = '/api/v1';

@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { MonitorPlay, LayoutDashboard, Award, CheckCircle2 } from "lucide-react";
+import { motion } from  "framer-motion";
+import { MonitorPlay, LayoutDashboard, Award, CheckCircle2 } from  "lucide-react";
 
 export function PlatformFeatures() {
   const lmsFeatures = [

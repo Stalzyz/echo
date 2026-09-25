@@ -1,11 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { 
-  MessageSquare, Send, Upload, RefreshCw, CheckCircle2, Image as ImageIcon, Link as LinkIcon, FileText, 
-  Users, Layers, Calendar, Check, AlertCircle, Clock, ShieldCheck, X, ChevronRight, Play, Settings2, Plus, Trash2
-} from "lucide-react"
-import { toast } from "sonner"
+import { useState } from  "react"
+import { MessageSquare, Send, Upload, RefreshCw, CheckCircle2, Image as ImageIcon, Link as LinkIcon, FileText, Users, Layers, Calendar, Check, AlertCircle, Clock, ShieldCheck, X, ChevronRight, Play, Settings2, Plus, Trash2 } from  "lucide-react"
+import { toast } from  "sonner"
 
 interface TemplateOption {
   id: string

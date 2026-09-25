@@ -1,13 +1,9 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { 
-  Plus, Trash2, CheckCircle2, AlertCircle, HelpCircle, 
-  Timer, Award, RotateCcw, Play, Check, X, Sparkles,
-  Layers, Shuffle, ChevronRight, Eye
-} from "lucide-react"
-import { toast } from "sonner"
+import { motion, AnimatePresence } from  "framer-motion"
+import { Plus, Trash2, CheckCircle2, AlertCircle, HelpCircle, Timer, Award, RotateCcw, Play, Check, X, Layers, Shuffle, ChevronRight, Eye } from  "lucide-react"
+import { toast } from  "sonner"
 
 export interface QuizQuestion {
   id: string

@@ -1,12 +1,9 @@
 "use client"
 
 import React, { useRef } from "react"
-import { motion } from "framer-motion"
-import { 
-  X, Download, QrCode, ShieldCheck, GraduationCap, 
-  MapPin, Calendar, CheckCircle2, User, Sparkles
-} from "lucide-react"
-import { toast } from "sonner"
+import { motion } from  "framer-motion"
+import { X, Download, QrCode, ShieldCheck, GraduationCap, MapPin, Calendar, CheckCircle2, User } from  "lucide-react"
+import { toast } from  "sonner"
 
 interface StudentBadgeData {
   id: string

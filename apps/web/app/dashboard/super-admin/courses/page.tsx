@@ -1,10 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { 
-  BookOpen, Plus, Tag, Layers, CheckCircle2, ShieldCheck, Check, X, Edit3, Settings2
-} from "lucide-react"
-import { toast } from "sonner"
+import { useState } from  "react"
+import { BookOpen, Plus, Tag, Layers, CheckCircle2, ShieldCheck, Check, X, Edit3, Settings2 } from  "lucide-react"
+import { toast } from  "sonner"
 
 interface CourseCategory {
   id: string

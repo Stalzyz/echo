@@ -1,11 +1,11 @@
 "use client"
 
-import { useApi, fetchApi } from "@/lib/useApi"
-import { BookOpen, Plus, Loader2, ArrowRight, UserPlus, X, Sparkles } from "lucide-react"
+import { useApi, fetchApi } from  "@/lib/useApi"
+import { BookOpen, Plus, Loader2, ArrowRight, UserPlus, X, CheckCircle2 } from  "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
-import { toast } from "sonner"
-import { BragGeneratorModal, BragData } from "@/components/BragGeneratorModal"
+import { useState } from  "react"
+import { toast } from  "sonner"
+import { BragGeneratorModal, BragData } from  "@/components/BragGeneratorModal"
 
 export default function OnsiteCoursesPage() {
   const { data: batchesRes, isLoading, mutate } = useApi<any>("/academy/batches")
@@ -145,7 +145,7 @@ export default function OnsiteCoursesPage() {
                   }
                   className="px-3 py-1.5 rounded-xl bg-purple-50 text-purple-600 hover:bg-purple-100 font-bold text-xs flex items-center gap-1.5 transition-colors border border-purple-200 shadow-sm"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-purple-600 animate-pulse" /> Brag & Launch
+                  <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 animate-pulse" /> Publish & Share
                 </button>
                 <Link href={`/dashboard/studio/courses/builder/${batch.courseId}`} className="text-teal-600 hover:text-teal-700 font-bold text-xs flex items-center gap-1 transition-colors">
                   Open Builder <ArrowRight className="w-3.5 h-3.5" />

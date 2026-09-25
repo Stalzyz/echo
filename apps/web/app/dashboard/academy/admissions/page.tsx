@@ -1,36 +1,17 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
-import { 
-  DndContext, 
-  closestCorners,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-  DragStartEvent,
-  DragOverlay
-} from '@dnd-kit/core'
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  useSortable
-} from '@dnd-kit/sortable'
-import { useDroppable } from '@dnd-kit/core'
-import { CSS } from '@dnd-kit/utilities'
-import { 
-  Plus, Search, Filter, Mail, Phone, Calendar, MoreHorizontal, X, Loader2, 
-  Upload, Download, FileText, CheckCircle2, LayoutGrid, List, ArrowUpDown, 
-  Clock, Monitor, MapPin, MessageSquare, ChevronDown, Trash2, UserCheck, Tag,
-  Share2, FileSpreadsheet, Sparkles, Globe, RefreshCw, ExternalLink, Zap
-} from "lucide-react"
-import { useApi, fetchApi } from "@/lib/useApi"
-import { toast } from "sonner"
-import { ClickToCallModal } from "@/components/crm/ClickToCallModal"
-import { CallIntelligenceModal } from "@/components/crm/CallIntelligenceModal"
-import { LeadCallHistoryTab } from "@/components/crm/LeadCallHistoryTab"
-import { AutomationTriggersModal } from "./AutomationTriggersModal"
+import { useState, useEffect, useMemo } from  "react"
+import { DndContext, closestCorners, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragStartEvent, DragOverlay } from  '@dnd-kit/core'
+import { SortableContext, verticalListSortingStrategy, useSortable } from  '@dnd-kit/sortable'
+import { useDroppable } from  '@dnd-kit/core'
+import { CSS } from  '@dnd-kit/utilities'
+import { Plus, Search, Filter, Mail, Phone, Calendar, MoreHorizontal, X, Loader2, Upload, Download, FileText, CheckCircle2, LayoutGrid, List, ArrowUpDown, Clock, Monitor, MapPin, MessageSquare, ChevronDown, Trash2, UserCheck, Tag, Share2, FileSpreadsheet, Globe, RefreshCw, ExternalLink, Workflow } from  "lucide-react"
+import { useApi, fetchApi } from  "@/lib/useApi"
+import { toast } from  "sonner"
+import { ClickToCallModal } from  "@/components/crm/ClickToCallModal"
+import { CallIntelligenceModal } from  "@/components/crm/CallIntelligenceModal"
+import { LeadCallHistoryTab } from  "@/components/crm/LeadCallHistoryTab"
+import { AutomationTriggersModal } from  "./AutomationTriggersModal"
 
 // Types
 type ColumnType = 'ENQUIRY' | 'COUNSELLING' | 'TRIAL' | 'ENROLLED_ACADEMY' | 'DROPPED'
@@ -699,7 +680,7 @@ export default function AdmissionsPipelinePage() {
               className="px-3 py-2 bg-purple-50 hover:bg-purple-100 text-purple-950 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 border border-purple-200"
               title="Automated WhatsApp & Email Follow-up Triggers"
             >
-              <Zap className="w-3.5 h-3.5 text-purple-600" />
+              <Workflow className="w-3.5 h-3.5 text-purple-600" />
               Auto Triggers
             </button>
 

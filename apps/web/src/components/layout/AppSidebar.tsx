@@ -1,49 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
-import { useOrganization } from "@/context/OrganizationContext";
-import { useSession, signOut } from "next-auth/react";
-import { usePlan } from "@/hooks/usePlan";
-import {
-  LayoutDashboard,
-  GraduationCap,
-  Users,
-  FileText,
-  Laptop,
-  Calendar,
-  Trophy,
-  DollarSign,
-  Video,
-  MessageSquare,
-  ClipboardList,
-  Briefcase,
-  Award,
-  TrendingUp,
-  Settings,
-  BookOpen,
-  ChevronLeft,
-  ChevronRight,
-  ChevronDown,
-  Layers,
-  ShieldAlert,
-  Percent,
-  Building2,
-  Globe,
-  CreditCard,
-  RefreshCw,
-  Receipt,
-  Palette,
-  Cpu,
-  BarChart3,
-  LogOut,
-  Phone,
-  Lock,
-  Sparkles,
-  Zap,
-} from "lucide-react";
+import { usePathname } from  "next/navigation";
+import { useState, useEffect } from  "react";
+import { cn } from  "@/lib/utils";
+import { useOrganization } from  "@/context/OrganizationContext";
+import { useSession, signOut } from  "next-auth/react";
+import { usePlan } from  "@/hooks/usePlan";
+import { LayoutDashboard, GraduationCap, Users, FileText, Laptop, Calendar, Trophy, DollarSign, Video, MessageSquare, ClipboardList, Briefcase, Award, TrendingUp, Settings, BookOpen, ChevronLeft, ChevronRight, ChevronDown, Layers, ShieldAlert, Percent, Building2, Globe, CreditCard, RefreshCw, Receipt, Palette, Cpu, BarChart3, LogOut, Phone, Lock, CheckCircle2, Workflow } from  "lucide-react";
 
 interface SidebarItem {
   title: string;
@@ -97,7 +61,7 @@ const sidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
       {
         title: "Meta Ads CRM Bridge",
         href: "/dashboard/settings/integrations?tab=meta",
-        icon: Zap,
+        icon: Workflow,
         requiredModule: "metaAdsSync",
       },
       {

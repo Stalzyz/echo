@@ -1,30 +1,30 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
-import { ArrowRight, Lock, Unlock, MoveHorizontal, Palette, Type } from "lucide-react";
-import { FeaturedCourses } from "./FeaturedCourses";
-import { Footer } from "./Footer";
+import { useState, useRef, useEffect } from  "react";
+import { motion, AnimatePresence, useMotionValue, useTransform } from  "framer-motion";
+import { ArrowRight, Lock, Unlock, MoveHorizontal, Palette, Type } from  "lucide-react";
+import { FeaturedCourses } from  "./FeaturedCourses";
+import { Footer } from  "./Footer";
 import Link from "next/link";
 
 // Restore storytelling narrative layouts
-import { NarrativeAct } from "../editorial/NarrativeAct";
-import { MagazineSpread } from "../editorial/MagazineSpread";
-import { PullQuote } from "../editorial/PullQuote";
-import { FilmStrip } from "../editorial/FilmStrip";
+import { NarrativeAct } from  "../editorial/NarrativeAct";
+import { MagazineSpread } from  "../editorial/MagazineSpread";
+import { PullQuote } from  "../editorial/PullQuote";
+import { FilmStrip } from  "../editorial/FilmStrip";
 
 // Restore original academy home page blocks
-import { HiringPartners } from "./HiringPartners";
-import { About } from "./About";
-import { Methodology } from "./Methodology";
-import { Outcomes } from "./Outcomes";
-import { InstructorsSection } from "./InstructorsSection";
-import { StudentShowcase } from "./StudentShowcase";
-import { StudentExperience } from "./StudentExperience";
-import { PlatformFeatures } from "./PlatformFeatures";
-import { Demographics } from "./Demographics";
-import { SubscriptionCard } from "./SubscriptionCard";
-import { Faq } from "./Faq";
+import { HiringPartners } from  "./HiringPartners";
+import { About } from  "./About";
+import { Methodology } from  "./Methodology";
+import { Outcomes } from  "./Outcomes";
+import { InstructorsSection } from  "./InstructorsSection";
+import { StudentShowcase } from  "./StudentShowcase";
+import { StudentExperience } from  "./StudentExperience";
+import { PlatformFeatures } from  "./PlatformFeatures";
+import { Demographics } from  "./Demographics";
+import { SubscriptionCard } from  "./SubscriptionCard";
+import { Faq } from  "./Faq";
 
 export default function DesktopSandbox() {
   const [isAligned, setIsAligned] = useState(false);

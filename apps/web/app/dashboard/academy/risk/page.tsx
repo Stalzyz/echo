@@ -1,7 +1,7 @@
 "use client"
 
-import { useApi } from "@/lib/useApi"
-import { AlertTriangle, UserX, TrendingDown, IndianRupee, ShieldAlert, CheckCircle2, Activity } from "lucide-react"
+import { useApi } from  "@/lib/useApi"
+import { AlertTriangle, UserX, TrendingDown, IndianRupee, ShieldAlert, CheckCircle2, Activity } from  "lucide-react"
 import Link from "next/link"
 
 const RISK_ICONS: any = {

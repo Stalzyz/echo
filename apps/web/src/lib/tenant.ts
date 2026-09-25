@@ -1,5 +1,5 @@
-import { auth } from "@/auth"
-import { cookies } from "next/headers"
+import { auth } from  "@/auth"
+import { cookies } from  "next/headers"
 
 export async function getTenantFilter() {
   const session = await auth()

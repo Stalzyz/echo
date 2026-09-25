@@ -1,11 +1,11 @@
 "use client"
 
-import { useState } from "react"
-import { Search, Plus, Users, Calendar, GraduationCap, ChevronRight, Video, Sparkles, Clock, Link as LinkIcon, CheckCircle2, PlayCircle, Loader2, X, Trash2, Edit3, ShieldAlert } from "lucide-react"
-import { useApi, fetchApi } from "@/lib/useApi"
-import { format } from "date-fns"
-import { SlideOver } from "@/components/SlideOver"
-import { toast } from "sonner"
+import { useState } from  "react"
+import { Search, Plus, Users, Calendar, GraduationCap, ChevronRight, Video, CheckCircle2, Clock, Link as LinkIcon, PlayCircle, Loader2, X, Trash2, Edit3, ShieldAlert } from  "lucide-react"
+import { useApi, fetchApi } from  "@/lib/useApi"
+import { format } from  "date-fns"
+import { SlideOver } from  "@/components/SlideOver"
+import { toast } from  "sonner"
 
 export default function BatchesPage() {
   const { data, isLoading, mutate } = useApi<any>("/academy/batches")
@@ -372,7 +372,7 @@ export default function BatchesPage() {
           {newBatch.courseId === "CREATE_NEW_COURSE" && (
             <div className="p-4 bg-teal-50 border border-teal-200 rounded-2xl space-y-3">
               <span className="text-xs font-bold text-teal-800 uppercase tracking-wider flex items-center gap-1.5 font-mono">
-                <Sparkles className="w-3.5 h-3.5 text-teal-600" /> New Course Setup
+                <CheckCircle2 className="w-3.5 h-3.5 text-teal-600" /> New Course Setup
               </span>
               <div>
                 <label className="text-[10px] font-bold uppercase tracking-wider text-slate-600 mb-1 block">Course Name *</label>
@@ -634,7 +634,7 @@ export default function BatchesPage() {
             <div className="p-4 bg-teal-50 border-b border-teal-200 flex items-center justify-between">
               <div>
                 <p className="text-xs font-bold text-teal-900 flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-teal-600" /> Auto-Generate 45-Day Course Schedule?
+                  <CheckCircle2 className="w-4 h-4 text-teal-600" /> Auto-Generate 45-Day Course Schedule?
                 </p>
                 <p className="text-[11px] text-teal-700">Creates 45 daily topics starting from batch start date ({new Date(selectedBatchData.startDate).toLocaleDateString('en-IN')}).</p>
               </div>

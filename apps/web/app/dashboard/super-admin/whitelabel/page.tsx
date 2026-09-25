@@ -1,11 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { 
-  Globe, ShieldCheck, RefreshCw, Palette, CheckCircle2, 
-  AlertCircle, ExternalLink, Edit3, Image as ImageIcon, Copy, Check, X, Loader2
-} from "lucide-react"
-import { toast } from "sonner"
+import { useState } from  "react"
+import { Globe, ShieldCheck, RefreshCw, Palette, CheckCircle2, AlertCircle, ExternalLink, Edit3, Image as ImageIcon, Copy, Check, X, Loader2 } from  "lucide-react"
+import { toast } from  "sonner"
 
 interface WhitelabelDomain {
   id: string

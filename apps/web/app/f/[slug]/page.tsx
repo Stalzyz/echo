@@ -1,9 +1,9 @@
 "use client"
 
-import { useApi } from "@/lib/useApi"
-import { useParams } from "next/navigation"
-import { useState } from "react"
-import { CheckCircle2, Loader2, GraduationCap } from "lucide-react"
+import { useApi } from  "@/lib/useApi"
+import { useParams } from  "next/navigation"
+import { useState } from  "react"
+import { CheckCircle2, Loader2, GraduationCap } from  "lucide-react"
 
 export default function PublicFormRenderer() {
   const params = useParams()

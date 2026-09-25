@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ApiClient } from "@/lib/api";
-import { Button } from "@/components/ui/button";
-import { Loader2, Palette, Image as ImageIcon, CheckCircle, BookOpen, Check, ArrowRight } from "lucide-react";
-import { toast } from "sonner";
+import { useEffect, useState } from  "react";
+import { ApiClient } from  "@/lib/api";
+import { Button } from  "@/components/ui/button";
+import { Loader2, Palette, Image as ImageIcon, CheckCircle, BookOpen, Check, ArrowRight } from  "lucide-react";
+import { toast } from  "sonner";
 
 const THEME_PRESETS = [
   { name: "Echo Teal", primary: "#0d9488", secondary: "#f59e0b", accent: "#10b981" },

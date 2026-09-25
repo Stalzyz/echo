@@ -1,11 +1,11 @@
 "use client"
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Users, BookOpen, Star, IndianRupee, ArrowUpRight, Plus, Video, Play, CheckCircle2, Clock, Info, Send, Laptop, Landmark, LayoutDashboard, ArrowLeft, Sparkles } from "lucide-react"
+import { useState } from  "react"
+import { motion } from  "framer-motion"
+import { Users, BookOpen, Star, IndianRupee, ArrowUpRight, Plus, Video, Play, CheckCircle2, Clock, Info, Send, Laptop, Landmark, LayoutDashboard, ArrowLeft } from  "lucide-react"
 import Link from "next/link"
-import { toast } from "sonner"
-import { useApi } from "@/lib/useApi"
+import { toast } from  "sonner"
+import { useApi } from  "@/lib/useApi"
 
 export default function EducatorDashboard() {
   const [studioMode, setStudioMode] = useState<'CAMPUS' | 'VIRTUAL'>('CAMPUS')
@@ -218,7 +218,7 @@ export default function EducatorDashboard() {
             </div>
             
             <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs text-center py-10">
-              <Sparkles className="w-8 h-8 text-teal-500 mx-auto mb-2" />
+              <CheckCircle2 className="w-8 h-8 text-teal-500 mx-auto mb-2" />
               <p className="text-sm font-bold text-slate-700">Studio is clean & ready for your courses.</p>
               <p className="text-xs text-slate-400 mt-1">Student submissions and project reviews will stream here automatically.</p>
             </div>

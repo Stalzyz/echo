@@ -1,58 +1,9 @@
-import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app"
-import {
-  getAuth,
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-  ConfirmationResult,
-  GoogleAuthProvider,
-  GithubAuthProvider,
-  signInWithPopup,
-  signOut,
-  sendPasswordResetEmail,
-  onAuthStateChanged,
-  type User,
-  Auth
-} from "firebase/auth"
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-  collection,
-  getDocs,
-  query,
-  where,
-  orderBy,
-  limit,
-  onSnapshot,
-  addDoc,
-  serverTimestamp,
-  Timestamp,
-  Firestore
-} from "firebase/firestore"
-import {
-  getStorage,
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-  deleteObject,
-  FirebaseStorage
-} from "firebase/storage"
-import {
-  getMessaging,
-  getToken,
-  onMessage,
-  isSupported as isMessagingSupported,
-  Messaging
-} from "firebase/messaging"
-import {
-  getAnalytics,
-  logEvent,
-  isSupported as isAnalyticsSupported,
-  Analytics
-} from "firebase/analytics"
+import { initializeApp, getApps, getApp, FirebaseApp } from  "firebase/app"
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult, GoogleAuthProvider, GithubAuthProvider, signInWithPopup, signOut, sendPasswordResetEmail, onAuthStateChanged, type User, Auth } from  "firebase/auth"
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, query, where, orderBy, limit, onSnapshot, addDoc, serverTimestamp, Timestamp, Firestore } from  "firebase/firestore"
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject, FirebaseStorage } from  "firebase/storage"
+import { getMessaging, getToken, onMessage, isSupported as isMessagingSupported, Messaging } from  "firebase/messaging"
+import { getAnalytics, logEvent, isSupported as isAnalyticsSupported, Analytics } from  "firebase/analytics"
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyCmskkuHzlilvOL0bvFIzUmmUOBeSYPYkc",

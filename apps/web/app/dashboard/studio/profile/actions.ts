@@ -1,7 +1,7 @@
 "use server"
 
-import { prisma } from "@/lib/prisma"
-import { revalidatePath } from "next/cache"
+import { prisma } from  "@/lib/prisma"
+import { revalidatePath } from  "next/cache"
 
 export async function checkSlugAvailability(slug: string, currentEducatorId: string) {
   const existing = await prisma.educator.findUnique({

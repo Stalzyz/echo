@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { auth } from "../../../../../../auth"
+import { NextRequest, NextResponse } from  "next/server"
+import { prisma } from  "@/lib/prisma"
+import { auth } from  "../../../../../../auth"
 
 // POST /api/v1/calls/[id]/sync-crm - 1-Click Sync Call Intel to CRM
 export async function POST(

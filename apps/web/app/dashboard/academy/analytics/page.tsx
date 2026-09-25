@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Users, Zap, CheckCircle2, AlertTriangle, TrendingUp, BookOpen, Clock, Activity } from "lucide-react"
+import { useState, useEffect } from  "react"
+import { Users, Workflow, CheckCircle2, AlertTriangle, TrendingUp, BookOpen, Clock, Activity } from  "lucide-react"
 
 export default function MentorAnalyticsDashboard() {
   const [analytics, setAnalytics] = useState<any>(null)
@@ -43,7 +43,7 @@ export default function MentorAnalyticsDashboard() {
 
         <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center shrink-0">
-            <Zap className="w-6 h-6" />
+            <Workflow className="w-6 h-6" />
           </div>
           <div>
             <div className="text-sm font-bold text-slate-400 uppercase tracking-wider">Avg Cohort XP</div>
@@ -127,7 +127,7 @@ export default function MentorAnalyticsDashboard() {
                   
                   <div className="flex items-center gap-4 text-sm font-bold">
                     <div className="text-red-600 flex items-center gap-1 bg-white px-2 py-1 rounded-md shadow-sm">
-                      <Zap className="w-3.5 h-3.5" /> {student.xp} XP
+                      <Workflow className="w-3.5 h-3.5" /> {student.xp} XP
                     </div>
                     <button className="ml-auto text-blue-600 hover:text-blue-700">Send Email →</button>
                   </div>

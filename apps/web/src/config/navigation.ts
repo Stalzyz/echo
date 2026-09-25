@@ -1,10 +1,4 @@
-import {
-  LayoutDashboard,
-  GraduationCap,
-  BookOpen,
-  Bell,
-  Settings,
-} from "lucide-react"
+import { LayoutDashboard, GraduationCap, BookOpen, Bell, Settings } from  "lucide-react"
 
 export type Role = "SUPER_ADMIN" | "ADMIN" | "MANAGER" | "STAFF" | "CLIENT" | "STUDENT" | "VENDOR" | "INTERN" | "EDUCATOR"
 

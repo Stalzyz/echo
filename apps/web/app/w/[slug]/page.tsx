@@ -1,15 +1,12 @@
 "use client"
 
-import { use, useState, useEffect } from "react"
-import { useSession } from "next-auth/react"
-import { 
-  Users, DollarSign, TrendingUp, Calendar, AlertCircle, Briefcase, GraduationCap, 
-  CheckCircle2, Clock, Plus, Sparkles, Rocket, Palette, Globe, Shield, ExternalLink
-} from "lucide-react"
+import { use, useState, useEffect } from  "react"
+import { useSession } from  "next-auth/react"
+import { Users, DollarSign, TrendingUp, Calendar, AlertCircle, Briefcase, GraduationCap, CheckCircle2, Clock, Plus, Rocket, Palette, Globe, Shield, ExternalLink } from  "lucide-react"
 import Link from "next/link"
-import { toast } from "sonner"
-import { useOrganization } from "@/context/OrganizationContext"
-import { usePlan } from "@/hooks/usePlan"
+import { toast } from  "sonner"
+import { useOrganization } from  "@/context/OrganizationContext"
+import { usePlan } from  "@/hooks/usePlan"
 
 interface AnalyticsData {
   organizationName?: string
@@ -207,7 +204,7 @@ export default function VendorWorkspacePage({ params }: { params: Promise<{ slug
               className="p-4 rounded-2xl border border-slate-200 hover:border-teal-500 hover:shadow-md transition-all group bg-slate-50/50"
             >
               <div className="flex items-center justify-between mb-2">
-                <Sparkles className="w-5 h-5 text-rose-600" />
+                <CheckCircle2 className="w-5 h-5 text-rose-600" />
                 <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-rose-600" />
               </div>
               <h4 className="font-bold text-sm text-slate-900">Live Webinar Room</h4>
@@ -216,7 +213,7 @@ export default function VendorWorkspacePage({ params }: { params: Promise<{ slug
           ) : (
             <div className="p-4 rounded-2xl border border-dashed border-slate-300 bg-slate-100/50 opacity-60">
               <div className="flex items-center justify-between mb-2">
-                <Sparkles className="w-5 h-5 text-slate-400" />
+                <CheckCircle2 className="w-5 h-5 text-slate-400" />
                 <span className="text-[10px] font-mono font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">Growth Plan</span>
               </div>
               <h4 className="font-bold text-sm text-slate-700">Webinar Studio</h4>

@@ -1,11 +1,11 @@
 "use client"
 
-import { useState } from "react"
-import { Search, Plus, GraduationCap, Mail, Phone, BookOpen, Fingerprint, X, Printer, LayoutGrid, List as ListIcon, ShieldCheck, Edit3, Trash2, Loader2 } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useApi, fetchApi } from "@/lib/useApi"
+import { useState } from  "react"
+import { Search, Plus, GraduationCap, Mail, Phone, BookOpen, Fingerprint, X, Printer, LayoutGrid, List as ListIcon, ShieldCheck, Edit3, Trash2, Loader2 } from  "lucide-react"
+import { motion, AnimatePresence } from  "framer-motion"
+import { useApi, fetchApi } from  "@/lib/useApi"
 import Link from "next/link"
-import { toast } from "sonner"
+import { toast } from  "sonner"
 
 export default function StudentDirectory() {
   const [search, setSearch] = useState("")

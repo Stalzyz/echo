@@ -1,10 +1,10 @@
 "use client"
 
 import Link from "next/link"
-import { CheckCircle2, Shield, Award, Calendar, User, BookOpen, Share2, Sparkles, MessageSquare } from "lucide-react"
-import { useState, use } from "react"
-import { toast } from "sonner"
-import { BragGeneratorModal, BragData } from "@/components/BragGeneratorModal"
+import { CheckCircle2, Shield, Award, Calendar, User, BookOpen, Share2, MessageSquare } from  "lucide-react"
+import { useState, use } from  "react"
+import { toast } from  "sonner"
+import { BragGeneratorModal, BragData } from  "@/components/BragGeneratorModal"
 
 interface VerifyProps {
   params: Promise<{ certificateId: string }>
@@ -68,7 +68,7 @@ export default function CertificateVerificationPage({ params }: VerifyProps) {
               }
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold text-xs transition-all hover:scale-105"
             >
-              <Sparkles className="w-3.5 h-3.5 text-purple-400 animate-pulse" /> ⚡ Brag & Share
+              <CheckCircle2 className="w-3.5 h-3.5 text-purple-400 animate-pulse" /> Share Credentials
             </button>
           </div>
 

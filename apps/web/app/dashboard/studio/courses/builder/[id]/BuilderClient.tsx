@@ -1,42 +1,18 @@
 "use client"
 
-import { useState, useTransition, useEffect, useRef } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { 
-  Plus, 
-  Settings,
-  DollarSign, 
-  Video, 
-  FileText, 
-  HelpCircle, 
-  GripVertical, 
-  ChevronRight,
-  ChevronDown,
-  Trash2,
-  Save,
-  Eye,
-  MonitorPlay,
-  Image as ImageIcon,
-  MoreVertical,
-  Link as LinkIcon,
-  Loader2,
-  Search,
-  Upload,
-  Play,
-  Film,
-  CheckCircle2,
-  X
-} from "lucide-react"
-import { cn } from "@/lib/utils"
-import { toast } from "sonner"
+import { useState, useTransition, useEffect, useRef } from  "react"
+import { motion, AnimatePresence } from  "framer-motion"
+import { Plus, Settings, DollarSign, Video, FileText, HelpCircle, GripVertical, ChevronRight, ChevronDown, Trash2, Save, Eye, MonitorPlay, Image as ImageIcon, MoreVertical, Link as LinkIcon, Loader2, Search, Upload, Play, Film, CheckCircle2, X } from  "lucide-react"
+import { cn } from  "@/lib/utils"
+import { toast } from  "sonner"
 
-import { ApiClient } from "@/lib/api"
-import { createModule, updateModule, deleteModule, reorderModules, createLesson, updateLesson, deleteLesson, reorderLessons } from "./actions"
-import { RichTextEditor } from "./RichTextEditor"
-import { QuizBuilder } from "./QuizBuilder"
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
+import { ApiClient } from  "@/lib/api"
+import { createModule, updateModule, deleteModule, reorderModules, createLesson, updateLesson, deleteLesson, reorderLessons } from  "./actions"
+import { RichTextEditor } from  "./RichTextEditor"
+import { QuizBuilder } from  "./QuizBuilder"
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from  "@dnd-kit/core"
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from  "@dnd-kit/sortable"
+import { CSS } from  "@dnd-kit/utilities"
 
 type LessonType = "VIDEO" | "RICH_TEXT" | "QUIZ" | "PDF"
 

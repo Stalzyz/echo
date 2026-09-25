@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { getEducators } from "../../app/actions/courses";
+import { useState, useEffect } from  "react";
+import { getEducators } from  "../../app/actions/courses";
 import Image from "next/image";
 
 export function InstructorsSection() {

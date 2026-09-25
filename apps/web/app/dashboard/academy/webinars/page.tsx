@@ -1,12 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { 
-  Video, Users, Calendar, Clock, Plus, Search, Filter, 
-  ExternalLink, Copy, Check, X, Eye, ArrowRight, PlayCircle,
-  MessageCircle, Zap, Tag, ShieldCheck, Radio, Settings, Sparkles, RefreshCw
-} from "lucide-react"
-import { toast } from "sonner"
+import { useState } from  "react"
+import { Video, Users, Calendar, Clock, Plus, Search, Filter, ExternalLink, Copy, Check, X, Eye, ArrowRight, PlayCircle, MessageCircle, Workflow, Tag, ShieldCheck, Radio, Settings, CheckCircle2, RefreshCw } from  "lucide-react"
+import { toast } from  "sonner"
 import Link from "next/link"
 
 interface Webinar {
@@ -249,7 +245,7 @@ export default function WebinarsPage() {
                   <div className="p-3 bg-amber-50/70 border border-amber-200/80 rounded-2xl text-xs space-y-1">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-black text-amber-800 uppercase tracking-wider flex items-center gap-1">
-                        <Zap className="w-3 h-3 text-amber-600 fill-amber-500" /> Timed Pitch @ Min {w.timedPitch.triggerMinute}
+                        <Workflow className="w-3 h-3 text-amber-600 fill-amber-500" /> Timed Pitch @ Min {w.timedPitch.triggerMinute}
                       </span>
                       <span className="text-[10px] font-bold bg-amber-200/80 text-amber-900 px-1.5 py-0.2 rounded font-mono">{w.timedPitch.couponCode}</span>
                     </div>
@@ -376,7 +372,7 @@ export default function WebinarsPage() {
               <div className="pt-3 border-t border-slate-200 space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-black text-slate-900 flex items-center gap-1.5">
-                    <Zap className="w-4 h-4 text-amber-500 fill-amber-400" /> Timed Pitch Offer Popup
+                    <Workflow className="w-4 h-4 text-amber-500 fill-amber-400" /> Timed Pitch Offer Popup
                   </span>
                   <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-600">
                     <input 

@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Users, GraduationCap, Building2, Quote, CheckCircle2 } from "lucide-react";
+import { motion } from  "framer-motion";
+import { Users, GraduationCap, Building2, Quote, CheckCircle2 } from  "lucide-react";
 
 export function StudentExperience() {
   const framework = [

@@ -1,17 +1,10 @@
 "use client"
 
-import { use, useState, useEffect, useRef } from "react"
-import { useApi } from "@/lib/useApi"
+import { use, useState, useEffect, useRef } from  "react"
+import { useApi } from  "@/lib/useApi"
 import Link from "next/link"
-import {
-  ArrowLeft, CheckCircle2, Circle, PlayCircle, FileText, 
-  Download, Award, ChevronRight, Lock, 
-  HelpCircle, RefreshCw, Layers, ExternalLink, Video,
-  Maximize2, Minimize2, MessageSquare, Bookmark, ListFilter,
-  Send, ThumbsUp, Check, Clock, FastForward,
-  ChevronDown, BookOpen, User
-} from "lucide-react"
-import { StudentQuizView } from "./StudentQuizView"
+import { ArrowLeft, CheckCircle2, Circle, PlayCircle, FileText, Download, Award, ChevronRight, Lock, HelpCircle, RefreshCw, Layers, ExternalLink, Video, Maximize2, Minimize2, MessageSquare, Bookmark, ListFilter, Send, ThumbsUp, Check, Clock, FastForward, ChevronDown, BookOpen, User } from  "lucide-react"
+import { StudentQuizView } from  "./StudentQuizView"
 
 export default function StudentCoursePlayerPage({ params }: { params: Promise<{ courseId: string }> }) {
   const resolvedParams = use(params)

@@ -1,8 +1,8 @@
-import { prisma } from "@/lib/prisma"
-import { NextResponse } from "next/server"
-import { auth } from "@/auth"
-import { getTenantFilter } from "@/lib/tenant"
-import { SubscriptionEntitlementService } from "@/lib/services/subscription-entitlement.service"
+import { prisma } from  "@/lib/prisma"
+import { NextResponse } from  "next/server"
+import { auth } from  "@/auth"
+import { getTenantFilter } from  "@/lib/tenant"
+import { SubscriptionEntitlementService } from  "@/lib/services/subscription-entitlement.service"
 
 export async function GET(req: Request) {
   try {

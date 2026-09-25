@@ -1,14 +1,10 @@
 "use client"
 
-import { useState, use } from "react"
-import { useApi, fetchApi } from "@/lib/useApi"
-import { QRCodeSVG } from "qrcode.react"
-import { toast } from "sonner"
-import {
-  ArrowLeft, Star, Plus, X, Loader2, Shield, Award,
-  BookOpen, Briefcase, GraduationCap, Heart, Phone, Mail,
-  Check, Droplets, Zap, Target
-} from "lucide-react"
+import { useState, use } from  "react"
+import { useApi, fetchApi } from  "@/lib/useApi"
+import { QRCodeSVG } from  "qrcode.react"
+import { toast } from  "sonner"
+import { ArrowLeft, Star, Plus, X, Loader2, Shield, Award, BookOpen, Briefcase, GraduationCap, Heart, Phone, Mail, Check, Droplets, Workflow, Target } from  "lucide-react"
 import Link from "next/link"
 
 const CAREER_SCORE_SEGMENTS = [
@@ -255,7 +251,7 @@ export default function StudentPassportPage({ params }: { params: Promise<{ stud
           <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-2">
-                <Zap className="w-4 h-4 text-amber-500" /> Skill Matrix
+                <Workflow className="w-4 h-4 text-amber-500" /> Skill Matrix
               </h2>
               <button onClick={() => setAddSkillOpen(true)}
                 className="flex items-center gap-1.5 text-xs font-bold bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 px-3 py-1.5 rounded-lg transition-colors">

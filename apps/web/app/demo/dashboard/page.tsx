@@ -1,19 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import {
-  BookOpen, Users, DollarSign, Award, Video, MessageSquare, 
-  CheckCircle2, TrendingUp, Layers, Flame, Zap, BarChart2,
-  Calendar, Clock, GraduationCap, Bell, Settings, Shield,
-  Globe, Mail, Phone, Star, Target, Activity, PieChart,
-  FileText, Briefcase, Home, Map, UserCheck, CreditCard,
-  Package, Tag, Megaphone, Link, Hash, Eye, ChevronRight,
-  PlayCircle, Mic, Edit, Trash2, Plus, Search, Filter,
-  Download, Upload, RefreshCw, AlertCircle, Info, Inbox,
-  Building, Users2, LayoutDashboard, Sparkles, ArrowUp,
-  ArrowDown, Wifi, WifiOff, CheckSquare, XCircle, Send,
-  QrCode, Smartphone, LucideIcon
-} from "lucide-react"
+import { useState } from  "react"
+import { BookOpen, Users, DollarSign, Award, Video, MessageSquare, CheckCircle2, TrendingUp, Layers, Activity, Workflow, BarChart2, Calendar, Clock, GraduationCap, Bell, Settings, Shield, Globe, Mail, Phone, Star, Target, PieChart, FileText, Briefcase, Home, Map, UserCheck, CreditCard, Package, Tag, Megaphone, Link, Hash, Eye, ChevronRight, PlayCircle, Mic, Edit, Trash2, Plus, Search, Filter, Download, Upload, RefreshCw, AlertCircle, Info, Inbox, Building, Users2, LayoutDashboard, ArrowUp, ArrowDown, Wifi, WifiOff, CheckSquare, XCircle, Send, QrCode, Smartphone, LucideIcon } from  "lucide-react"
 
 // ─── Mini Stat Card ──────────────────────────────────────────────
 function StatCard({ label, value, sub, color = "purple", icon: Icon }: { label: string; value: string; sub?: string; color?: string; icon?: any }) {
@@ -372,7 +360,7 @@ export default function PublicDemoDashboardPage() {
                   <p className="text-[10px] text-slate-600 font-mono mt-2">{cert.id}</p>
                   <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-200">
                     <button className="text-[10px] text-purple-600 hover:text-purple-300 font-medium flex items-center gap-1">
-                      <Sparkles className="w-3 h-3" /> Brag Card
+                      <CheckCircle2 className="w-3 h-3" /> Credential Card
                     </button>
                     <button className="text-[10px] text-slate-600 hover:text-slate-900 font-medium flex items-center gap-1 ml-auto">
                       <QrCode className="w-3 h-3" /> Verify
@@ -444,7 +432,7 @@ export default function PublicDemoDashboardPage() {
                     </div>
                   </div>
                   <button className="w-full bg-purple-600 hover:bg-purple-500 text-slate-900 text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors">
-                    <Zap className="w-4 h-4" /> Generate with AI
+                    <Workflow className="w-4 h-4" /> Generate with AI
                   </button>
                 </div>
               </div>
@@ -695,7 +683,7 @@ export default function PublicDemoDashboardPage() {
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div className="bg-white shadow-sm border border-pink-500/20 rounded-2xl p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Flame className="w-4 h-4 text-amber-600 animate-bounce" />
+                  <Activity className="w-4 h-4 text-amber-600 animate-bounce" />
                   <span className="text-xs font-mono font-bold text-pink-600">LIVE EVERGREEN WEBINAR</span>
                 </div>
                 <h3 className="font-bold text-slate-900 text-base mb-2">Scaling AI SaaS Products in 2026</h3>

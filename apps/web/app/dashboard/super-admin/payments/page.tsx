@@ -1,11 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { 
-  Receipt, Search, Filter, ArrowUpRight, DollarSign, 
-  Download, CheckCircle2, XCircle, RefreshCw, CreditCard
-} from "lucide-react"
-import { toast } from "sonner"
+import { useState } from  "react"
+import { Receipt, Search, Filter, ArrowUpRight, DollarSign, Download, CheckCircle2, XCircle, RefreshCw, CreditCard } from  "lucide-react"
+import { toast } from  "sonner"
 
 interface Transaction {
   id: string

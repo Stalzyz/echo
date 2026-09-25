@@ -1,13 +1,9 @@
 "use client"
 
-import { useState } from "react"
-import { 
-  CreditCard, ShieldCheck, Sparkles, CheckCircle2, AlertCircle, 
-  RefreshCw, ArrowUpRight, Check, X, FileText, Download, 
-  ExternalLink, Clock, Layers, Users, BookOpen, HardDrive, MessageCircle, Zap, ShieldAlert
-} from "lucide-react"
-import { useApi, fetchApi } from "@/lib/useApi"
-import { toast } from "sonner"
+import { useState } from  "react"
+import { CreditCard, ShieldCheck, CheckCircle2, AlertCircle, RefreshCw, ArrowUpRight, Check, X, FileText, Download, ExternalLink, Clock, Layers, Users, BookOpen, HardDrive, MessageCircle, Workflow, ShieldAlert } from  "lucide-react"
+import { useApi, fetchApi } from  "@/lib/useApi"
+import { toast } from  "sonner"
 
 export default function AcademyBillingAndSubscriptionPage() {
   const { data, isLoading, mutate } = useApi<any>("/subscription")
@@ -103,7 +99,7 @@ export default function AcademyBillingAndSubscriptionPage() {
             onClick={() => setIsUpgradeModalOpen(true)}
             className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all shadow-xs"
           >
-            <Sparkles className="w-4 h-4" /> Change / Upgrade Plan
+            <CheckCircle2 className="w-4 h-4" /> Change / Upgrade Plan
           </button>
         </div>
       </div>
@@ -111,7 +107,7 @@ export default function AcademyBillingAndSubscriptionPage() {
       {/* BILLING LIFECYCLE WARNING BANNERS */}
       {subscription?.status === "TRIALING" && (
         <div className="p-4 bg-teal-50 border border-teal-200 rounded-2xl flex items-start gap-3 text-teal-900">
-          <Sparkles className="w-5 h-5 text-teal-600 shrink-0 mt-0.5" />
+          <CheckCircle2 className="w-5 h-5 text-teal-600 shrink-0 mt-0.5" />
           <div className="text-xs space-y-1">
             <span className="font-bold block">Free Trial Active</span>
             <p className="text-teal-800">You are currently enjoying full access under your 14-day free trial. Your trial ends on <strong>{subscription.trialEnd ? new Date(subscription.trialEnd).toLocaleDateString() : 'soon'}</strong>. Choose a plan to ensure uninterrupted operations.</p>
@@ -208,7 +204,7 @@ export default function AcademyBillingAndSubscriptionPage() {
               onClick={() => setIsUpgradeModalOpen(true)}
               className="flex-1 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1"
             >
-              <Sparkles className="w-3.5 h-3.5" /> Upgrade Plan
+              <CheckCircle2 className="w-3.5 h-3.5" /> Upgrade Plan
             </button>
             {!subscription?.cancelAtPeriodEnd && subscription?.status === "ACTIVE" && (
               <button

@@ -1,16 +1,9 @@
 "use client"
 
-import { useState } from "react"
-import { useApi } from "@/lib/useApi"
+import { useState } from  "react"
+import { useApi } from  "@/lib/useApi"
 import Link from "next/link"
-import {
-  BookOpen, PlayCircle, Clock, CheckCircle2, Award, 
-  Search, FileText, ArrowRight, User, GraduationCap, 
-  BarChart2, Calendar, Star, ChevronRight, Menu, X,
-  Edit3, Shield, Globe, Mail, Phone, MapPin, Zap, 
-  Code, Share2, Save, Loader2, LogOut, Download, ExternalLink,
-  Flame, Bell
-} from "lucide-react"
+import { BookOpen, PlayCircle, Clock, CheckCircle2, Award, Search, FileText, ArrowRight, User, GraduationCap, BarChart2, Calendar, Star, ChevronRight, Menu, X, Edit3, Shield, Globe, Mail, Phone, MapPin, Workflow, Code, Share2, Save, Loader2, LogOut, Download, ExternalLink, Activity, Bell } from  "lucide-react"
 
 export default function UnifiedStudentDashboardPage() {
   const { data: coursesData } = useApi<any>("/lms/courses")
@@ -265,7 +258,7 @@ export default function UnifiedStudentDashboardPage() {
 
             {/* Streak Badge */}
             <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-200 rounded-full text-xs font-bold text-amber-900 font-mono">
-              <Flame className="w-3.5 h-3.5 text-amber-600 fill-amber-500" /> 7-Day Streak
+              <Activity className="w-3.5 h-3.5 text-amber-600 fill-amber-500" /> 7-Day Streak
             </div>
 
             {/* Profile Avatar Button */}
@@ -437,7 +430,7 @@ export default function UnifiedStudentDashboardPage() {
 
                 <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-4">
                   <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-teal-600" /> Portfolio & Links
+                    <Workflow className="w-4 h-4 text-teal-600" /> Portfolio & Links
                   </h3>
                   <div className="space-y-2 text-xs">
                     <a href={form.githubUrl} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-between font-bold text-slate-800">

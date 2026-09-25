@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { X, CheckCircle2, Sparkles, Building2, Phone, Mail, User, ShieldCheck } from "lucide-react"
-import { toast } from "sonner"
+import { useState } from  "react"
+import { motion, AnimatePresence } from  "framer-motion"
+import { X, CheckCircle2, Building2, Phone, Mail, User, ShieldCheck } from  "lucide-react"
+import { toast } from  "sonner"
 
 interface PricingInquiryModalProps {
   isOpen: boolean

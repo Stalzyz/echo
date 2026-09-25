@@ -1,8 +1,8 @@
 "use client"
 
-import { useRealtimeUpdates } from "@/hooks/useRealtimeUpdates"
-import { useState, useEffect } from "react"
-import { Radio, Wifi, WifiOff } from "lucide-react"
+import { useRealtimeUpdates } from  "@/hooks/useRealtimeUpdates"
+import { useState, useEffect } from  "react"
+import { Radio, Wifi, WifiOff } from  "lucide-react"
 
 export default function RealtimeIndicator() {
   const [events, setEvents] = useState<string[]>([])

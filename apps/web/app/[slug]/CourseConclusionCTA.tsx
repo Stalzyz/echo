@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, GraduationCap } from "lucide-react";
+import { ArrowRight, GraduationCap } from  "lucide-react";
 import Link from "next/link";
 
 type CourseConclusionCTAProps = {

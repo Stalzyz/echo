@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Laptop, Briefcase, Users, Award, Cpu, BookOpen } from "lucide-react";
+import { motion } from  "framer-motion";
+import { Laptop, Briefcase, Users, Award, Cpu, BookOpen } from  "lucide-react";
 
 const features = [
   {

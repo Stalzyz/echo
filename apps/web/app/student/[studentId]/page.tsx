@@ -1,13 +1,9 @@
 "use client"
 
-import { use, useState, useEffect } from "react"
-import { useApi } from "@/lib/useApi"
-import { QRCodeSVG } from "qrcode.react"
-import {
-  Star, Shield, Award, BookOpen, Briefcase, 
-  GraduationCap, Phone, Mail, Droplets, Zap, 
-  Target, Loader2, ArrowLeft, ExternalLink, CheckCircle2
-} from "lucide-react"
+import { use, useState, useEffect } from  "react"
+import { useApi } from  "@/lib/useApi"
+import { QRCodeSVG } from  "qrcode.react"
+import { Star, Shield, Award, BookOpen, Briefcase, GraduationCap, Phone, Mail, Droplets, Workflow, Target, Loader2, ArrowLeft, ExternalLink, CheckCircle2 } from  "lucide-react"
 import Link from "next/link"
 
 const CAREER_SCORE_SEGMENTS = [
@@ -148,7 +144,7 @@ export default function PublicStudentPassportPage({ params }: { params: Promise<
           {/* Skills Breakdown */}
           <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-4">
             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-              <Zap className="w-4 h-4 text-teal-600" /> Verified Skills & Competencies
+              <Workflow className="w-4 h-4 text-teal-600" /> Verified Skills & Competencies
             </h3>
             
             <div className="space-y-3">

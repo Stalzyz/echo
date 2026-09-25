@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { Phone, PhoneOff, Mic, MicOff, ShieldCheck, Sparkles, AlertTriangle, CheckCircle2, Volume2, Radio, X } from "lucide-react"
+import { useState, useEffect, useRef } from  "react"
+import { Phone, PhoneOff, Mic, MicOff, ShieldCheck, Activity, AlertTriangle, CheckCircle2, Volume2, Radio, X } from  "lucide-react"
 
 interface ClickToCallModalProps {
   isOpen: boolean
@@ -472,7 +472,7 @@ export function ClickToCallModal({ isOpen, onClose, lead, onCallEnded }: ClickTo
             <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
               <span>Live Counsellor Call Notes</span>
               <span className="text-[10px] text-teal-700 font-extrabold flex items-center gap-1">
-                <Sparkles className="w-3 h-3" /> Auto AI Analysis
+                <Activity className="w-3 h-3" /> Audio Analysis Active
               </span>
             </label>
             <textarea

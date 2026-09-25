@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server"
-import { auth } from "@/auth"
-import { cookies } from "next/headers"
+import { NextResponse } from  "next/server"
+import { auth } from  "@/auth"
+import { cookies } from  "next/headers"
 
 export async function POST() {
   try {

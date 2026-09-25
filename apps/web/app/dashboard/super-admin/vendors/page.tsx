@@ -1,13 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { 
-  Building2, Plus, Search, Filter, ShieldCheck, MoreVertical, 
-  UserCheck, AlertTriangle, ExternalLink, Check, X, Loader2, Layers, RefreshCw, CheckCircle2, AlertCircle,
-  Trash2, LogIn, Sparkles
-} from "lucide-react"
-import { toast } from "sonner"
-import { useSession } from "next-auth/react"
+import { useState, useEffect } from  "react"
+import { Building2, Plus, Search, Filter, ShieldCheck, MoreVertical, UserCheck, AlertTriangle, ExternalLink, Check, X, Loader2, Layers, RefreshCw, CheckCircle2, AlertCircle, Trash2, LogIn } from  "lucide-react"
+import { toast } from  "sonner"
+import { useSession } from  "next-auth/react"
 
 interface Vendor {
   id: string
@@ -222,7 +218,7 @@ export default function VendorManagementPage() {
             className="flex-1 sm:flex-none min-h-[44px] flex items-center justify-center gap-2 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-800 font-extrabold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all shadow-xs"
             title="Purge dummy vendors and keep only the official Demo Academy"
           >
-            <Sparkles className="w-4 h-4 text-rose-600" /> Clean Slate (Keep Only Demo)
+            <CheckCircle2 className="w-4 h-4 text-rose-600" /> Clean Slate (Keep Only Demo)
           </button>
 
           <button 

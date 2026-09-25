@@ -1,11 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { 
-  Tag, Plus, Percent, DollarSign, Calendar, Users, 
-  CheckCircle2, AlertCircle, Copy, Check, Trash2, X, Loader2
-} from "lucide-react"
-import { toast } from "sonner"
+import { useState } from  "react"
+import { Tag, Plus, Percent, DollarSign, Calendar, Users, CheckCircle2, AlertCircle, Copy, Check, Trash2, X, Loader2 } from  "lucide-react"
+import { toast } from  "sonner"
 
 interface Coupon {
   id: string

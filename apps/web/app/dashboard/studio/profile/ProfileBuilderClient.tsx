@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useTransition } from "react"
-import { motion } from "framer-motion"
-import { Save, Loader2, Link as LinkIcon, User, Camera, Eye } from "lucide-react"
-import { updateEducatorProfile, checkSlugAvailability } from "./actions"
-import { toast } from "sonner"
-import { cn } from "@/lib/utils"
+import { useState, useTransition } from  "react"
+import { motion } from  "framer-motion"
+import { Save, Loader2, Link as LinkIcon, User, Camera, Eye } from  "lucide-react"
+import { updateEducatorProfile, checkSlugAvailability } from  "./actions"
+import { toast } from  "sonner"
+import { cn } from  "@/lib/utils"
 
 export default function ProfileBuilderClient({ initialEducator }: { initialEducator: any }) {
   const [isPending, startTransition] = useTransition()

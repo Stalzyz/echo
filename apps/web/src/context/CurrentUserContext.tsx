@@ -1,8 +1,8 @@
 "use client"
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
-import { fetchApi } from '@/lib/useApi'
+import { useSession } from  'next-auth/react'
+import { fetchApi } from  '@/lib/useApi'
 
 interface CurrentUserContextType {
   userId: string | null;

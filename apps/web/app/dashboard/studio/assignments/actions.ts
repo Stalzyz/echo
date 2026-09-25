@@ -1,7 +1,7 @@
 "use server"
 
-import { prisma } from "@/lib/prisma"
-import { revalidatePath } from "next/cache"
+import { prisma } from  "@/lib/prisma"
+import { revalidatePath } from  "next/cache"
 
 export async function createAssignment(data: { title: string, brief: string, maxScore: number }) {
   const assignment = await prisma.assignment.create({

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { FileText, ArrowLeft, Phone, Mail, MapPin } from "lucide-react"
+import { FileText, ArrowLeft, Phone, Mail, MapPin } from  "lucide-react"
 
 export default function TermsPage() {
   return (

@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Folder, Briefcase, FileCode2, LineChart, MessageSquare, Lightbulb, GraduationCap } from "lucide-react";
+import { motion } from  "framer-motion";
+import { Folder, Briefcase, FileCode2, LineChart, MessageSquare, Lightbulb, GraduationCap } from  "lucide-react";
 
 export function Outcomes() {
   const cards = [

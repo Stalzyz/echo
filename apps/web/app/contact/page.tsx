@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState } from  "react"
 import Link from "next/link"
-import { Mail, Phone, Building, Send, CheckCircle2, Loader2 } from "lucide-react"
+import { Mail, Phone, Building, Send, CheckCircle2, Loader2 } from  "lucide-react"
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false)

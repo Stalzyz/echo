@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react"
-import { useApi, fetchApi } from "@/lib/useApi"
-import { useOrganization } from "@/context/OrganizationContext"
-import { Briefcase, Building, X, Loader2, Plus } from "lucide-react"
-import { toast } from "sonner"
+import { useState } from  "react"
+import { useApi, fetchApi } from  "@/lib/useApi"
+import { useOrganization } from  "@/context/OrganizationContext"
+import { Briefcase, Building, X, Loader2, Plus } from  "lucide-react"
+import { toast } from  "sonner"
 
 export default function AcademyInternships() {
   const org = useOrganization()

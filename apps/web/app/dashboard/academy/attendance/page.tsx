@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Search, Users, CheckCircle2, XCircle, Clock, Maximize2, Loader2, QrCode, GraduationCap, Sparkles } from "lucide-react"
-import { toast } from "sonner"
-import { useApi, fetchApi } from "@/lib/useApi"
-import { QrAttendanceScannerModal } from "./QrAttendanceScannerModal"
-import { StudentIdBadgeModal } from "./StudentIdBadgeModal"
+import { useState, useEffect } from  "react"
+import { Search, Users, CheckCircle2, XCircle, Clock, Maximize2, Loader2, QrCode, GraduationCap } from  "lucide-react"
+import { toast } from  "sonner"
+import { useApi, fetchApi } from  "@/lib/useApi"
+import { QrAttendanceScannerModal } from  "./QrAttendanceScannerModal"
+import { StudentIdBadgeModal } from  "./StudentIdBadgeModal"
 
 const FALLBACK_BATCHES = ["UI/UX Cohort 4", "Brand Design Int.", "Web Dev Basics"]
 

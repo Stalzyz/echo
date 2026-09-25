@@ -1,11 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState } from  "react"
 import Link from "next/link"
-import { 
-  CheckCircle2, ArrowRight, Shield, Zap, X, MessageCircle, Mail, 
-  ArrowLeft, Check, ExternalLink, Globe, Sparkles, Building2, HelpCircle
-} from "lucide-react"
+import { CheckCircle2, ArrowRight, Shield, Workflow, X, MessageCircle, Mail, ArrowLeft, Check, ExternalLink, Globe, Building2, HelpCircle } from  "lucide-react"
 
 export interface ComparisonRow {
   feature: string
@@ -135,7 +132,7 @@ export default function DedicatedPricingPage() {
       <section className="relative pt-10 pb-12 border-b border-slate-200 bg-gradient-to-b from-white via-slate-50 to-teal-50/20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold shadow-2xs">
-            <Zap className="w-3.5 h-3.5 text-teal-600" /> Dedicated Pricing & Plan Matrix
+            <Workflow className="w-3.5 h-3.5 text-teal-600" /> Dedicated Pricing & Plan Matrix
           </div>
 
           <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-slate-900 leading-tight">

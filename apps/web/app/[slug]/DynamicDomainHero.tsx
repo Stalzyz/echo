@@ -1,9 +1,9 @@
 "use client";
 
-import { CourseDomain } from "./CategoryThemeMapper";
-import { motion } from "framer-motion";
-import { useState } from "react";
-import { ArrowRight, Play } from "lucide-react";
+import { CourseDomain } from  "./CategoryThemeMapper";
+import { motion } from  "framer-motion";
+import { useState } from  "react";
+import { ArrowRight, Play } from  "lucide-react";
 
 type DynamicDomainHeroProps = {
   domain: CourseDomain;

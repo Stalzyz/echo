@@ -1,11 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { 
-  GraduationCap, Video, Building2, Sparkles, 
-  ArrowRight, ArrowLeft, ExternalLink, ShieldCheck, CheckCircle2 
-} from "lucide-react"
+import { usePathname } from  "next/navigation"
+import { GraduationCap, Video, Building2, ArrowRight, ArrowLeft, ExternalLink, ShieldCheck, CheckCircle2 } from  "lucide-react"
 
 interface DemoPersonaSwitcherProps {
   currentRole: "admin" | "student" | "educator"
@@ -103,10 +100,10 @@ export function DemoPersonaSwitcher({ currentRole }: DemoPersonaSwitcherProps) {
           </Link>
 
           <Link
-            href="/pricing"
-            className="bg-gradient-to-r from-teal-500 to-emerald-400 text-slate-950 font-black text-xs px-4 py-1.5 rounded-xl transition-all hover:shadow-md hover:shadow-teal-500/20 flex items-center gap-1.5 shrink-0"
+            href="/auth/login"
+            className="bg-teal-500 hover:bg-teal-400 text-slate-950 font-black text-xs px-4 py-1.5 rounded-xl transition-all hover:shadow-md flex items-center gap-1.5 shrink-0"
           >
-            <Sparkles className="w-3.5 h-3.5" /> Start 14-Day Trial
+            <ArrowRight className="w-3.5 h-3.5" /> Start Free Trial
           </Link>
         </div>
 

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { getCourses } from "../../app/actions/courses";
-import { EditorialCourseSpread } from "../editorial/EditorialCourseSpread";
+import { useState, useEffect } from  "react";
+import { getCourses } from  "../../app/actions/courses";
+import { EditorialCourseSpread } from  "../editorial/EditorialCourseSpread";
 
 const defaultCourses = [
   { title: "Graphic Design", code: "PGDM-2026", coverImage: null },

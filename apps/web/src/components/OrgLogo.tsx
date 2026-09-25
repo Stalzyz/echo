@@ -1,6 +1,6 @@
 "use client";
 
-import { Organization } from "@/lib/useOrganization";
+import { Organization } from  "@/lib/useOrganization";
 
 interface OrgLogoProps {
   org: Organization;

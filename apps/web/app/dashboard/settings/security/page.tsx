@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { ApiClient } from "@/lib/api";
-import { Shield, QrCode, Key, CheckCircle, Loader2, Copy, AlertTriangle } from "lucide-react";
+import { useState } from  "react";
+import { ApiClient } from  "@/lib/api";
+import { Shield, QrCode, Key, CheckCircle, Loader2, Copy, AlertTriangle } from  "lucide-react";
 
 type Step = "idle" | "setup" | "verify" | "done";
 

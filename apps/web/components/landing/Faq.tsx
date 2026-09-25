@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { useState } from  "react";
+import { motion, AnimatePresence } from  "framer-motion";
+import { ChevronDown } from  "lucide-react";
 
 const faqs = [
   { q: "Do I need prior experience?", a: "No. Many of our beginner programs are designed for students with no previous experience." },

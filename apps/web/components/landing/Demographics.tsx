@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { UserCheck } from "lucide-react";
+import { motion } from  "framer-motion";
+import { UserCheck } from  "lucide-react";
 
 export function Demographics() {
   const demographics = [

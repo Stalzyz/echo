@@ -1,12 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { 
-  Settings, ShieldCheck, Key, Mail, Bell, CreditCard, 
-  HardDrive, Code, FileText, Save, CheckCircle2, AlertTriangle, 
-  RefreshCw, Lock, Send, Plus, Eye, EyeOff, ShieldAlert, Check, Copy, Search, Building2
-} from "lucide-react"
-import { toast } from "sonner"
+import { useState } from  "react"
+import { Settings, ShieldCheck, Key, Mail, Bell, CreditCard, HardDrive, Code, FileText, Save, CheckCircle2, AlertTriangle, RefreshCw, Lock, Send, Plus, Eye, EyeOff, ShieldAlert, Check, Copy, Search, Building2 } from  "lucide-react"
+import { toast } from  "sonner"
 
 export default function PlatformSettingsPage() {
   const [activeTab, setActiveTab] = useState("vendor")

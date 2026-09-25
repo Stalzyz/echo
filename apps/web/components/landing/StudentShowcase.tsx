@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { getPortfolioProjects } from "../../app/actions/courses";
+import { useState, useEffect } from  "react";
+import { getPortfolioProjects } from  "../../app/actions/courses";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ExternalLink } from "lucide-react";
+import { ArrowRight, ExternalLink } from  "lucide-react";
 
 export function StudentShowcase() {
   const [projects, setProjects] = useState<any[]>([]);

@@ -1,11 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { 
-  Calendar, Clock, Video, User, Plus, Search, Filter, 
-  CheckCircle2, AlertCircle, ExternalLink, Copy, Check, X, Loader2, DollarSign
-} from "lucide-react"
-import { toast } from "sonner"
+import { useState } from  "react"
+import { Calendar, Clock, Video, User, Plus, Search, Filter, CheckCircle2, AlertCircle, ExternalLink, Copy, Check, X, Loader2, DollarSign } from  "lucide-react"
+import { toast } from  "sonner"
 
 interface ConsultationSession {
   id: string

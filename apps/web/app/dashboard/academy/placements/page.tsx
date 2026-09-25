@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
-import { useApi, fetchApi } from "@/lib/useApi"
-import { toast } from "sonner"
-import { Briefcase, Building, Plus, Users, Target, Search, X, Loader2 } from "lucide-react"
+import { useState } from  "react"
+import { useApi, fetchApi } from  "@/lib/useApi"
+import { toast } from  "sonner"
+import { Briefcase, Building, Plus, Users, Target, Search, X, Loader2 } from  "lucide-react"
 
 export default function PlacementEngine() {
   const { data: companies, mutate: refreshCompanies } = useApi<any[]>("/academy/placements/companies")

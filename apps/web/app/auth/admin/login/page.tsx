@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useEffect } from  "react"
+import { useRouter } from  "next/navigation"
 import SuperAdminLoginPage from "../../../super-admin/login/page"
 
 export default function AdminLoginRedirect() {

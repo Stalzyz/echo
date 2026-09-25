@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { CheckCircle2, Loader2, GraduationCap, Star, Building2, HelpCircle, BookOpen, Compass } from "lucide-react"
-import { fetchApi } from "@/lib/useApi"
+import { useState } from  "react"
+import { CheckCircle2, Loader2, GraduationCap, Star, Building2, HelpCircle, BookOpen, Compass } from  "lucide-react"
+import { fetchApi } from  "@/lib/useApi"
 
 const INTERESTS = [
   "Graphic Design", "UI/UX Design", "Web Development",

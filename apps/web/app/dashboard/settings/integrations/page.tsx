@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
-import { Plug, Zap, Video, Mail, CreditCard, Save, CheckCircle2, Webhook, Plus, Trash2, Loader2, Eye, EyeOff, X, KeyRound, Send, Copy, AlertCircle, RefreshCw } from "lucide-react"
+import { useState, useEffect, useCallback } from  "react"
+import { Plug, Workflow, Video, Mail, CreditCard, Save, CheckCircle2, Webhook, Plus, Trash2, Loader2, Eye, EyeOff, X, KeyRound, Send, Copy, AlertCircle, RefreshCw } from  "lucide-react"
 
 type Service = "RAZORPAY" | "PHONEPE" | "STRIPE" | "SMTP" | "WHATSAPP" | "META" | "FIREBASE" | "GOOGLE" | "ZOOM"
 
@@ -29,8 +29,8 @@ const SERVICE_META: Record<Service, { label: string; icon: any; color: string; b
   PHONEPE:   { label: "PhonePe",   icon: CreditCard, color: "text-violet-400", bg: "bg-violet-500/10",  border: "border-violet-500/20",  desc: "UPI payment collection" },
   STRIPE:    { label: "Stripe",    icon: CreditCard, color: "text-blue-400",   bg: "bg-blue-500/10",    border: "border-blue-500/20",    desc: "International card payments" },
   SMTP:      { label: "SMTP",      icon: Mail,       color: "text-cyan-400",   bg: "bg-cyan-500/10",    border: "border-cyan-500/20",    desc: "Transactional email delivery" },
-  WHATSAPP:  { label: "WhatsApp",  icon: Zap,        color: "text-emerald-400",bg: "bg-emerald-500/10", border: "border-emerald-500/20", desc: "WhatsApp Business API & Grafty Autopilot" },
-  META:      { label: "Meta Leads & Ads", icon: Zap,  color: "text-blue-500",   bg: "bg-blue-500/10",    border: "border-blue-500/20",    desc: "Facebook & Instagram Lead Ads Auto-Sync" },
+  WHATSAPP:  { label: "WhatsApp",  icon: Workflow,        color: "text-emerald-400",bg: "bg-emerald-500/10", border: "border-emerald-500/20", desc: "WhatsApp Business API & Grafty Autopilot" },
+  META:      { label: "Meta Leads & Ads", icon: Workflow,  color: "text-blue-500",   bg: "bg-blue-500/10",    border: "border-blue-500/20",    desc: "Facebook & Instagram Lead Ads Auto-Sync" },
   FIREBASE:  { label: "Firebase SMS & Auth", icon: KeyRound, color: "text-amber-500", bg: "bg-amber-500/10", border: "border-amber-500/20", desc: "Firebase Phone Auth SMS OTP & OAuth Provider" },
   GOOGLE:    { label: "Google",    icon: Video,      color: "text-red-400",    bg: "bg-red-500/10",     border: "border-red-500/20",     desc: "OAuth, Meet & Calendar integrations" },
   ZOOM:      { label: "Zoom",      icon: Video,      color: "text-sky-400",    bg: "bg-sky-500/10",     border: "border-sky-500/20",     desc: "Zoom Meetings & Webinars OAuth API" },
@@ -483,7 +483,7 @@ export default function IntegrationsDashboard() {
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="font-bold text-foreground text-base flex items-center gap-2">
-                      <Zap className="w-5 h-5 text-emerald-500" /> WhatsApp & Meta Direct Cloud Diagnostics
+                      <Workflow className="w-5 h-5 text-emerald-500" /> WhatsApp & Meta Direct Cloud Diagnostics
                     </h3>
                     <p className="text-xs text-muted-foreground mt-1">
                       Test Meta Graph API & Grafty WhatsApp credentials to verify phone number ID and WABA connection.
@@ -597,7 +597,7 @@ export default function IntegrationsDashboard() {
               <div className="flex items-start justify-between">
                 <div>
                   <h3 className="font-bold text-blue-300 text-base flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-blue-400" /> Meta Lead Ads Callback URL (Facebook & Instagram)
+                    <Workflow className="w-5 h-5 text-blue-400" /> Meta Lead Ads Callback URL (Facebook & Instagram)
                   </h3>
                   <p className="text-xs text-blue-200/70 mt-1">
                     Copy this Webhook URL into Facebook Developers Console → App → Webhooks → Leadgen.

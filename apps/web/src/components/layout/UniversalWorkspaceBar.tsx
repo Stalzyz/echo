@@ -1,8 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Building, GraduationCap, Video, ShieldCheck, ChevronRight } from "lucide-react"
+import { usePathname } from  "next/navigation"
+import { Building, GraduationCap, Video, ShieldCheck, ChevronRight } from  "lucide-react"
 
 export function UniversalWorkspaceBar() {
   const pathname = usePathname()

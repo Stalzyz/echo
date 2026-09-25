@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { Cloud, BookOpen, PenTool, X, TrendingUp, Wrench, Image as ImageIcon, Briefcase, Target, Star } from "lucide-react";
+import { useRef } from  "react";
+import { motion, useScroll, useTransform } from  "framer-motion";
+import { Cloud, BookOpen, PenTool, X, TrendingUp, Wrench, Image as ImageIcon, Briefcase, Target, Star } from  "lucide-react";
 
 const journeySteps = [
   { icon: Cloud, label: "Dream" },

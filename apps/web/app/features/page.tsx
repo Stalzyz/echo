@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Shield, Zap, Users, BookOpen, CreditCard, MessageSquare, CheckCircle2, ArrowRight } from "lucide-react"
+import { Shield, Workflow, Users, BookOpen, CreditCard, MessageSquare, CheckCircle2, ArrowRight } from  "lucide-react"
 
 export default function FeaturesPage() {
   return (
@@ -48,7 +48,7 @@ export default function FeaturesPage() {
             items: ["Custom Subdomains & Domains", "Separate Student Databases", "Role-Based Access Control"]
           },
           {
-            icon: Zap,
+            icon: Workflow,
             title: "Meta & Lead Ads Automation",
             desc: "Direct Facebook & Instagram Lead Ads integration. Leads flow into CRM instantly with auto-responder triggers.",
             items: ["Meta Graph API Webhook", "Instant CRM Assignment", "Lead Leadgen Field Mapping"]
@@ -72,7 +72,7 @@ export default function FeaturesPage() {
             items: ["Razorpay & PhonePe Gateways", "Automated PDF Invoices", "Payment Link Sharing"]
           },
           {
-            icon: Zap,
+            icon: Workflow,
             title: "Public Certificate Verification",
             desc: "Every issued certificate gets a public tamper-proof verification URL for employer verification.",
             items: ["QR Code Credential Verification", "Public Verifier Portal", "Custom Academy Badging"]

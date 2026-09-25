@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { toast } from "sonner"
-import { Plus, Ticket, Copy, Percent, Tag, Check, Calendar, Trash2, Search } from "lucide-react"
+import { useState } from  "react"
+import { toast } from  "sonner"
+import { Plus, Ticket, Copy, Percent, Tag, Check, Calendar, Trash2, Search } from  "lucide-react"
 
 interface Coupon {
   id: string

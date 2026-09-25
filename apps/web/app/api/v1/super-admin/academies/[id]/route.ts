@@ -1,6 +1,6 @@
-import { prisma } from "@/lib/prisma"
-import { NextResponse } from "next/server"
-import { auth } from "@/auth"
+import { prisma } from  "@/lib/prisma"
+import { NextResponse } from  "next/server"
+import { auth } from  "@/auth"
 
 // DELETE /api/v1/super-admin/academies/[id] - Permanently delete an academy vendor with full cascade
 export async function DELETE(

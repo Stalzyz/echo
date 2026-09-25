@@ -1,13 +1,9 @@
 "use client"
 
 import React, { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { 
-  X, Zap, MessageSquare, Mail, Send, CheckCircle2, 
-  Smartphone, Clock, Sparkles, Bell, ArrowRight, ToggleLeft, ToggleRight,
-  FileText, ShieldCheck, Play
-} from "lucide-react"
-import { toast } from "sonner"
+import { motion, AnimatePresence } from  "framer-motion"
+import { X, Workflow, MessageSquare, Mail, Send, CheckCircle2, Smartphone, Clock, Bell, ArrowRight, ToggleLeft, ToggleRight, FileText, ShieldCheck, Play } from  "lucide-react"
+import { toast } from  "sonner"
 
 export interface AutomationTrigger {
   id: string
@@ -113,7 +109,7 @@ export function AutomationTriggersModal({ isOpen, onClose }: AutomationTriggersM
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-teal-500 text-white flex items-center justify-center shadow-xs">
-              <Zap className="w-5 h-5" />
+              <Workflow className="w-5 h-5" />
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
@@ -159,7 +155,7 @@ export function AutomationTriggersModal({ isOpen, onClose }: AutomationTriggersM
                         t.channel === "EMAIL" ? "bg-blue-50 text-blue-600" : "bg-purple-50 text-purple-600"
                       }`}>
                         {t.channel === "WHATSAPP" ? <MessageSquare className="w-4 h-4" /> :
-                         t.channel === "EMAIL" ? <Mail className="w-4 h-4" /> : <Zap className="w-4 h-4" />}
+                         t.channel === "EMAIL" ? <Mail className="w-4 h-4" /> : <Workflow className="w-4 h-4" />}
                       </div>
                       <div className="truncate">
                         <p className={`text-xs font-bold truncate ${isActive ? "text-slate-900" : "text-slate-700"}`}>
@@ -184,7 +180,7 @@ export function AutomationTriggersModal({ isOpen, onClose }: AutomationTriggersM
             <div className="pt-4 px-2">
               <div className="p-3.5 rounded-2xl bg-teal-50/70 border border-teal-200/80 text-teal-950 space-y-1 text-xs">
                 <p className="font-bold flex items-center gap-1 text-teal-900">
-                  <Sparkles className="w-3.5 h-3.5 text-teal-600" /> Supported Variables
+                  <CheckCircle2 className="w-3.5 h-3.5 text-teal-600" /> Supported Variables
                 </p>
                 <p className="text-[11px] text-teal-800 leading-relaxed font-mono">
                   {"{{student_name}}, {{course_name}}, {{payment_link}}, {{campus_map_link}}"}
