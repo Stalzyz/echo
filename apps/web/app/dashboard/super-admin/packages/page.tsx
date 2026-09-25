@@ -16,18 +16,44 @@ export interface PlatformModule {
 }
 
 export const ALL_PLATFORM_MODULES: PlatformModule[] = [
-  { key: "coreLms", name: "Core LMS & Course Studio", category: "Core", description: "Video hosting, DRM player, lesson builder & attachments" },
-  { key: "studentPortal", name: "Student Portal & Mobile App", category: "Core", description: "PWA app, push alerts & offline downloads" },
-  { key: "webinars", name: "Webinars & Conversion Funnels", category: "Engagement", description: "Live streams, Timed Pitch CTAs & 24/7 Evergreen loops" },
-  { key: "whatsappAuto", name: "WhatsApp 1-Tap Automation", category: "Automation", description: "Broadcasts, automated reminders & Official WABA API" },
-  { key: "emailMarketing", name: "Email Drip & Sequences", category: "Automation", description: "Custom SMTP, drip sequences & lead nurturing" },
-  { key: "whitelabel", name: "Custom Domain & Whitelabel", category: "Growth", description: "Custom CNAME SSL & remove echo branding" },
-  { key: "feesEmi", name: "Student Fees & Automated EMI", category: "Core", description: "Automated payment reminders, EMI rules & GST receipts" },
-  { key: "mentorship", name: "1-on-1 Mentorship & Booking", category: "Engagement", description: "Slot booking calendar & 1-on-1 consultation video rooms" },
-  { key: "walkInKiosk", name: "Offline Walk-in & Kiosk CRM", category: "Growth", description: "QR code attendance, branch CRM & offline receipt printing" },
-  { key: "referrals", name: "Affiliate & Student Referrals", category: "Growth", description: "Student ambassador portal & commission payout engine" },
-  { key: "certificates", name: "AI Certificate Generator", category: "Engagement", description: "Custom designer & public QR verification portal" },
-  { key: "customPaymentGateway", name: "Custom Payment Gateway / Link", category: "Automation", description: "Custom Razorpay/UPI/WhatsApp checkout link support" }
+  // Core & Studio
+  { key: "coreLms", name: "Core LMS & Course Studio", category: "Core", description: "Video hosting, DRM player, lesson builder & curriculum uploads" },
+  { key: "studentPortal", name: "Student Portal & Digital ID", category: "Core", description: "Mobile-optimized student portal, assignments & digital passport" },
+  { key: "quizBuilder", name: "Quizzes & Timed Assessments", category: "Core", description: "MCQ assessments, question banks & automatic scorecard generation" },
+  { key: "certificates", name: "Verifiable PDF Certificates", category: "Core", description: "Automated certificate generator with public QR verification links" },
+  { key: "feesEmi", name: "Fee Invoicing & EMI Plans", category: "Core", description: "Automated payment schedules, GST receipts & installment tracking" },
+  { key: "customPaymentGateway", name: "Direct Payment Gateway", category: "Core", description: "Connect own Razorpay / Stripe credentials (0% platform commission)" },
+  
+  // Marketing & Ads Engine
+  { key: "metaAdsSync", name: "Meta Ads CRM Bridge (FB/IG)", category: "Growth", description: "Auto-sync Facebook & Instagram Lead Ads to CRM with instant routing" },
+  { key: "googleAdsSync", name: "Google Ads & Conversion Sync", category: "Growth", description: "Direct webhook listener for Google Search/PMax leads & conversion API" },
+  { key: "landingPages", name: "Storefront & Theme Builder", category: "Growth", description: "Custom academy homepage, course storefront & landing page funnels" },
+  { key: "referrals", name: "Affiliate & Student Referrals", category: "Growth", description: "Student ambassador links, coupon reward tracking & payouts" },
+  { key: "marketplace", name: "Course Marketplace", category: "Growth", description: "Public course catalog to sell digital masterclasses & study material" },
+
+  // Communications & Telephony
+  { key: "callIntelligence", name: "Call Intelligence & Telephony", category: "Automation", description: "Browser click-to-call, call recording, AI transcripts & sentiment analysis" },
+  { key: "whatsappAuto", name: "WhatsApp 1-Tap Cloud API", category: "Automation", description: "Official WABA broadcasts, fee due reminders & attendance alerts" },
+  { key: "emailMarketing", name: "Visual Drip Email Sequences", category: "Automation", description: "Drag-and-drop workflow visual automation & drip email campaigns" },
+
+  // Admissions & Operations
+  { key: "crmPipelines", name: "Admissions CRM & Form Builder", category: "Core", description: "Kanban lead stage tracker, custom lead capture forms & demo booking" },
+  { key: "walkInKiosk", name: "Campus Reception Walk-in Kiosk", category: "Engagement", description: "Tablet kiosk mode for physical visitors, OTP check-in & routing" },
+  { key: "attendanceScanner", name: "Smart QR Attendance Scanner", category: "Core", description: "Fast QR code attendance check-in for students and campus faculty" },
+
+  // Live Streaming & Mentorship
+  { key: "webinars", name: "Interactive Live Webinars", category: "Engagement", description: "WebRTC live streams, pitch CTAs, live chat & evergreen replays" },
+  { key: "mentorship", name: "1:1 Mentorship & Office Hours", category: "Engagement", description: "Instructor calendar booking, 1:1 paid consulting & doubt rooms" },
+
+  // AI & Analytics
+  { key: "aiLessonWriter", name: "AI Studio Course Generator", category: "Automation", description: "LLM-powered course syllabus drafting & instant quiz question writer" },
+  { key: "aiRiskEngine", name: "AI Dropout & Payment Risk", category: "Growth", description: "Predictive early warning for student dropouts and overdue payments" },
+
+  // Enterprise & Whitelabel
+  { key: "whitelabel", name: "Full Whitelabel & Branding", category: "Growth", description: "Remove 'Powered by ECHO', custom logo, colors & theme CSS" },
+  { key: "customDomain", name: "Custom Domain Mapping (SSL)", category: "Growth", description: "Host academy on custom domain (e.g. learn.myacademy.com) with SSL" },
+  { key: "apiAccess", name: "Developer REST API & Webhooks", category: "Automation", description: "API keys, programmatic batch creation & raw webhook streaming" },
+  { key: "multiBranch", name: "Multi-Branch Management", category: "Growth", description: "Manage multiple regional campus branches under a single master org" },
 ]
 
 export interface PackagePlan {

@@ -5,8 +5,12 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 export interface PlanFeatureMap {
   coreLms?: boolean
   studentPortal?: boolean
+  quizBuilder?: boolean
   feesEmi?: boolean
   certificates?: boolean
+  metaAdsSync?: boolean
+  googleAdsSync?: boolean
+  landingPages?: boolean
   whatsappAuto?: boolean
   emailMarketing?: boolean
   webinars?: boolean
@@ -15,12 +19,15 @@ export interface PlanFeatureMap {
   walkInKiosk?: boolean
   referrals?: boolean
   customPaymentGateway?: boolean
+  marketplace?: boolean
   crmPipelines?: boolean
   attendanceScanner?: boolean
   aiLessonWriter?: boolean
+  aiRiskEngine?: boolean
   callIntelligence?: boolean
   customDomain?: boolean
   apiAccess?: boolean
+  multiBranch?: boolean
   [key: string]: boolean | undefined
 }
 

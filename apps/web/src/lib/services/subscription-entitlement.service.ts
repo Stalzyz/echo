@@ -4,8 +4,12 @@ import { SubscriptionStatus, BillingCycle, SubscriptionInvoiceStatus, PaymentSta
 export interface PlanFeatureMap {
   coreLms?: boolean
   studentPortal?: boolean
+  quizBuilder?: boolean
   feesEmi?: boolean
   certificates?: boolean
+  metaAdsSync?: boolean
+  googleAdsSync?: boolean
+  landingPages?: boolean
   whatsappAuto?: boolean
   emailMarketing?: boolean
   webinars?: boolean
@@ -14,12 +18,15 @@ export interface PlanFeatureMap {
   walkInKiosk?: boolean
   referrals?: boolean
   customPaymentGateway?: boolean
+  marketplace?: boolean
   crmPipelines?: boolean
   attendanceScanner?: boolean
   aiLessonWriter?: boolean
+  aiRiskEngine?: boolean
   callIntelligence?: boolean
   customDomain?: boolean
   apiAccess?: boolean
+  multiBranch?: boolean
   [key: string]: boolean | undefined
 }
 
@@ -72,11 +79,15 @@ export const DEFAULT_SAAS_PLANS = [
     features: {
       coreLms: true,
       studentPortal: true,
+      quizBuilder: true,
       feesEmi: true,
       certificates: true,
       customPaymentGateway: true,
       crmPipelines: true,
       attendanceScanner: true,
+      metaAdsSync: false,
+      googleAdsSync: false,
+      landingPages: false,
       whatsappAuto: false,
       emailMarketing: false,
       webinars: false,
@@ -84,16 +95,20 @@ export const DEFAULT_SAAS_PLANS = [
       mentorship: false,
       walkInKiosk: false,
       referrals: false,
+      marketplace: false,
       aiLessonWriter: false,
+      aiRiskEngine: false,
       callIntelligence: false,
-      customDomain: false
+      customDomain: false,
+      apiAccess: false,
+      multiBranch: false
     }
   },
   {
     id: "plan-growth",
     slug: "growth-institute",
     name: "GROWTH INSTITUTE",
-    description: "For expanding institutes that need WhatsApp automation, CRM pipelines & AI lesson writers.",
+    description: "For expanding institutes that need WhatsApp automation, Meta/Google Ads sync, CRM pipelines & AI lesson writers.",
     billingType: "RECURRING",
     monthlyPrice: 3999,
     yearlyPrice: 49999,
@@ -122,28 +137,36 @@ export const DEFAULT_SAAS_PLANS = [
     features: {
       coreLms: true,
       studentPortal: true,
+      quizBuilder: true,
       feesEmi: true,
       certificates: true,
       customPaymentGateway: true,
+      crmPipelines: true,
+      attendanceScanner: true,
+      metaAdsSync: true,
+      googleAdsSync: true,
+      landingPages: true,
       whatsappAuto: true,
       emailMarketing: true,
       webinars: true,
       whitelabel: true,
       mentorship: true,
       referrals: true,
-      crmPipelines: true,
-      attendanceScanner: true,
+      marketplace: true,
       aiLessonWriter: true,
+      aiRiskEngine: true,
       callIntelligence: true,
       customDomain: true,
-      walkInKiosk: false
+      walkInKiosk: false,
+      apiAccess: false,
+      multiBranch: false
     }
   },
   {
     id: "plan-enterprise",
     slug: "enterprise-multi-branch",
     name: "ENTERPRISE PRO",
-    description: "Complete unconstrained platform suite with full whitelabeling, multi-branch & unlimited capacity.",
+    description: "Complete unconstrained platform suite with full whitelabeling, multi-branch, walk-in kiosks & unlimited capacity.",
     billingType: "RECURRING",
     monthlyPrice: 7999,
     yearlyPrice: 99999,
@@ -172,9 +195,15 @@ export const DEFAULT_SAAS_PLANS = [
     features: {
       coreLms: true,
       studentPortal: true,
+      quizBuilder: true,
       feesEmi: true,
       certificates: true,
       customPaymentGateway: true,
+      crmPipelines: true,
+      attendanceScanner: true,
+      metaAdsSync: true,
+      googleAdsSync: true,
+      landingPages: true,
       whatsappAuto: true,
       emailMarketing: true,
       webinars: true,
@@ -182,12 +211,13 @@ export const DEFAULT_SAAS_PLANS = [
       mentorship: true,
       walkInKiosk: true,
       referrals: true,
-      crmPipelines: true,
-      attendanceScanner: true,
+      marketplace: true,
       aiLessonWriter: true,
+      aiRiskEngine: true,
       callIntelligence: true,
       customDomain: true,
-      apiAccess: true
+      apiAccess: true,
+      multiBranch: true
     }
   }
 ]

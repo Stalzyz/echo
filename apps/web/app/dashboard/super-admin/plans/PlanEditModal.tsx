@@ -311,16 +311,16 @@ export function PlanEditModal({
             </div>
           </div>
 
-          {/* Module Access Controls (12 modules) */}
+          {/* Module Access Controls */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-800">Enabled SaaS Modules (12-Module Matrix)</label>
+              <label className="text-xs font-bold text-slate-800">Enabled SaaS Modules ({ALL_PLATFORM_MODULES.length}-Module Matrix)</label>
               <span className="text-[11px] font-bold text-teal-700">
                 {Object.values(formData.enabledModules).filter(Boolean).length} / {ALL_PLATFORM_MODULES.length} Active
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto custom-scrollbar p-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto custom-scrollbar p-1">
               {ALL_PLATFORM_MODULES.map(m => {
                 const isActive = !!formData.enabledModules[m.key]
                 return (

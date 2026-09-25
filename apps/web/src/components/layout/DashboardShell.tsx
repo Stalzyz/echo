@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation"
 import { TopNav } from "@/components/layout/TopNav"
 import { AppSidebar } from "@/components/layout/AppSidebar"
+import { UpgradePlanModal } from "@/components/subscription/UpgradePlanModal"
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -11,7 +12,12 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const isStudio = pathname?.startsWith("/dashboard/studio")
 
   if (isStudio) {
-    return <div className="min-h-screen w-full bg-slate-50">{children}</div>
+    return (
+      <div className="min-h-screen w-full bg-slate-50">
+        {children}
+        <UpgradePlanModal />
+      </div>
+    )
   }
 
   return (
@@ -26,6 +32,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
+
+      {/* Global Interactive Upgrade Modal */}
+      <UpgradePlanModal />
     </div>
   )
 }

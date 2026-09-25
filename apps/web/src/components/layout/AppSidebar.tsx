@@ -40,6 +40,9 @@ import {
   BarChart3,
   LogOut,
   Phone,
+  Lock,
+  Sparkles,
+  Zap,
 } from "lucide-react";
 
 interface SidebarItem {
@@ -48,7 +51,8 @@ interface SidebarItem {
   icon: React.ElementType;
   badge?: string;
   requiredModule?: string;
-  children?: { title: string; href: string; icon?: React.ElementType; requiredModule?: string }[];
+  isLocked?: boolean;
+  children?: { title: string; href: string; icon?: React.ElementType; requiredModule?: string; isLocked?: boolean }[];
 }
 
 const superAdminSidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
@@ -89,6 +93,18 @@ const sidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
         href: "/dashboard/academy/admissions",
         icon: Users,
         requiredModule: "crmPipelines",
+      },
+      {
+        title: "Meta Ads CRM Bridge",
+        href: "/dashboard/settings/integrations?tab=meta",
+        icon: Zap,
+        requiredModule: "metaAdsSync",
+      },
+      {
+        title: "Google Ads Lead Sync",
+        href: "/dashboard/settings/integrations?tab=google",
+        icon: Globe,
+        requiredModule: "googleAdsSync",
       },
       {
         title: "Call Intelligence",
@@ -175,6 +191,12 @@ const sidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
         requiredModule: "coreLms",
       },
       {
+        title: "Course Marketplace",
+        href: "/dashboard/academy/marketplace",
+        icon: Layers,
+        requiredModule: "marketplace",
+      },
+      {
         title: "Webinars & Funnels",
         href: "/dashboard/academy/webinars",
         icon: Video,
@@ -199,6 +221,12 @@ const sidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
         requiredModule: "whatsappAuto",
       },
       {
+        title: "Storefront Theme",
+        href: "/dashboard/website/theme",
+        icon: Palette,
+        requiredModule: "whitelabel",
+      },
+      {
         title: "Referrals & Rewards",
         href: "/dashboard/academy/referrals",
         icon: Award,
@@ -208,7 +236,7 @@ const sidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
         title: "AI Risk Engine",
         href: "/dashboard/academy/risk",
         icon: ShieldAlert,
-        requiredModule: "callIntelligence",
+        requiredModule: "aiRiskEngine",
       },
       {
         title: "Global Leaderboard",
@@ -354,6 +382,17 @@ export function AppSidebar() {
 
   const plan = usePlan();
 
+  const handleLockedClick = (title: string, requiredModule?: string) => {
+    window.dispatchEvent(
+      new CustomEvent("open-upgrade-modal", {
+        detail: {
+          featureKey: requiredModule,
+          featureTitle: title,
+        },
+      })
+    );
+  };
+
   const activeGroups = isSuperAdminRoute
     ? superAdminSidebarGroups
     : sidebarGroups
@@ -361,19 +400,22 @@ export function AppSidebar() {
           ...g,
           items: g.items
             .filter((item) => {
-              if (item.requiredModule && !plan.hasFeature(item.requiredModule)) return false;
               if (item.requiredModule && org?.enabledModules && Array.isArray(org.enabledModules)) {
                 return org.enabledModules.includes(item.requiredModule);
               }
               return true;
             })
             .map((item) => {
-              if (!item.children) return item;
+              const isItemLocked = item.requiredModule ? !plan.hasFeature(item.requiredModule) : false;
               return {
                 ...item,
-                children: item.children.filter((sub) => {
-                  if (sub.requiredModule && !plan.hasFeature(sub.requiredModule)) return false;
-                  return true;
+                isLocked: isItemLocked,
+                children: item.children?.map((sub) => {
+                  const isSubLocked = sub.requiredModule ? !plan.hasFeature(sub.requiredModule) : false;
+                  return {
+                    ...sub,
+                    isLocked: isSubLocked,
+                  };
                 }),
               };
             }),
@@ -448,6 +490,7 @@ export function AppSidebar() {
               const Icon = item.icon;
               const hasChildren = item.children && item.children.length > 0;
               const isSubOpen = openGroups[item.title];
+              const isLocked = item.isLocked;
 
               return (
                 <div key={item.title} className="space-y-1">
@@ -466,6 +509,26 @@ export function AppSidebar() {
                       <ChevronDown
                         className={cn("w-3.5 h-3.5 transition-transform", isSubOpen && "rotate-180")}
                       />
+                    </button>
+                  ) : isLocked ? (
+                    <button
+                      type="button"
+                      onClick={() => handleLockedClick(item.title, item.requiredModule)}
+                      title={isCollapsed ? `🔒 ${item.title} (Requires Upgrade)` : undefined}
+                      className={cn(
+                        "w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all group relative cursor-pointer",
+                        "text-slate-400 hover:text-slate-800 hover:bg-amber-50/60 border border-transparent hover:border-amber-200/60"
+                      )}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <Icon className="w-4 h-4 shrink-0 text-slate-400 group-hover:text-amber-600 transition-colors" />
+                        {!isCollapsed && <span className="truncate">{item.title}</span>}
+                      </div>
+                      {!isCollapsed && (
+                        <span className="flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-amber-800 bg-amber-100/90 px-1.5 py-0.5 rounded-md border border-amber-300 shrink-0">
+                          <Lock className="w-2.5 h-2.5" /> PRO
+                        </span>
+                      )}
                     </button>
                   ) : (
                     <Link
@@ -494,6 +557,21 @@ export function AppSidebar() {
                     <div className="pl-7 space-y-1 pt-1 border-l-2 border-slate-100 ml-5">
                       {item.children?.map((sub) => {
                         const isSubActive = pathname === sub.href;
+                        if (sub.isLocked) {
+                          return (
+                            <button
+                              key={sub.href}
+                              type="button"
+                              onClick={() => handleLockedClick(sub.title, sub.requiredModule)}
+                              className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-800 hover:bg-amber-50/50 transition-all cursor-pointer group"
+                            >
+                              <span className="truncate">{sub.title}</span>
+                              <span className="text-[9px] font-black uppercase text-amber-800 bg-amber-100/90 px-1 py-0.2 rounded border border-amber-300 flex items-center gap-0.5">
+                                <Lock className="w-2.5 h-2.5" />
+                              </span>
+                            </button>
+                          );
+                        }
                         return (
                           <Link
                             key={sub.href}
