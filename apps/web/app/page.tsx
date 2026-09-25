@@ -1,111 +1,20 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import {
-  GraduationCap, Users, Bot, MessageSquare, CreditCard,
-  BarChart3, CheckCircle2, ArrowRight, Play, ChevronDown, ChevronUp,
-  Globe, Shield, Zap, Video, Check, Laptop, Layers, Calendar, Clock,
-  Lock, Sliders, Search, Award, RefreshCw, FileText, Send, Building2,
-  BookOpen, CheckSquare, PhoneCall, Workflow, ExternalLink, Mail, MapPin, Phone,
-  Sparkles, Megaphone, Smartphone, HelpCircle, FileCheck, ShieldCheck, Database,
-  TrendingUp, Star, Radio, Mic, Server, LayoutDashboard, QrCode, Receipt
+  Users, Bot, MessageSquare, ArrowRight, Play, ChevronDown, ChevronUp,
+  Globe, Video, Laptop, BookOpen, PhoneCall, Workflow, ExternalLink, Mail, MapPin, Phone,
+  Sparkles, Megaphone, CheckCircle2, QrCode, Receipt, Mic
 } from "lucide-react"
 import { toast } from "sonner"
 import { DemoLoginModal } from "@/components/auth/DemoLoginModal"
 
-interface Plan {
-  id: string
-  name: string
-  monthlyPrice: number
-  yearlyPrice: number
-  freeTrialDays: number
-  studentLimit: number | string
-  instructorLimit: number | string
-  courseLimit: number | string
-  storageLimitGB: number | string
-  features: string[]
-  status: "ACTIVE" | "DISABLED"
-  popular?: boolean
-}
-
-const DEFAULT_HOMEPAGE_PLANS: Plan[] = [
-  {
-    id: "plan-starter",
-    name: "STARTER ACADEMY",
-    monthlyPrice: 999,
-    yearlyPrice: 9990,
-    freeTrialDays: 14,
-    studentLimit: 500,
-    instructorLimit: 5,
-    courseLimit: 15,
-    storageLimitGB: 50,
-    features: [
-      "Up to 500 Active Students",
-      "5 Educator & Staff Accounts",
-      "Courses, Quizzes & Video Player",
-      "Admissions CRM & Lead Tracker",
-      "Razorpay, PhonePe & Stripe Integration",
-      "Basic WhatsApp & Email Alerts"
-    ],
-    status: "ACTIVE"
-  },
-  {
-    id: "plan-growth",
-    name: "GROWTH INSTITUTE",
-    monthlyPrice: 2499,
-    yearlyPrice: 24990,
-    freeTrialDays: 14,
-    studentLimit: 2500,
-    instructorLimit: 20,
-    courseLimit: 50,
-    storageLimitGB: 250,
-    features: [
-      "Up to 2,500 Active Students",
-      "20 Educator & Staff Accounts",
-      "Meta Ads & Google Ads Direct Webhook Sync",
-      "WhatsApp Cloud API Drips & Fee Reminders",
-      "Call Intelligence & Audio Audit Logs",
-      "Zoom & Google Meet Live Class Automation",
-      "Automated EMI Invoicing & GST Tax Receipts",
-      "QR Attendance Biometrics & Student Passport",
-      "Custom Domain (CNAME) & White-Label"
-    ],
-    status: "ACTIVE",
-    popular: true
-  },
-  {
-    id: "plan-enterprise",
-    name: "ENTERPRISE MULTI-BRANCH",
-    monthlyPrice: 9999,
-    yearlyPrice: 99990,
-    freeTrialDays: 30,
-    studentLimit: "Unlimited",
-    instructorLimit: "Unlimited",
-    courseLimit: "Unlimited",
-    storageLimitGB: "Unlimited",
-    features: [
-      "Unlimited Students & Multi-Branch Campuses",
-      "AI Student Drop-out Risk Predictive Engine",
-      "Front-Desk Walk-Ins QR Kiosk Station",
-      "Dedicated High-Performance Database Pod",
-      "Bi-Directional Google Sheets 2-Way Pipeline",
-      "Custom SSO, SAML & Active Directory Auth",
-      "White-Glove Data Migration & 24/7 SLA"
-    ],
-    status: "ACTIVE"
-  }
-]
-
 export default function PublicHomePage() {
-  const [activeJourneyStep, setActiveJourneyStep] = useState<number>(0)
-  const [activeWorkflowTab, setActiveWorkflowTab] = useState<"lead" | "payment" | "inactive" | "completion">("lead")
   const [openFaq, setOpenFaq] = useState<number | null>(0)
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false)
-  const [plans, setPlans] = useState<Plan[]>(DEFAULT_HOMEPAGE_PLANS)
-  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly")
 
-  // Contact / Pricing Form State
+  // Contact / Pricing Lead Form State
   const [inquiryForm, setInquiryForm] = useState({
     name: "",
     academyName: "",
@@ -115,17 +24,6 @@ export default function PublicHomePage() {
     message: ""
   })
   const [isSubmittingInquiry, setIsSubmittingInquiry] = useState(false)
-
-  useEffect(() => {
-    fetch("/api/v1/plans")
-      .then(res => res.json())
-      .then(data => {
-        if (data && Array.isArray(data.plans) && data.plans.length > 0) {
-          setPlans(data.plans)
-        }
-      })
-      .catch(() => {})
-  }, [])
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index)
@@ -145,18 +43,11 @@ export default function PublicHomePage() {
         studentVolume: "100-500",
         message: ""
       })
-    }, 900)
-  }
-
-  const scrollToPricing = () => {
-    const el = document.getElementById("pricing-section")
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" })
-    }
+    }, 800)
   }
 
   const scrollToForm = () => {
-    const el = document.getElementById("contact-inquiry-form")
+    const el = document.getElementById("pricing-inquiry-form")
     if (el) {
       el.scrollIntoView({ behavior: "smooth" })
     }
@@ -187,18 +78,11 @@ export default function PublicHomePage() {
             <a href="#ecosystem" className="hover:text-teal-700 transition-colors">Ecosystem</a>
             <a href="#integrations" className="hover:text-teal-700 transition-colors">Integrations</a>
             <a href="#modules" className="hover:text-teal-700 transition-colors">Modules</a>
-            <a href="#pricing-section" className="hover:text-teal-700 transition-colors">Pricing</a>
             <a href="#about-grekam" className="hover:text-teal-700 transition-colors">About Grekam</a>
             <a href="#faq" className="hover:text-teal-700 transition-colors">FAQ</a>
           </nav>
 
-          <div className="flex items-center gap-2.5">
-            <button
-              onClick={scrollToPricing}
-              className="hidden sm:inline-flex px-3.5 py-2 rounded-xl text-slate-700 hover:text-slate-950 text-xs font-bold transition-all"
-            >
-              View Prices
-            </button>
+          <div className="flex items-center gap-3">
             <Link 
               href="/auth/login" 
               className="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-900 text-xs font-bold transition-all"
@@ -207,7 +91,7 @@ export default function PublicHomePage() {
             </Link>
             <button 
               onClick={() => setIsDemoModalOpen(true)}
-              className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
+              className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Live Demo
@@ -224,25 +108,21 @@ export default function PublicHomePage() {
           
           {/* Left Column (Content) */}
           <div className="lg:col-span-6 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-900 text-xs font-bold shadow-2xs">
-              <span className="w-2.5 h-2.5 rounded-full bg-teal-600 animate-pulse" />
-              <span>echo • ACADEMY OPERATING SYSTEM BY GREKAM</span>
-            </div>
+            
+            {/* Clean Subtitle - Without rounded pill, box, or circle icons */}
+            <p className="text-xs sm:text-sm font-bold text-teal-700 tracking-wider uppercase">
+              echo • ACADEMY OPERATING SYSTEM BY GREKAM
+            </p>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.08]">
               YOUR ACADEMY.<br />
               <span className="text-teal-600">ONE CONNECTED SYSTEM.</span>
             </h1>
 
-            <div className="flex flex-wrap items-center gap-2 text-sm sm:text-base font-bold text-teal-700">
-              <span className="bg-teal-50 px-2.5 py-0.5 rounded-md border border-teal-100">Teach.</span>
-              <span className="text-slate-300">•</span>
-              <span className="bg-teal-50 px-2.5 py-0.5 rounded-md border border-teal-100">Manage.</span>
-              <span className="text-slate-300">•</span>
-              <span className="bg-teal-50 px-2.5 py-0.5 rounded-md border border-teal-100">Sell.</span>
-              <span className="text-slate-300">•</span>
-              <span className="bg-teal-50 px-2.5 py-0.5 rounded-md border border-teal-100">Grow.</span>
-            </div>
+            {/* Clean subtext without rounded boxes */}
+            <p className="text-base sm:text-lg font-bold text-teal-700 tracking-wide">
+              Teach. &bull; Manage. &bull; Sell. &bull; Grow.
+            </p>
 
             <p className="text-sm sm:text-base text-slate-600 font-normal leading-relaxed max-w-xl">
               <strong>echo</strong> brings your courses, students, educators, live classes, Meta & Google lead ingestion, Call Intelligence, automated WhatsApp communication, EMI invoicing and academy website into one connected platform.
@@ -264,10 +144,10 @@ export default function PublicHomePage() {
               </button>
 
               <button 
-                onClick={scrollToPricing}
+                onClick={scrollToForm}
                 className="px-5 py-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
-                View Prices
+                View Pricing
               </button>
             </div>
 
@@ -278,28 +158,14 @@ export default function PublicHomePage() {
             </div>
           </div>
 
-          {/* Right Column (High-Resolution Hero Image from User Asset) */}
+          {/* Right Column (Hero Image Blended Naturally to Background - No Black Background) */}
           <div className="lg:col-span-6 relative">
-            <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-2xl bg-slate-950 group">
+            <div className="relative rounded-2xl overflow-hidden border border-slate-200/80 shadow-2xl bg-white/40 backdrop-blur-xs transition-transform duration-500 hover:scale-[1.01]">
               <img 
                 src="/echohero.png" 
                 alt="echo LMS Academy OS Dashboard Interface" 
-                className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-[1.02]"
+                className="w-full h-auto object-contain rounded-2xl"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none" />
-              
-              {/* Floating Feature Badges */}
-              <div className="absolute bottom-4 left-4 right-4 flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-900/90 backdrop-blur-md border border-slate-700/80 text-white text-[11px] font-medium shadow-lg">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                  <span className="font-bold text-emerald-300">Live Meta & Google Ads Sync</span>
-                </div>
-                <div className="flex items-center gap-3 text-slate-300">
-                  <span>🎙️ Call Intelligence</span>
-                  <span>⚡ WhatsApp Drips</span>
-                  <span>💳 Instant EMI</span>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -312,11 +178,10 @@ export default function PublicHomePage() {
       <section id="integrations" className="py-16 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-10">
           
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-800 text-[11px] font-bold">
-              <Workflow className="w-3.5 h-3.5" />
+          <div className="text-center max-w-3xl mx-auto space-y-2">
+            <p className="text-xs font-bold text-teal-700 uppercase tracking-wider">
               SEAMLESS API & DIRECT PIPELINE INTEGRATIONS
-            </div>
+            </p>
             <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
               Connect Every Tool Your Academy Relies On.
             </h2>
@@ -325,7 +190,7 @@ export default function PublicHomePage() {
             </p>
           </div>
 
-          {/* Integrations Grid */}
+          {/* Integrations Grid with Perfectly Fitted Rectangular Logo Badges */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5">
             {[
               {
@@ -333,7 +198,7 @@ export default function PublicHomePage() {
                 tag: "Direct Leads Connection",
                 desc: "Instant webhook lead ingestion from Facebook & Instagram lead gen ads.",
                 icon: (
-                  <svg className="w-6 h-6 text-[#1877F2] fill-current" viewBox="0 0 24 24">
+                  <svg className="w-7 h-7 text-[#1877F2] fill-current" viewBox="0 0 24 24">
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                   </svg>
                 )
@@ -343,7 +208,7 @@ export default function PublicHomePage() {
                 tag: "Direct Leads Connection",
                 desc: "Real-time Google search & display lead form extension sync into CRM.",
                 icon: (
-                  <svg className="w-6 h-6" viewBox="0 0 24 24">
+                  <svg className="w-7 h-7" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
                     <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
                     <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.97 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
@@ -356,18 +221,21 @@ export default function PublicHomePage() {
                 tag: "1-Click Classroom",
                 desc: "Automated recurring calendar links and live room launch for batches.",
                 icon: (
-                  <div className="w-6 h-6 flex items-center justify-center rounded bg-emerald-600 text-white font-black text-[10px]">
-                    Meet
-                  </div>
+                  <svg className="w-7 h-7" viewBox="0 0 24 24">
+                    <rect width="14" height="14" x="2" y="5" rx="3" fill="#00832d" />
+                    <path d="M16 10l5-3.5v11L16 14v-4z" fill="#00ac47" />
+                  </svg>
                 )
               },
               {
-                name: "Zoom Video",
+                name: "Zoom",
                 tag: "Cloud Recordings",
                 desc: "Native SDK live sessions, interactive breakout rooms & auto cloud sync.",
                 icon: (
-                  <div className="w-6 h-6 flex items-center justify-center rounded bg-blue-600 text-white font-black text-[10px]">
-                    Zoom
+                  <div className="w-7 h-7 rounded-md bg-[#2D8CFF] flex items-center justify-center text-white shadow-2xs">
+                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                      <path d="M4 6.5A2.5 2.5 0 016.5 4h8A2.5 2.5 0 0117 6.5v11a2.5 2.5 0 01-2.5 2.5h-8A2.5 2.5 0 014 17.5v-11zm15 3.12v4.76l4 2.67V7l-4 2.62z"/>
+                    </svg>
                   </div>
                 )
               },
@@ -376,8 +244,10 @@ export default function PublicHomePage() {
                 tag: "2-Way Live Sync",
                 desc: "Continuous bi-directional export/import for counselors and branch reports.",
                 icon: (
-                  <div className="w-6 h-6 flex items-center justify-center rounded bg-emerald-700 text-white font-black text-[10px]">
-                    Sheets
+                  <div className="w-7 h-7 rounded-md bg-[#0F9D58] flex items-center justify-center text-white shadow-2xs">
+                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14H6v-3h4v3zm0-5H6V9h4v3zm0-5H6V6h4v1zm6 10h-4v-3h4v3zm0-5h-4V9h4v3zm0-5h-4V6h4v1z"/>
+                    </svg>
                   </div>
                 )
               },
@@ -386,15 +256,17 @@ export default function PublicHomePage() {
                 tag: "Visual Design Engine",
                 desc: "Integrated media asset library and promotional graphics designer.",
                 icon: (
-                  <img src="https://grafty.pro/grafty.svg" alt="Grafty" className="w-6 h-6 object-contain" />
+                  <div className="w-7 h-7 flex items-center justify-center">
+                    <img src="https://grafty.pro/grafty.svg" alt="Grafty" className="w-7 h-7 object-contain" />
+                  </div>
                 )
               },
               {
-                name: "WhatsApp API",
+                name: "WhatsApp",
                 tag: "Automated Drips",
                 desc: "Official Cloud API triggers for welcome packs, fee dues & batch reminders.",
                 icon: (
-                  <svg className="w-6 h-6 text-emerald-500 fill-current" viewBox="0 0 24 24">
+                  <svg className="w-7 h-7 text-[#25D366] fill-current" viewBox="0 0 24 24">
                     <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/>
                   </svg>
                 )
@@ -403,31 +275,35 @@ export default function PublicHomePage() {
                 name: "Email Drips",
                 tag: "Transactional & Marketing",
                 desc: "Deliver high-inbox GST invoices, homework notices and drip nurture flows.",
-                icon: <Mail className="w-6 h-6 text-blue-500" />
+                icon: <Mail className="w-7 h-7 text-blue-500" />
               },
               {
                 name: "AI Engine",
                 tag: "OpenAI & Gemini",
                 desc: "Student at-risk drop detection, quiz generation and smart study notes.",
-                icon: <Bot className="w-6 h-6 text-purple-600" />
+                icon: <Bot className="w-7 h-7 text-purple-600" />
               },
               {
                 name: "YouTube",
                 tag: "Unlisted & Live",
                 desc: "Distribute unlisted video lectures with seamless iframe player privacy.",
                 icon: (
-                  <div className="w-6 h-6 flex items-center justify-center rounded bg-rose-600 text-white font-black text-[10px]">
-                    YT
+                  <div className="w-7 h-7 rounded-md bg-[#FF0000] flex items-center justify-center text-white shadow-2xs">
+                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
                   </div>
                 )
               },
               {
-                name: "Vimeo OTT",
+                name: "Vimeo",
                 tag: "DRM Protection",
                 desc: "Encrypted, domain-restricted video streaming preventing piracy.",
                 icon: (
-                  <div className="w-6 h-6 flex items-center justify-center rounded bg-sky-500 text-white font-black text-[10px]">
-                    Vimeo
+                  <div className="w-7 h-7 rounded-md bg-[#1AB7EA] flex items-center justify-center text-white shadow-2xs">
+                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                      <path d="M22.396 7.164c-.093 2.026-1.507 4.798-4.245 8.32C15.323 19.161 12.927 21 10.96 21c-1.215 0-2.24-1.119-3.08-3.358-.56-2.052-1.12-4.105-1.68-6.158-.62-2.39-1.28-3.585-1.98-3.585-.156 0-.7.327-1.632.98L1 7.21c1.026-.902 2.037-1.804 3.033-2.705 1.37-1.182 2.4-1.804 3.09-1.866 1.62-.156 2.617.95 2.99 3.32.404 2.553.684 4.143.84 4.766.467 2.117.98 3.175 1.54 3.175.435 0 1.072-.685 1.91-2.055.84-1.37 1.29-2.413 1.353-3.13.125-1.183-.342-1.775-1.4-1.775-.5 0-1.01.11-1.53.327.995-3.256 2.89-4.836 5.684-4.742 2.068.062 3.038 1.4 2.91 4.01z"/>
+                    </svg>
                   </div>
                 )
               },
@@ -436,8 +312,8 @@ export default function PublicHomePage() {
                 tag: "UPI, Cards & EMI",
                 desc: "India's premier payment gateway with automated webhook fee reconciliation.",
                 icon: (
-                  <div className="w-6 h-6 flex items-center justify-center rounded bg-blue-700 text-white font-black text-[9px]">
-                    Razor
+                  <div className="w-7 h-7 rounded-md bg-[#0C2340] flex items-center justify-center text-[#3395FF] font-black text-xs shadow-2xs">
+                    <span className="tracking-tighter">Rzp</span>
                   </div>
                 )
               },
@@ -446,8 +322,8 @@ export default function PublicHomePage() {
                 tag: "Direct Merchant UPI",
                 desc: "Instant UPI dynamic QR generation for zero-drop fee collection.",
                 icon: (
-                  <div className="w-6 h-6 flex items-center justify-center rounded bg-purple-700 text-white font-black text-[9px]">
-                    PhonePe
+                  <div className="w-7 h-7 rounded-md bg-[#5F259F] flex items-center justify-center text-white font-black text-xs shadow-2xs">
+                    <span className="tracking-tighter">पे</span>
                   </div>
                 )
               },
@@ -456,8 +332,8 @@ export default function PublicHomePage() {
                 tag: "Global Payments",
                 desc: "Accept international student enrollments in 135+ currencies.",
                 icon: (
-                  <div className="w-6 h-6 flex items-center justify-center rounded bg-indigo-600 text-white font-black text-[10px]">
-                    Stripe
+                  <div className="w-7 h-7 rounded-md bg-[#635BFF] flex items-center justify-center text-white font-black text-xs shadow-2xs">
+                    <span>S</span>
                   </div>
                 )
               },
@@ -465,12 +341,12 @@ export default function PublicHomePage() {
                 name: "Call Recorder",
                 tag: "Voice Intelligence",
                 desc: "In-app call audit logs, audio playback and counselor conversation analytics.",
-                icon: <Mic className="w-6 h-6 text-rose-500" />
+                icon: <Mic className="w-7 h-7 text-rose-500" />
               }
             ].map((integ, i) => (
               <div key={i} className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-teal-300 hover:shadow-md transition-all space-y-2 group">
                 <div className="flex items-center justify-between">
-                  <div className="p-2 rounded-lg bg-white border border-slate-200 shadow-2xs group-hover:scale-105 transition-transform">
+                  <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 shadow-2xs flex items-center justify-center p-1.5 group-hover:scale-105 transition-transform overflow-hidden shrink-0">
                     {integ.icon}
                   </div>
                   <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-teal-50 text-teal-800 border border-teal-100">
@@ -497,11 +373,10 @@ export default function PublicHomePage() {
       <section id="modules" className="py-20 bg-slate-50 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
           
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-100/70 border border-teal-300 text-teal-900 text-[11px] font-bold">
-              <Sparkles className="w-3.5 h-3.5" />
+          <div className="text-center max-w-3xl mx-auto space-y-2">
+            <p className="text-xs font-bold text-teal-700 uppercase tracking-wider">
               NEXT-GENERATION ACADEMY MODULES
-            </div>
+            </p>
             <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
               Engineered for Revenue, Operations & Student Success.
             </h2>
@@ -694,152 +569,53 @@ export default function PublicHomePage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 05 — PRICING & INQUIRY FORM */}
+      {/* 05 — PRICING & INQUIRY LEAD FORM (REPLACED PRICING TABLE) */}
       {/* ========================================================================= */}
-      <section id="pricing-section" className="py-20 bg-slate-900 text-white border-b border-slate-800 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-16">
+      <section id="pricing-inquiry-form" className="py-20 bg-slate-900 text-white border-b border-slate-800 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
           
-          <div className="text-center max-w-3xl mx-auto space-y-4">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-500/20 border border-teal-500/40 text-teal-300 text-[11px] font-bold">
-              TRANSPARENT PLANS & CUSTOM PACKAGES
-            </div>
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <p className="text-xs font-bold text-teal-400 uppercase tracking-wider">
+              PRICING & CUSTOM PACKAGES
+            </p>
             <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
-              Scale Your Academy Without Hidden Penalties.
+              Get Custom Pricing Built For Your Academy.
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Every plan includes full LMS and CRM core access, encrypted student data, and multi-channel support.
+              Every academy is unique. Tell us about your student volume, branches, or migration requirements to receive tailored pricing and a live 1-on-1 walkthrough.
             </p>
-
-            {/* Billing Toggle */}
-            <div className="flex items-center justify-center gap-3 pt-2">
-              <span className={`text-xs font-bold ${billingCycle === "monthly" ? "text-white" : "text-slate-400"}`}>Monthly Billing</span>
-              <button
-                onClick={() => setBillingCycle(b => b === "monthly" ? "yearly" : "monthly")}
-                className="w-12 h-6 rounded-full bg-slate-800 border border-slate-700 p-0.5 relative transition-colors focus:outline-none"
-              >
-                <div className={`w-5 h-5 rounded-full bg-teal-500 transition-transform ${billingCycle === "yearly" ? "translate-x-6" : "translate-x-0"}`} />
-              </button>
-              <div className="flex items-center gap-1.5">
-                <span className={`text-xs font-bold ${billingCycle === "yearly" ? "text-white" : "text-slate-400"}`}>Yearly Billing</span>
-                <span className="px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 text-[10px] font-black border border-teal-500/30">
-                  SAVE 20%
-                </span>
-              </div>
-            </div>
           </div>
 
-          {/* Pricing Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {plans.map((plan) => {
-              const price = billingCycle === "monthly" ? plan.monthlyPrice : Math.round(plan.yearlyPrice / 12)
-              return (
-                <div 
-                  key={plan.id}
-                  className={`rounded-2xl p-7 flex flex-col justify-between transition-all relative ${
-                    plan.popular 
-                      ? "bg-slate-800/90 border-2 border-teal-500 shadow-2xl shadow-teal-500/10" 
-                      : "bg-slate-950/60 border border-slate-800 hover:border-slate-700"
-                  }`}
-                >
-                  {plan.popular && (
-                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 bg-teal-500 text-slate-950 text-[10px] font-black uppercase tracking-wider rounded-full shadow-md">
-                      Most Popular For Institutes
-                    </div>
-                  )}
-
-                  <div className="space-y-5">
-                    <div>
-                      <h3 className="text-lg font-black text-white">{plan.name}</h3>
-                      <p className="text-[11px] text-slate-400 mt-1">{plan.freeTrialDays}-Day Free Full Access Trial</p>
-                    </div>
-
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-3xl sm:text-4xl font-black text-white">₹{price.toLocaleString()}</span>
-                      <span className="text-xs text-slate-400">/ month</span>
-                    </div>
-
-                    <div className="pt-4 border-t border-slate-800 space-y-2 text-xs font-medium text-slate-300">
-                      <div className="flex justify-between py-1 border-b border-slate-800/60">
-                        <span className="text-slate-400">Student Capacity:</span>
-                        <span className="font-bold text-white">{plan.studentLimit}</span>
-                      </div>
-                      <div className="flex justify-between py-1 border-b border-slate-800/60">
-                        <span className="text-slate-400">Educator Accounts:</span>
-                        <span className="font-bold text-white">{plan.instructorLimit}</span>
-                      </div>
-                      <div className="flex justify-between py-1 border-b border-slate-800/60">
-                        <span className="text-slate-400">Course Limit:</span>
-                        <span className="font-bold text-white">{plan.courseLimit}</span>
-                      </div>
-                      <div className="flex justify-between py-1">
-                        <span className="text-slate-400">Cloud Storage:</span>
-                        <span className="font-bold text-white">{plan.storageLimitGB} GB</span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2 pt-3">
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Included Capabilities:</p>
-                      <ul className="space-y-2 text-xs text-slate-300">
-                        {plan.features.map((feat, fi) => (
-                          <li key={fi} className="flex items-start gap-2">
-                            <Check className="w-4 h-4 text-teal-400 shrink-0 mt-0.5" />
-                            <span className="leading-tight">{feat}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div className="pt-8">
-                    <button
-                      onClick={scrollToForm}
-                      className={`w-full py-3.5 rounded-xl font-bold text-xs sm:text-sm text-center transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                        plan.popular 
-                          ? "bg-teal-500 hover:bg-teal-400 text-slate-950 shadow-lg" 
-                          : "bg-slate-800 hover:bg-slate-700 text-white"
-                      }`}
-                    >
-                      Choose {plan.name} <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-
-          {/* Dedicated Interactive Contact / Pricing Inquiry Form */}
-          <div id="contact-inquiry-form" className="bg-slate-800/90 border border-slate-700 rounded-3xl p-6 sm:p-10 shadow-2xl max-w-4xl mx-auto">
+          {/* Interactive Pricing & Demo Request Form */}
+          <div className="bg-slate-800/90 border border-slate-700 rounded-3xl p-6 sm:p-10 shadow-2xl max-w-4xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               
               <div className="lg:col-span-5 space-y-4 text-left">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-500/20 text-teal-300 text-[10px] font-bold border border-teal-500/40">
-                  <Sparkles className="w-3 h-3" /> CUSTOM ENTERPRISE QUOTATION
-                </div>
                 <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                  Request a Custom Pricing Quote or Live Walkthrough.
+                  Request Pricing & Live Walkthrough
                 </h3>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  Have multi-branch locations, 5,000+ students, or need custom ERP/CRM data migration? Fill out the form and our solutions engineering team will get back to you with a tailored deployment plan.
+                  Whether you are starting with 100 students or managing 10,000+ across multi-branch campuses, we provide flexible, predictable packages with zero hidden per-transaction penalties.
                 </p>
 
                 <div className="space-y-2 pt-2 text-xs text-slate-300">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-teal-400" />
-                    <span>Free 1-on-1 Architecture Walkthrough</span>
+                    <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0" />
+                    <span>Free 1-on-1 Academy OS Architecture Tour</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-teal-400" />
+                    <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0" />
                     <span>Assisted Data & Student Migration</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-teal-400" />
-                    <span>Instant WhatsApp Follow-up Support</span>
+                    <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0" />
+                    <span>WhatsApp Follow-up within 15 Minutes</span>
                   </div>
                 </div>
               </div>
 
               <div className="lg:col-span-7">
-                <form onSubmit={handleInquirySubmit} className="space-y-4 bg-slate-900/80 p-6 rounded-2xl border border-slate-700/80 text-left">
+                <form onSubmit={handleInquirySubmit} className="space-y-4 bg-slate-900/90 p-6 rounded-2xl border border-slate-700 text-left">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="text-[11px] font-bold text-slate-300 block mb-1">Your Full Name *</label>
@@ -905,12 +681,12 @@ export default function PublicHomePage() {
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-bold text-slate-300 block mb-1">Requirements / Questions (Optional)</label>
+                    <label className="text-[11px] font-bold text-slate-300 block mb-1">Requirements / Modules Needed (Optional)</label>
                     <textarea 
                       rows={2}
                       value={inquiryForm.message}
                       onChange={e => setInquiryForm(prev => ({ ...prev, message: e.target.value }))}
-                      placeholder="Tell us about your current courses, marketing stack, or data migration needs..."
+                      placeholder="e.g. Meta Ads integration, Call Intelligence, WhatsApp automation, or offline student migration..."
                       className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-teal-500"
                     />
                   </div>
@@ -920,7 +696,7 @@ export default function PublicHomePage() {
                     disabled={isSubmittingInquiry}
                     className="w-full py-3.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-black text-xs sm:text-sm tracking-wide transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
-                    {isSubmittingInquiry ? "Submitting Inquiry..." : "Submit Pricing & Demo Request →"}
+                    {isSubmittingInquiry ? "Submitting Inquiry..." : "Get Pricing & Schedule Walkthrough →"}
                   </button>
                 </form>
               </div>
@@ -940,10 +716,9 @@ export default function PublicHomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
             <div className="lg:col-span-6 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-300 text-slate-800 text-xs font-bold">
-                <Building2 className="w-3.5 h-3.5 text-teal-600" />
+              <p className="text-xs font-bold text-teal-700 uppercase tracking-wider">
                 ABOUT GREKAM NETWORK • COIMBATORE, INDIA
-              </div>
+              </p>
 
               <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
                 Built by Grekam. Powering Modern Learning Ventures.
