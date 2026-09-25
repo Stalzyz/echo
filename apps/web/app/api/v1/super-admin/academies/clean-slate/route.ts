@@ -72,96 +72,88 @@ export async function POST(req: Request) {
       const otherOrgIds = otherOrgs.map(o => o.id)
 
       if (otherOrgIds.length > 0) {
-        // Cascade delete billing for other orgs
-        await tx.organizationEntitlementOverride.deleteMany({ where: { organizationId: { in: otherOrgIds } } })
-        await tx.organizationUsageCounter.deleteMany({ where: { organizationId: { in: otherOrgIds } } })
-        await tx.subscriptionPayment.deleteMany({ where: { organizationId: { in: otherOrgIds } } })
-        await tx.subscriptionInvoice.deleteMany({ where: { organizationId: { in: otherOrgIds } } })
-        await tx.subscriptionEvent.deleteMany({ where: { organizationId: { in: otherOrgIds } } })
-        await tx.tenantSubscription.deleteMany({ where: { organizationId: { in: otherOrgIds } } })
+        const idsList = otherOrgIds.map(id => `'${id}'`).join(',')
+        
+        await tx.$executeRawUnsafe(`
+          DELETE FROM "organization_entitlement_overrides" WHERE "organizationId" IN (${idsList});
+          DELETE FROM "organization_usage_counters" WHERE "organizationId" IN (${idsList});
+          DELETE FROM "subscription_payments" WHERE "organizationId" IN (${idsList});
+          DELETE FROM "subscription_invoices" WHERE "organizationId" IN (${idsList});
+          DELETE FROM "subscription_events" WHERE "organizationId" IN (${idsList});
+          DELETE FROM "tenant_subscriptions" WHERE "organizationId" IN (${idsList});
+          DELETE FROM "proposals" WHERE "organizationId" IN (${idsList});
+          DELETE FROM "invoices" WHERE "organizationId" IN (${idsList});
+          DELETE FROM "projects" WHERE "organizationId" IN (${idsList});
+          DELETE FROM "forum_categories" WHERE "organizationId" IN (${idsList});
 
-        // Cascade delete LMS courses for other orgs
-        const courses = await tx.course.findMany({ where: { organizationId: { in: otherOrgIds } }, select: { id: true } })
-        const courseIds = courses.map(c => c.id)
-        if (courseIds.length > 0) {
-          const batches = await tx.batch.findMany({ where: { courseId: { in: courseIds } }, select: { id: true } })
-          const batchIds = batches.map(b => b.id)
-          if (batchIds.length > 0) {
-            const enrollments = await tx.enrollment.findMany({ where: { batchId: { in: batchIds } }, select: { id: true } })
-            const enrollmentIds = enrollments.map(e => e.id)
-            if (enrollmentIds.length > 0) {
-              await tx.feeInstallment.deleteMany({ where: { enrollmentId: { in: enrollmentIds } } })
-              await tx.enrollment.deleteMany({ where: { id: { in: enrollmentIds } } })
-            }
-            await tx.batchSession.deleteMany({ where: { batchId: { in: batchIds } } })
-            await tx.batch.deleteMany({ where: { id: { in: batchIds } } })
-          }
+          DELETE FROM "fee_installments" WHERE "enrollmentId" IN (SELECT id FROM "enrollments" WHERE "batchId" IN (SELECT id FROM "batches" WHERE "organizationId" IN (${idsList})));
+          DELETE FROM "enrollments" WHERE "batchId" IN (SELECT id FROM "batches" WHERE "organizationId" IN (${idsList}));
+          DELETE FROM "batch_sessions" WHERE "batchId" IN (SELECT id FROM "batches" WHERE "organizationId" IN (${idsList}));
+          DELETE FROM "batches" WHERE "organizationId" IN (${idsList});
 
-          const lmsCourses = await tx.lMSCourse.findMany({ where: { courseId: { in: courseIds } }, select: { id: true } })
-          const lmsCourseIds = lmsCourses.map(l => l.id)
-          if (lmsCourseIds.length > 0) {
-            const lmsModules = await tx.lMSModule.findMany({ where: { lmsCourseId: { in: lmsCourseIds } }, select: { id: true } })
-            const moduleIds = lmsModules.map(m => m.id)
-            if (moduleIds.length > 0) {
-              await tx.lessonProgress.deleteMany({ where: { lesson: { moduleId: { in: moduleIds } } } })
-              await tx.lMSLesson.deleteMany({ where: { moduleId: { in: moduleIds } } })
-              await tx.lMSModule.deleteMany({ where: { id: { in: moduleIds } } })
-            }
-            await tx.lMSCourse.deleteMany({ where: { id: { in: lmsCourseIds } } })
-          }
+          DELETE FROM "lms_lessons" WHERE "moduleId" IN (SELECT id FROM "lms_modules" WHERE "lmsCourseId" IN (SELECT id FROM "lms_courses" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${idsList}))));
+          DELETE FROM "lms_modules" WHERE "lmsCourseId" IN (SELECT id FROM "lms_courses" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${idsList})));
+          DELETE FROM "lms_courses" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${idsList}));
+          DELETE FROM "certificates" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${idsList}));
+          DELETE FROM "quizzes" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${idsList}));
+          DELETE FROM "courses" WHERE "organizationId" IN (${idsList});
 
-          await tx.certificate.deleteMany({ where: { courseId: { in: courseIds } } })
-          await tx.quiz.deleteMany({ where: { courseId: { in: courseIds } } })
-          await tx.course.deleteMany({ where: { id: { in: courseIds } } })
-        }
+          DELETE FROM "call_records" WHERE "leadId" IN (SELECT id FROM "leads" WHERE "organizationId" IN (${idsList}));
+          DELETE FROM "lead_activities" WHERE "leadId" IN (SELECT id FROM "leads" WHERE "organizationId" IN (${idsList}));
+          DELETE FROM "leads" WHERE "organizationId" IN (${idsList});
+          DELETE FROM "form_submissions" WHERE "formId" IN (SELECT id FROM "enquiry_forms" WHERE "organizationId" IN (${idsList}));
+          DELETE FROM "enquiry_forms" WHERE "organizationId" IN (${idsList});
+          DELETE FROM "demo_registrations" WHERE "demoSessionId" IN (SELECT id FROM "demo_sessions" WHERE "organizationId" IN (${idsList}));
+          DELETE FROM "demo_sessions" WHERE "organizationId" IN (${idsList});
+          DELETE FROM "walk_ins" WHERE "organizationId" IN (${idsList});
 
-        // Cascade delete CRM Leads for other orgs
-        const leads = await tx.lead.findMany({ where: { organizationId: { in: otherOrgIds } }, select: { id: true } })
-        const leadIds = leads.map(l => l.id)
-        if (leadIds.length > 0) {
-          await tx.callRecord.deleteMany({ where: { leadId: { in: leadIds } } })
-          await tx.leadActivity.deleteMany({ where: { leadId: { in: leadIds } } })
-          await tx.lead.deleteMany({ where: { id: { in: leadIds } } })
-        }
+          DELETE FROM "campus_events" WHERE "organizationId" IN (${idsList});
+          DELETE FROM "placement_jobs" WHERE "companyId" IN (SELECT id FROM "placement_companies" WHERE "organizationId" IN (${idsList}));
+          DELETE FROM "placement_companies" WHERE "organizationId" IN (${idsList});
+          DELETE FROM "academy_projects" WHERE "organizationId" IN (${idsList});
 
-        // Cascade delete other modules
-        const forms = await tx.enquiryForm.findMany({ where: { organizationId: { in: otherOrgIds } }, select: { id: true } })
-        const formIds = forms.map(f => f.id)
-        if (formIds.length > 0) {
-          await tx.formSubmission.deleteMany({ where: { formId: { in: formIds } } })
-          await tx.enquiryForm.deleteMany({ where: { id: { in: formIds } } })
-        }
-        await tx.demoRegistration.deleteMany({ where: { demoSession: { organizationId: { in: otherOrgIds } } } })
-        await tx.demoSession.deleteMany({ where: { organizationId: { in: otherOrgIds } } })
-        await tx.walkIn.deleteMany({ where: { organizationId: { in: otherOrgIds } } })
-        await tx.campusEvent.deleteMany({ where: { organizationId: { in: otherOrgIds } } })
-        await tx.placementJob.deleteMany({ where: { company: { organizationId: { in: otherOrgIds } } } })
-        await tx.placementCompany.deleteMany({ where: { organizationId: { in: otherOrgIds } } })
-        await tx.academyProject.deleteMany({ where: { organizationId: { in: otherOrgIds } } })
+          DELETE FROM "students" WHERE "userId" IN (SELECT id FROM "users" WHERE "organizationId" IN (${idsList}) AND "role" != 'SUPER_ADMIN');
+          DELETE FROM "educators" WHERE "userId" IN (SELECT id FROM "users" WHERE "organizationId" IN (${idsList}) AND "role" != 'SUPER_ADMIN');
+          DELETE FROM "employees" WHERE "userId" IN (SELECT id FROM "users" WHERE "organizationId" IN (${idsList}) AND "role" != 'SUPER_ADMIN');
+          DELETE FROM "sessions" WHERE "userId" IN (SELECT id FROM "users" WHERE "organizationId" IN (${idsList}) AND "role" != 'SUPER_ADMIN');
+          DELETE FROM "users" WHERE "organizationId" IN (${idsList}) AND "role" != 'SUPER_ADMIN';
 
-        // Cascade delete users belonging strictly to other orgs (never delete SUPER_ADMIN)
-        const otherUsers = await tx.user.findMany({
-          where: {
-            organizationId: { in: otherOrgIds },
-            role: { not: "SUPER_ADMIN" }
-          },
-          select: { id: true }
-        })
-        const otherUserIds = otherUsers.map(u => u.id)
-        if (otherUserIds.length > 0) {
-          await tx.student.deleteMany({ where: { userId: { in: otherUserIds } } })
-          await tx.educator.deleteMany({ where: { userId: { in: otherUserIds } } })
-          await tx.employee.deleteMany({ where: { userId: { in: otherUserIds } } })
-          await tx.auditLog.deleteMany({ where: { userId: { in: otherUserIds } } })
-          await tx.session.deleteMany({ where: { userId: { in: otherUserIds } } })
-          await tx.user.deleteMany({ where: { id: { in: otherUserIds } } })
-        }
-
-        // Delete all other organizations
-        await tx.organization.deleteMany({
-          where: { id: { in: otherOrgIds } }
-        })
+          DELETE FROM "organization" WHERE "id" IN (${idsList});
+        `)
       }
+
+      // 3. Ensure Demo Accounts Exist
+      const passwordHash = "$2b$10$s0bAH5frbigHJnR3HvS70upJ/Ml8VrF9dGV7Pd.IlrmtX3BuUjFEi"
+
+      await tx.user.upsert({
+        where: { email: "demo.academy@echo.in" },
+        update: { passwordHash, role: "ADMIN", status: "ACTIVE", firstName: "Echo", lastName: "Director", organizationId: demoOrg.id },
+        create: { email: "demo.academy@echo.in", passwordHash, role: "ADMIN", status: "ACTIVE", firstName: "Echo", lastName: "Director", organizationId: demoOrg.id }
+      })
+
+      const stu = await tx.user.upsert({
+        where: { email: "demo.student@echo.in" },
+        update: { passwordHash, role: "STUDENT", status: "ACTIVE", firstName: "Alex", lastName: "Martin", organizationId: demoOrg.id },
+        create: { email: "demo.student@echo.in", passwordHash, role: "STUDENT", status: "ACTIVE", firstName: "Alex", lastName: "Martin", organizationId: demoOrg.id }
+      })
+
+      await tx.student.upsert({
+        where: { userId: stu.id },
+        update: { studentCode: "STU-ECHO-001", learningLanguage: "English" },
+        create: { userId: stu.id, studentCode: "STU-ECHO-001", learningLanguage: "English" }
+      })
+
+      const edu = await tx.user.upsert({
+        where: { email: "demo.educator@echo.in" },
+        update: { passwordHash, role: "EDUCATOR", status: "ACTIVE", firstName: "Dr. Priya", lastName: "Menon", organizationId: demoOrg.id },
+        create: { email: "demo.educator@echo.in", passwordHash, role: "EDUCATOR", status: "ACTIVE", firstName: "Dr. Priya", lastName: "Menon", organizationId: demoOrg.id }
+      })
+
+      await tx.educator.upsert({
+        where: { userId: edu.id },
+        update: { designation: "Lead Faculty & Curriculum Director", company: "Echo Academy" },
+        create: { userId: edu.id, designation: "Lead Faculty & Curriculum Director", company: "Echo Academy" }
+      })
 
       return {
         demoOrg,

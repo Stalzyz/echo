@@ -35,6 +35,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Course name and course code are required." }, { status: 400 })
     }
 
+    if (tenantId) {
+      const { SubscriptionEntitlementService } = await import("@/lib/services/subscription-entitlement.service")
+      await SubscriptionEntitlementService.assertWithinLimit(tenantId, "courses", 1)
+      await SubscriptionEntitlementService.assertWithinLimit(tenantId, "batches", 1)
+    }
+
     const feeNum = typeof courseFee === "number" ? courseFee : parseFloat(courseFee) || 0
     const capNum = typeof capacity === "number" ? capacity : parseInt(capacity, 10) || 20
 
