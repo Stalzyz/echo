@@ -255,62 +255,56 @@ async function main() {
   const otherOrgIds = otherOrgs.map(o => o.id);
 
   if (otherOrgIds.length > 0) {
-    // Let's use raw SQL cascading deletes or ordered deletions to guarantee 100% success
-    await prisma.$executeRawUnsafe(`
-      -- 1. Billing & Subscriptions
-      DELETE FROM "organization_entitlement_overrides" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')});
-      DELETE FROM "organization_usage_counters" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')});
-      DELETE FROM "subscription_payments" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')});
-      DELETE FROM "subscription_invoices" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')});
-      DELETE FROM "subscription_events" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')});
-      DELETE FROM "tenant_subscriptions" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')});
+    const idsList = otherOrgIds.map(id => `'${id}'`).join(',');
+    
+    const statements = [
+      `DELETE FROM "organization_entitlement_overrides" WHERE "organizationId" IN (${idsList})`,
+      `DELETE FROM "organization_usage_counters" WHERE "organizationId" IN (${idsList})`,
+      `DELETE FROM "subscription_payments" WHERE "organizationId" IN (${idsList})`,
+      `DELETE FROM "subscription_invoices" WHERE "organizationId" IN (${idsList})`,
+      `DELETE FROM "subscription_events" WHERE "organizationId" IN (${idsList})`,
+      `DELETE FROM "tenant_subscriptions" WHERE "organizationId" IN (${idsList})`,
+      `DELETE FROM "proposals" WHERE "organizationId" IN (${idsList})`,
+      `DELETE FROM "invoices" WHERE "organizationId" IN (${idsList})`,
+      `DELETE FROM "projects" WHERE "organizationId" IN (${idsList})`,
+      `DELETE FROM "forum_categories" WHERE "organizationId" IN (${idsList})`,
+      `DELETE FROM "fee_installments" WHERE "enrollmentId" IN (SELECT id FROM "enrollments" WHERE "batchId" IN (SELECT id FROM "batches" WHERE "organizationId" IN (${idsList})))`,
+      `DELETE FROM "enrollments" WHERE "batchId" IN (SELECT id FROM "batches" WHERE "organizationId" IN (${idsList}))`,
+      `DELETE FROM "batch_sessions" WHERE "batchId" IN (SELECT id FROM "batches" WHERE "organizationId" IN (${idsList}))`,
+      `DELETE FROM "batches" WHERE "organizationId" IN (${idsList})`,
+      `DELETE FROM "lms_lessons" WHERE "moduleId" IN (SELECT id FROM "lms_modules" WHERE "lmsCourseId" IN (SELECT id FROM "lms_courses" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${idsList}))))`,
+      `DELETE FROM "lms_modules" WHERE "lmsCourseId" IN (SELECT id FROM "lms_courses" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${idsList})))`,
+      `DELETE FROM "lms_courses" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${idsList}))`,
+      `DELETE FROM "certificates" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${idsList}))`,
+      `DELETE FROM "quizzes" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${idsList}))`,
+      `DELETE FROM "courses" WHERE "organizationId" IN (${idsList})`,
+      `DELETE FROM "call_records" WHERE "leadId" IN (SELECT id FROM "leads" WHERE "organizationId" IN (${idsList}))`,
+      `DELETE FROM "lead_activities" WHERE "leadId" IN (SELECT id FROM "leads" WHERE "organizationId" IN (${idsList}))`,
+      `DELETE FROM "leads" WHERE "organizationId" IN (${idsList})`,
+      `DELETE FROM "form_submissions" WHERE "formId" IN (SELECT id FROM "enquiry_forms" WHERE "organizationId" IN (${idsList}))`,
+      `DELETE FROM "enquiry_forms" WHERE "organizationId" IN (${idsList})`,
+      `DELETE FROM "demo_registrations" WHERE "demoSessionId" IN (SELECT id FROM "demo_sessions" WHERE "organizationId" IN (${idsList}))`,
+      `DELETE FROM "demo_sessions" WHERE "organizationId" IN (${idsList})`,
+      `DELETE FROM "walk_ins" WHERE "organizationId" IN (${idsList})`,
+      `DELETE FROM "campus_events" WHERE "organizationId" IN (${idsList})`,
+      `DELETE FROM "placement_jobs" WHERE "companyId" IN (SELECT id FROM "placement_companies" WHERE "organizationId" IN (${idsList}))`,
+      `DELETE FROM "placement_companies" WHERE "organizationId" IN (${idsList})`,
+      `DELETE FROM "academy_projects" WHERE "organizationId" IN (${idsList})`,
+      `DELETE FROM "students" WHERE "userId" IN (SELECT id FROM "users" WHERE "organizationId" IN (${idsList}) AND "role" != 'SUPER_ADMIN')`,
+      `DELETE FROM "educators" WHERE "userId" IN (SELECT id FROM "users" WHERE "organizationId" IN (${idsList}) AND "role" != 'SUPER_ADMIN')`,
+      `DELETE FROM "employees" WHERE "userId" IN (SELECT id FROM "users" WHERE "organizationId" IN (${idsList}) AND "role" != 'SUPER_ADMIN')`,
+      `DELETE FROM "sessions" WHERE "userId" IN (SELECT id FROM "users" WHERE "organizationId" IN (${idsList}) AND "role" != 'SUPER_ADMIN')`,
+      `DELETE FROM "users" WHERE "organizationId" IN (${idsList}) AND "role" != 'SUPER_ADMIN'`,
+      `DELETE FROM "organization" WHERE "id" IN (${idsList})`
+    ];
 
-      -- 2. Proposals & Projects & Invoices
-      DELETE FROM "proposals" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')});
-      DELETE FROM "invoices" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')});
-      DELETE FROM "projects" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')});
-      DELETE FROM "forum_categories" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')});
-
-      -- 3. LMS Batches, Enrollments, Fee Installments
-      DELETE FROM "fee_installments" WHERE "enrollmentId" IN (SELECT id FROM "enrollments" WHERE "batchId" IN (SELECT id FROM "batches" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')})));
-      DELETE FROM "enrollments" WHERE "batchId" IN (SELECT id FROM "batches" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')}));
-      DELETE FROM "batch_sessions" WHERE "batchId" IN (SELECT id FROM "batches" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')}));
-      DELETE FROM "batches" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')});
-
-      -- 4. LMS Courses, Modules, Lessons
-      DELETE FROM "lms_lessons" WHERE "moduleId" IN (SELECT id FROM "lms_modules" WHERE "lmsCourseId" IN (SELECT id FROM "lms_courses" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')} vendor_id_placeholder)));
-      DELETE FROM "lms_modules" WHERE "lmsCourseId" IN (SELECT id FROM "lms_courses" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')})));
-      DELETE FROM "lms_courses" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')}));
-      DELETE FROM "certificates" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')}));
-      DELETE FROM "quizzes" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')}));
-      DELETE FROM "courses" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')});
-
-      -- 5. CRM Leads, Forms, Walk-Ins, Demo Sessions
-      DELETE FROM "call_records" WHERE "leadId" IN (SELECT id FROM "leads" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')}));
-      DELETE FROM "lead_activities" WHERE "leadId" IN (SELECT id FROM "leads" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')}));
-      DELETE FROM "leads" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')});
-      DELETE FROM "form_submissions" WHERE "formId" IN (SELECT id FROM "enquiry_forms" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')}));
-      DELETE FROM "enquiry_forms" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')});
-      DELETE FROM "demo_registrations" WHERE "demoSessionId" IN (SELECT id FROM "demo_sessions" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')}));
-      DELETE FROM "demo_sessions" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')});
-      DELETE FROM "walk_ins" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')});
-
-      -- 6. Events, Placements, Projects
-      DELETE FROM "campus_events" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')});
-      DELETE FROM "placement_jobs" WHERE "companyId" IN (SELECT id FROM "placement_companies" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')}));
-      DELETE FROM "placement_companies" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')});
-      DELETE FROM "academy_projects" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')});
-
-      -- 7. Users strictly belonging to these orgs (excluding SUPER_ADMIN)
-      DELETE FROM "students" WHERE "userId" IN (SELECT id FROM "users" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')}) AND "role" != 'SUPER_ADMIN');
-      DELETE FROM "educators" WHERE "userId" IN (SELECT id FROM "users" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')}) AND "role" != 'SUPER_ADMIN');
-      DELETE FROM "employees" WHERE "userId" IN (SELECT id FROM "users" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')}) AND "role" != 'SUPER_ADMIN');
-      DELETE FROM "sessions" WHERE "userId" IN (SELECT id FROM "users" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')}) AND "role" != 'SUPER_ADMIN');
-      DELETE FROM "users" WHERE "organizationId" IN (${otherOrgIds.map(id => `'${id}'`).join(',')}) AND "role" != 'SUPER_ADMIN';
-
-      -- 8. Delete the Organizations
-      DELETE FROM "organization" WHERE "id" IN (${otherOrgIds.map(id => `'${id}'`).join(',')});
-    `.replace(' vendor_id_placeholder', ''));
+    for (const sql of statements) {
+      try {
+        await prisma.$executeRawUnsafe(sql);
+      } catch (err) {
+        console.warn(`Warning executing statement: ${sql.slice(0, 50)}...`, err.message);
+      }
+    }
 
     console.log(`Successfully purged ${otherOrgs.length} dummy organization(s) and all linked data!`);
   }

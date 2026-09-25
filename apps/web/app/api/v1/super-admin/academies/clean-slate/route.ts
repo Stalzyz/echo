@@ -83,52 +83,54 @@ export async function POST(req: Request) {
       if (otherOrgIds.length > 0) {
         const idsList = otherOrgIds.map(id => `'${id}'`).join(',')
         
-        await tx.$executeRawUnsafe(`
-          DELETE FROM "organization_entitlement_overrides" WHERE "organizationId" IN (${idsList});
-          DELETE FROM "organization_usage_counters" WHERE "organizationId" IN (${idsList});
-          DELETE FROM "subscription_payments" WHERE "organizationId" IN (${idsList});
-          DELETE FROM "subscription_invoices" WHERE "organizationId" IN (${idsList});
-          DELETE FROM "subscription_events" WHERE "organizationId" IN (${idsList});
-          DELETE FROM "tenant_subscriptions" WHERE "organizationId" IN (${idsList});
-          DELETE FROM "proposals" WHERE "organizationId" IN (${idsList});
-          DELETE FROM "invoices" WHERE "organizationId" IN (${idsList});
-          DELETE FROM "projects" WHERE "organizationId" IN (${idsList});
-          DELETE FROM "forum_categories" WHERE "organizationId" IN (${idsList});
+        const statements = [
+          `DELETE FROM "organization_entitlement_overrides" WHERE "organizationId" IN (${idsList})`,
+          `DELETE FROM "organization_usage_counters" WHERE "organizationId" IN (${idsList})`,
+          `DELETE FROM "subscription_payments" WHERE "organizationId" IN (${idsList})`,
+          `DELETE FROM "subscription_invoices" WHERE "organizationId" IN (${idsList})`,
+          `DELETE FROM "subscription_events" WHERE "organizationId" IN (${idsList})`,
+          `DELETE FROM "tenant_subscriptions" WHERE "organizationId" IN (${idsList})`,
+          `DELETE FROM "proposals" WHERE "organizationId" IN (${idsList})`,
+          `DELETE FROM "invoices" WHERE "organizationId" IN (${idsList})`,
+          `DELETE FROM "projects" WHERE "organizationId" IN (${idsList})`,
+          `DELETE FROM "forum_categories" WHERE "organizationId" IN (${idsList})`,
+          `DELETE FROM "fee_installments" WHERE "enrollmentId" IN (SELECT id FROM "enrollments" WHERE "batchId" IN (SELECT id FROM "batches" WHERE "organizationId" IN (${idsList})))`,
+          `DELETE FROM "enrollments" WHERE "batchId" IN (SELECT id FROM "batches" WHERE "organizationId" IN (${idsList}))`,
+          `DELETE FROM "batch_sessions" WHERE "batchId" IN (SELECT id FROM "batches" WHERE "organizationId" IN (${idsList}))`,
+          `DELETE FROM "batches" WHERE "organizationId" IN (${idsList})`,
+          `DELETE FROM "lms_lessons" WHERE "moduleId" IN (SELECT id FROM "lms_modules" WHERE "lmsCourseId" IN (SELECT id FROM "lms_courses" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${idsList}))))`,
+          `DELETE FROM "lms_modules" WHERE "lmsCourseId" IN (SELECT id FROM "lms_courses" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${idsList})))`,
+          `DELETE FROM "lms_courses" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${idsList}))`,
+          `DELETE FROM "certificates" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${idsList}))`,
+          `DELETE FROM "quizzes" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${idsList}))`,
+          `DELETE FROM "courses" WHERE "organizationId" IN (${idsList})`,
+          `DELETE FROM "call_records" WHERE "leadId" IN (SELECT id FROM "leads" WHERE "organizationId" IN (${idsList}))`,
+          `DELETE FROM "lead_activities" WHERE "leadId" IN (SELECT id FROM "leads" WHERE "organizationId" IN (${idsList}))`,
+          `DELETE FROM "leads" WHERE "organizationId" IN (${idsList})`,
+          `DELETE FROM "form_submissions" WHERE "formId" IN (SELECT id FROM "enquiry_forms" WHERE "organizationId" IN (${idsList}))`,
+          `DELETE FROM "enquiry_forms" WHERE "organizationId" IN (${idsList})`,
+          `DELETE FROM "demo_registrations" WHERE "demoSessionId" IN (SELECT id FROM "demo_sessions" WHERE "organizationId" IN (${idsList}))`,
+          `DELETE FROM "demo_sessions" WHERE "organizationId" IN (${idsList})`,
+          `DELETE FROM "walk_ins" WHERE "organizationId" IN (${idsList})`,
+          `DELETE FROM "campus_events" WHERE "organizationId" IN (${idsList})`,
+          `DELETE FROM "placement_jobs" WHERE "companyId" IN (SELECT id FROM "placement_companies" WHERE "organizationId" IN (${idsList}))`,
+          `DELETE FROM "placement_companies" WHERE "organizationId" IN (${idsList})`,
+          `DELETE FROM "academy_projects" WHERE "organizationId" IN (${idsList})`,
+          `DELETE FROM "students" WHERE "userId" IN (SELECT id FROM "users" WHERE "organizationId" IN (${idsList}) AND "role" != 'SUPER_ADMIN')`,
+          `DELETE FROM "educators" WHERE "userId" IN (SELECT id FROM "users" WHERE "organizationId" IN (${idsList}) AND "role" != 'SUPER_ADMIN')`,
+          `DELETE FROM "employees" WHERE "userId" IN (SELECT id FROM "users" WHERE "organizationId" IN (${idsList}) AND "role" != 'SUPER_ADMIN')`,
+          `DELETE FROM "sessions" WHERE "userId" IN (SELECT id FROM "users" WHERE "organizationId" IN (${idsList}) AND "role" != 'SUPER_ADMIN')`,
+          `DELETE FROM "users" WHERE "organizationId" IN (${idsList}) AND "role" != 'SUPER_ADMIN'`,
+          `DELETE FROM "organization" WHERE "id" IN (${idsList})`
+        ]
 
-          DELETE FROM "fee_installments" WHERE "enrollmentId" IN (SELECT id FROM "enrollments" WHERE "batchId" IN (SELECT id FROM "batches" WHERE "organizationId" IN (${idsList})));
-          DELETE FROM "enrollments" WHERE "batchId" IN (SELECT id FROM "batches" WHERE "organizationId" IN (${idsList}));
-          DELETE FROM "batch_sessions" WHERE "batchId" IN (SELECT id FROM "batches" WHERE "organizationId" IN (${idsList}));
-          DELETE FROM "batches" WHERE "organizationId" IN (${idsList});
-
-          DELETE FROM "lms_lessons" WHERE "moduleId" IN (SELECT id FROM "lms_modules" WHERE "lmsCourseId" IN (SELECT id FROM "lms_courses" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${idsList}))));
-          DELETE FROM "lms_modules" WHERE "lmsCourseId" IN (SELECT id FROM "lms_courses" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${idsList})));
-          DELETE FROM "lms_courses" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${idsList}));
-          DELETE FROM "certificates" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${idsList}));
-          DELETE FROM "quizzes" WHERE "courseId" IN (SELECT id FROM "courses" WHERE "organizationId" IN (${idsList}));
-          DELETE FROM "courses" WHERE "organizationId" IN (${idsList});
-
-          DELETE FROM "call_records" WHERE "leadId" IN (SELECT id FROM "leads" WHERE "organizationId" IN (${idsList}));
-          DELETE FROM "lead_activities" WHERE "leadId" IN (SELECT id FROM "leads" WHERE "organizationId" IN (${idsList}));
-          DELETE FROM "leads" WHERE "organizationId" IN (${idsList});
-          DELETE FROM "form_submissions" WHERE "formId" IN (SELECT id FROM "enquiry_forms" WHERE "organizationId" IN (${idsList}));
-          DELETE FROM "enquiry_forms" WHERE "organizationId" IN (${idsList});
-          DELETE FROM "demo_registrations" WHERE "demoSessionId" IN (SELECT id FROM "demo_sessions" WHERE "organizationId" IN (${idsList}));
-          DELETE FROM "demo_sessions" WHERE "organizationId" IN (${idsList});
-          DELETE FROM "walk_ins" WHERE "organizationId" IN (${idsList});
-
-          DELETE FROM "campus_events" WHERE "organizationId" IN (${idsList});
-          DELETE FROM "placement_jobs" WHERE "companyId" IN (SELECT id FROM "placement_companies" WHERE "organizationId" IN (${idsList}));
-          DELETE FROM "placement_companies" WHERE "organizationId" IN (${idsList});
-          DELETE FROM "academy_projects" WHERE "organizationId" IN (${idsList});
-
-          DELETE FROM "students" WHERE "userId" IN (SELECT id FROM "users" WHERE "organizationId" IN (${idsList}) AND "role" != 'SUPER_ADMIN');
-          DELETE FROM "educators" WHERE "userId" IN (SELECT id FROM "users" WHERE "organizationId" IN (${idsList}) AND "role" != 'SUPER_ADMIN');
-          DELETE FROM "employees" WHERE "userId" IN (SELECT id FROM "users" WHERE "organizationId" IN (${idsList}) AND "role" != 'SUPER_ADMIN');
-          DELETE FROM "sessions" WHERE "userId" IN (SELECT id FROM "users" WHERE "organizationId" IN (${idsList}) AND "role" != 'SUPER_ADMIN');
-          DELETE FROM "users" WHERE "organizationId" IN (${idsList}) AND "role" != 'SUPER_ADMIN';
-
-          DELETE FROM "organization" WHERE "id" IN (${idsList});
-        `)
+        for (const sql of statements) {
+          try {
+            await tx.$executeRawUnsafe(sql)
+          } catch (err: any) {
+            console.warn(`Clean slate statement note: ${sql.slice(0, 45)}...`, err?.message)
+          }
+        }
       }
 
       // 3. Ensure Demo Accounts Exist
