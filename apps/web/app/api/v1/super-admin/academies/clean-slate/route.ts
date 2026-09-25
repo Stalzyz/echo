@@ -17,11 +17,13 @@ export async function POST(req: Request) {
     await SubscriptionEntitlementService.ensureDefaultPlansExist()
 
     const result = await prisma.$transaction(async (tx) => {
-      // 1. Ensure the Pristine Demo Organization (Apex Coding Academy) exists
+      // 1. Ensure the Pristine Demo Organization (Echo Academy) exists
       let demoOrg = await tx.organization.findFirst({
         where: {
           OR: [
+            { slug: "echo-academy" },
             { slug: "apex-code" },
+            { name: "Echo Academy" },
             { name: "Apex Coding Academy" }
           ]
         }
@@ -30,30 +32,33 @@ export async function POST(req: Request) {
       if (!demoOrg) {
         demoOrg = await tx.organization.create({
           data: {
-            name: "Apex Coding Academy",
-            slug: "apex-code",
-            domain: "apex-code.echolms.com",
-            ownerName: "Apex Academy Director",
+            name: "Echo Academy",
+            slug: "echo-academy",
+            domain: "echo-academy.echolms.com",
+            ownerName: "Echo Academy Director",
             ownerEmail: "demo.academy@echo.in",
             ownerPhone: "+91 9876543210",
             subscription: "GROWTH",
             status: "ACTIVE",
-            primaryColor: "#0d9488",
-            secondaryColor: "#115e59",
-            accentColor: "#f59e0b"
+            primaryColor: "#0f766e",
+            secondaryColor: "#1e1b4b",
+            accentColor: "#6366f1"
           }
         })
       } else {
         demoOrg = await tx.organization.update({
           where: { id: demoOrg.id },
           data: {
-            name: "Apex Coding Academy",
-            slug: "apex-code",
-            domain: "apex-code.echolms.com",
-            ownerName: "Apex Academy Director",
+            name: "Echo Academy",
+            slug: "echo-academy",
+            domain: "echo-academy.echolms.com",
+            ownerName: "Echo Academy Director",
             ownerEmail: "demo.academy@echo.in",
             subscription: "GROWTH",
-            status: "ACTIVE"
+            status: "ACTIVE",
+            primaryColor: "#0f766e",
+            secondaryColor: "#1e1b4b",
+            accentColor: "#6366f1"
           }
         })
       }

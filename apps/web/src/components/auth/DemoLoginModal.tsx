@@ -38,7 +38,7 @@ const DEMO_PERSONAS: DemoPersona[] = [
   {
     id: "admin",
     title: "Academy Admin Dashboard",
-    roleSubtitle: "Apex Coding Academy (Admin)",
+    roleSubtitle: "Echo Academy (Admin)",
     email: "demo.academy@echo.in",
     password: "echo123",
     targetRoute: "/dashboard",

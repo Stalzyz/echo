@@ -153,7 +153,7 @@ export default function VendorManagementPage() {
   }
 
   const handleCleanSlate = async () => {
-    if (!confirm("⚠️ RESET TO CLEAN SLATE?\n\nThis will keep ONLY the pristine Demo Academy (Apex Coding Academy) connected to the landing page and delete all other dummy vendors and test data. Continue?")) return
+    if (!confirm("⚠️ RESET TO CLEAN SLATE?\n\nThis will keep ONLY the pristine Demo Academy (Echo Academy) connected to the landing page and delete all other dummy vendors and test data. Continue?")) return
 
     try {
       toast.loading("Executing Clean Slate purge...", { id: "clean-slate" })
