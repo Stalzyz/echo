@@ -17,7 +17,8 @@ export async function GET(req: Request) {
 
     if (slugParam) {
       org = await prisma.organization.findFirst({
-        where: { OR: [{ slug: slugParam }, { domain: slugParam }] }
+        where: { OR: [{ slug: slugParam }, { domain: slugParam }] },
+        include: { tenantSubscription: { include: { plan: true } } }
       })
     }
 
@@ -31,14 +32,17 @@ export async function GET(req: Request) {
 
       if (activeTenantId) {
         org = await prisma.organization.findUnique({
-          where: { id: activeTenantId }
+          where: { id: activeTenantId },
+          include: { tenantSubscription: { include: { plan: true } } }
         })
       }
     }
 
     // Fallback ONLY for Super Admin outside tenant context
     if (!org && (session.user.role === 'SUPER_ADMIN' || session.user.role === 'Super Admin')) {
-      org = await prisma.organization.findFirst()
+      org = await prisma.organization.findFirst({
+        include: { tenantSubscription: { include: { plan: true } } }
+      })
     }
 
     if (!org) {
@@ -55,8 +59,12 @@ export async function GET(req: Request) {
         accentColor: "#10b981",
         darkModeDefault: false,
         supportEmail: "support@echolms.com",
+        subscription: "GROWTH",
+        plan: null,
       })
     }
+
+    const subPlan = org.tenantSubscription?.plan
 
     return NextResponse.json({
       ...org,
@@ -68,6 +76,19 @@ export async function GET(req: Request) {
       primaryColor: org.primaryColor || "#0d9488",
       secondaryColor: org.secondaryColor || "#f59e0b",
       accentColor: org.accentColor || "#10b981",
+      subscription: org.subscription || (subPlan ? subPlan.slug.toUpperCase() : "STARTER"),
+      plan: subPlan ? {
+        id: subPlan.id,
+        name: subPlan.name,
+        slug: subPlan.slug,
+        badgeText: subPlan.badgeText,
+        features: subPlan.features,
+        maxStudents: subPlan.maxStudents,
+        maxCourses: subPlan.maxCourses,
+        maxBatches: subPlan.maxBatches,
+        maxStaff: subPlan.maxStaff,
+        maxStorageGB: subPlan.maxStorageGB,
+      } : null
     })
   } catch (error: any) {
     console.error("Error in GET /api/v1/settings/organization:", error)

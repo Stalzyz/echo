@@ -2,6 +2,41 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
+export interface PlanFeatureMap {
+  coreLms?: boolean
+  studentPortal?: boolean
+  feesEmi?: boolean
+  certificates?: boolean
+  whatsappAuto?: boolean
+  emailMarketing?: boolean
+  webinars?: boolean
+  whitelabel?: boolean
+  mentorship?: boolean
+  walkInKiosk?: boolean
+  referrals?: boolean
+  customPaymentGateway?: boolean
+  crmPipelines?: boolean
+  attendanceScanner?: boolean
+  aiLessonWriter?: boolean
+  callIntelligence?: boolean
+  customDomain?: boolean
+  apiAccess?: boolean
+  [key: string]: boolean | undefined
+}
+
+export interface PlanInfo {
+  id: string
+  name: string
+  slug: string
+  badgeText?: string | null
+  features?: PlanFeatureMap | null
+  maxStudents: number
+  maxCourses: number
+  maxBatches: number
+  maxStaff: number
+  maxStorageGB: number
+}
+
 export interface Organization {
   id: string;
   name: string;
@@ -20,6 +55,8 @@ export interface Organization {
   website?: string | null;
   phone?: string | null;
   enabledModules?: string[] | null;
+  subscription?: string;
+  plan?: PlanInfo | null;
 }
 
 const defaultOrg: Organization = {
@@ -39,6 +76,8 @@ const defaultOrg: Organization = {
   website: "https://echolms.com",
   phone: null,
   enabledModules: null,
+  subscription: "GROWTH",
+  plan: null,
 };
 
 const OrganizationContext = createContext<Organization>(defaultOrg);

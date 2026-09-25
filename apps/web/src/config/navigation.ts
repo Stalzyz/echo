@@ -8,13 +8,21 @@ import {
 
 export type Role = "SUPER_ADMIN" | "MANAGER" | "STAFF" | "CLIENT" | "STUDENT" | "VENDOR" | "INTERN"
 
+export interface NavChild {
+  title: string
+  href: string
+  feature?: string
+  badge?: string
+}
+
 export interface NavItem {
   title: string
   href: string
   icon: React.ElementType
   roles: Role[]
   resource?: string
-  children?: { title: string; href: string }[]
+  feature?: string
+  children?: NavChild[]
 }
 
 export const navigation: NavItem[] = [
@@ -31,32 +39,32 @@ export const navigation: NavItem[] = [
     resource: "ACADEMY",
     roles: ["SUPER_ADMIN", "MANAGER"],
     children: [
-      { title: "Admissions CRM", href: "/dashboard/academy/admissions" },
-      { title: "Form Builder", href: "/dashboard/academy/forms" },
-      { title: "Walk-ins Kiosk", href: "/dashboard/academy/walk-ins" },
-      { title: "Demo Sessions", href: "/dashboard/academy/demo-sessions" },
-      { title: "Campus Students",   href: "/dashboard/academy/students/onsite" },
-      { title: "Remote Students",   href: "/dashboard/academy/students/online" },
-      { title: "Global Leaderboard", href: "/dashboard/academy/leaderboard" },
-      { title: "Campus Faculty",   href: "/dashboard/academy/educators/onsite" },
-      { title: "Office Hours", href: "/dashboard/studio/office-hours" },
-      { title: "Remote Instructors",   href: "/dashboard/academy/educators/online" },
-      { title: "Fee Collection",   href: "/dashboard/academy/fees" },
-      { title: "Batches",    href: "/dashboard/academy/batches" },
-      { title: "Live Projects", href: "/dashboard/academy/projects" },
-      { title: "Internships", href: "/dashboard/academy/internships" },
-      { title: "Placements", href: "/dashboard/academy/placements" },
-      { title: "Marketplace", href: "/dashboard/academy/marketplace" },
-      { title: "Visual Automations", href: "/dashboard/academy/automation" },
-      { title: "WhatsApp Templates", href: "/dashboard/academy/whatsapp" },
-      { title: "Coupons & Offers", href: "/dashboard/academy/coupons" },
-      { title: "Storefront Theme", href: "/dashboard/website/theme" },
-      { title: "1:1 Consultations", href: "/dashboard/academy/consultations" },
-      { title: "Student EMI Plans", href: "/dashboard/academy/fees/emi" },
-      { title: "Webinars & Funnels", href: "/dashboard/academy/webinars" },
-      { title: "Social Community", href: "/dashboard/academy/community" },
-      { title: "Referrals", href: "/dashboard/academy/referrals" },
-      { title: "AI Risk Engine", href: "/dashboard/academy/risk" },
+      { title: "Admissions CRM", href: "/dashboard/academy/admissions", feature: "crmPipelines" },
+      { title: "Form Builder", href: "/dashboard/academy/forms", feature: "crmPipelines" },
+      { title: "Walk-ins Kiosk", href: "/dashboard/academy/walk-ins", feature: "walkInKiosk" },
+      { title: "Demo Sessions", href: "/dashboard/academy/demo-sessions", feature: "crmPipelines" },
+      { title: "Campus Students", href: "/dashboard/academy/students/onsite", feature: "coreLms" },
+      { title: "Remote Students", href: "/dashboard/academy/students/online", feature: "coreLms" },
+      { title: "Global Leaderboard", href: "/dashboard/academy/leaderboard", feature: "coreLms" },
+      { title: "Campus Faculty", href: "/dashboard/academy/educators/onsite", feature: "coreLms" },
+      { title: "Office Hours", href: "/dashboard/studio/office-hours", feature: "mentorship" },
+      { title: "Remote Instructors", href: "/dashboard/academy/educators/online", feature: "coreLms" },
+      { title: "Fee Collection", href: "/dashboard/academy/fees", feature: "feesEmi" },
+      { title: "Student EMI Plans", href: "/dashboard/academy/fees/emi", feature: "feesEmi" },
+      { title: "Batches", href: "/dashboard/academy/batches", feature: "coreLms" },
+      { title: "Live Projects", href: "/dashboard/academy/projects", feature: "coreLms" },
+      { title: "Internships", href: "/dashboard/academy/internships", feature: "coreLms" },
+      { title: "Placements", href: "/dashboard/academy/placements", feature: "coreLms" },
+      { title: "Marketplace", href: "/dashboard/academy/marketplace", feature: "whitelabel" },
+      { title: "Visual Automations", href: "/dashboard/academy/automation", feature: "whatsappAuto" },
+      { title: "WhatsApp Templates", href: "/dashboard/academy/whatsapp", feature: "whatsappAuto" },
+      { title: "Coupons & Offers", href: "/dashboard/academy/coupons", feature: "coreLms" },
+      { title: "Storefront Theme", href: "/dashboard/website/theme", feature: "whitelabel" },
+      { title: "1:1 Consultations", href: "/dashboard/academy/consultations", feature: "mentorship" },
+      { title: "Webinars & Funnels", href: "/dashboard/academy/webinars", feature: "webinars" },
+      { title: "Social Community", href: "/dashboard/academy/community", feature: "coreLms" },
+      { title: "Referrals", href: "/dashboard/academy/referrals", feature: "referrals" },
+      { title: "AI Risk Engine", href: "/dashboard/academy/risk", feature: "callIntelligence" },
     ],
   },
 
@@ -82,8 +90,8 @@ export const navigation: NavItem[] = [
     icon: Settings,
     roles: ["SUPER_ADMIN"],
     children: [
-      { title: "Branding & Theme", href: "/dashboard/settings" },
-      { title: "Storefront Builder", href: "/dashboard/website/theme" },
+      { title: "Branding & Theme", href: "/dashboard/settings", feature: "whitelabel" },
+      { title: "Storefront Builder", href: "/dashboard/website/theme", feature: "whitelabel" },
       { title: "Roles & Permissions", href: "/dashboard/settings/roles" },
       { title: "Finance & Currency", href: "/dashboard/settings/finance" },
       { title: "Integrations", href: "/dashboard/settings/integrations" },
@@ -91,11 +99,36 @@ export const navigation: NavItem[] = [
   },
 ]
 
-export const getNavItemsByRole = (role: string, customPermissions?: string[]) => {
-  return navigation.filter((item) => {
-    if (customPermissions && customPermissions.length > 0 && item.resource) {
-      return customPermissions.includes(item.resource)
-    }
-    return item.roles.includes(role as Role)
-  })
+export const getNavItemsByRole = (
+  role: string, 
+  customPermissions?: string[], 
+  planFeatures?: Record<string, boolean | undefined> | null,
+  isSuperAdmin: boolean = false
+) => {
+  return navigation
+    .filter((item) => {
+      if (customPermissions && customPermissions.length > 0 && item.resource) {
+        if (!customPermissions.includes(item.resource)) return false
+      }
+      if (item.feature && !isSuperAdmin && planFeatures && planFeatures[item.feature] === false) {
+        return false
+      }
+      return item.roles.includes(role as Role)
+    })
+    .map((item) => {
+      if (!item.children) return item
+      
+      const filteredChildren = item.children.filter((child) => {
+        if (!isSuperAdmin && planFeatures && child.feature) {
+          // If the feature is explicitly false in the subscription plan, do not show it
+          return planFeatures[child.feature] !== false
+        }
+        return true
+      })
+
+      return {
+        ...item,
+        children: filteredChildren
+      }
+    })
 }

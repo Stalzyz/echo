@@ -20,6 +20,7 @@ function OrgHeader() {
   const org = useOrganization()
   const orgName = org?.name && !org.name.includes("Grekam") ? org.name : "Echo LMS"
   const logoSrc = org?.logoUrl || org?.academyLogoUrl || "/echo_logo.png"
+  const planBadge = org?.plan?.name || (org?.subscription ? `${org.subscription} PLAN` : "STARTER PLAN")
 
   return (
     <div className="flex items-center gap-2.5 shrink-0">
@@ -31,8 +32,8 @@ function OrgHeader() {
       <div className="flex flex-col">
         <div className="flex items-center gap-2">
           <span className="text-sm md:text-base font-black tracking-tight text-slate-900 truncate max-w-[120px] sm:max-w-none">{orgName}</span>
-          <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-800 text-[10px] font-extrabold border border-amber-400/40 uppercase tracking-wider items-center gap-1 shadow-xs">
-            PRO SAAS
+          <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-800 text-[10px] font-black border border-teal-500/20 uppercase tracking-wider items-center gap-1 shadow-xs font-mono">
+            {planBadge}
           </span>
         </div>
       </div>

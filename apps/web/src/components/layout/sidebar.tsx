@@ -127,7 +127,11 @@ export function Sidebar() {
   
   const role = rawRole as Role
   const customPermissions = (session?.user as any)?.permissions || []
-  const navItems = getNavItemsByRole(role, customPermissions)
+  const isSuperAdminPlatform =
+    (role === "SUPER_ADMIN" || session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "Super Admin") &&
+    !session?.user?.impersonatedBySuperAdmin
+
+  const navItems = getNavItemsByRole(role, customPermissions, org?.plan?.features || null, isSuperAdminPlatform)
 
   const getBottomTabs = (role: Role) => {
     switch (role) {
