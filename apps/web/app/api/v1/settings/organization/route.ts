@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { getTenantFilter } from "@/lib/tenant"
+import { SubscriptionEntitlementService } from "@/lib/services/subscription-entitlement.service"
 
 export async function GET(req: Request) {
   try {
@@ -59,9 +60,19 @@ export async function GET(req: Request) {
         accentColor: "#10b981",
         darkModeDefault: false,
         supportEmail: "support@echolms.com",
-        subscription: "GROWTH",
+        subscription: "STARTER",
         plan: null,
       })
+    }
+
+    // If tenant exists but has no subscription record yet, auto-resolve and link it
+    if (org.id && org.id !== "default" && !org.tenantSubscription) {
+      try {
+        const sub = await SubscriptionEntitlementService.getOrganizationSubscription(org.id)
+        org.tenantSubscription = sub
+      } catch (err) {
+        console.error("Failed to auto-resolve tenant subscription:", err)
+      }
     }
 
     const subPlan = org.tenantSubscription?.plan

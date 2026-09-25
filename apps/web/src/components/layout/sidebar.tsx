@@ -117,18 +117,21 @@ export function Sidebar() {
   const org = useOrganization()
 
   let rawRole = session?.user?.role || "INTERN"
-  if (rawRole === "Super Admin") rawRole = "SUPER_ADMIN"
-  if (rawRole === "Manager") rawRole = "MANAGER"
-  if (rawRole === "Staff") rawRole = "STAFF"
-  if (rawRole === "Client") rawRole = "CLIENT"
-  if (rawRole === "Student") rawRole = "STUDENT"
-  if (rawRole === "Vendor") rawRole = "VENDOR"
-  if (rawRole === "Intern") rawRole = "INTERN"
+  if (rawRole === "Super Admin" || rawRole === "SUPER_ADMIN") rawRole = "SUPER_ADMIN"
+  if (rawRole === "Admin" || rawRole === "ADMIN") rawRole = "ADMIN"
+  if (rawRole === "Manager" || rawRole === "MANAGER") rawRole = "MANAGER"
+  if (rawRole === "Staff" || rawRole === "STAFF") rawRole = "STAFF"
+  if (rawRole === "Client" || rawRole === "CLIENT") rawRole = "CLIENT"
+  if (rawRole === "Student" || rawRole === "STUDENT") rawRole = "STUDENT"
+  if (rawRole === "Vendor" || rawRole === "VENDOR") rawRole = "VENDOR"
+  if (rawRole === "Intern" || rawRole === "INTERN") rawRole = "INTERN"
+  if (rawRole === "Educator" || rawRole === "EDUCATOR") rawRole = "EDUCATOR"
   
   const role = rawRole as Role
   const customPermissions = (session?.user as any)?.permissions || []
   const isSuperAdminPlatform =
-    (role === "SUPER_ADMIN" || session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "Super Admin") &&
+    (role === "SUPER_ADMIN") &&
+    !session?.user?.organizationId &&
     !session?.user?.impersonatedBySuperAdmin
 
   const navItems = getNavItemsByRole(role, customPermissions, org?.plan?.features || null, isSuperAdminPlatform)

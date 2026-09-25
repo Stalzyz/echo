@@ -37,6 +37,7 @@ export async function POST(req: Request) {
     // Execute atomic provisioning inside database transaction
     const result = await prisma.$transaction(async (tx) => {
       // Step 1: Create or fetch Organization (Tenant)
+      const requestedTier = (subscription || "STARTER").toUpperCase()
       let organization = await tx.organization.findFirst({
         where: { OR: [{ slug }, { name }] }
       })
@@ -53,12 +54,57 @@ export async function POST(req: Request) {
             ownerName: ownerName || name,
             ownerEmail,
             ownerPhone: ownerPhone || null,
-            subscription: subscription || "PRO",
+            subscription: requestedTier,
             status: "ACTIVE"
           }
         })
         steps[0].status = "SUCCESS"
         steps[0].details = `Tenant ID ${organization.id} created successfully with domain ${organization.domain}`
+      }
+
+      // Step 1.5: Bind SaaS Subscription Plan
+      const searchKey = requestedTier.toLowerCase()
+      let targetPlan = await tx.saaSPlan.findFirst({
+        where: {
+          OR: [
+            { slug: { contains: searchKey } },
+            { id: { contains: searchKey } },
+            { name: { contains: requestedTier, mode: 'insensitive' } }
+          ],
+          isActive: true
+        }
+      })
+
+      if (!targetPlan) {
+        targetPlan = await tx.saaSPlan.findFirst({
+          where: { isActive: true },
+          orderBy: { sortOrder: "asc" }
+        })
+      }
+
+      if (targetPlan) {
+        const now = new Date()
+        const periodEnd = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000)
+
+        await tx.tenantSubscription.upsert({
+          where: { organizationId: organization.id },
+          create: {
+            organizationId: organization.id,
+            planId: targetPlan.id,
+            status: "ACTIVE",
+            billingCycle: "YEARLY",
+            startDate: now,
+            currentPeriodStart: now,
+            currentPeriodEnd: periodEnd,
+            cancelAtPeriodEnd: false
+          },
+          update: {
+            planId: targetPlan.id,
+            status: "ACTIVE",
+            billingCycle: "YEARLY",
+            currentPeriodEnd: periodEnd
+          }
+        })
       }
 
       // Step 2: Create Admin Account

@@ -48,7 +48,7 @@ interface SidebarItem {
   icon: React.ElementType;
   badge?: string;
   requiredModule?: string;
-  children?: { title: string; href: string; icon?: React.ElementType }[];
+  children?: { title: string; href: string; icon?: React.ElementType; requiredModule?: string }[];
 }
 
 const superAdminSidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
@@ -88,16 +88,19 @@ const sidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
         title: "Admissions CRM",
         href: "/dashboard/academy/admissions",
         icon: Users,
+        requiredModule: "crmPipelines",
       },
       {
         title: "Call Intelligence",
         href: "/dashboard/academy/calls",
         icon: Phone,
+        requiredModule: "callIntelligence",
       },
       {
         title: "Form Builder",
         href: "/dashboard/academy/forms",
         icon: FileText,
+        requiredModule: "crmPipelines",
       },
       {
         title: "Walk-ins Kiosk",
@@ -109,56 +112,67 @@ const sidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
         title: "Demo Sessions",
         href: "/dashboard/academy/demo-sessions",
         icon: Calendar,
+        requiredModule: "crmPipelines",
       },
       {
         title: "Campus Students",
         href: "/dashboard/academy/students/onsite",
         icon: GraduationCap,
+        requiredModule: "coreLms",
       },
       {
         title: "Remote Students",
         href: "/dashboard/academy/students/online",
         icon: GraduationCap,
+        requiredModule: "coreLms",
       },
       {
         title: "Campus Faculty",
         href: "/dashboard/academy/educators/onsite",
         icon: Users,
+        requiredModule: "coreLms",
       },
       {
         title: "Remote Instructors",
         href: "/dashboard/academy/educators/online",
         icon: Users,
+        requiredModule: "coreLms",
       },
       {
         title: "Fee Collection",
         href: "/dashboard/academy/fees",
         icon: DollarSign,
+        requiredModule: "feesEmi",
       },
       {
         title: "Student EMI Plans",
         href: "/dashboard/academy/fees/emi",
         icon: DollarSign,
+        requiredModule: "feesEmi",
       },
       {
         title: "Batches & Courses",
         href: "/dashboard/academy/batches",
         icon: ClipboardList,
+        requiredModule: "coreLms",
       },
       {
         title: "Live Projects",
         href: "/dashboard/academy/projects",
         icon: Briefcase,
+        requiredModule: "coreLms",
       },
       {
         title: "Internships",
         href: "/dashboard/academy/internships",
         icon: Briefcase,
+        requiredModule: "coreLms",
       },
       {
         title: "Placements",
         href: "/dashboard/academy/placements",
         icon: Award,
+        requiredModule: "coreLms",
       },
       {
         title: "Webinars & Funnels",
@@ -170,6 +184,7 @@ const sidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
         title: "Social Community",
         href: "/dashboard/academy/community",
         icon: MessageSquare,
+        requiredModule: "coreLms",
       },
       {
         title: "WhatsApp Messages",
@@ -181,12 +196,25 @@ const sidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
         title: "Visual Automations",
         href: "/dashboard/academy/automation",
         icon: Layers,
-        requiredModule: "emailMarketing",
+        requiredModule: "whatsappAuto",
+      },
+      {
+        title: "Referrals & Rewards",
+        href: "/dashboard/academy/referrals",
+        icon: Award,
+        requiredModule: "referrals",
+      },
+      {
+        title: "AI Risk Engine",
+        href: "/dashboard/academy/risk",
+        icon: ShieldAlert,
+        requiredModule: "callIntelligence",
       },
       {
         title: "Global Leaderboard",
         href: "/dashboard/academy/leaderboard",
         icon: Trophy,
+        requiredModule: "coreLms",
       },
     ],
   },
@@ -198,22 +226,23 @@ const sidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
         href: "/dashboard/studio",
         icon: BookOpen,
         children: [
-          { title: "Studio Dashboard", href: "/dashboard/studio" },
-          { title: "My Students", href: "/dashboard/studio/students" },
-          { title: "My Courses", href: "/dashboard/studio/courses" },
-          { title: "Course Builder", href: "/dashboard/studio/course-builder" },
-          { title: "Quiz Builder", href: "/dashboard/studio/quiz-builder" },
-          { title: "Assignments", href: "/dashboard/studio/assignments" },
-          { title: "Certificates", href: "/dashboard/studio/certificates" },
-          { title: "Analytics", href: "/dashboard/studio/analytics" },
-          { title: "Live Studio", href: "/dashboard/studio/live" },
-          { title: "Office Hours", href: "/dashboard/studio/office-hours" },
+          { title: "Studio Dashboard", href: "/dashboard/studio", requiredModule: "coreLms" },
+          { title: "My Students", href: "/dashboard/studio/students", requiredModule: "coreLms" },
+          { title: "My Courses", href: "/dashboard/studio/courses", requiredModule: "coreLms" },
+          { title: "Course Builder", href: "/dashboard/studio/course-builder", requiredModule: "coreLms" },
+          { title: "Quiz Builder", href: "/dashboard/studio/quiz-builder", requiredModule: "coreLms" },
+          { title: "Assignments", href: "/dashboard/studio/assignments", requiredModule: "coreLms" },
+          { title: "Certificates", href: "/dashboard/studio/certificates", requiredModule: "certificates" },
+          { title: "Analytics", href: "/dashboard/studio/analytics", requiredModule: "coreLms" },
+          { title: "Live Studio", href: "/dashboard/studio/live", requiredModule: "webinars" },
+          { title: "Office Hours", href: "/dashboard/studio/office-hours", requiredModule: "mentorship" },
         ],
       },
       {
         title: "Office Hours",
         href: "/dashboard/studio/office-hours",
         icon: Calendar,
+        requiredModule: "mentorship",
       },
     ],
   },
@@ -225,11 +254,11 @@ const sidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
         href: "/dashboard/settings",
         icon: Settings,
         children: [
-          { title: "Branding & Theme", href: "/dashboard/settings" },
+          { title: "Branding & Theme", href: "/dashboard/settings", requiredModule: "whitelabel" },
           { title: "Company Details", href: "/dashboard/settings/organization" },
           { title: "Finance & Currency", href: "/dashboard/settings/finance" },
           { title: "Roles & Permissions", href: "/dashboard/settings/roles" },
-          { title: "Integrations & API", href: "/dashboard/settings/integrations" },
+          { title: "Integrations & API", href: "/dashboard/settings/integrations", requiredModule: "apiAccess" },
           { title: "Audit Logs", href: "/dashboard/settings/audit-logs" },
           { title: "Security & Auth", href: "/dashboard/settings/security" },
         ],
@@ -330,13 +359,24 @@ export function AppSidebar() {
     : sidebarGroups
         .map((g) => ({
           ...g,
-          items: g.items.filter((item) => {
-            if (item.requiredModule && !plan.hasFeature(item.requiredModule)) return false;
-            if (item.requiredModule && org?.enabledModules && Array.isArray(org.enabledModules)) {
-              return org.enabledModules.includes(item.requiredModule);
-            }
-            return true;
-          }),
+          items: g.items
+            .filter((item) => {
+              if (item.requiredModule && !plan.hasFeature(item.requiredModule)) return false;
+              if (item.requiredModule && org?.enabledModules && Array.isArray(org.enabledModules)) {
+                return org.enabledModules.includes(item.requiredModule);
+              }
+              return true;
+            })
+            .map((item) => {
+              if (!item.children) return item;
+              return {
+                ...item,
+                children: item.children.filter((sub) => {
+                  if (sub.requiredModule && !plan.hasFeature(sub.requiredModule)) return false;
+                  return true;
+                }),
+              };
+            }),
         }))
         .filter((g) => g.items.length > 0);
 

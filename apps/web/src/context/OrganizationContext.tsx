@@ -76,7 +76,7 @@ const defaultOrg: Organization = {
   website: "https://echolms.com",
   phone: null,
   enabledModules: null,
-  subscription: "GROWTH",
+  subscription: "STARTER",
   plan: null,
 };
 

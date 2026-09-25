@@ -17,13 +17,19 @@ const DEFAULT_STARTER_MODULES: Record<string, boolean> = {
   feesEmi: true,
   certificates: true,
   customPaymentGateway: true,
+  crmPipelines: true,
+  attendanceScanner: true,
   whatsappAuto: false,
   emailMarketing: false,
   webinars: false,
   whitelabel: false,
   mentorship: false,
   walkInKiosk: false,
-  referrals: false
+  referrals: false,
+  aiLessonWriter: false,
+  callIntelligence: false,
+  customDomain: false,
+  apiAccess: false,
 }
 
 const GROWTH_MODULES: Record<string, boolean> = {
@@ -32,13 +38,19 @@ const GROWTH_MODULES: Record<string, boolean> = {
   feesEmi: true,
   certificates: true,
   customPaymentGateway: true,
+  crmPipelines: true,
+  attendanceScanner: true,
   whatsappAuto: true,
   emailMarketing: true,
   webinars: true,
   whitelabel: true,
-  mentorship: false,
+  mentorship: true,
   walkInKiosk: false,
-  referrals: true
+  referrals: true,
+  aiLessonWriter: true,
+  callIntelligence: true,
+  customDomain: true,
+  apiAccess: false,
 }
 
 const ALL_MODULES: Record<string, boolean> = {
@@ -47,23 +59,32 @@ const ALL_MODULES: Record<string, boolean> = {
   feesEmi: true,
   certificates: true,
   customPaymentGateway: true,
+  crmPipelines: true,
+  attendanceScanner: true,
   whatsappAuto: true,
   emailMarketing: true,
   webinars: true,
   whitelabel: true,
   mentorship: true,
   walkInKiosk: true,
-  referrals: true
+  referrals: true,
+  aiLessonWriter: true,
+  callIntelligence: true,
+  customDomain: true,
+  apiAccess: true,
 }
 
 export function usePlan(): PlanDetails {
   const org = useOrganization()
   const { data: session } = useSession()
 
-  const isSuperAdmin = session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "Super Admin"
+  // Only global Super Admin viewing platform mode (NOT in tenant context, NOT impersonating) gets full bypass
+  const isSuperAdminGlobal =
+    (session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "Super Admin") &&
+    !session?.user?.organizationId &&
+    !session?.user?.impersonatedBySuperAdmin
 
-  // Super admins have access to all features across all modules
-  if (isSuperAdmin) {
+  if (isSuperAdminGlobal) {
     return {
       planName: "PLATFORM_SUPER_ADMIN",
       enabledModules: ALL_MODULES,
@@ -73,34 +94,41 @@ export function usePlan(): PlanDetails {
     }
   }
 
-  const rawSub = (org as any)?.subscription?.toUpperCase() || "STARTER"
+  // Use database plan if available
+  const planObj = org?.plan
+  const planSlug = (planObj?.slug || org?.subscription || "STARTER").toUpperCase()
 
-  let planName = "STARTER"
-  let modules = DEFAULT_STARTER_MODULES
+  let fallbackModules = DEFAULT_STARTER_MODULES
   let studentLimit: number | "Unlimited" = 500
   let courseLimit: number | "Unlimited" = 15
 
-  if (rawSub === "ENTERPRISE" || rawSub === "CUSTOM") {
-    planName = "ENTERPRISE"
-    modules = ALL_MODULES
-    studentLimit = "Unlimited"
-    courseLimit = "Unlimited"
-  } else if (rawSub === "GROWTH" || rawSub === "PRO") {
-    planName = "GROWTH"
-    modules = GROWTH_MODULES
-    studentLimit = 2500
-    courseLimit = 50
+  if (planSlug.includes("ENTERPRISE") || planSlug.includes("CUSTOM")) {
+    fallbackModules = ALL_MODULES
+    studentLimit = planObj?.maxStudents === -1 ? "Unlimited" : (planObj?.maxStudents ?? "Unlimited")
+    courseLimit = planObj?.maxCourses === -1 ? "Unlimited" : (planObj?.maxCourses ?? "Unlimited")
+  } else if (planSlug.includes("GROWTH") || planSlug.includes("PRO")) {
+    fallbackModules = GROWTH_MODULES
+    studentLimit = planObj?.maxStudents ?? 2500
+    courseLimit = planObj?.maxCourses ?? 50
   } else {
-    planName = "STARTER"
-    modules = DEFAULT_STARTER_MODULES
-    studentLimit = 500
-    courseLimit = 15
+    fallbackModules = DEFAULT_STARTER_MODULES
+    studentLimit = planObj?.maxStudents ?? 500
+    courseLimit = planObj?.maxCourses ?? 15
+  }
+
+  const featuresMap = (planObj?.features as Record<string, boolean>) || fallbackModules
+
+  const hasFeature = (moduleKey: string): boolean => {
+    if (featuresMap && typeof featuresMap[moduleKey] === "boolean") {
+      return featuresMap[moduleKey]
+    }
+    return !!fallbackModules[moduleKey]
   }
 
   return {
-    planName,
-    enabledModules: modules,
-    hasFeature: (moduleKey: string) => !!modules[moduleKey],
+    planName: planObj?.name || org?.subscription || "STARTER",
+    enabledModules: featuresMap,
+    hasFeature,
     studentLimit,
     courseLimit
   }

@@ -18,7 +18,7 @@ const RealtimeIndicator = dynamic(() => import("@/components/RealtimeIndicator")
 
 function OrgHeader() {
   const org = useOrganization()
-  const orgName = org?.name && !org.name.includes("Grekam") ? org.name : "Echo LMS"
+  const orgName = org?.name || "Echo LMS"
   const logoSrc = org?.logoUrl || org?.academyLogoUrl || "/echo_logo.png"
   const planBadge = org?.plan?.name || (org?.subscription ? `${org.subscription} PLAN` : "STARTER PLAN")
 
@@ -47,17 +47,20 @@ export function TopNav() {
   const [mobileOpen, setMobileOpen] = useState(false)
   
   let rawRole = session?.user?.role || "SUPER_ADMIN"
-  if (rawRole === "Super Admin") rawRole = "SUPER_ADMIN"
-  if (rawRole === "Manager") rawRole = "MANAGER"
-  if (rawRole === "Staff") rawRole = "STAFF"
-  if (rawRole === "Client") rawRole = "CLIENT"
-  if (rawRole === "Student") rawRole = "STUDENT"
-  if (rawRole === "Vendor") rawRole = "VENDOR"
-  if (rawRole === "Intern") rawRole = "INTERN"
+  if (rawRole === "Super Admin" || rawRole === "SUPER_ADMIN") rawRole = "SUPER_ADMIN"
+  if (rawRole === "Admin" || rawRole === "ADMIN") rawRole = "ADMIN"
+  if (rawRole === "Manager" || rawRole === "MANAGER") rawRole = "MANAGER"
+  if (rawRole === "Staff" || rawRole === "STAFF") rawRole = "STAFF"
+  if (rawRole === "Client" || rawRole === "CLIENT") rawRole = "CLIENT"
+  if (rawRole === "Student" || rawRole === "STUDENT") rawRole = "STUDENT"
+  if (rawRole === "Vendor" || rawRole === "VENDOR") rawRole = "VENDOR"
+  if (rawRole === "Intern" || rawRole === "INTERN") rawRole = "INTERN"
+  if (rawRole === "Educator" || rawRole === "EDUCATOR") rawRole = "EDUCATOR"
   
   const role = rawRole as Role
   const isSuperAdminPlatform =
-    (role === "SUPER_ADMIN" || session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "Super Admin") &&
+    (role === "SUPER_ADMIN") &&
+    !session?.user?.organizationId &&
     !session?.user?.impersonatedBySuperAdmin
 
   return (

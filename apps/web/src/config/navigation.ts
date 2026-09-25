@@ -6,7 +6,7 @@ import {
   Settings,
 } from "lucide-react"
 
-export type Role = "SUPER_ADMIN" | "MANAGER" | "STAFF" | "CLIENT" | "STUDENT" | "VENDOR" | "INTERN"
+export type Role = "SUPER_ADMIN" | "ADMIN" | "MANAGER" | "STAFF" | "CLIENT" | "STUDENT" | "VENDOR" | "INTERN" | "EDUCATOR"
 
 export interface NavChild {
   title: string
@@ -30,14 +30,14 @@ export const navigation: NavItem[] = [
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
-    roles: ["SUPER_ADMIN", "MANAGER", "STAFF", "STUDENT", "INTERN"],
+    roles: ["SUPER_ADMIN", "ADMIN", "MANAGER", "STAFF", "STUDENT", "INTERN", "EDUCATOR"],
   },
   {
     title: "Academy Admin",
     href: "/dashboard/academy/admissions",
     icon: GraduationCap,
     resource: "ACADEMY",
-    roles: ["SUPER_ADMIN", "MANAGER"],
+    roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
     children: [
       { title: "Admissions CRM", href: "/dashboard/academy/admissions", feature: "crmPipelines" },
       { title: "Form Builder", href: "/dashboard/academy/forms", feature: "crmPipelines" },
@@ -72,13 +72,13 @@ export const navigation: NavItem[] = [
     title: "Teaching Studio",
     href: "/dashboard/studio",
     icon: GraduationCap,
-    roles: ["SUPER_ADMIN", "MANAGER", "STAFF"],
+    roles: ["SUPER_ADMIN", "ADMIN", "MANAGER", "STAFF", "EDUCATOR"],
   },
   {
     title: "Student Portal",
     href: "/student/assignments",
     icon: BookOpen,
-    roles: ["SUPER_ADMIN", "MANAGER", "STAFF", "STUDENT", "INTERN"],
+    roles: ["SUPER_ADMIN", "ADMIN", "MANAGER", "STAFF", "STUDENT", "INTERN"],
     children: [
       { title: "Assignments & Submissions", href: "/student/assignments" },
       { title: "Digital Passport", href: "/student/cuid-student-demo" },
@@ -88,13 +88,13 @@ export const navigation: NavItem[] = [
     title: "Settings",
     href: "/dashboard/settings",
     icon: Settings,
-    roles: ["SUPER_ADMIN"],
+    roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
     children: [
       { title: "Branding & Theme", href: "/dashboard/settings", feature: "whitelabel" },
       { title: "Storefront Builder", href: "/dashboard/website/theme", feature: "whitelabel" },
       { title: "Roles & Permissions", href: "/dashboard/settings/roles" },
       { title: "Finance & Currency", href: "/dashboard/settings/finance" },
-      { title: "Integrations", href: "/dashboard/settings/integrations" },
+      { title: "Integrations", href: "/dashboard/settings/integrations", feature: "apiAccess" },
     ],
   },
 ]
