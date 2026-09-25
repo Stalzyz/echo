@@ -1,110 +1,46 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
-
-export interface SubscriptionPlanItem {
-  id: string
-  name: string
-  originalPriceYearly: number
-  offerPriceYearly: number
-  gstText: string
-  studentLimit: number | "Unlimited"
-  instructorLimit: number | "Unlimited"
-  courseLimit: number | "Unlimited"
-  storageLimitGB: number | "Unlimited"
-  enabledModules: Record<string, boolean>
-  customPaymentLink: string
-  status: "ACTIVE" | "DISABLED"
-  popular?: boolean
-  badgeText?: string
-}
-
-// In-memory / persistent fallback cache
-let globalPlansCache: SubscriptionPlanItem[] = [
-  {
-    id: "plan-starter",
-    name: "STARTER ACADEMY",
-    originalPriceYearly: 24999,
-    offerPriceYearly: 14999,
-    gstText: "+ 18% GST",
-    studentLimit: 500,
-    instructorLimit: 5,
-    courseLimit: 15,
-    storageLimitGB: 50,
-    enabledModules: {
-      coreLms: true,
-      studentPortal: true,
-      feesEmi: true,
-      certificates: true,
-      customPaymentGateway: true
-    },
-    customPaymentLink: "https://echolms.com/subscribe/starter",
-    status: "ACTIVE",
-    badgeText: "Save 40%"
-  },
-  {
-    id: "plan-growth",
-    name: "GROWTH INSTITUTE",
-    originalPriceYearly: 49999,
-    offerPriceYearly: 29999,
-    gstText: "+ 18% GST",
-    studentLimit: 2500,
-    instructorLimit: 20,
-    courseLimit: 50,
-    storageLimitGB: 200,
-    enabledModules: {
-      coreLms: true,
-      studentPortal: true,
-      feesEmi: true,
-      certificates: true,
-      customPaymentGateway: true,
-      whatsappAutomation: true,
-      attendanceScanner: true,
-      crmPipelines: true,
-      aiLessonWriter: true
-    },
-    customPaymentLink: "https://echolms.com/subscribe/growth",
-    status: "ACTIVE",
-    popular: true,
-    badgeText: "Most Popular"
-  },
-  {
-    id: "plan-enterprise",
-    name: "ENTERPRISE PRO",
-    originalPriceYearly: 99999,
-    offerPriceYearly: 59999,
-    gstText: "+ 18% GST",
-    studentLimit: "Unlimited",
-    instructorLimit: "Unlimited",
-    courseLimit: "Unlimited",
-    storageLimitGB: "Unlimited",
-    enabledModules: {
-      coreLms: true,
-      studentPortal: true,
-      feesEmi: true,
-      certificates: true,
-      customPaymentGateway: true,
-      whatsappAutomation: true,
-      attendanceScanner: true,
-      crmPipelines: true,
-      aiLessonWriter: true,
-      customDomain: true,
-      whiteLabelBranding: true,
-      prioritySupport: true,
-      multiCampusAccess: true
-    },
-    customPaymentLink: "https://echolms.com/subscribe/enterprise",
-    status: "ACTIVE",
-    badgeText: "Full Power"
-  }
-]
+import { SubscriptionEntitlementService } from "@/lib/services/subscription-entitlement.service"
 
 export async function GET() {
   try {
-    return NextResponse.json({ plans: globalPlansCache })
+    await SubscriptionEntitlementService.ensureDefaultPlansExist()
+
+    const dbPlans = await prisma.saaSPlan.findMany({
+      orderBy: { sortOrder: 'asc' }
+    })
+
+    // Format for UI consumption
+    const plans = dbPlans.map(p => ({
+      id: p.id,
+      slug: p.slug,
+      name: p.name,
+      description: p.description,
+      billingType: p.billingType,
+      monthlyPrice: p.monthlyPrice,
+      originalPriceYearly: p.yearlyPrice,
+      offerPriceYearly: p.offerPriceYearly || p.yearlyPrice,
+      gstText: p.gstText || "+ 18% GST",
+      currency: p.currency,
+      taxRate: p.taxRate,
+      trialDays: p.trialDays,
+      gracePeriodDays: p.gracePeriodDays,
+      studentLimit: p.maxStudents === -1 ? "Unlimited" : p.maxStudents,
+      instructorLimit: p.maxInstructors === -1 ? "Unlimited" : p.maxInstructors,
+      courseLimit: p.maxCourses === -1 ? "Unlimited" : p.maxCourses,
+      storageLimitGB: p.maxStorageGB === -1 ? "Unlimited" : p.maxStorageGB,
+      enabledModules: (p.features as Record<string, boolean>) || {},
+      customPaymentLink: p.customPaymentLink || "",
+      status: p.isActive ? "ACTIVE" : "DISABLED",
+      popular: p.isPopular,
+      badgeText: p.badgeText || undefined
+    }))
+
+    return NextResponse.json({ plans })
   } catch (error: any) {
-    console.error("Error loading plans:", error)
-    return NextResponse.json({ plans: globalPlansCache })
+    console.error("Error loading SaaS plans from DB:", error)
+    return NextResponse.json({ error: error.message || "Failed to load plans" }, { status: 500 })
   }
 }
 
@@ -118,22 +54,46 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized. Super Admin access required." }, { status: 403 })
     }
 
-    const planData: SubscriptionPlanItem = await req.json()
+    const planData = await req.json()
 
-    if (!planData.name || !planData.offerPriceYearly) {
-      return NextResponse.json({ error: "Plan name and offer price are required." }, { status: 400 })
+    if (!planData.name || (!planData.offerPriceYearly && !planData.yearlyPrice)) {
+      return NextResponse.json({ error: "Plan name and yearly price are required." }, { status: 400 })
     }
 
-    const newPlan: SubscriptionPlanItem = {
-      ...planData,
-      id: planData.id || `plan-${Date.now()}`
-    }
+    const slug = (planData.slug || planData.name.toLowerCase().replace(/[^a-z0-9]/g, '-')).replace(/-+/g, '-').replace(/^-|-$/g, '')
+    const yearlyPrice = planData.originalPriceYearly || planData.yearlyPrice || 24999
+    const offerPriceYearly = planData.offerPriceYearly || yearlyPrice
 
-    globalPlansCache = [newPlan, ...globalPlansCache.filter(p => p.id !== newPlan.id)]
+    const newPlan = await prisma.saaSPlan.create({
+      data: {
+        id: planData.id || `plan-${Date.now()}`,
+        slug: `${slug}-${Date.now().toString().slice(-4)}`,
+        name: planData.name,
+        description: planData.description || null,
+        billingType: planData.billingType || "RECURRING",
+        monthlyPrice: planData.monthlyPrice || Math.round(offerPriceYearly / 12),
+        yearlyPrice,
+        offerPriceYearly,
+        gstText: planData.gstText || "+ 18% GST",
+        currency: planData.currency || "INR",
+        taxRate: planData.taxRate || 18.0,
+        trialDays: planData.trialDays || 14,
+        gracePeriodDays: planData.gracePeriodDays || 7,
+        maxStudents: planData.studentLimit === "Unlimited" ? -1 : (parseInt(planData.studentLimit) || 500),
+        maxInstructors: planData.instructorLimit === "Unlimited" ? -1 : (parseInt(planData.instructorLimit) || 5),
+        maxCourses: planData.courseLimit === "Unlimited" ? -1 : (parseInt(planData.courseLimit) || 15),
+        maxStorageGB: planData.storageLimitGB === "Unlimited" ? -1 : (parseInt(planData.storageLimitGB) || 50),
+        features: planData.enabledModules || {},
+        customPaymentLink: planData.customPaymentLink || null,
+        isActive: planData.status !== "DISABLED",
+        isPopular: !!planData.popular,
+        badgeText: planData.badgeText || null
+      }
+    })
 
-    return NextResponse.json({ success: true, plan: newPlan, plans: globalPlansCache })
+    return NextResponse.json({ success: true, plan: newPlan })
   } catch (error: any) {
-    console.error("Error creating plan:", error)
+    console.error("Error creating SaaS plan:", error)
     return NextResponse.json({ error: error.message || "Failed to create plan" }, { status: 500 })
   }
 }
@@ -148,17 +108,37 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: "Unauthorized. Super Admin access required." }, { status: 403 })
     }
 
-    const updatedPlan: SubscriptionPlanItem = await req.json()
+    const updatedPlan = await req.json()
 
     if (!updatedPlan.id) {
       return NextResponse.json({ error: "Plan ID is required." }, { status: 400 })
     }
 
-    globalPlansCache = globalPlansCache.map(p => p.id === updatedPlan.id ? { ...p, ...updatedPlan } : p)
+    const updated = await prisma.saaSPlan.update({
+      where: { id: updatedPlan.id },
+      data: {
+        name: updatedPlan.name,
+        description: updatedPlan.description,
+        yearlyPrice: updatedPlan.originalPriceYearly || updatedPlan.yearlyPrice,
+        offerPriceYearly: updatedPlan.offerPriceYearly,
+        gstText: updatedPlan.gstText,
+        trialDays: updatedPlan.trialDays,
+        gracePeriodDays: updatedPlan.gracePeriodDays,
+        maxStudents: updatedPlan.studentLimit === "Unlimited" ? -1 : (parseInt(updatedPlan.studentLimit) || 500),
+        maxInstructors: updatedPlan.instructorLimit === "Unlimited" ? -1 : (parseInt(updatedPlan.instructorLimit) || 5),
+        maxCourses: updatedPlan.courseLimit === "Unlimited" ? -1 : (parseInt(updatedPlan.courseLimit) || 15),
+        maxStorageGB: updatedPlan.storageLimitGB === "Unlimited" ? -1 : (parseInt(updatedPlan.storageLimitGB) || 50),
+        features: updatedPlan.enabledModules,
+        customPaymentLink: updatedPlan.customPaymentLink,
+        isActive: updatedPlan.status !== "DISABLED",
+        isPopular: !!updatedPlan.popular,
+        badgeText: updatedPlan.badgeText
+      }
+    })
 
-    return NextResponse.json({ success: true, plan: updatedPlan, plans: globalPlansCache })
+    return NextResponse.json({ success: true, plan: updated })
   } catch (error: any) {
-    console.error("Error updating plan:", error)
+    console.error("Error updating SaaS plan:", error)
     return NextResponse.json({ error: error.message || "Failed to update plan" }, { status: 500 })
   }
 }
@@ -180,15 +160,30 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "Plan ID is required." }, { status: 400 })
     }
 
-    if (globalPlansCache.length <= 1) {
-      return NextResponse.json({ error: "At least one active plan must remain." }, { status: 400 })
+    // Check if there are active subscribers attached to this plan
+    const activeSubCount = await prisma.tenantSubscription.count({
+      where: { planId }
+    })
+
+    if (activeSubCount > 0) {
+      // Soft-deactivate instead of hard-deleting to preserve tenant integrity
+      await prisma.saaSPlan.update({
+        where: { id: planId },
+        data: { isActive: false }
+      })
+      return NextResponse.json({ 
+        success: true, 
+        message: `Plan has ${activeSubCount} active subscriber(s). Plan has been deactivated for new subscriptions while preserving existing customer agreements.` 
+      })
     }
 
-    globalPlansCache = globalPlansCache.filter(p => p.id !== planId)
+    await prisma.saaSPlan.delete({
+      where: { id: planId }
+    })
 
-    return NextResponse.json({ success: true, plans: globalPlansCache })
+    return NextResponse.json({ success: true, message: "Plan deleted successfully." })
   } catch (error: any) {
-    console.error("Error deleting plan:", error)
+    console.error("Error deleting SaaS plan:", error)
     return NextResponse.json({ error: error.message || "Failed to delete plan" }, { status: 500 })
   }
 }

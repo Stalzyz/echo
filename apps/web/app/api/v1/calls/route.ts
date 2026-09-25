@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { auth } from "../../../../auth"
+import { SubscriptionEntitlementService } from "@/lib/services/subscription-entitlement.service"
 
 // GET /api/v1/calls - List call records with filters
 export async function GET(req: NextRequest) {
@@ -87,6 +88,14 @@ export async function POST(req: NextRequest) {
       transcriptText,
       consentGiven = true
     } = body
+
+    // Server-Side Subscription Entitlement Guard
+    if (session.user.organizationId && session.user.role !== "SUPER_ADMIN") {
+      await SubscriptionEntitlementService.assertEntitlement(session.user.organizationId, "callIntelligence")
+      const minutesToConsume = Math.ceil(Number(durationSeconds || 60) / 60)
+      await SubscriptionEntitlementService.assertWithinLimit(session.user.organizationId, "call_minutes", minutesToConsume)
+      await SubscriptionEntitlementService.incrementUsage(session.user.organizationId, "call_minutes", minutesToConsume)
+    }
 
     // Create call record
     const callRecord = await prisma.callRecord.create({

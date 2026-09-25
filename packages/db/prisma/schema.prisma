@@ -241,6 +241,11 @@ model Organization {
   enquiryForms  EnquiryForm[]
   forumCategories ForumCategory[]
 
+  // SaaS Billing & Entitlements
+  tenantSubscription   TenantSubscription?
+  entitlementOverrides OrganizationEntitlementOverride[]
+  usageCounters        OrganizationUsageCounter[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -3425,4 +3430,242 @@ model WebhookEndpoint {
 
   @@map("webhook_endpoints")
 }
+
+// ─────────────────────────────────────────
+// SAAS BILLING & MULTI-TENANT SUBSCRIPTION ENGINE
+// ─────────────────────────────────────────
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  GRACE_PERIOD
+  SUSPENDED
+  CANCELLED
+  EXPIRED
+  INCOMPLETE
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+  LIFETIME
+}
+
+enum SubscriptionInvoiceStatus {
+  DRAFT
+  ISSUED
+  PAID
+  VOID
+  UNCOLLECTIBLE
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+model SaaSPlan {
+  id                  String   @id @default(cuid())
+  slug                String   @unique
+  name                String
+  description         String?
+  billingType         String   @default("RECURRING") // RECURRING | ONE_TIME
+  monthlyPrice        Float    @default(0)
+  yearlyPrice         Float    @default(0)
+  offerPriceYearly    Float?
+  currency            String   @default("INR")
+  taxRate             Float    @default(18.0) // 18% GST default
+  gstText             String   @default("+ 18% GST")
+  trialDays           Int      @default(14)
+  gracePeriodDays     Int      @default(7)
+  sortOrder           Int      @default(0)
+  isActive            Boolean  @default(true)
+  isPopular           Boolean  @default(false)
+  badgeText           String?
+  customPaymentLink   String?
+  version             Int      @default(1)
+  
+  // Numerical Measurable Limits (-1 = Unlimited, 0 = Disabled, >0 = Explicit Cap)
+  maxStudents         Int      @default(500)
+  maxInstructors      Int      @default(5)
+  maxCourses          Int      @default(15)
+  maxBatches          Int      @default(20)
+  maxStorageGB        Int      @default(50)
+  maxWhatsAppMessages Int      @default(1000)
+  maxAiRequests       Int      @default(500)
+  maxCallMinutes      Int      @default(100)
+  maxCustomDomains    Int      @default(1)
+  maxAutomations      Int      @default(5)
+  maxStaff            Int      @default(5)
+
+  // Entitlement Feature Flags JSON: { "coreLms": true, "whatsappAuto": true, ... }
+  features            Json     @default("{}")
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  subscriptions       TenantSubscription[]
+
+  @@map("saas_plans")
+}
+
+model TenantSubscription {
+  id                     String             @id @default(cuid())
+  organizationId         String             @unique
+  planId                 String
+  status                 SubscriptionStatus @default(TRIALING)
+  billingCycle           BillingCycle       @default(YEARLY)
+
+  startDate              DateTime           @default(now())
+  currentPeriodStart     DateTime           @default(now())
+  currentPeriodEnd       DateTime
+  trialStart             DateTime?
+  trialEnd               DateTime?
+  gracePeriodEnd         DateTime?
+  
+  cancelAtPeriodEnd      Boolean            @default(false)
+  cancelledAt            DateTime?
+  suspendedAt            DateTime?
+  endedAt                DateTime?
+
+  provider               String             @default("RAZORPAY") // RAZORPAY | STRIPE | MANUAL_COMP
+  providerSubscriptionId String?            @unique
+  providerCustomerId     String?
+  metadata               Json?
+
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  organization           Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan                   SaaSPlan           @relation(fields: [planId], references: [id])
+  events                 SubscriptionEvent[]
+  invoices               SubscriptionInvoice[]
+  payments               SubscriptionPayment[]
+
+  @@index([organizationId, status])
+  @@map("tenant_subscriptions")
+}
+
+model SubscriptionEvent {
+  id             String              @id @default(cuid())
+  subscriptionId String
+  organizationId String
+  eventType      String              // STATUS_CHANGE | PLAN_CHANGE | PAYMENT_SUCCESS | PAYMENT_FAILED | TRIAL_START | TRIAL_EXPIRED | GRACE_ENTER | SUSPENDED | CANCELLED | REACTIVATED | MANUAL_OVERRIDE
+  fromStatus     SubscriptionStatus?
+  toStatus       SubscriptionStatus?
+  fromPlanId     String?
+  toPlanId       String?
+  reason         String?
+  source         String              @default("SYSTEM") // SYSTEM | WEBHOOK | SUPER_ADMIN | VENDOR
+  actorId        String?
+  metadata       Json?
+  createdAt      DateTime            @default(now())
+
+  subscription   TenantSubscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([subscriptionId])
+  @@map("subscription_events")
+}
+
+model SubscriptionInvoice {
+  id                String                    @id @default(cuid())
+  organizationId    String
+  subscriptionId    String
+  invoiceNumber     String                    @unique
+  status            SubscriptionInvoiceStatus @default(ISSUED)
+  billingReason     String                    @default("SUBSCRIPTION_CYCLE") // SUBSCRIPTION_CYCLE | UPGRADE | MANUAL
+  
+  currency          String                    @default("INR")
+  baseAmount        Float
+  discountAmount    Float                     @default(0)
+  taxRate           Float                     @default(18.0)
+  taxAmount         Float
+  totalAmount       Float
+  
+  periodStart       DateTime
+  periodEnd         DateTime
+  dueDate           DateTime
+  paidAt            DateTime?
+  pdfUrl            String?
+  immutableSnapshot Json?                     // Preserves exact customer name, address, GSTIN, plan details at invoice finalization
+
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  subscription      TenantSubscription        @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  payments          SubscriptionPayment[]
+
+  @@index([organizationId])
+  @@map("subscription_invoices")
+}
+
+model SubscriptionPayment {
+  id                String             @id @default(cuid())
+  organizationId    String
+  subscriptionId    String
+  invoiceId         String?
+  
+  provider          String             @default("RAZORPAY")
+  providerPaymentId String?            @unique
+  providerOrderId   String?
+  
+  amount            Float
+  currency          String             @default("INR")
+  status            PaymentStatus      @default(PENDING)
+  idempotencyKey    String?            @unique
+  paymentMethod     String?
+  failureReason     String?
+
+  refundAmount      Float?
+  refundReason      String?
+  refundedAt        DateTime?
+
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  subscription      TenantSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  invoice           SubscriptionInvoice? @relation(fields: [invoiceId], references: [id])
+
+  @@index([organizationId])
+  @@index([idempotencyKey])
+  @@map("subscription_payments")
+}
+
+model OrganizationEntitlementOverride {
+  id              String    @id @default(cuid())
+  organizationId  String
+  featureKey      String    // e.g. "aiLessonWriter", "whitelabel", "maxStudents"
+  isEnabled       Boolean   @default(true)
+  customLimit     Int?      // Custom limit override if applicable
+  reason          String
+  grantedByUserId String?
+  expiresAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, featureKey])
+  @@map("organization_entitlement_overrides")
+}
+
+model OrganizationUsageCounter {
+  id             String    @id @default(cuid())
+  organizationId String
+  metric         String    // "students", "staff", "courses", "storage_mb", "whatsapp_messages", "ai_requests", "call_minutes"
+  currentUsage   Int       @default(0)
+  periodStart    DateTime  @default(now())
+  periodEnd      DateTime?
+  updatedAt      DateTime  @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, metric])
+  @@map("organization_usage_counters")
+}
+
 
