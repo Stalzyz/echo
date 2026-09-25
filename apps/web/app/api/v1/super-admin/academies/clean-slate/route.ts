@@ -46,6 +46,15 @@ export async function POST(req: Request) {
           }
         })
       } else {
+        // Clear any potential slug/domain collision from other orgs first
+        await tx.$executeRawUnsafe(`
+          UPDATE "organization" 
+          SET "slug" = 'purged-' || id, 
+              "domain" = 'purged-' || id || '.echolms.com' 
+          WHERE ("slug" = 'echo-academy' OR "domain" = 'echo-academy.echolms.com') 
+            AND "id" != '${demoOrg.id}';
+        `)
+
         demoOrg = await tx.organization.update({
           where: { id: demoOrg.id },
           data: {

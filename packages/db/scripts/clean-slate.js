@@ -33,6 +33,15 @@ async function main() {
       }
     });
   } else {
+    // Clear any potential slug/domain collision from other orgs first
+    await prisma.$executeRawUnsafe(`
+      UPDATE "organization" 
+      SET "slug" = 'purged-' || id, 
+          "domain" = 'purged-' || id || '.echolms.com' 
+      WHERE ("slug" = 'echo-academy' OR "domain" = 'echo-academy.echolms.com') 
+        AND "id" != '${demoOrg.id}';
+    `);
+
     demoOrg = await prisma.organization.update({
       where: { id: demoOrg.id },
       data: {
