@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useState, useEffect, useMemo } from  "react"
 import { DndContext, closestCorners, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragStartEvent, DragOverlay } from  '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy, useSortable } from  '@dnd-kit/sortable'
@@ -645,25 +646,25 @@ export default function AdmissionsPipelinePage() {
             </div>
 
             {/* Integration Connectors */}
-            <button 
-              onClick={() => setIsMetaModalOpen(true)}
+            <Link 
+              href="/dashboard/settings/integrations?service=META&add=true"
               className="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-900 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 border border-blue-200"
-              title="Connect Facebook & Instagram Lead Ads"
+              title="Add Facebook & Instagram Lead Ads Credentials"
             >
-              <Share2 className="w-3.5 h-3.5 text-blue-600" />
-              Meta Leads
+              <Workflow className="w-3.5 h-3.5 text-blue-600" />
+              Meta Ads Bridge
               {metaForm.isConnected && <span className="w-2 h-2 rounded-full bg-emerald-500" />}
-            </button>
+            </Link>
 
-            <button 
-              onClick={() => setIsGoogleAdsModalOpen(true)}
+            <Link 
+              href="/dashboard/settings/integrations?service=GOOGLE&add=true"
               className="px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-950 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 border border-amber-200"
-              title="Connect Google Ads Lead Forms"
+              title="Add Google Ads Lead Forms Credentials"
             >
               <Globe className="w-3.5 h-3.5 text-amber-600" />
-              Google Ads
+              Google Ads Sync
               {googleAdsForm.isConnected && <span className="w-2 h-2 rounded-full bg-emerald-500" />}
-            </button>
+            </Link>
 
             <button 
               onClick={() => setIsGoogleSheetsModalOpen(true)}

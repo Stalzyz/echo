@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from  "react"
+import { useState, useRef, useEffect } from  "react"
 import { Palette, Building, Bell, Save, Image as ImageIcon, CheckCircle2, DollarSign, Plug, RefreshCw, Upload, Eye, Lock, Layers, RotateCcw, Check, Monitor, Smartphone, AlertCircle, Trash2, ArrowUpRight, History } from  "lucide-react"
 import { toast } from  "sonner"
 import { DEFAULT_TENANT_THEME } from  "@/components/theme/TenantThemeProvider"
@@ -59,6 +59,40 @@ export default function BrandingThemeSettingsPage() {
   const [isPublishing, setIsPublishing] = useState(false)
   const [isDirty, setIsDirty] = useState(false)
 
+  // Load existing org branding from DB on mount
+  useEffect(() => {
+    const loadOrgBranding = async () => {
+      try {
+        const { ApiClient } = await import("@/lib/api");
+        const org = await ApiClient.get("/settings/organization");
+        if (org) {
+          setTheme(prev => ({
+            ...prev,
+            identity: {
+              ...prev.identity,
+              academyName: org.name || prev.identity.academyName,
+              mainLogoUrl: org.logoUrl && org.logoUrl !== '/echo_logo.png' ? org.logoUrl : (prev.identity.mainLogoUrl || ""),
+              faviconUrl: org.faviconUrl && org.faviconUrl !== '/favicon.ico' ? org.faviconUrl : (prev.identity.faviconUrl || ""),
+              mobileLogoUrl: org.mobileLogoUrl || prev.identity.mobileLogoUrl || "",
+            },
+            colors: {
+              ...prev.colors,
+              primary: org.primaryColor || prev.colors.primary,
+              secondary: org.secondaryColor || prev.colors.secondary,
+              accent: org.accentColor || prev.colors.accent,
+              button: org.primaryColor || prev.colors.button,
+              link: org.primaryColor || prev.colors.link,
+            }
+          }))
+        }
+      } catch (err) {
+        // Silently fail - defaults are fine
+        console.warn("Could not load org branding:", err)
+      }
+    }
+    loadOrgBranding()
+  }, [])
+
   // Version History State
   const [versions, setVersions] = useState<ThemeVersionHistory[]>([
     {
@@ -86,6 +120,8 @@ export default function BrandingThemeSettingsPage() {
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetKey: 'mainLogoUrl' | 'faviconUrl' | 'mobileLogoUrl') => {
     const file = e.target.files?.[0]
     if (!file) return
+    // Reset the input value so the same file can be re-selected if needed
+    e.target.value = ""
     setIsUploadingLogo(true)
     try {
       const formData = new FormData()
@@ -94,19 +130,52 @@ export default function BrandingThemeSettingsPage() {
         method: 'POST',
         body: formData,
       })
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.error || `Upload failed (${res.status})`)
+      }
       const data = await res.json()
       if (data.downloadUrl) {
+        const newLogoUrl = data.downloadUrl
         setTheme(prev => ({
           ...prev,
           identity: {
             ...prev.identity,
-            [targetKey]: data.downloadUrl
+            [targetKey]: newLogoUrl
           }
         }))
         setIsDirty(true)
-        toast.success(`Logo asset uploaded successfully!`)
+        toast.success(`Logo uploaded! Click "Publish Theme" to save it permanently.`)
+
+        // Immediately save the logo to DB so it persists without needing to click Publish separately
+        if (targetKey === 'mainLogoUrl') {
+          try {
+            const { ApiClient } = await import("@/lib/api");
+            await ApiClient.patch("/settings/organization", { logoUrl: newLogoUrl });
+            // Broadcast to sidebar/topnav for real-time update
+            if (typeof window !== "undefined") {
+              window.dispatchEvent(new CustomEvent("organization-updated", { detail: { logoUrl: newLogoUrl } }));
+            }
+          } catch (saveErr) {
+            console.warn("Auto-save logo failed, will save on Publish:", saveErr)
+          }
+        } else if (targetKey === 'faviconUrl') {
+          try {
+            const { ApiClient } = await import("@/lib/api");
+            await ApiClient.patch("/settings/organization", { faviconUrl: newLogoUrl });
+          } catch (saveErr) {
+            console.warn("Auto-save favicon failed, will save on Publish:", saveErr)
+          }
+        } else if (targetKey === 'mobileLogoUrl') {
+          try {
+            const { ApiClient } = await import("@/lib/api");
+            await ApiClient.patch("/settings/organization", { mobileLogoUrl: newLogoUrl });
+          } catch (saveErr) {
+            console.warn("Auto-save mobile logo failed, will save on Publish:", saveErr)
+          }
+        }
       } else {
-        toast.error(data.error || "Upload failed")
+        toast.error(data.error || "Upload failed — no URL returned")
       }
     } catch (err: any) {
       toast.error("File upload error: " + err.message)
@@ -172,12 +241,18 @@ export default function BrandingThemeSettingsPage() {
     setIsPublishing(true);
     try {
       const { ApiClient } = await import("@/lib/api");
-      await ApiClient.patch("/settings/organization", {
+      const patchPayload: Record<string, any> = {
         name: theme.identity.academyName,
         primaryColor: theme.colors.primary,
         secondaryColor: theme.colors.secondary,
         accentColor: theme.colors.accent,
-      });
+      };
+      // Include logo/favicon URLs so they are persisted
+      if (theme.identity.mainLogoUrl) patchPayload.logoUrl = theme.identity.mainLogoUrl;
+      if (theme.identity.faviconUrl)  patchPayload.faviconUrl = theme.identity.faviconUrl;
+      if ((theme.identity as any).mobileLogoUrl) patchPayload.mobileLogoUrl = (theme.identity as any).mobileLogoUrl;
+
+      await ApiClient.patch("/settings/organization", patchPayload);
 
       triggerLiveThemeUpdate({
         primary: theme.colors.primary,
@@ -185,6 +260,13 @@ export default function BrandingThemeSettingsPage() {
         accent: theme.colors.accent,
         name: theme.identity.academyName,
       });
+
+      // Broadcast logo update to sidebar/topnav in real-time
+      if (theme.identity.mainLogoUrl && typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("organization-updated", {
+          detail: { logoUrl: theme.identity.mainLogoUrl }
+        }));
+      }
 
       const newVersionNum = theme.version + 1;
       const newTheme = { ...theme, version: newVersionNum, updatedAt: new Date().toISOString() };
@@ -194,7 +276,7 @@ export default function BrandingThemeSettingsPage() {
           version: newVersionNum,
           publishedAt: new Date().toLocaleString(),
           publishedBy: "Current Admin",
-          summary: `Published Theme v${newVersionNum} with primary ${newTheme.colors.primary}`,
+          summary: `Published Theme v${newVersionNum} with logo & primary ${newTheme.colors.primary}`,
           theme: newTheme
         },
         ...prev

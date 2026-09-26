@@ -195,11 +195,19 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
 
     const handleUpdate = (e?: Event) => {
       if (e && (e as CustomEvent).detail) {
-        // Optimistic update if event contains details
+        // Optimistic update if event contains details (covers logo, colors, name, etc.)
         const customData = (e as CustomEvent).detail;
-        if (customData.primaryColor) {
+        const hasUpdateableFields = customData.primaryColor || customData.logoUrl || 
+          customData.academyLogoUrl || customData.name || customData.faviconUrl;
+        if (hasUpdateableFields) {
           setOrg((prev) => {
-            const updated = { ...prev, ...customData };
+            const updated: typeof prev = { 
+              ...prev, 
+              ...customData,
+              // Keep logo fields in sync with each other when only one is provided
+              logoUrl: customData.logoUrl || customData.academyLogoUrl || prev.logoUrl,
+              academyLogoUrl: customData.academyLogoUrl || customData.logoUrl || prev.academyLogoUrl,
+            };
             applyThemeVariables(updated);
             return updated;
           });

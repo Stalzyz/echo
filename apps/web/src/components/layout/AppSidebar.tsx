@@ -59,18 +59,6 @@ const sidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
         requiredModule: "crmPipelines",
       },
       {
-        title: "Meta Ads CRM Bridge",
-        href: "/dashboard/settings/integrations?tab=meta",
-        icon: Workflow,
-        requiredModule: "metaAdsSync",
-      },
-      {
-        title: "Google Ads Lead Sync",
-        href: "/dashboard/settings/integrations?tab=google",
-        icon: Globe,
-        requiredModule: "googleAdsSync",
-      },
-      {
         title: "Call Intelligence",
         href: "/dashboard/academy/calls",
         icon: Phone,
@@ -185,7 +173,7 @@ const sidebarGroups: { groupName: string; items: SidebarItem[] }[] = [
         requiredModule: "whatsappAuto",
       },
       {
-        title: "Storefront Theme",
+        title: "Academy Landing Page",
         href: "/dashboard/website/theme",
         icon: Palette,
         requiredModule: "whitelabel",
@@ -398,7 +386,7 @@ export function AppSidebar() {
       )}
     >
       {/* Sidebar Header */}
-      <div className="h-16 border-b border-slate-200 flex items-center justify-between px-4 shrink-0">
+      <div className={cn("h-16 border-b border-slate-200 flex items-center shrink-0 relative", isCollapsed ? "justify-center px-2" : "justify-between px-4")}>
         <Link
           href={isSuperAdminRoute ? "/dashboard/super-admin" : "/dashboard"}
           className="flex items-center gap-3 min-w-0"
@@ -430,9 +418,14 @@ export function AppSidebar() {
         <button
           onClick={toggleCollapse}
           title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-          className="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-600 flex items-center justify-center shrink-0 transition-colors"
+          className={cn(
+            "rounded-lg bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-600 flex items-center justify-center shrink-0 transition-all",
+            isCollapsed
+              ? "absolute -right-3 top-5 w-6 h-6 rounded-full bg-white border-slate-300 text-slate-700 shadow-md hover:bg-slate-50 z-50 hover:scale-110"
+              : "w-7 h-7"
+          )}
         >
-          {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+          {isCollapsed ? <ChevronRight className="w-3.5 h-3.5 text-slate-700" /> : <ChevronLeft className="w-4 h-4" />}
         </button>
       </div>
 

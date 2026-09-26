@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from  "react"
+import { useSearchParams } from "next/navigation"
 import { Plug, Workflow, Video, Mail, CreditCard, Save, CheckCircle2, Webhook, Plus, Trash2, Loader2, Eye, EyeOff, X, KeyRound, Send, Copy, AlertCircle, RefreshCw } from  "lucide-react"
 
 type Service = "RAZORPAY" | "PHONEPE" | "STRIPE" | "SMTP" | "WHATSAPP" | "META" | "FIREBASE" | "GOOGLE" | "ZOOM"
@@ -75,6 +76,7 @@ async function apiDelete(path: string) {
 }
 
 export default function IntegrationsDashboard() {
+  const searchParams               = useSearchParams()
   const [activeTab, setActiveTab]   = useState<"api" | "webhooks">("api")
   const [keys, setKeys]             = useState<IntegrationKey[]>([])
   const [webhooks, setWebhooks]     = useState<WebhookEndpoint[]>([])
@@ -92,6 +94,16 @@ export default function IntegrationsDashboard() {
 
   const [selectedService, setSelectedService] = useState<Service>("RAZORPAY")
   const [formValues, setFormValues] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    const tabParam = searchParams.get("tab")?.toUpperCase()
+    const serviceParam = searchParams.get("service")?.toUpperCase()
+    const targetService = serviceParam || tabParam
+    if (targetService === "META" || targetService === "GOOGLE" || targetService === "WHATSAPP" || targetService === "RAZORPAY" || targetService === "SMTP") {
+      setSelectedService(targetService as Service)
+      setShowAdd(true)
+    }
+  }, [searchParams])
   
   // Custom Webhook form state
   const [webhookForm, setWebhookForm] = useState({

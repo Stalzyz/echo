@@ -53,7 +53,7 @@ export const navigation: NavItem[] = [
       { title: "Visual Automations", href: "/dashboard/academy/automation", feature: "whatsappAuto" },
       { title: "WhatsApp Templates", href: "/dashboard/academy/whatsapp", feature: "whatsappAuto" },
       { title: "Coupons & Offers", href: "/dashboard/academy/coupons", feature: "coreLms" },
-      { title: "Storefront Theme", href: "/dashboard/website/theme", feature: "whitelabel" },
+      { title: "Academy Landing Page", href: "/dashboard/website/theme", feature: "whitelabel" },
       { title: "1:1 Consultations", href: "/dashboard/academy/consultations", feature: "mentorship" },
       { title: "Webinars & Funnels", href: "/dashboard/academy/webinars", feature: "webinars" },
       { title: "Social Community", href: "/dashboard/academy/community", feature: "coreLms" },
@@ -85,7 +85,7 @@ export const navigation: NavItem[] = [
     roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
     children: [
       { title: "Branding & Theme", href: "/dashboard/settings", feature: "whitelabel" },
-      { title: "Storefront Builder", href: "/dashboard/website/theme", feature: "whitelabel" },
+      { title: "Academy Landing Page", href: "/dashboard/website/theme", feature: "whitelabel" },
       { title: "Roles & Permissions", href: "/dashboard/settings/roles" },
       { title: "Finance & Currency", href: "/dashboard/settings/finance" },
       { title: "Integrations", href: "/dashboard/settings/integrations", feature: "apiAccess" },

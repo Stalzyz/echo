@@ -91,7 +91,7 @@ export default function VendorWorkspacePage({ params }: { params: Promise<{ slug
               </Link>
             )}
             <Link 
-              href="/dashboard/settings/branding"
+              href="/dashboard/settings"
               className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold text-xs rounded-xl border border-white/20 transition-all flex items-center gap-2"
             >
               <Palette className="w-4 h-4" /> Settings
