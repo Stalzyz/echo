@@ -129,12 +129,12 @@ export default async function contactsRouter(app: FastifyInstance) {
     }
 
     if (tempPassword) {
-      const loginUrl = process.env.AUTH_URL || 'https://garage.grekam.in/auth/login';
+      const loginUrl = process.env.AUTH_URL || 'https://echo.grekam.in/auth/login';
       const emailHtml = `
         <div style="font-family: 'Inter', -apple-system, sans-serif; background-color: #f9fafb; padding: 40px 20px; color: #1f2937;">
           <div style="max-width: 580px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; border: 1px solid #e5e7eb; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
             <div style="background-color: #1e3a8a; padding: 32px; text-align: center;">
-              <h2 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.025em;">Welcome to Grekam OS</h2>
+              <h2 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.025em;">Welcome to Echo LMS</h2>
             </div>
             <div style="padding: 40px 32px;">
               <p style="font-size: 15px; line-height: 1.6; color: #4b5563; margin-top: 0;">Hi ${user.firstName},</p>
@@ -175,12 +175,12 @@ export default async function contactsRouter(app: FastifyInstance) {
         emailHtml
       );
     } else {
-      const loginUrl = process.env.AUTH_URL || 'https://garage.grekam.in/auth/login';
+      const loginUrl = process.env.AUTH_URL || 'https://echo.grekam.in/auth/login';
       const emailHtml = `
         <div style="font-family: 'Inter', -apple-system, sans-serif; background-color: #f9fafb; padding: 40px 20px; color: #1f2937;">
           <div style="max-width: 580px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; border: 1px solid #e5e7eb; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
             <div style="background-color: #1e3a8a; padding: 32px; text-align: center;">
-              <h2 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.025em;">Welcome to Grekam OS</h2>
+              <h2 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.025em;">Welcome to Echo LMS</h2>
             </div>
             <div style="padding: 40px 32px;">
               <p style="font-size: 15px; line-height: 1.6; color: #4b5563; margin-top: 0;">Hi ${user.firstName},</p>
@@ -485,7 +485,7 @@ export default async function contactsRouter(app: FastifyInstance) {
       data: { passwordHash }
     });
 
-    const loginUrl = process.env.AUTH_URL || 'https://garage.grekam.in/auth/login';
+    const loginUrl = process.env.AUTH_URL || 'https://echo.grekam.in/auth/login';
     const emailHtml = `
       <div style="font-family: 'Inter', -apple-system, sans-serif; background-color: #f9fafb; padding: 40px 20px; color: #1f2937;">
         <div style="max-width: 580px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; border: 1px solid #e5e7eb; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">

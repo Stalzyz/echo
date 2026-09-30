@@ -227,8 +227,8 @@ export default async function proposalsRouter(app: FastifyInstance) {
         }
       }
 
-      const systemPrompt = `You are the Lead Digital Solutions Architect & Sales Director at "Grekam Agency" (part of Grekam Visuals & Grekam OS).
-Grekam is an elite engineering agency known for:
+      const systemPrompt = `You are the Lead Digital Solutions Architect & Sales Director at "Echo LMS & Solutions".
+Echo is an elite engineering platform known for:
 - Bespoke High-Performance Web Platforms (Next.js 16, Turbopack, TailwindCSS, Headless Architecture)
 - AI & CRM Automation Suites (Custom WhatsApp Bots via Grafty AI, Automated Lead Pipelines, ERP Sync)
 - Ultra-Fast E-Commerce Infrastructure (Razorpay/Stripe, Sub-800ms page transitions, Luxury UI/UX)
@@ -542,7 +542,7 @@ Write a proposal with 3–4 phases that map directly to the client's goals. Make
       const { sendEmail } = await import('../integrations/email.service');
       const { generateProposalPDF } = await import('../finance/pdf.service');
       
-      const portalUrl = process.env.PORTAL_URL || process.env.AUTH_URL || 'https://garage.grekam.in';
+      const portalUrl = process.env.PORTAL_URL || process.env.AUTH_URL || 'https://echo.grekam.in';
       const link = `${portalUrl}/portal/proposals/${token}`;
       
       const { getBrandConfig } = await import('../utils/brand');

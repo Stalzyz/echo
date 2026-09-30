@@ -30,7 +30,7 @@ export function initializeCronJobs() {
         const name = proposal.contact?.firstName || proposal.lead?.name || 'Client';
         
         if (email) {
-          const portalUrl = process.env.PORTAL_URL || 'https://garage.grekam.in';
+          const portalUrl = process.env.PORTAL_URL || 'https://echo.grekam.in';
           const link = `${portalUrl}/proposal/${proposal.publicToken}`;
           
           await sendEmail(email, {
@@ -76,7 +76,7 @@ export function initializeCronJobs() {
       for (const lead of coldLeads) {
         if (lead.email) {
           await sendEmail(lead.email, {
-            subject: `Re-engage with Grekam Visuals`,
+            subject: `Re-engage with Echo LMS`,
             html: `
               <h2 style="color:#0f172a;font-size:22px;font-weight:700;margin:0 0 10px;">Hi ${lead.name},</h2>
               <p style="color:#334155;font-size:15px;line-height:1.65;margin:0 0 20px;">
@@ -86,7 +86,7 @@ export function initializeCronJobs() {
                 Simply reply directly to this email and let's get the conversation moving. We'd love to partner with you!
               </p>
               <div style="margin:24px 0;">
-                <a href="https://garage.grekam.in" style="display:inline-block;background-color:#4f46e5;color:#ffffff !important;text-decoration:none;padding:13px 26px;border-radius:8px;font-weight:600;font-size:14px;">Visit Grekam OS &rarr;</a>
+                <a href="${process.env.PORTAL_URL || 'https://echo.grekam.in'}" style="display:inline-block;background-color:#4f46e5;color:#ffffff !important;text-decoration:none;padding:13px 26px;border-radius:8px;font-weight:600;font-size:14px;">Visit Echo LMS &rarr;</a>
               </div>
             `
           });

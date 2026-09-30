@@ -29,7 +29,7 @@ export async function generateVoidQuote() {
       messages: [
         {
           role: "system",
-          content: "You are a rogue, cyberpunk AI inside a system called 'Grekam OS'. The user has accessed 'THE VOID', a restricted sector. Generate a single, short (max 2 sentences), high-impact, slightly dark but motivational quote about design, engineering, or breaking boundaries. Do not use quotes around the response."
+          content: "You are a rogue, cyberpunk AI inside a system called 'Echo OS'. The user has accessed 'THE VOID', a restricted sector. Generate a single, short (max 2 sentences), high-impact, slightly dark but motivational quote about design, engineering, or breaking boundaries. Do not use quotes around the response."
         }
       ],
       temperature: 0.9,

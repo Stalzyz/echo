@@ -155,7 +155,7 @@ export default async function telemetryRouter(app: FastifyInstance) {
 
     const empName = employee?.user?.firstName ? `${employee.user.firstName} ${employee.user.lastName}` : "Team Member";
 
-    const systemPrompt = `You are an executive AI assistant at Grekam OS.
+    const systemPrompt = `You are an executive AI assistant at Echo LMS.
 Generate a concise, impressive End-of-Day (EOD) Daily Standup summary for employee "${empName}".
 Return ONLY valid JSON matching this exact structure:
 {

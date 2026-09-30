@@ -93,7 +93,7 @@ Make the summary and deliverables specific to the client's industry and goals. U
       ]);
       const totalRevVal = totalRev._sum.totalAmount || 0;
 
-      const systemPrompt = `You are the executive AI copilot for Grekam OS (Visuals Pro Agency & Academy).
+      const systemPrompt = `You are the executive AI copilot for Echo LMS (Platform & Academy).
 You have access to live database metrics:
 - Total CRM Leads: ${totalLeads}
 - Total Generated Invoices: ${totalInvoices}

@@ -11,7 +11,18 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
   const isDashboard = pathname?.startsWith("/dashboard")
 
   useEffect(() => {
-    if (isDashboard) return
+    if (isDashboard) {
+      if (lenisRef.current) {
+        lenisRef.current.destroy()
+        lenisRef.current = null
+      }
+      if (typeof document !== "undefined") {
+        document.documentElement.style.removeProperty("overflow")
+        document.body.style.removeProperty("overflow")
+        document.documentElement.classList.remove("lenis", "lenis-smooth", "lenis-stopped")
+      }
+      return
+    }
 
     // Initialize Lenis
     const lenis = new Lenis({

@@ -137,7 +137,7 @@ export default async function calendarRouter(app: FastifyInstance) {
               ` : ''}
             </div>
             <div style="padding:16px 32px;background:#080810;border-top:1px solid #1e1e2e;font-size:12px;color:#6b7280;text-align:center;">
-              This invite was sent via Grekam OS. Please add this to your calendar.
+              This invite was sent via Echo LMS. Please add this to your calendar.
             </div>
           </div>
         `

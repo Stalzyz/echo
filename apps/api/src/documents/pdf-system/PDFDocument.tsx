@@ -71,8 +71,8 @@ export const PDFDocument: React.FC<PDFDocumentProps> = ({ children, author, titl
     author={author}
     title={title}
     subject={subject}
-    creator="Grekam OS"
-    producer="Grekam Document Engine"
+    creator="Echo LMS"
+    producer="Echo Document Engine"
   >
     {children}
   </Document>

@@ -20,7 +20,7 @@ export default async function twoFaRouter(app: FastifyInstance) {
 
     // Generate TOTP secret
     const totp = new OTPAuth.TOTP({
-      issuer: 'Grekam OS',
+      issuer: 'Echo LMS',
       label: user.email,
       algorithm: 'SHA1',
       digits: 6,
@@ -60,7 +60,7 @@ export default async function twoFaRouter(app: FastifyInstance) {
     if (!user?.twoFaSecret) return reply.badRequest('2FA setup not initiated.');
 
     const totp = new OTPAuth.TOTP({
-      issuer: 'Grekam OS',
+      issuer: 'Echo LMS',
       label: user.email,
       algorithm: 'SHA1',
       digits: 6,

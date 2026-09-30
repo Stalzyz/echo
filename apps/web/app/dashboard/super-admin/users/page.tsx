@@ -68,8 +68,29 @@ export default function PlatformUsersPage() {
     }
   }
 
+  const updateUserRole = async (id: string, newRole: string, name: string) => {
+    try {
+      const res = await fetch("/api/v1/super-admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: id, role: newRole })
+      })
+      if (res.ok) {
+        toast.success(`Updated role for ${name} to ${newRole}`)
+        fetchUsers()
+        if (selectedUser && selectedUser.id === id) {
+          setSelectedUser({ ...selectedUser, role: newRole as any })
+        }
+      } else {
+        toast.error("Failed to update user role")
+      }
+    } catch {
+      toast.error("Error updating role")
+    }
+  }
+
   return (
-    <div className="flex flex-col h-full bg-slate-50 text-slate-900 overflow-y-auto custom-scrollbar p-8">
+    <div className="flex flex-col min-h-full bg-slate-50 text-slate-900 p-8">
       
       {/* Header */}
       <div className="flex-none pb-8 border-b border-slate-200 mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -213,7 +234,18 @@ export default function PlatformUsersPage() {
 
               <div>
                 <span className="text-[10px] font-black uppercase text-slate-400">Platform Role</span>
-                <div className="font-bold text-xs text-teal-700 mt-0.5">{selectedUser.role}</div>
+                <select
+                  value={selectedUser.role}
+                  onChange={e => updateUserRole(selectedUser.id, e.target.value, selectedUser.name)}
+                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 outline-none focus:ring-2 focus:ring-teal-600"
+                >
+                  <option value="SUPER_ADMIN">SUPER_ADMIN (Platform Owner)</option>
+                  <option value="ACADEMY_ADMIN">ACADEMY_ADMIN (Academy Director)</option>
+                  <option value="INSTRUCTOR">INSTRUCTOR (Faculty / Educator)</option>
+                  <option value="STAFF">STAFF (Admissions / Operations)</option>
+                  <option value="STUDENT">STUDENT</option>
+                  <option value="INTERN">INTERN</option>
+                </select>
               </div>
 
               <div>

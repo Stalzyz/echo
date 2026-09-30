@@ -14,7 +14,7 @@ export const EmailService = {
       if (org?.resendApiKey) {
         const resend = new Resend(org.resendApiKey);
         const data = await resend.emails.send({
-          from: fromOverride || 'Grekam OS <onboarding@resend.dev>', // Should ideally be configured or verified domain
+          from: fromOverride || 'Echo LMS <onboarding@resend.dev>', // Should ideally be configured or verified domain
           to: [to],
           cc: ccList,
           subject,
@@ -34,7 +34,7 @@ export const EmailService = {
       let port = parseInt(process.env.SMTP_PORT || '587');
       let user = process.env.SMTP_USER || 'ethereal_user';
       let pass = process.env.SMTP_PASS || 'ethereal_pass';
-      let fromAddress = fromOverride || '"Grekam OS" <noreply@grekam.com>';
+      let fromAddress = fromOverride || '"Echo LMS" <noreply@echo.grekam.in>';
 
       for (const k of keys) {
         if (k.keyName === 'SMTP_HOST') host = decrypt(k.encryptedValue);

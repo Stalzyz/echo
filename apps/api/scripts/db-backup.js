@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Grekam OS — Automated Database Backup Script
+ * Echo LMS — Automated Database Backup Script
  * 
  * Usage:
  *   node scripts/db-backup.js

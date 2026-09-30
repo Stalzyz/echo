@@ -101,11 +101,15 @@ export async function DELETE(
       await tx.demoSession.deleteMany({ where: { organizationId: id } })
       await tx.walkIn.deleteMany({ where: { organizationId: id } })
 
-      // 5. Delete Campus Events, Placement Jobs & Projects
+      // 5. Delete Campus Events, Placement Jobs, Projects, Proposals, Invoices, Forums
       await tx.campusEvent.deleteMany({ where: { organizationId: id } })
       await tx.placementJob.deleteMany({ where: { company: { organizationId: id } } })
       await tx.placementCompany.deleteMany({ where: { organizationId: id } })
       await tx.academyProject.deleteMany({ where: { organizationId: id } })
+      await tx.proposal.deleteMany({ where: { organizationId: id } }).catch(() => {})
+      await tx.invoice.deleteMany({ where: { organizationId: id } }).catch(() => {})
+      await tx.project.deleteMany({ where: { organizationId: id } }).catch(() => {})
+      await tx.forumCategory.deleteMany({ where: { organizationId: id } }).catch(() => {})
 
       // 6. Delete Organization Users (Students, Educators, Staff, Admins)
       const userIds = org.users.map(u => u.id)

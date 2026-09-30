@@ -4,7 +4,7 @@
 set -e
 
 echo "======================================"
-echo "🚀 Starting Grekam OS Deployment (PM2)"
+echo "🚀 Starting Echo LMS Deployment (PM2)"
 echo "======================================"
 
 # 1. Pull latest code (if applicable)

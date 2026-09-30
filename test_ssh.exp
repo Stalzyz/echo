@@ -1,0 +1,15 @@
+#!/usr/bin/expect -f
+set timeout 20
+spawn ssh -o StrictHostKeyChecking=no -o PubkeyAuthentication=no root@72.61.231.187
+expect {
+  "password:" {
+    send "Photoshop09@\r"
+    exp_continue
+  }
+  "# " {
+    send "echo 'SUCCESSFUL_LOGIN'\r"
+    expect "# "
+    send "exit\r"
+  }
+}
+expect eof

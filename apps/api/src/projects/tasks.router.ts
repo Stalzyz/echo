@@ -117,7 +117,7 @@ export default async function tasksRouter(app: FastifyInstance) {
                 taskTitle: task.title,
                 priority: task.priority,
                 dueDate: task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'N/A',
-                taskUrl: `https://garage.grekam.in/dashboard/projects/${task.projectId}`
+                taskUrl: `${process.env.AUTH_URL || 'https://echo.grekam.in'}/dashboard/projects/${task.projectId}`
               }
             });
           }

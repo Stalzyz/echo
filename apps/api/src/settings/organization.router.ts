@@ -53,28 +53,33 @@ export default async function organizationRouter(app: FastifyInstance) {
       });
     }
 
-    // Fallback: Super Admin without impersonation → return first org (platform branding)
-    if (!org && user?.role === 'SUPER_ADMIN') {
+    // Fallback: Return first organization (platform branding) if tenant not found or super admin
+    if (!org) {
       org = await app.prisma.organization.findFirst();
     }
 
-    // Auto-seed default config if none exists at all
+    // Auto-seed default config ONLY if database has ZERO organizations at all
     if (!org) {
-      org = await app.prisma.organization.create({
-        data: {
-          name: "Echo LMS",
-          companyName: "Echo LMS Platform",
-          logoUrl: "/echo_logo.png",
-          academyLogoUrl: "/echo_logo.png",
-          faviconUrl: "/favicon.ico",
-          academyFaviconUrl: "/favicon.ico",
-          primaryColor: "#0d9488",
-          secondaryColor: "#f59e0b",
-          accentColor: "#10b981",
-          darkModeDefault: false,
-          supportEmail: "support@echolms.com",
-        }
-      });
+      const totalCount = await app.prisma.organization.count();
+      if (totalCount === 0) {
+        org = await app.prisma.organization.create({
+          data: {
+            name: "Echo Academy",
+            companyName: "Echo LMS Platform",
+            slug: "echo-academy",
+            domain: "echo-academy.echolms.com",
+            logoUrl: "/echo_logo.png",
+            academyLogoUrl: "/echo_logo.png",
+            faviconUrl: "/favicon.ico",
+            academyFaviconUrl: "/favicon.ico",
+            primaryColor: "#0d9488",
+            secondaryColor: "#f59e0b",
+            accentColor: "#10b981",
+            darkModeDefault: false,
+            supportEmail: "support@echolms.com",
+          }
+        });
+      }
     }
 
     return {

@@ -59,6 +59,7 @@ export default function AcademiesManagementPage() {
   const [filterPlan, setFilterPlan] = useState("ALL")
   const [filterStatus, setFilterStatus] = useState("ALL")
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
 
   // Provision Modal
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -213,6 +214,58 @@ export default function AcademiesManagementPage() {
     }
   }
 
+  const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) return
+    if (!confirm(`⚠️ PERMANENTLY DELETE ${selectedIds.length} VENDOR(S)?\n\nThis will cascade delete all courses, students, and settings for the selected academies. This action cannot be undone.`)) return
+
+    try {
+      toast.loading(`Deleting ${selectedIds.length} selected vendor(s)...`, { id: "bulk-del" })
+      const res = await fetch("/api/v1/super-admin/academies/bulk-delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: selectedIds })
+      })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        toast.success(data.message, { id: "bulk-del" })
+        setSelectedIds([])
+        fetchAcademies()
+      } else {
+        toast.error(data.error || "Failed to bulk delete vendors", { id: "bulk-del" })
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Error bulk deleting vendors", { id: "bulk-del" })
+    }
+  }
+
+  const handleDeleteEmptyVendors = async () => {
+    const emptyVendors = academies.filter(a => a.studentsCount === 0 && a.slug !== "echo-academy" && a.slug !== "apex-code")
+    if (emptyVendors.length === 0) {
+      toast.info("No empty dummy vendors found to purge.")
+      return
+    }
+    if (!confirm(`⚠️ FOUND ${emptyVendors.length} EMPTY VENDOR(S) (0 students).\n\nDo you want to permanently delete all ${emptyVendors.length} empty vendors at once?`)) return
+
+    try {
+      toast.loading(`Purging ${emptyVendors.length} empty vendor(s)...`, { id: "bulk-del" })
+      const res = await fetch("/api/v1/super-admin/academies/bulk-delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: emptyVendors.map(v => v.id) })
+      })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        toast.success(data.message, { id: "bulk-del" })
+        setSelectedIds([])
+        fetchAcademies()
+      } else {
+        toast.error(data.error || "Failed to purge empty vendors", { id: "bulk-del" })
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Error purging empty vendors", { id: "bulk-del" })
+    }
+  }
+
   const handleCleanSlate = async () => {
     if (!confirm("⚠️ RESET TO CLEAN SLATE?\n\nThis will keep ONLY the pristine Demo Academy (Echo Academy) connected to the landing page and delete all other dummy vendors and test data. Continue?")) return
 
@@ -225,6 +278,7 @@ export default function AcademiesManagementPage() {
 
       if (res.ok && data.success) {
         toast.success(data.message || "Clean slate complete!", { id: "clean-slate" })
+        setSelectedIds([])
         fetchAcademies()
       } else {
         toast.error(data.error || "Clean slate failed", { id: "clean-slate" })
@@ -244,7 +298,7 @@ export default function AcademiesManagementPage() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-slate-50 text-slate-900 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 space-y-6 pb-24 md:pb-8">
+    <div className="flex flex-col min-h-full bg-slate-50 text-slate-900 p-4 sm:p-6 lg:p-8 space-y-6 pb-24 md:pb-8">
 
       {/* Header */}
       <div className="flex-none pb-6 border-b border-slate-200/90 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -260,6 +314,14 @@ export default function AcademiesManagementPage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+          <button
+            type="button"
+            onClick={handleDeleteEmptyVendors}
+            className="flex-1 sm:flex-none min-h-[44px] flex items-center justify-center gap-2 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 font-extrabold text-xs sm:text-sm px-3.5 py-2.5 rounded-xl transition-all shadow-xs"
+            title="Delete all empty dummy vendors with 0 students"
+          >
+            <Trash2 className="w-4 h-4 text-amber-600" /> Purge Empty (0 Students)
+          </button>
           <button
             type="button"
             onClick={handleCleanSlate}
@@ -281,6 +343,37 @@ export default function AcademiesManagementPage() {
           </button>
         </div>
       </div>
+
+      {/* Selected Action Banner */}
+      {selectedIds.length > 0 && (
+        <div className="bg-rose-50 border-2 border-rose-300 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center gap-3">
+            <span className="w-8 h-8 rounded-xl bg-rose-600 text-white font-black text-sm flex items-center justify-center shrink-0">
+              {selectedIds.length}
+            </span>
+            <div>
+              <div className="font-extrabold text-sm text-rose-950">
+                {selectedIds.length} vendor{selectedIds.length > 1 ? "s" : ""} selected for deletion
+              </div>
+              <div className="text-xs text-rose-700">Delete all selected vendor organizations in a single click.</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <button
+              onClick={() => setSelectedIds([])}
+              className="flex-1 sm:flex-none px-3.5 py-2 bg-white border border-rose-200 text-rose-800 rounded-xl text-xs font-bold hover:bg-rose-100 transition-colors"
+            >
+              Clear Selection
+            </button>
+            <button
+              onClick={handleBulkDelete}
+              className="flex-1 sm:flex-none px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black transition-colors flex items-center justify-center gap-1.5 shadow-sm"
+            >
+              <Trash2 className="w-4 h-4" /> Delete Selected ({selectedIds.length})
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -346,19 +439,31 @@ export default function AcademiesManagementPage() {
           <div className="p-12 text-center text-slate-600 font-medium text-sm">No vendors found.</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse min-w-[1100px]">
               <thead>
                 <tr className="bg-slate-100/70 border-b border-slate-200 text-xs font-black uppercase tracking-wider text-slate-600">
-                  <th className="py-3.5 px-5">Vendor</th>
-                  <th className="py-3.5 px-5">Admin</th>
-                  <th className="py-3.5 px-5">Plan</th>
-                  <th className="py-3.5 px-5">Status</th>
-                  <th className="py-3.5 px-5 text-right">Students</th>
-                  <th className="py-3.5 px-5 text-right">Staff</th>
-                  <th className="py-3.5 px-5">Storage</th>
-                  <th className="py-3.5 px-5">Domain</th>
-                  <th className="py-3.5 px-5">Created</th>
-                  <th className="py-3.5 px-5 text-right">Actions</th>
+                  <th className="py-3.5 px-4 w-12 text-center">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.length > 0 && selectedIds.length === filteredAcademies.length}
+                      onChange={e => {
+                        if (e.target.checked) setSelectedIds(filteredAcademies.map(a => a.id))
+                        else setSelectedIds([])
+                      }}
+                      className="w-4 h-4 rounded border-slate-300 text-teal-600 accent-teal-600 cursor-pointer"
+                      title="Select / Deselect All"
+                    />
+                  </th>
+                  <th className="py-3.5 px-4">Vendor</th>
+                  <th className="py-3.5 px-4">Admin</th>
+                  <th className="py-3.5 px-4">Plan</th>
+                  <th className="py-3.5 px-4">Status</th>
+                  <th className="py-3.5 px-4 text-right">Students</th>
+                  <th className="py-3.5 px-4 text-right">Staff</th>
+                  <th className="py-3.5 px-4">Storage</th>
+                  <th className="py-3.5 px-4">Domain</th>
+                  <th className="py-3.5 px-4">Created</th>
+                  <th className="py-3.5 px-4 text-right min-w-[240px]">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm">
@@ -366,8 +471,18 @@ export default function AcademiesManagementPage() {
                   const statusCfg = STATUS_CONFIG[a.status] || STATUS_CONFIG["ACTIVE"]
                   const planCfg = PLAN_CONFIG[a.subscription] || PLAN_CONFIG["FREE"]
                   return (
-                    <tr key={a.id} className="hover:bg-slate-50/80 transition-colors group">
-                      <td className="py-3.5 px-5">
+                    <tr key={a.id} className={`hover:bg-slate-50/80 transition-colors group ${selectedIds.includes(a.id) ? 'bg-teal-50/40' : ''}`}>
+                      <td className="py-3.5 px-4 text-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(a.id)}
+                          onChange={() => {
+                            setSelectedIds(prev => prev.includes(a.id) ? prev.filter(x => x !== a.id) : [...prev, a.id])
+                          }}
+                          className="w-4 h-4 rounded border-slate-300 text-teal-600 accent-teal-600 cursor-pointer"
+                        />
+                      </td>
+                      <td className="py-3.5 px-4">
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-xl bg-teal-700 text-white font-black text-sm flex items-center justify-center shrink-0 shadow-xs">
                             {a.name.charAt(0)}
@@ -381,44 +496,52 @@ export default function AcademiesManagementPage() {
                           </div>
                         </div>
                       </td>
-                      <td className="py-3.5 px-5">
+                      <td className="py-3.5 px-4">
                         <div className="font-bold text-slate-900 text-xs">{a.ownerName}</div>
                         <div className="text-[11px] text-slate-500">{a.ownerEmail}</div>
                       </td>
-                      <td className="py-3.5 px-5">
+                      <td className="py-3.5 px-4">
                         <span className={`px-2.5 py-1 rounded-lg text-xs font-black border ${planCfg}`}>
                           {a.subscription}
                         </span>
                       </td>
-                      <td className="py-3.5 px-5">
+                      <td className="py-3.5 px-4">
                         <span className={`px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wide border ${statusCfg.color}`}>
                           {statusCfg.label}
                         </span>
                       </td>
-                      <td className="py-3.5 px-5 text-right font-extrabold text-slate-950 text-sm">{a.studentsCount.toLocaleString()}</td>
-                      <td className="py-3.5 px-5 text-right font-bold text-slate-700 text-sm">{a.staffCount || a.totalUsers}</td>
-                      <td className="py-3.5 px-5">
+                      <td className="py-3.5 px-4 text-right font-extrabold text-slate-950 text-sm">{a.studentsCount.toLocaleString()}</td>
+                      <td className="py-3.5 px-4 text-right font-bold text-slate-700 text-sm">{a.staffCount || a.totalUsers}</td>
+                      <td className="py-3.5 px-4">
                         <div className="flex items-center gap-1.5">
                           <HardDrive className="w-3.5 h-3.5 text-slate-400" />
                           <span className="text-xs font-bold text-slate-700">{a.storageUsed || "—"}</span>
                         </div>
                       </td>
-                      <td className="py-3.5 px-5">
+                      <td className="py-3.5 px-4">
                         <a href={a.portalUrl || `#`} target="_blank" rel="noreferrer"
                           className="text-[11px] font-mono text-teal-700 hover:underline flex items-center gap-1">
                           {a.portalUrl || `/w/${a.slug}`} <ExternalLink className="w-3 h-3" />
                         </a>
                       </td>
-                      <td className="py-3.5 px-5 text-xs text-slate-500 font-medium">{a.createdAt ? new Date(a.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—"}</td>
-                      <td className="py-3.5 px-5 text-right">
+                      <td className="py-3.5 px-4 text-xs text-slate-500 font-medium">{a.createdAt ? new Date(a.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—"}</td>
+                      <td className="py-3.5 px-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
                           <Link href={`/dashboard/super-admin/academies/${a.id}`}
-                            className="min-h-[36px] px-3 py-1.5 bg-slate-100 text-slate-800 hover:bg-slate-200 border border-slate-200 rounded-lg text-xs font-extrabold transition-colors flex items-center gap-1">
+                            className="min-h-[36px] px-2.5 py-1.5 bg-slate-100 text-slate-800 hover:bg-slate-200 border border-slate-200 rounded-lg text-xs font-extrabold transition-colors flex items-center gap-1">
                             <Eye className="w-3.5 h-3.5" /> View
                           </Link>
                           <button onClick={() => handleImpersonate(a)}
-                            className="min-h-[36px] px-3 py-1.5 bg-teal-700 text-white hover:bg-teal-800 rounded-lg text-xs font-extrabold transition-colors flex items-center gap-1">
+                            className="min-h-[36px] px-2.5 py-1.5 bg-teal-700 text-white hover:bg-teal-800 rounded-lg text-xs font-extrabold transition-colors flex items-center gap-1">
                             <LogIn className="w-3.5 h-3.5" /> Enter
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteAcademy(a.id, a.name)}
+                            className="min-h-[36px] px-2.5 py-1.5 bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 rounded-lg text-xs font-extrabold transition-colors flex items-center gap-1"
+                            title="Delete Vendor"
+                          >
+                            <Trash2 className="w-3.5 h-3.5 text-rose-600" /> Delete
                           </button>
                           {/* Actions Dropdown */}
                           <div className="relative" onClick={e => e.stopPropagation()}>

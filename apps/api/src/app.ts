@@ -146,8 +146,8 @@ export async function buildApp(opts: any = {}): Promise<any> {
   await app.register(swagger, {
     openapi: {
       info: {
-        title: 'Grekam OS API',
-        description: 'Enterprise API for Grekam Visuals & Academy',
+        title: 'Echo LMS API',
+        description: 'Enterprise API for Echo LMS Platform & Academy',
         version: '1.0.0',
       },
       components: {
@@ -424,7 +424,7 @@ export async function buildApp(opts: any = {}): Promise<any> {
     });
 
     // Send welcome ping
-    socket.send(JSON.stringify({ type: 'CONNECTED', message: 'Grekam OS real-time stream ready' }));
+    socket.send(JSON.stringify({ type: 'CONNECTED', message: 'Echo LMS real-time stream ready' }));
   });
 
   // Expose broadcast helper so other routers can use it

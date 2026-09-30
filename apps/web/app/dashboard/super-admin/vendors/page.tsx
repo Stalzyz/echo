@@ -197,7 +197,7 @@ export default function VendorManagementPage() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-slate-50 text-slate-950 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 space-y-6 pb-24 md:pb-8">
+    <div className="flex flex-col min-h-full bg-slate-50 text-slate-950 p-4 sm:p-6 lg:p-8 space-y-6 pb-24 md:pb-8">
       
       {/* Header */}
       <div className="flex-none pb-6 border-b border-slate-200/90 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">

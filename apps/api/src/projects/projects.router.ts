@@ -186,8 +186,8 @@ export default async function projectsRouter(app: FastifyInstance) {
           data: {
             clientName,
             companyName,
-            portalLink: 'https://garage.grekam.in/portal/dashboard',
-            accountManager: 'Grekam Project Manager'
+            portalLink: `${process.env.AUTH_URL || 'https://echo.grekam.in'}/portal/dashboard`,
+            accountManager: 'Echo Project Manager'
           }
         });
 
@@ -293,7 +293,7 @@ export default async function projectsRouter(app: FastifyInstance) {
                 projectType: project.type,
                 dueDate: project.dueDate ? project.dueDate.toLocaleDateString() : 'TBD',
                 updateDate: new Date().toLocaleDateString(),
-                portalLink: `https://garage.grekam.in/portal/projects/${project.id}`
+                portalLink: `${process.env.AUTH_URL || 'https://echo.grekam.in'}/portal/projects/${project.id}`
               }
             });
           }
@@ -663,7 +663,7 @@ export default async function projectsRouter(app: FastifyInstance) {
             <p>Dear ${clientName},</p>
             <p>${messageToSend}</p>
             <div style="margin: 25px 0;">
-              <a href="${process.env.AUTH_URL || 'https://garage.grekam.in'}/portal" style="background: #2563eb; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">Open Client Portal & Upload Files</a>
+              <a href="${process.env.AUTH_URL || 'https://echo.grekam.in'}/portal" style="background: #2563eb; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">Open Client Portal & Upload Files</a>
             </div>
             <p style="color: #666; font-size: 12px;">Thank you for working with us!</p>
           </div>

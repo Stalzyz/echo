@@ -88,8 +88,8 @@ export default async function meRouter(app: FastifyInstance) {
     });
 
     const loginUrl = portalType === 'CLIENT' 
-      ? (process.env.PORTAL_URL || 'https://garage.grekam.in/portal')
-      : (process.env.AUTH_URL || 'https://garage.grekam.in/auth/login');
+      ? (process.env.PORTAL_URL || 'https://echo.grekam.in/portal')
+      : (process.env.AUTH_URL || 'https://echo.grekam.in/auth/login');
 
     const emailHtml = `
       <div style="font-family: 'Inter', -apple-system, sans-serif; background-color: #f9fafb; padding: 40px 20px; color: #1f2937;">
@@ -135,7 +135,7 @@ export default async function meRouter(app: FastifyInstance) {
       user.email,
       'Your Temporary Password',
       emailHtml,
-      '"Grekam OS" <admin@grekam.in>'
+      '"Echo LMS" <noreply@echo.grekam.in>'
     );
 
     return { success: true, message: 'Temporary password sent.' };

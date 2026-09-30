@@ -131,7 +131,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }
 
           const totp = new OTPAuth.TOTP({
-            issuer: 'Grekam OS',
+            issuer: 'Echo LMS',
             label: user.email,
             algorithm: 'SHA1',
             digits: 6,

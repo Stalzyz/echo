@@ -25,7 +25,7 @@ async function notifyAssignedStaff(app: FastifyInstance, assignedToId: string, l
           email: lead.email || 'N/A',
           leadSource: lead.source || 'Website',
           interestTier: lead.tier || lead.courseInterest || 'General Enquiry',
-          crmLink: 'https://garage.grekam.in/dashboard/crm'
+          crmLink: `${process.env.AUTH_URL || 'https://echo.grekam.in'}/dashboard/crm`
         }
       });
     }

@@ -1,4 +1,4 @@
-// This is your Prisma schema file for GREKAM OS
+// This is your Prisma schema file for ECHO LMS
 // Full 12-module enterprise platform schema
 
 generator client {
