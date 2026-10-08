@@ -287,8 +287,8 @@ export async function resetAndSeedE2E() {
                   title: 'Lesson 1.1: Multi-Tenant Schema Design',
                   type: 'VIDEO',
                   sortOrder: 1,
-                  videoUrl: 'https://cdn.echo.test/videos/lesson1.mp4',
-                  isFree: true,
+                  contentUrl: 'https://cdn.echo.test/videos/lesson1.mp4',
+                  isPreview: true,
                 }
               ]
             }
@@ -386,8 +386,8 @@ export async function resetAndSeedE2E() {
                   title: 'Lesson 1.1: Pandas & NumPy Essentials',
                   type: 'VIDEO',
                   sortOrder: 1,
-                  videoUrl: 'https://cdn.echo.test/videos/beta-lesson1.mp4',
-                  isFree: true,
+                  contentUrl: 'https://cdn.echo.test/videos/beta-lesson1.mp4',
+                  isPreview: true,
                 }
               ]
             }
