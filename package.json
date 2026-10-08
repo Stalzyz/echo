@@ -9,6 +9,7 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "test:e2e": "playwright test",
+    "test:e2e:db:reset": "pnpm --filter=@grekam/db run test:e2e:db:reset",
     "db:generate": "turbo run db:generate --filter=@grekam/db",
     "db:migrate": "turbo run db:migrate --filter=@grekam/db",
     "db:studio": "turbo run db:studio --filter=@grekam/db"

@@ -7,7 +7,8 @@
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "db:seed": "ts-node prisma/seed.ts"
+    "db:seed": "ts-node prisma/seed.ts",
+    "test:e2e:db:reset": "node scripts/reset-e2e.js"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
