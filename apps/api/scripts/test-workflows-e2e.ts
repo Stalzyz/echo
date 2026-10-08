@@ -1,28 +1,35 @@
-/**
- * ECHO LMS — Phase 4 Core LMS & Academy Business Workflows E2E Test Suite
- * 
- * Tests the complete lifecycle:
- * 1. Public Dynamic Form submission -> CRM Lead creation in Tenant Alpha
- * 2. CRM Lead Stage Progression -> Lead to Student conversion
- * 3. Batch Enrollment & Student Dashboard Hub
- * 4. Lesson Progress tracking & completion % aggregation
- * 5. Assignment submission & Mentor review/grading -> Portfolio auto-push
- * 6. Educator Attendance marking & student scan
- * 7. Fee schedule creation & installment payment reconciliation
- * 8. Certificate generation & PDF issuance
- * 9. Cross-tenant workflow containment assertions
- */
+import path from 'path';
+import fs from 'fs';
+import dotenv from 'dotenv';
+
+// 1. Force load E2E environment with override: true BEFORE importing prisma/app
+const candidates = [
+  path.resolve(__dirname, '../../../packages/db/.env.e2e'),
+  path.resolve(__dirname, '../../packages/db/.env.e2e'),
+  path.resolve(__dirname, '../.env.e2e'),
+  path.resolve(__dirname, '../../.env.e2e'),
+  path.resolve(__dirname, '../../../.env.e2e'),
+];
+
+for (const p of candidates) {
+  if (fs.existsSync(p)) {
+    dotenv.config({ path: p, override: true });
+  }
+}
+
+if (!process.env.DATABASE_URL || !process.env.DATABASE_URL.includes('echo_lms_e2e')) {
+  process.env.DATABASE_URL = "postgresql://echo:Photoshop09%40.@localhost:5432/echo_lms_e2e?schema=public";
+}
+
+const dbUrl = process.env.DATABASE_URL || '';
+if (!dbUrl.includes('echo_lms_e2e') && !dbUrl.includes('_test') && !dbUrl.includes('_e2e')) {
+  console.error(`FATAL: test-workflows-e2e MUST be run against echo_lms_e2e database! Got: ${dbUrl}`);
+  process.exit(1);
+}
 
 import { buildApp } from '../src/app';
 import { prisma } from '../src/db';
 import assert from 'assert';
-
-// Safety assertion to prevent accidental execution against production
-const dbUrl = process.env.DATABASE_URL || '';
-if (!dbUrl.includes('echo_lms_e2e')) {
-  console.error('FATAL: test-workflows-e2e MUST be run against echo_lms_e2e database!');
-  process.exit(1);
-}
 
 interface TestContext {
   tenantAlphaId: string;
