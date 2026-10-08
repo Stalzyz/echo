@@ -175,8 +175,25 @@
 - **Total Core Prisma Models**: **142 database entities**
 - **Dedicated Isolated E2E Database**: `echo_lms_e2e` (PostgreSQL on VPS)
 - **Deterministic E2E Seed Script**: `npm run test:e2e:db:reset` (`packages/db/scripts/reset-e2e.js`)
+- **Automated Multi-Tenant Isolation & IDOR Suite**: `npm run test:e2e:security` (`apps/api/scripts/test-tenant-isolation-e2e.ts`)
 - **Phase Status**:
   - ✅ **Phase 1: Full System Inventory & Route Discovery** (COMPLETE)
   - ✅ **Phase 2: Isolated E2E Database, Deterministic Reset & Seed Infrastructure** (COMPLETE)
-  - 🔄 **Phase 3: Multi-Tenant Isolation & IDOR Security Audit** (NEXT)
+  - ✅ **Phase 3: Multi-Tenant Isolation & IDOR Security Audit** (COMPLETE — 26/26 Tests Passed)
+  - 🔄 **Phase 4: Core LMS & Academy Business Workflows** (NEXT)
+
+---
+
+## 11. Phase 3 Security Remediation & Verification Log
+
+| Vulnerability / Surface | Root Cause Identified | Remediation Applied | Automated E2E Verification |
+| :--- | :--- | :--- | :--- |
+| **Tenant Header Spoofing** | `getTenantContext` allowed non-superadmins to pass `x-tenant-id` | Restricted header & impersonation cookie overrides strictly to `SUPER_ADMIN` in [`apps/api/src/utils/tenant.ts`](file:///Users/stalinkumar/Documents/Demo/Gecho%20LMS/apps/api/src/utils/tenant.ts) | ✅ Verified spoofed headers ignored |
+| **CRM Leads IDOR** | `GET /leads/:id` was missing tenant filter | Enforced tenant match or 403 Forbidden in [`apps/api/src/crm/leads.router.ts`](file:///Users/stalinkumar/Documents/Demo/Gecho%20LMS/apps/api/src/crm/leads.router.ts) | ✅ Verified 403 on cross-tenant read/patch/delete |
+| **Invoice IDOR & CSV Leak** | `GET /invoices/:id`, `/pdf`, and `/export.csv` lacked org scoping | Applied `orgFilter` and tenant ownership assertions across all finance routes in [`apps/api/src/finance/invoices.router.ts`](file:///Users/stalinkumar/Documents/Demo/Gecho%20LMS/apps/api/src/finance/invoices.router.ts) | ✅ Verified 403 & 0-record leakage in CSV |
+| **LMS Courses IDOR** | `GET /lms/courses/:id` lacked tenant scoping | Added tenant validation on base course relation in [`apps/api/src/lms/courses.router.ts`](file:///Users/stalinkumar/Documents/Demo/Gecho%20LMS/apps/api/src/lms/courses.router.ts) | ✅ Verified 403 on cross-tenant read/patch/delete |
+| **Dynamic Forms IDOR** | `GET /forms/id/:id`, `PATCH /forms/:id`, and toggle lacked tenant check | Added tenant match validation in [`apps/api/src/academy/dynamic-forms.router.ts`](file:///Users/stalinkumar/Documents/Demo/Gecho%20LMS/apps/api/src/academy/dynamic-forms.router.ts) | ✅ Verified 403 on cross-tenant form tampering |
+| **RBAC Cross-Tenant Reassignment** | `POST /roles/:id/assign` updated users without `organizationId` filter | Enforced `organizationId: tenantId` in [`apps/api/src/settings/rbac.router.ts`](file:///Users/stalinkumar/Documents/Demo/Gecho%20LMS/apps/api/src/settings/rbac.router.ts) | ✅ Verified tenant-confined staff assignment |
+| **Global Session Context** | Unhooked routes had undefined `request.user` without `preHandler` | Added universal `onRequest` session extraction in [`apps/api/src/plugins/auth.plugin.ts`](file:///Users/stalinkumar/Documents/Demo/Gecho%20LMS/apps/api/src/plugins/auth.plugin.ts) | ✅ Verified all 26 E2E endpoints authenticated |
+
 
