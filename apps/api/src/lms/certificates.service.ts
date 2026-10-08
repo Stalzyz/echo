@@ -155,11 +155,17 @@ export const CertificatesService = {
       }
 
       // Save certificate record to database
+      const lmsCourse = await prisma.lMSCourse.findUnique({
+        where: { id: payload.lmsCourseId },
+        select: { courseId: true }
+      });
+      const resolvedCourseId = lmsCourse?.courseId || payload.lmsCourseId;
+
       await prisma.certificate.create({
         data: {
           certificateId: `LMS-${Date.now()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`,
           studentId: payload.studentId,
-          courseId: payload.lmsCourseId,
+          courseId: resolvedCourseId,
           grade: 'PASS',
           issuedAt: new Date(),
           metadata: certificateUrl ? { fileUrl: certificateUrl } : {},

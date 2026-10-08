@@ -46,11 +46,6 @@ export default async function lmsStudentRoutes(app: FastifyInstance) {
           orderBy: { date: 'desc' },
           take: 30
         },
-        submissions: {
-          include: { assignment: true },
-          orderBy: { updatedAt: 'desc' },
-          take: 5
-        },
         Certificate: {
           include: { course: true },
           orderBy: { issuedAt: 'desc' }
@@ -61,6 +56,13 @@ export default async function lmsStudentRoutes(app: FastifyInstance) {
     if (!student) {
       return reply.code(404).send({ error: 'Student profile not found' });
     }
+
+    const recentSubmissions = await server.prisma.assignmentSubmission.findMany({
+      where: { studentId: student.id },
+      include: { assignment: true },
+      orderBy: { updatedAt: 'desc' },
+      take: 5
+    });
 
     // Calculate progress for each enrollment
     const enrolledCourses = await Promise.all(
@@ -134,7 +136,7 @@ export default async function lmsStudentRoutes(app: FastifyInstance) {
         totalWatchedSecs: enrolledCourses.reduce((sum, c) => sum + c.watchedSecs, 0)
       },
       courses: enrolledCourses,
-      recentSubmissions: student.submissions,
+      recentSubmissions,
       certificates: student.Certificate,
       upcomingFee: upcomingInstallment ? {
         id: upcomingInstallment.id,

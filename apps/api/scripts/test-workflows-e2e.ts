@@ -206,14 +206,18 @@ async function main() {
 
     // Verify lead was generated
     const submission = await prisma.formSubmission.findUnique({
-      where: { id: json.submissionId },
-      include: { lead: true }
+      where: { id: json.submissionId }
     });
     assert.ok(submission?.leadId, 'Lead was not linked to submission');
-    assert.strictEqual(submission?.lead?.organizationId, ctx.tenantAlphaId, 'Lead organizationId mismatch');
-    assert.strictEqual(submission?.lead?.name, 'Rajesh Kumar');
-    assert.strictEqual(submission?.lead?.status, 'ENQUIRY');
-    generatedLeadId = submission.leadId!;
+
+    const lead = await prisma.lead.findUnique({
+      where: { id: submission.leadId }
+    });
+    assert.ok(lead, 'Lead record not found in database');
+    assert.strictEqual(lead.organizationId, ctx.tenantAlphaId, 'Lead organizationId mismatch');
+    assert.strictEqual(lead.name, 'Rajesh Kumar');
+    assert.strictEqual(lead.status, 'ENQUIRY');
+    generatedLeadId = submission.leadId;
   });
 
   await runTest('1.2 Staff updates Lead Stage to CONTACTED and WON', async () => {
