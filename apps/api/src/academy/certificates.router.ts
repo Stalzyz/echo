@@ -1,7 +1,52 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
+import { getTenantContext } from '../utils/tenant';
 
 export default async function certificatesRouter(app: FastifyInstance) {
+  // GET /api/v1/academy/certificates
+  app.get('/', async (req, reply) => {
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
+    const orgFilter = isGlobalSuperAdmin
+      ? {}
+      : { student: { user: { organizationId: tenantId || '__NO_ACCESS__' } } };
+
+    const certificates = await app.prisma.certificate.findMany({
+      where: orgFilter,
+      include: {
+        student: { include: { user: { select: { firstName: true, lastName: true, email: true } } } },
+        course: { select: { name: true, code: true } }
+      },
+      orderBy: { issuedAt: 'desc' }
+    });
+
+    return { certificates };
+  });
+
+  // GET /api/v1/academy/certificates/student/:studentId
+  app.get('/student/:studentId', async (req, reply) => {
+    const { studentId } = req.params as { studentId: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
+    const student = await app.prisma.student.findUnique({
+      where: { id: studentId },
+      include: { user: true }
+    });
+
+    if (!student) return reply.notFound('Student not found');
+    if (!isGlobalSuperAdmin && student.user?.organizationId && student.user.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to certificates of another tenant' });
+    }
+
+    const certificates = await app.prisma.certificate.findMany({
+      where: { studentId },
+      include: { course: true },
+      orderBy: { issuedAt: 'desc' }
+    });
+
+    return { certificates };
+  });
+
   // GET /api/v1/academy/certificates/templates
   app.get('/templates', async (req, reply) => {
     const templates = await app.prisma.certificateTemplate.findMany({
@@ -38,9 +83,14 @@ export default async function certificatesRouter(app: FastifyInstance) {
     });
     
     const data = schema.parse(req.body);
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
 
     const student = await app.prisma.student.findUnique({ where: { id: data.studentId }, include: { user: true } });
     if (!student) return reply.code(404).send({ error: 'Student not found' });
+
+    if (!isGlobalSuperAdmin && student.user?.organizationId && student.user.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to generate certificate for another tenant student' });
+    }
 
     const course = await app.prisma.course.findUnique({ where: { id: data.courseId } });
     if (!course) return reply.code(404).send({ error: 'Course not found' });
@@ -49,7 +99,7 @@ export default async function certificatesRouter(app: FastifyInstance) {
     if (!template) return reply.code(404).send({ error: 'Template not found' });
 
     // Ensure Certificate ID is unique
-    const certificateId = `GRK-${new Date().getFullYear()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    const certificateId = `CERT-${new Date().getFullYear()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
 
     // Generate PDF using Design System
     const { getBrandConfig } = await import('../utils/brand');
@@ -66,7 +116,7 @@ export default async function certificatesRouter(app: FastifyInstance) {
       issuedAt: new Date().toISOString(),
     });
 
-    const pdfUrl = `https://storage.grekam.in/certificates/${certificateId}.pdf`; 
+    const pdfUrl = `https://storage.echo-lms.com/certificates/${certificateId}.pdf`; 
 
     const certificate = await app.prisma.certificate.create({
       data: {
@@ -82,8 +132,8 @@ export default async function certificatesRouter(app: FastifyInstance) {
       app.log.info(`Sending certificate email to ${student.user.email}`);
     }
 
-    // Since we are returning the pdf inline for preview in this builder
     reply.header('Content-Type', 'application/pdf');
+    reply.header('x-certificate-id', certificate.id);
     return reply.send(pdfBuffer);
   });
 }

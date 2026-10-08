@@ -1,15 +1,23 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
+import { getTenantContext } from '../utils/tenant';
 
 export default async function attendanceRouter(app: FastifyInstance) {
   // ── GET /api/v1/academy/attendance ───────────────────────────────
   app.get('/', async (req, reply) => {
     const { batchId, date, search } = req.query as { batchId?: string; date?: string; search?: string };
-    
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
     const targetDate = date ? new Date(date) : new Date();
     targetDate.setHours(0, 0, 0, 0);
 
-    const studentWhere: any = {};
+    const orgFilter = isGlobalSuperAdmin
+      ? {}
+      : { user: { organizationId: tenantId || '__NO_ACCESS__' } };
+
+    const studentWhere: any = {
+      ...orgFilter
+    };
     if (batchId) {
       studentWhere.enrollments = { some: { batchId } };
     }
@@ -24,7 +32,7 @@ export default async function attendanceRouter(app: FastifyInstance) {
     const students = await app.prisma.student.findMany({
       where: studentWhere,
       include: {
-        user: { select: { firstName: true, lastName: true, avatarUrl: true } },
+        user: { select: { firstName: true, lastName: true, avatarUrl: true, organizationId: true } },
         enrollments: {
           include: { batch: { select: { id: true, name: true } } },
           take: 1
@@ -67,6 +75,7 @@ export default async function attendanceRouter(app: FastifyInstance) {
 
   // ── POST /api/v1/academy/attendance/batch-mark ──────────────────────────
   app.post('/batch-mark', async (req, reply) => {
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
     const schema = z.object({
       records: z.array(z.object({
         studentId: z.string(),
@@ -81,6 +90,15 @@ export default async function attendanceRouter(app: FastifyInstance) {
 
     const results: any[] = [];
     for (const record of records) {
+      const student = await app.prisma.student.findUnique({
+        where: { id: record.studentId },
+        include: { user: true }
+      });
+      if (!student) continue;
+      if (!isGlobalSuperAdmin && student.user?.organizationId && student.user.organizationId !== tenantId) {
+        continue; // Skip records for students in other tenants
+      }
+
       const existing = await app.prisma.studentAttendance.findUnique({
         where: { studentId_date: { studentId: record.studentId, date: today } }
       });
@@ -109,6 +127,7 @@ export default async function attendanceRouter(app: FastifyInstance) {
 
   // ── POST /api/v1/academy/attendance/mark ──────────────────────────────
   app.post('/mark', async (req, reply) => {
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
     const schema = z.object({
       studentId: z.string(),
       status: z.enum(['PRESENT', 'ABSENT', 'LATE']),
@@ -116,6 +135,15 @@ export default async function attendanceRouter(app: FastifyInstance) {
       notes: z.string().optional()
     });
     const { studentId, status, date, notes } = schema.parse(req.body);
+
+    const student = await app.prisma.student.findUnique({
+      where: { id: studentId },
+      include: { user: true }
+    });
+    if (!student) return reply.notFound('Student not found');
+    if (!isGlobalSuperAdmin && student.user?.organizationId && student.user.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to mark attendance for another tenant student' });
+    }
 
     const targetDate = date ? new Date(date) : new Date();
     targetDate.setHours(0, 0, 0, 0);
@@ -139,6 +167,7 @@ export default async function attendanceRouter(app: FastifyInstance) {
 
   // ── POST /api/v1/academy/attendance/scan ───────────────────────────────
   app.post('/scan', async (req, reply) => {
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
     const schema = z.object({
       studentCode: z.string(),
       location: z.string().default('Main Campus')
@@ -148,12 +177,16 @@ export default async function attendanceRouter(app: FastifyInstance) {
     const student = await app.prisma.student.findUnique({
       where: { studentCode },
       include: {
-        user: { select: { firstName: true, lastName: true, avatarUrl: true } }
+        user: { select: { firstName: true, lastName: true, avatarUrl: true, organizationId: true } }
       }
     });
 
     if (!student) {
       return reply.code(404).send({ success: false, message: 'Invalid Student ID Card' });
+    }
+
+    if (!isGlobalSuperAdmin && student.user?.organizationId && student.user.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to student of another tenant' });
     }
 
     // Check if already marked today

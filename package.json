@@ -10,6 +10,7 @@
     "test": "turbo run test",
     "test:e2e": "playwright test",
     "test:e2e:security": "pnpm --filter=@grekam/api run test:e2e:security",
+    "test:e2e:workflows": "pnpm --filter=@grekam/api run test:e2e:workflows",
     "test:e2e:db:reset": "pnpm --filter=@grekam/db run test:e2e:db:reset",
     "db:generate": "turbo run db:generate --filter=@grekam/db",
     "db:migrate": "turbo run db:migrate --filter=@grekam/db",

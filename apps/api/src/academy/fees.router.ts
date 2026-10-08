@@ -1,18 +1,23 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { EventBus, SystemEvents } from '../automations/event-bus';
+import { getTenantContext } from '../utils/tenant';
 
 export default async function feesRouter(app: FastifyInstance) {
-
-
 
   // ─────────────────────────────────────────────────────────────
   // GET /api/v1/academy/fees — Overview: stats + overdue board
   // ─────────────────────────────────────────────────────────────
   app.get('/fees', async (req, reply) => {
     const today = new Date();
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
+    const orgFilter = isGlobalSuperAdmin
+      ? {}
+      : { enrollment: { student: { user: { organizationId: tenantId || '__NO_ACCESS__' } } } };
 
     const allInstallments = await app.prisma.feeInstallment.findMany({
+      where: orgFilter,
       include: {
         enrollment: {
           include: {
@@ -61,11 +66,12 @@ export default async function feesRouter(app: FastifyInstance) {
   // ─────────────────────────────────────────────────────────────
   app.get('/fees/student/:studentId', async (req, reply) => {
     const { studentId } = req.params as { studentId: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
 
     const student = await app.prisma.student.findUnique({
       where: { id: studentId },
       include: {
-        user: { select: { firstName: true, lastName: true, email: true, phone: true } },
+        user: { select: { firstName: true, lastName: true, email: true, phone: true, organizationId: true } },
         enrollments: {
           include: {
             batch: { select: { name: true, course: { select: { name: true } } } },
@@ -79,6 +85,11 @@ export default async function feesRouter(app: FastifyInstance) {
     });
 
     if (!student) return reply.notFound('Student not found');
+
+    if (!isGlobalSuperAdmin && student.user?.organizationId && student.user.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to fees of another tenant' });
+    }
+
     return student;
   });
 
