@@ -1,11 +1,27 @@
 import path from 'path';
+import fs from 'fs';
 import dotenv from 'dotenv';
 
-// 1. Force load E2E environment
-const envPath = path.resolve(__dirname, '../../../packages/db/.env.e2e');
-dotenv.config({ path: envPath });
-dotenv.config({ path: path.resolve(__dirname, '../.env.e2e') });
-dotenv.config({ path: path.resolve(__dirname, '../../.env.e2e') });
+// 1. Force load E2E environment with override: true
+const candidates = [
+  path.resolve(__dirname, '../../../packages/db/.env.e2e'),
+  path.resolve(__dirname, '../../packages/db/.env.e2e'),
+  path.resolve(__dirname, '../.env.e2e'),
+  path.resolve(__dirname, '../../.env.e2e'),
+  path.resolve(__dirname, '../../../.env.e2e'),
+];
+
+for (const p of candidates) {
+  if (fs.existsSync(p)) {
+    dotenv.config({ path: p, override: true });
+  }
+}
+
+// Ensure database URL points to echo_lms_e2e
+if (!process.env.DATABASE_URL || !process.env.DATABASE_URL.includes('echo_lms_e2e')) {
+  // If not loaded, construct localhost connection
+  process.env.DATABASE_URL = "postgresql://echo:Photoshop09%40.@localhost:5432/echo_lms_e2e?schema=public";
+}
 
 const dbUrl = process.env.DATABASE_URL || '';
 if (!dbUrl.includes('echo_lms_e2e') && !dbUrl.includes('_test') && !dbUrl.includes('_e2e')) {
