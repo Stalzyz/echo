@@ -1,4 +1,4 @@
-import { PrismaClient, UserRole, UserStatus } from '@prisma/client';
+import { PrismaClient, UserRole, UserStatus, BusinessUnit, InvoiceStatus, DeliveryMode, LeadStatus, LeadSource } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -54,15 +54,15 @@ export async function resetAndSeedE2E() {
       id: 'tenant-alpha-001',
       name: 'E2E Academy Alpha',
       slug: 'academy-alpha',
-      subdomain: 'alpha',
-      customDomain: 'alpha.echo.test',
-      plan: 'GROW',
-      subscriptionStatus: 'ACTIVE',
-      brandColor: '#0d9488',
+      domain: 'alpha.echo.test',
+      subscription: 'GROWTH',
+      status: 'ACTIVE',
+      primaryColor: '#0d9488',
       supportEmail: 'support@academy-alpha.test',
-      contactPhone: '+91 98765 00001',
-      websiteUrl: 'https://alpha.echo.test',
-      primaryContactName: 'Admin Alpha',
+      phone: '+91 98765 00001',
+      website: 'https://alpha.echo.test',
+      ownerName: 'Admin Alpha',
+      ownerEmail: 'admin-alpha@example.test',
     },
   });
 
@@ -71,15 +71,15 @@ export async function resetAndSeedE2E() {
       id: 'tenant-beta-002',
       name: 'E2E Academy Beta',
       slug: 'academy-beta',
-      subdomain: 'beta',
-      customDomain: 'beta.echo.test',
-      plan: 'START',
-      subscriptionStatus: 'ACTIVE',
-      brandColor: '#6366f1',
+      domain: 'beta.echo.test',
+      subscription: 'STARTER',
+      status: 'ACTIVE',
+      primaryColor: '#6366f1',
       supportEmail: 'support@academy-beta.test',
-      contactPhone: '+91 98765 00002',
-      websiteUrl: 'https://beta.echo.test',
-      primaryContactName: 'Admin Beta',
+      phone: '+91 98765 00002',
+      website: 'https://beta.echo.test',
+      ownerName: 'Admin Beta',
+      ownerEmail: 'admin-beta@example.test',
     },
   });
 
@@ -88,19 +88,19 @@ export async function resetAndSeedE2E() {
       id: 'tenant-gamma-003',
       name: 'E2E Academy Gamma',
       slug: 'academy-gamma',
-      subdomain: 'gamma',
-      customDomain: 'gamma.echo.test',
-      plan: 'PRO',
-      subscriptionStatus: 'ACTIVE',
-      brandColor: '#e11d48',
+      domain: 'gamma.echo.test',
+      subscription: 'ENTERPRISE',
+      status: 'ACTIVE',
+      primaryColor: '#e11d48',
       supportEmail: 'support@academy-gamma.test',
-      contactPhone: '+91 98765 00003',
-      websiteUrl: 'https://gamma.echo.test',
-      primaryContactName: 'Admin Gamma',
+      phone: '+91 98765 00003',
+      website: 'https://gamma.echo.test',
+      ownerName: 'Admin Gamma',
+      ownerEmail: 'admin-gamma@example.test',
     },
   });
 
-  console.log('✅ Created Tenants: Alpha (GROW), Beta (START), Gamma (PRO)');
+  console.log('✅ Created Tenants: Alpha (GROWTH), Beta (STARTER), Gamma (ENTERPRISE)');
 
   // ─────────────────────────────────────────
   // 2. CREATE CONTROLLED ROLE USERS
@@ -215,15 +215,13 @@ export async function resetAndSeedE2E() {
     data: {
       id: 'student-alpha-id',
       userId: studentAlphaUser.id,
-      organizationId: tenantAlpha.id,
-      rollNo: 'E2E-ALPHA-001',
-      studentType: 'ONSITE',
+      studentCode: 'E2E-ALPHA-001',
+      deliveryMode: DeliveryMode.ONSITE,
       dateOfBirth: new Date('2002-05-15'),
       gender: 'Male',
       address: '123 Alpha Boulevard, Tech City',
-      guardianName: 'Parent Alpha',
-      guardianPhone: '+91 98765 77777',
-      status: 'ACTIVE',
+      parentName: 'Parent Alpha',
+      parentPhone: '+91 98765 77777',
     },
   });
 
@@ -245,15 +243,13 @@ export async function resetAndSeedE2E() {
     data: {
       id: 'student-beta-id',
       userId: studentBetaUser.id,
-      organizationId: tenantBeta.id,
-      rollNo: 'E2E-BETA-001',
-      studentType: 'ONLINE',
+      studentCode: 'E2E-BETA-001',
+      deliveryMode: DeliveryMode.ONLINE,
       dateOfBirth: new Date('2003-08-20'),
       gender: 'Female',
       address: '456 Beta Highway, Data Park',
-      guardianName: 'Parent Beta',
-      guardianPhone: '+91 98765 99999',
-      status: 'ACTIVE',
+      parentName: 'Parent Beta',
+      parentPhone: '+91 98765 99999',
     },
   });
 
@@ -266,10 +262,9 @@ export async function resetAndSeedE2E() {
     data: {
       id: 'course-alpha-001',
       organizationId: tenantAlpha.id,
-      title: 'Full-Stack Web Mastery (Alpha)',
-      code: 'FSW-101',
-      category: 'Software Engineering',
-      durationHours: 120,
+      name: 'Full-Stack Web Mastery (Alpha)',
+      code: 'FSW-101-ALP',
+      duration: '3 months',
       fee: 45000,
       isPublished: true,
       description: 'Comprehensive Full-Stack training program for Alpha students.',
@@ -282,23 +277,21 @@ export async function resetAndSeedE2E() {
       organizationId: tenantAlpha.id,
       courseId: courseAlpha.id,
       name: 'Alpha-Batch-2026-A',
-      code: 'BATCH-ALP-01',
+      type: 'MORNING',
+      capacity: 30,
       startDate: new Date(),
       endDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
-      maxCapacity: 30,
-      currentStudents: 1,
-      mode: 'OFFLINE',
-      status: 'ACTIVE',
+      isActive: true,
     },
   });
 
   await prisma.enrollment.create({
     data: {
       studentId: studentAlpha.id,
-      courseId: courseAlpha.id,
       batchId: batchAlpha.id,
+      totalFee: 45000,
+      feePaid: 15000,
       status: 'ACTIVE',
-      enrolledAt: new Date(),
     },
   });
 
@@ -310,14 +303,14 @@ export async function resetAndSeedE2E() {
       name: 'Prospect Alpha 1',
       email: 'prospect1@alpha-lead.test',
       phone: '+91 91111 00001',
-      status: 'NEW',
-      source: 'WEBSITE',
-      tier: 'HIGH',
+      status: LeadStatus.NEW,
+      source: LeadSource.WEBSITE,
       courseInterest: 'Full-Stack Web Mastery',
+      businessUnit: 'ACADEMY',
     },
   });
 
-  // Tenant A Fee Invoice & Installment
+  // Tenant A Fee Invoice
   await prisma.invoice.create({
     data: {
       id: 'invoice-alpha-001',
@@ -325,8 +318,11 @@ export async function resetAndSeedE2E() {
       invoiceNumber: 'INV-ALP-2026-001',
       clientName: 'Student Alpha',
       clientEmail: studentAlphaUser.email,
+      businessUnit: BusinessUnit.ACADEMY,
+      subtotal: 45000,
       totalAmount: 45000,
-      status: 'PARTIALLY_PAID',
+      paidAmount: 15000,
+      status: InvoiceStatus.PARTIALLY_PAID,
       dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     },
   });
@@ -338,10 +334,9 @@ export async function resetAndSeedE2E() {
     data: {
       id: 'course-beta-001',
       organizationId: tenantBeta.id,
-      title: 'Data Analytics & AI (Beta)',
-      code: 'DAT-201',
-      category: 'Data Science',
-      durationHours: 80,
+      name: 'Data Analytics & AI (Beta)',
+      code: 'DAT-201-BET',
+      duration: '2 months',
       fee: 30000,
       isPublished: true,
       description: 'Data analytics program scoped strictly to Tenant Beta.',
@@ -354,23 +349,21 @@ export async function resetAndSeedE2E() {
       organizationId: tenantBeta.id,
       courseId: courseBeta.id,
       name: 'Beta-Batch-2026-1',
-      code: 'BATCH-BET-01',
+      type: 'ONLINE',
+      capacity: 25,
       startDate: new Date(),
       endDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
-      maxCapacity: 25,
-      currentStudents: 1,
-      mode: 'ONLINE',
-      status: 'ACTIVE',
+      isActive: true,
     },
   });
 
   await prisma.enrollment.create({
     data: {
       studentId: studentBeta.id,
-      courseId: courseBeta.id,
       batchId: batchBeta.id,
+      totalFee: 30000,
+      feePaid: 30000,
       status: 'ACTIVE',
-      enrolledAt: new Date(),
     },
   });
 
@@ -381,10 +374,10 @@ export async function resetAndSeedE2E() {
       name: 'Prospect Beta 1',
       email: 'prospect1@beta-lead.test',
       phone: '+91 92222 00001',
-      status: 'NEW',
-      source: 'META_ADS',
-      tier: 'MEDIUM',
+      status: LeadStatus.NEW,
+      source: LeadSource.META_ADS,
       courseInterest: 'Data Analytics & AI',
+      businessUnit: 'ACADEMY',
     },
   });
 
