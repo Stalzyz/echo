@@ -5,6 +5,7 @@ import { EventBus, SystemEvents } from '../automations/event-bus';
 import { sendTemplatedEmail } from '../services/emailRenderer';
 import { whatsappService } from '../integrations/whatsapp.service';
 import Papa from 'papaparse';
+import { getTenantContext } from '../utils/tenant';
 
 async function notifyAssignedStaff(app: FastifyInstance, assignedToId: string, lead: any) {
   try {
@@ -107,14 +108,7 @@ export default async function leadsRouter(app: FastifyInstance) {
     });
     const dncPhones = dncList.map(d => d.phone.trim()).filter(Boolean);
 
-    const user = (req as any).user;
-    const cookies = cookie.parse(req.headers.cookie || '');
-    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
-    const tenantId = user?.organizationId || impersonatedTenantId;
-
-    const orgFilter = (user?.role === 'SUPER_ADMIN' && !impersonatedTenantId)
-      ? {}
-      : { organizationId: tenantId || '__NO_ACCESS__' };
+    const { orgFilter } = getTenantContext(req);
 
     const leads = await app.prisma.lead.findMany({
       where: {
@@ -150,6 +144,8 @@ export default async function leadsRouter(app: FastifyInstance) {
   // GET /api/v1/crm/leads/:id — get single lead with full history
   app.get('/leads/:id', async (req, reply) => {
     const { id } = req.params as { id: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
     const lead = await app.prisma.lead.findUnique({
       where: { id },
       include: {
@@ -158,6 +154,11 @@ export default async function leadsRouter(app: FastifyInstance) {
       },
     });
     if (!lead) return reply.notFound('Lead not found');
+
+    if (!isGlobalSuperAdmin && lead.organizationId && lead.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to lead of another tenant' });
+    }
+
     return lead;
   });
 
@@ -170,9 +171,7 @@ export default async function leadsRouter(app: FastifyInstance) {
 
     const score = calculateScore(body.estimatedBudget, body.source, body.projectType, body.businessUnit);
 
-    const user = (req as any).user;
-    const cookies = cookie.parse(req.headers.cookie || '');
-    const tenantId = user?.organizationId || cookies['echo_impersonate_tenant'] || null;
+    const { tenantId } = getTenantContext(req);
 
     const lead = await app.prisma.lead.create({
       data: { 
@@ -209,13 +208,7 @@ export default async function leadsRouter(app: FastifyInstance) {
   // PATCH /api/v1/crm/leads/:id — update lead / move stage
   app.patch('/leads/:id', async (req, reply) => {
     const { id } = req.params as { id: string };
-    const user = (req as any).user;
-    const cookies = cookie.parse(req.headers.cookie || '');
-    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
-    const isGlobalSuperAdmin = (user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin') && !impersonatedTenantId;
-    const tenantId = (user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin')
-      ? (impersonatedTenantId || null)
-      : (user?.organizationId || null);
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
     
     const originalLead = await app.prisma.lead.findUnique({ where: { id } });
     if (!originalLead) return reply.notFound('Lead not found');
@@ -263,13 +256,7 @@ export default async function leadsRouter(app: FastifyInstance) {
   // DELETE /api/v1/crm/leads/:id
   app.delete('/leads/:id', async (req, reply) => {
     const { id } = req.params as { id: string };
-    const user = (req as any).user;
-    const cookies = cookie.parse(req.headers.cookie || '');
-    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
-    const isGlobalSuperAdmin = (user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin') && !impersonatedTenantId;
-    const tenantId = (user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin')
-      ? (impersonatedTenantId || null)
-      : (user?.organizationId || null);
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
 
     const originalLead = await app.prisma.lead.findUnique({ where: { id } });
     if (!originalLead) return reply.notFound('Lead not found');

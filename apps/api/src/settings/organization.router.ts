@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
+import { getTenantContext } from '../utils/tenant';
 
 const UpdateOrganizationSchema = z.object({
   name: z.string().optional(),
@@ -37,49 +38,21 @@ const UpdateOrganizationSchema = z.object({
 export default async function organizationRouter(app: FastifyInstance) {
   // GET /api/v1/settings/organization — Get organization branding scoped to tenant
   app.get('/organization', async (req, reply) => {
-    const user = (req as any).user;
-    const cookies = require('cookie').parse(req.headers.cookie || '');
-    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
-    // Resolve the active tenant ID: impersonation cookie takes precedence,
-    // then the user's own organizationId (for Academy Admins)
-    const activeTenantId = impersonatedTenantId || user?.organizationId || null;
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
 
     let org: any = null;
 
-    if (activeTenantId) {
+    if (tenantId) {
       // Tenant-scoped: return THIS academy's organization record
       org = await app.prisma.organization.findUnique({
-        where: { id: activeTenantId }
+        where: { id: tenantId }
       });
-    }
-
-    // Fallback: Return first organization (platform branding) if tenant not found or super admin
-    if (!org) {
+    } else if (isGlobalSuperAdmin) {
       org = await app.prisma.organization.findFirst();
     }
 
-    // Auto-seed default config ONLY if database has ZERO organizations at all
     if (!org) {
-      const totalCount = await app.prisma.organization.count();
-      if (totalCount === 0) {
-        org = await app.prisma.organization.create({
-          data: {
-            name: "Echo Academy",
-            companyName: "Echo LMS Platform",
-            slug: "echo-academy",
-            domain: "echo-academy.echolms.com",
-            logoUrl: "/echo_logo.png",
-            academyLogoUrl: "/echo_logo.png",
-            faviconUrl: "/favicon.ico",
-            academyFaviconUrl: "/favicon.ico",
-            primaryColor: "#0d9488",
-            secondaryColor: "#f59e0b",
-            accentColor: "#10b981",
-            darkModeDefault: false,
-            supportEmail: "support@echolms.com",
-          }
-        });
-      }
+      return reply.notFound('Organization not found');
     }
 
     return {
@@ -97,10 +70,17 @@ export default async function organizationRouter(app: FastifyInstance) {
 
   // PATCH /api/v1/settings/organization — Update the organization branding
   app.patch('/organization', async (req, reply) => {
-    const user = (req as any).user;
-    const cookies = require('cookie').parse(req.headers.cookie || '');
-    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
-    const activeTenantId = impersonatedTenantId || user?.organizationId || null;
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
+    let targetOrgId = tenantId;
+    if (!targetOrgId && isGlobalSuperAdmin) {
+      const firstOrg = await app.prisma.organization.findFirst();
+      targetOrgId = firstOrg?.id || null;
+    }
+
+    if (!targetOrgId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'No organization available to update' });
+    }
 
     const body = UpdateOrganizationSchema.parse(req.body);
     
@@ -110,27 +90,10 @@ export default async function organizationRouter(app: FastifyInstance) {
     if (!dataToSave.accentColor) delete dataToSave.accentColor;
     if (!dataToSave.name) delete dataToSave.name;
 
-    let org: any = null;
-    if (activeTenantId) {
-      org = await app.prisma.organization.findUnique({
-        where: { id: activeTenantId }
-      });
-    }
-
-    if (!org) {
-      org = await app.prisma.organization.findFirst();
-    }
-    
-    if (!org) {
-      org = await app.prisma.organization.create({
-        data: { name: "Echo LMS", ...dataToSave }
-      });
-    } else {
-      org = await app.prisma.organization.update({
-        where: { id: org.id },
-        data: dataToSave,
-      });
-    }
+    const org = await app.prisma.organization.update({
+      where: { id: targetOrgId },
+      data: dataToSave,
+    });
 
     // Keep GST synchronized with FinanceSettings if provided
     if (body.gstNumber !== undefined) {

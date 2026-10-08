@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
+import { getTenantContext } from '../utils/tenant';
 
 export default async function rbacRoutes(app: FastifyInstance) {
   const server = app.withTypeProvider<ZodTypeProvider>();
@@ -29,14 +30,9 @@ export default async function rbacRoutes(app: FastifyInstance) {
 
   // GET /roles/assignable-users — List users available to be assigned roles
   server.get('/roles/assignable-users', async (req, reply) => {
-    const user = (req as any).user;
-    const cookies = require('cookie').parse(req.headers.cookie || '');
-    const activeTenantId = cookies['echo_impersonate_tenant'] || user?.organizationId || null;
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
 
-    const where: any = {};
-    if (activeTenantId) {
-      where.organizationId = activeTenantId;
-    }
+    const where: any = isGlobalSuperAdmin ? {} : { organizationId: tenantId || '__NO_ACCESS__' };
 
     const users = await server.prisma.user.findMany({
       where,
@@ -149,6 +145,7 @@ export default async function rbacRoutes(app: FastifyInstance) {
     const { id } = req.params;
     const { userIds, userId } = req.body;
     const targetIds = userIds || (userId ? [userId] : []);
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
 
     if (targetIds.length === 0) {
       return reply.status(400).send({ error: "No user IDs provided for role assignment" });
@@ -160,7 +157,10 @@ export default async function rbacRoutes(app: FastifyInstance) {
     }
 
     await server.prisma.user.updateMany({
-      where: { id: { in: targetIds } },
+      where: { 
+        id: { in: targetIds },
+        ...(isGlobalSuperAdmin ? {} : { organizationId: tenantId || '__NO_ACCESS__' })
+      },
       data: { customRoleId: id }
     });
 
@@ -183,13 +183,18 @@ export default async function rbacRoutes(app: FastifyInstance) {
     const { id } = req.params;
     const { userIds, userId } = req.body;
     const targetIds = userIds || (userId ? [userId] : []);
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
 
     if (targetIds.length === 0) {
       return reply.status(400).send({ error: "No user IDs provided" });
     }
 
     await server.prisma.user.updateMany({
-      where: { id: { in: targetIds }, customRoleId: id },
+      where: { 
+        id: { in: targetIds }, 
+        customRoleId: id,
+        ...(isGlobalSuperAdmin ? {} : { organizationId: tenantId || '__NO_ACCESS__' })
+      },
       data: { customRoleId: null }
     });
 

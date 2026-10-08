@@ -2,18 +2,16 @@ import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import * as cookie from 'cookie';
+import { getTenantContext } from '../utils/tenant';
 
 export default async function coursesRoutes(app: FastifyInstance) {
   const server = app.withTypeProvider<ZodTypeProvider>();
 
   // GET /api/v1/lms/courses
   server.get('/', async (req, reply) => {
-    const user = (req as any).user;
-    const cookies = cookie.parse(req.headers.cookie || '');
-    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
-    const tenantId = user?.organizationId || impersonatedTenantId;
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
 
-    const orgFilter = (user?.role === 'SUPER_ADMIN' && !impersonatedTenantId)
+    const orgFilter = isGlobalSuperAdmin
       ? {}
       : { course: { organizationId: tenantId || '__NO_ACCESS__' } };
 
@@ -36,6 +34,8 @@ export default async function coursesRoutes(app: FastifyInstance) {
   server.get('/:id', {
     schema: { params: z.object({ id: z.string() }) }
   }, async (req, reply) => {
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
     const course = await server.prisma.lMSCourse.findUnique({
       where: { id: req.params.id },
       include: {
@@ -46,6 +46,12 @@ export default async function coursesRoutes(app: FastifyInstance) {
         }
       }
     });
+    if (!course) return reply.status(404).send({ error: "Course not found" });
+
+    if (!isGlobalSuperAdmin && course.course?.organizationId && course.course?.organizationId !== tenantId) {
+      return reply.code(403).send({ error: "Forbidden: Access denied to course of another tenant" });
+    }
+
     return { course };
   });
 
@@ -65,12 +71,7 @@ export default async function coursesRoutes(app: FastifyInstance) {
     }
   }, async (req, reply) => {
     const { name, code, description, duration, fee, thumbnail, outcomes, prerequisites } = req.body;
-    const user = (req as any).user;
-    const cookies = cookie.parse(req.headers.cookie || '');
-    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
-    const tenantId = (user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin')
-      ? (impersonatedTenantId || null)
-      : (user?.organizationId || null);
+    const { tenantId } = getTenantContext(req);
 
     // Create the base Course record scoped to tenant
     const baseCourse = await server.prisma.course.create({
@@ -108,13 +109,7 @@ export default async function coursesRoutes(app: FastifyInstance) {
       })
     }
   }, async (req, reply) => {
-    const user = (req as any).user;
-    const cookies = cookie.parse(req.headers.cookie || '');
-    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
-    const isGlobalSuperAdmin = (user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin') && !impersonatedTenantId;
-    const tenantId = (user?.role === 'SUPER_ADMIN' || user?.role === 'Super Admin')
-      ? (impersonatedTenantId || null)
-      : (user?.organizationId || null);
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
 
     const existing = await server.prisma.lMSCourse.findUnique({ where: { id: req.params.id }, include: { course: true } });
     if (!existing) return reply.status(404).send({ error: "Course not found" });

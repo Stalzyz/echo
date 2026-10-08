@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import * as cookie from 'cookie';
 import { EventBus, SystemEvents } from '../automations/event-bus';
+import { getTenantContext } from '../utils/tenant';
 
 // Helper to evaluate multi-role commission plan:
 // 1. Referral Partner (5%)
@@ -219,14 +220,7 @@ export default async function invoicesRouter(app: FastifyInstance) {
   // GET /api/v1/finance/invoices
   app.get('/invoices', async (req, reply) => {
     const { status, businessUnit } = req.query as { status?: string; businessUnit?: string };
-    const user = (req as any).user;
-    const cookies = cookie.parse(req.headers.cookie || '');
-    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
-    const tenantId = user?.organizationId || impersonatedTenantId;
-
-    const orgFilter = (user?.role === 'SUPER_ADMIN' && !impersonatedTenantId)
-      ? {}
-      : { organizationId: tenantId || '__NO_ACCESS__' };
+    const { orgFilter } = getTenantContext(req);
 
     const invoices = await app.prisma.invoice.findMany({
       where: {
@@ -243,6 +237,8 @@ export default async function invoicesRouter(app: FastifyInstance) {
   // GET /api/v1/finance/invoices/:id
   app.get('/invoices/:id', async (req, reply) => {
     const { id } = req.params as { id: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
     const invoice = await app.prisma.invoice.findUnique({
       where: { id },
       include: {
@@ -251,12 +247,19 @@ export default async function invoicesRouter(app: FastifyInstance) {
       },
     });
     if (!invoice) return reply.notFound('Invoice not found');
+
+    if (!isGlobalSuperAdmin && invoice.organizationId && invoice.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to invoice of another tenant' });
+    }
+
     return invoice;
   });
 
   // GET /api/v1/finance/invoices/:id/pdf  — Download as PDF
   app.get('/invoices/:id/pdf', async (req, reply) => {
     const { id } = req.params as { id: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
     const [invoice, financeSettings] = await Promise.all([
       app.prisma.invoice.findUnique({
         where: { id },
@@ -266,6 +269,10 @@ export default async function invoicesRouter(app: FastifyInstance) {
     ]);
 
     if (!invoice) return reply.notFound('Invoice not found');
+
+    if (!isGlobalSuperAdmin && invoice.organizationId && invoice.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to invoice of another tenant' });
+    }
     
     // Dynamically import to avoid circular issues or top-level await issues
     const { getBrandConfig } = await import('../utils/brand');
@@ -291,7 +298,8 @@ export default async function invoicesRouter(app: FastifyInstance) {
 
   // GET /api/v1/finance/invoices/export.csv
   app.get('/invoices/export.csv', async (req, reply) => {
-    const invoices = await app.prisma.invoice.findMany({ orderBy: { createdAt: 'desc' } });
+    const { orgFilter } = getTenantContext(req);
+    const invoices = await app.prisma.invoice.findMany({ where: orgFilter, orderBy: { createdAt: 'desc' } });
     const headers = ['invoiceNumber', 'clientName', 'clientEmail', 'status', 'totalAmount', 'currency', 'dueDate', 'createdAt'];
     const csv = toCsv(invoices.map(i => ({
       ...i,
@@ -387,9 +395,11 @@ async function getNextSequentialInvoiceNumber(app: FastifyInstance, type: 'TAX' 
       }
     }
 
+    const { tenantId } = getTenantContext(req);
     const totals = calculateTaxesAndTotals(body.items, body.clientGst, orgGst || undefined, body.discountRate);
     const invoice = await app.prisma.invoice.create({
       data: {
+        organizationId: tenantId,
         invoiceNumber: finalInvoiceNumber,
         projectId: body.projectId,
         clientName: body.clientName,
@@ -440,8 +450,14 @@ async function getNextSequentialInvoiceNumber(app: FastifyInstance, type: 'TAX' 
   // PATCH /api/v1/finance/invoices/:id
   app.patch('/invoices/:id', async (req, reply) => {
     const { id } = req.params as { id: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
     const originalInvoice = await app.prisma.invoice.findUnique({ where: { id } });
     if (!originalInvoice) return reply.notFound('Invoice not found');
+
+    if (!isGlobalSuperAdmin && originalInvoice.organizationId && originalInvoice.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to invoice of another tenant' });
+    }
 
     const body = UpdateInvoiceSchema.parse(req.body);
     const { items, ...rest } = body;
@@ -510,8 +526,14 @@ async function getNextSequentialInvoiceNumber(app: FastifyInstance, type: 'TAX' 
   // DELETE /api/v1/finance/invoices/:id
   app.delete('/invoices/:id', async (req, reply) => {
     const { id } = req.params as { id: string };
-    const invoice = await app.prisma.invoice.findUnique({ where: { id }, select: { invoiceNumber: true } });
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
+    const invoice = await app.prisma.invoice.findUnique({ where: { id } });
     if (!invoice) return reply.notFound('Invoice not found');
+
+    if (!isGlobalSuperAdmin && invoice.organizationId && invoice.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to invoice of another tenant' });
+    }
 
     await app.prisma.$transaction([
       app.prisma.payment.deleteMany({ where: { invoiceId: id } }),

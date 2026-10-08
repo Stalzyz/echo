@@ -58,11 +58,18 @@ export default async function dynamicFormsRouter(app: FastifyInstance) {
   // Admin fetch by ID
   app.get('/forms/id/:id', async (req, reply) => {
     const { id } = req.params as { id: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
     const form = await app.prisma.enquiryForm.findUnique({
       where: { id },
       include: { submissions: { orderBy: { createdAt: 'desc' } } }
     });
     if (!form) return reply.notFound('Form not found');
+
+    if (!isGlobalSuperAdmin && form.organizationId && form.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to form of another tenant' });
+    }
+
     return form;
   });
 
@@ -123,6 +130,15 @@ export default async function dynamicFormsRouter(app: FastifyInstance) {
   // Admin updates an existing dynamic form
   app.patch('/forms/:id', async (req, reply) => {
     const { id } = req.params as { id: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
+    const existing = await app.prisma.enquiryForm.findUnique({ where: { id } });
+    if (!existing) return reply.notFound('Form not found');
+
+    if (!isGlobalSuperAdmin && existing.organizationId && existing.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to form of another tenant' });
+    }
+
     const schema = z.object({
       title: z.string().optional(),
       description: z.string().optional(),
@@ -141,9 +157,15 @@ export default async function dynamicFormsRouter(app: FastifyInstance) {
   // ── PATCH /api/v1/academy/forms/:id/toggle ───────────────────────────────
   app.patch('/forms/:id/toggle', async (req, reply) => {
     const { id } = req.params as { id: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
     const form = await app.prisma.enquiryForm.findUnique({ where: { id } });
-    if (!form) return reply.notFound();
+    if (!form) return reply.notFound('Form not found');
     
+    if (!isGlobalSuperAdmin && form.organizationId && form.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to form of another tenant' });
+    }
+
     const updated = await app.prisma.enquiryForm.update({
       where: { id },
       data: { isActive: !form.isActive }

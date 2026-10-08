@@ -4,6 +4,7 @@ import * as cookie from 'cookie';
 import { auditLog } from '../utils/audit';
 import OpenAI from 'openai';
 import { generateProposalPDF } from '../finance/pdf.service';
+import { getTenantContext } from '../utils/tenant';
 
 const ProposalItemSchema = z.object({
   description: z.string().min(1),
@@ -60,14 +61,7 @@ export default async function proposalsRouter(app: FastifyInstance) {
     const limitNum = parseInt(limit, 10);
     const skip = (pageNum - 1) * limitNum;
 
-    const user = (req as any).user;
-    const cookies = cookie.parse(req.headers.cookie || '');
-    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
-    const tenantId = user?.organizationId || impersonatedTenantId;
-
-    const orgFilter = (user?.role === 'SUPER_ADMIN' && !impersonatedTenantId)
-      ? {}
-      : { organizationId: tenantId || '__NO_ACCESS__' };
+    const { orgFilter } = getTenantContext(req);
 
     const whereClause: any = {
       ...orgFilter,
@@ -112,6 +106,8 @@ export default async function proposalsRouter(app: FastifyInstance) {
   // GET /api/v1/crm/proposals/:id
   app.get('/proposals/:id', async (req, reply) => {
     const { id } = req.params as { id: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
     const proposal = await app.prisma.proposal.findUnique({
       where: { id },
       include: {
@@ -121,12 +117,19 @@ export default async function proposalsRouter(app: FastifyInstance) {
       },
     });
     if (!proposal) return reply.notFound('Proposal not found');
+
+    if (!isGlobalSuperAdmin && proposal.organizationId && proposal.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to proposal of another tenant' });
+    }
+
     return proposal;
   });
 
   // GET /api/v1/crm/proposals/:id/pdf
   app.get('/proposals/:id/pdf', async (req, reply) => {
     const { id } = req.params as { id: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
     const proposal = await app.prisma.proposal.findUnique({
       where: { id },
       include: {
@@ -137,6 +140,10 @@ export default async function proposalsRouter(app: FastifyInstance) {
     });
     
     if (!proposal) return reply.notFound('Proposal not found');
+
+    if (!isGlobalSuperAdmin && proposal.organizationId && proposal.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to proposal of another tenant' });
+    }
 
     const financeSettings = await app.prisma.financeSettings.findFirst();
 
@@ -344,9 +351,7 @@ Write a proposal with 3–4 phases that map directly to the client's goals. Make
     const cleanContactId = body.contactId && body.contactId.trim() !== "" ? body.contactId.trim() : null;
     const cleanValidUntil = body.validUntil && !isNaN(Date.parse(body.validUntil)) ? new Date(body.validUntil) : null;
 
-    const user = (req as any).user;
-    const cookies = cookie.parse(req.headers.cookie || '');
-    const tenantId = user?.organizationId || cookies['echo_impersonate_tenant'] || null;
+    const { tenantId } = getTenantContext(req);
 
     const generatedToken = `prop_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
@@ -386,6 +391,15 @@ Write a proposal with 3–4 phases that map directly to the client's goals. Make
 
   const updateProposalHandler = async (req: any, reply: any) => {
     const { id } = req.params as { id: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
+    const existing = await app.prisma.proposal.findUnique({ where: { id } });
+    if (!existing) return reply.notFound('Proposal not found');
+
+    if (!isGlobalSuperAdmin && existing.organizationId && existing.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to proposal of another tenant' });
+    }
+
     const body = UpdateProposalSchema.parse(req.body);
     const { items, taxRate, discountRate, leadId, contactId, validUntil, signedAt, ...rest } = body;
 
@@ -402,7 +416,6 @@ Write a proposal with 3–4 phases that map directly to the client's goals. Make
 
     if (items) {
       subtotal = calcTotal(items);
-      const existing = await app.prisma.proposal.findUnique({ where: { id } });
       newTaxRate = taxRate !== undefined ? taxRate : (existing?.taxRate || 0);
       newDiscountRate = discountRate !== undefined ? discountRate : (existing?.discountRate || 0);
       
@@ -411,17 +424,14 @@ Write a proposal with 3–4 phases that map directly to the client's goals. Make
       calculatedTax = afterOverallDiscount * (newTaxRate / 100);
       totalAmount = afterOverallDiscount + calculatedTax;
     } else if (taxRate !== undefined || discountRate !== undefined) {
-      const existing = await app.prisma.proposal.findUnique({ where: { id } });
-      if (existing) {
-        subtotal = existing.subtotal;
-        newTaxRate = taxRate !== undefined ? taxRate : (existing.taxRate || 0);
-        newDiscountRate = discountRate !== undefined ? discountRate : (existing.discountRate || 0);
-        
-        const overallDiscount = subtotal * (newDiscountRate / 100);
-        const afterOverallDiscount = subtotal - overallDiscount;
-        calculatedTax = afterOverallDiscount * (newTaxRate / 100);
-        totalAmount = afterOverallDiscount + calculatedTax;
-      }
+      subtotal = existing.subtotal;
+      newTaxRate = taxRate !== undefined ? taxRate : (existing.taxRate || 0);
+      newDiscountRate = discountRate !== undefined ? discountRate : (existing.discountRate || 0);
+      
+      const overallDiscount = subtotal * (newDiscountRate / 100);
+      const afterOverallDiscount = subtotal - overallDiscount;
+      calculatedTax = afterOverallDiscount * (newTaxRate / 100);
+      totalAmount = afterOverallDiscount + calculatedTax;
     }
 
     const proposal = await app.prisma.$transaction(async (tx) => {
@@ -647,6 +657,15 @@ Write a proposal with 3–4 phases that map directly to the client's goals. Make
   // DELETE /api/v1/crm/proposals/:id
   app.delete('/proposals/:id', async (req, reply) => {
     const { id } = req.params as { id: string };
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
+    const existing = await app.prisma.proposal.findUnique({ where: { id } });
+    if (!existing) return reply.notFound('Proposal not found');
+
+    if (!isGlobalSuperAdmin && existing.organizationId && existing.organizationId !== tenantId) {
+      return reply.code(403).send({ error: 'Forbidden', message: 'Access denied to proposal of another tenant' });
+    }
+
     await app.prisma.proposal.delete({ where: { id } });
     await auditLog(app.prisma as any, req, 'DELETE', 'Proposal', id);
     return reply.code(204).send();

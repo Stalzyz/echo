@@ -19,6 +19,7 @@ import { registerGlobalListeners } from './automations/listeners';
 import { startCronJobs } from './cron/invoice-jobs';
 import { initializeCronJobs as startAutomatedDrips } from './automations/cron';
 import { initSentry } from './sentry';
+import { getTenantContext } from './utils/tenant';
 
 import path from 'path';
 
@@ -232,7 +233,11 @@ export async function buildApp(opts: any = {}): Promise<any> {
   // Telephony & Call Intelligence bridge endpoint
   app.get('/api/v1/calls', async (req, reply) => {
     const { leadId, counsellorId, status } = (req.query as any) || {};
-    const where: any = {};
+    const { tenantId, isGlobalSuperAdmin } = getTenantContext(req);
+
+    const where: any = {
+      ...(isGlobalSuperAdmin ? {} : { lead: { organizationId: tenantId || '__NO_ACCESS__' } })
+    };
     if (leadId) where.leadId = leadId;
     if (counsellorId) where.counsellorId = counsellorId;
     if (status) where.status = status;
