@@ -127,11 +127,11 @@ export const CertificatesService = {
       const pdfBuffer = await renderBuffer(doc);
       console.log(`[Certificates] PDF generated (${pdfBuffer.length} bytes)`);
 
-      // Upload to Cloudflare R2
+      // Upload to Cloudflare R2 if configured and not in test mode
       let certificateUrl: string | null = null;
-      try {
-        const { S3Client, PutObjectCommand } = await import('@aws-sdk/client-s3');
-        if (process.env.R2_ACCESS_KEY_ID) {
+      if (process.env.R2_ACCESS_KEY_ID && process.env.NODE_ENV !== 'test') {
+        try {
+          const { S3Client, PutObjectCommand } = await import('@aws-sdk/client-s3');
           const s3 = new S3Client({
             region: 'auto',
             endpoint: process.env.R2_ENDPOINT_URL,
@@ -142,16 +142,16 @@ export const CertificatesService = {
           });
           const key = `certificates/${payload.studentId}/${Date.now()}-certificate.pdf`;
           await s3.send(new PutObjectCommand({
-            Bucket: process.env.R2_BUCKET_NAME || 'grekamos',
+            Bucket: process.env.R2_BUCKET_NAME || 'echo-lms',
             Key: key,
             Body: pdfBuffer,
             ContentType: 'application/pdf',
           }));
-          certificateUrl = `${process.env.R2_PUBLIC_DOMAIN}/${key}`;
+          certificateUrl = `${process.env.R2_PUBLIC_DOMAIN || 'https://storage.echo-lms.com'}/${key}`;
           console.log(`[Certificates] Uploaded to R2: ${certificateUrl}`);
+        } catch (uploadErr) {
+          console.error('[Certificates] R2 upload failed, continuing with email dispatch.', uploadErr);
         }
-      } catch (uploadErr) {
-        console.error('[Certificates] R2 upload failed, continuing with email dispatch.', uploadErr);
       }
 
       // Save certificate record to database
@@ -161,9 +161,21 @@ export const CertificatesService = {
       });
       const resolvedCourseId = lmsCourse?.courseId || payload.lmsCourseId;
 
-      await prisma.certificate.create({
-        data: {
-          certificateId: `CERT-${new Date().getFullYear()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+      const certificateId = `CERT-${new Date().getFullYear()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+
+      await prisma.certificate.upsert({
+        where: {
+          studentId_courseId: {
+            studentId: payload.studentId,
+            courseId: resolvedCourseId
+          }
+        },
+        update: {
+          issuedAt: new Date(),
+          metadata: certificateUrl ? { fileUrl: certificateUrl } : {},
+        },
+        create: {
+          certificateId,
           studentId: payload.studentId,
           courseId: resolvedCourseId,
           grade: 'PASS',
@@ -172,21 +184,25 @@ export const CertificatesService = {
         }
       });
 
-      // Send email with certificate as attachment
-      if (payload.studentEmail) {
-        await EmailService.sendEmail(
-          payload.studentEmail,
-          `🎓 Your Certificate for "${payload.courseName}" is Ready!`,
-          `
-            <div style="background:#0a0a0a;color:#fff;font-family:sans-serif;padding:40px;border-radius:12px">
-              <h1 style="color:#2563eb">Congratulations, ${payload.studentName}! 🎉</h1>
-              <p style="color:#9ca3af">You have successfully completed <strong style="color:#fff">${payload.courseName}</strong> at Grekam Academy.</p>
-              <p style="color:#9ca3af">Your certificate has been generated. ${certificateUrl ? `You can <a href="${certificateUrl}" style="color:#2563eb">download it here</a>.` : 'It will be available in your student portal shortly.'}</p>
-              <p style="color:#6b7280;margin-top:32px;font-size:12px">Grekam Academy — Empowering Creativity</p>
-            </div>
-          `
-        );
-        console.log(`[Certificates] Email dispatched to ${payload.studentEmail}`);
+      // Send email with certificate as attachment if not in test mode
+      if (payload.studentEmail && process.env.NODE_ENV !== 'test') {
+        try {
+          await EmailService.sendEmail(
+            payload.studentEmail,
+            `🎓 Your Certificate for "${payload.courseName}" is Ready!`,
+            `
+              <div style="background:#0a0a0a;color:#fff;font-family:sans-serif;padding:40px;border-radius:12px">
+                <h1 style="color:#2563eb">Congratulations, ${payload.studentName}! 🎉</h1>
+                <p style="color:#9ca3af">You have successfully completed <strong style="color:#fff">${payload.courseName}</strong>.</p>
+                <p style="color:#9ca3af">Your certificate has been generated. ${certificateUrl ? `You can <a href="${certificateUrl}" style="color:#2563eb">download it here</a>.` : 'It will be available in your student portal shortly.'}</p>
+                <p style="color:#6b7280;margin-top:32px;font-size:12px">ECHO LMS — Empowering Modern Education</p>
+              </div>
+            `
+          );
+          console.log(`[Certificates] Email dispatched to ${payload.studentEmail}`);
+        } catch (mailErr) {
+          console.warn('[Certificates] Email dispatch failed:', mailErr);
+        }
       }
 
       return { success: true, certificateUrl };
