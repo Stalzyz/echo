@@ -271,6 +271,33 @@ export async function resetAndSeedE2E() {
     },
   });
 
+  const lmsCourseAlpha = await prisma.lMSCourse.create({
+    data: {
+      id: 'lms-course-alpha-001',
+      courseId: courseAlpha.id,
+      isPublished: true,
+      modules: {
+        create: [
+          {
+            title: 'Module 1: Next.js & Fastify Architecture',
+            sortOrder: 1,
+            lessons: {
+              create: [
+                {
+                  title: 'Lesson 1.1: Multi-Tenant Schema Design',
+                  type: 'VIDEO',
+                  sortOrder: 1,
+                  videoUrl: 'https://cdn.echo.test/videos/lesson1.mp4',
+                  isFree: true,
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  });
+
   const batchAlpha = await prisma.batch.create({
     data: {
       id: 'batch-alpha-001',
@@ -341,6 +368,33 @@ export async function resetAndSeedE2E() {
       isPublished: true,
       description: 'Data analytics program scoped strictly to Tenant Beta.',
     },
+  });
+
+  const lmsCourseBeta = await prisma.lMSCourse.create({
+    data: {
+      id: 'lms-course-beta-001',
+      courseId: courseBeta.id,
+      isPublished: true,
+      modules: {
+        create: [
+          {
+            title: 'Module 1: Python for Data Science',
+            sortOrder: 1,
+            lessons: {
+              create: [
+                {
+                  title: 'Lesson 1.1: Pandas & NumPy Essentials',
+                  type: 'VIDEO',
+                  sortOrder: 1,
+                  videoUrl: 'https://cdn.echo.test/videos/beta-lesson1.mp4',
+                  isFree: true,
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
   });
 
   const batchBeta = await prisma.batch.create({

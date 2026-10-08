@@ -24,120 +24,134 @@ declare module 'fastify' {
   }
 }
 
+const extractUserFromRequest = async (fastify: any, request: FastifyRequest) => {
+  if (request.user) return request.user;
+
+  try {
+    const cookies = cookie.parse(request.headers.cookie || '');
+    
+    const candidateCookies = [
+      '__Secure-authjs.session-token',
+      'authjs.session-token',
+      '__Secure-next-auth.session-token',
+      'next-auth.session-token'
+    ];
+
+    let token = '';
+    let detectedSalt = '';
+
+    const authHeader = request.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7).trim();
+    }
+
+    if (!token) {
+      for (const name of candidateCookies) {
+        if (cookies[name]) {
+          token = cookies[name];
+          detectedSalt = name;
+          break;
+        }
+      }
+    }
+
+    if (!token) return null;
+
+    const secretsToTry = [
+      process.env.AUTH_SECRET,
+      process.env.NEXTAUTH_SECRET,
+      process.env.JWT_SECRET,
+      "echo_jwt_secret_key_2026",
+      "fallback-dev-secret-if-env-fails-12345"
+    ].filter(Boolean) as string[];
+
+    const saltsToTry = Array.from(new Set([
+      detectedSalt,
+      '__Secure-authjs.session-token',
+      'authjs.session-token',
+      '__Secure-next-auth.session-token',
+      'next-auth.session-token'
+    ])).filter(Boolean);
+
+    let decoded = null;
+    for (const s of secretsToTry) {
+      for (const salt of saltsToTry) {
+        if (decoded) break;
+        try {
+          decoded = await decode({ token, secret: s, salt });
+        } catch (e) {
+          // continue
+        }
+      }
+    }
+
+    if (!decoded) return null;
+
+    const decodedAny = decoded as any;
+    const userId = (decodedAny?.id || decodedAny?.sub) as string;
+    const impersonatedTenantId = cookies['echo_impersonate_tenant'];
+
+    let dbUser: any = null;
+    if (userId) {
+      try {
+        dbUser = await fastify.prisma.user.findUnique({
+          where: { id: userId },
+          select: { id: true, email: true, firstName: true, lastName: true, role: true, organizationId: true }
+        });
+      } catch {}
+    }
+    if (!dbUser && decodedAny?.email) {
+      try {
+        dbUser = await fastify.prisma.user.findUnique({
+          where: { email: decodedAny.email },
+          select: { id: true, email: true, firstName: true, lastName: true, role: true, organizationId: true }
+        });
+      } catch {}
+    }
+
+    const effectiveRole = dbUser?.role || decodedAny?.role || 'STUDENT';
+    
+    let effectiveOrgId: string | null = null;
+    if (effectiveRole === 'SUPER_ADMIN') {
+      effectiveOrgId = impersonatedTenantId || null;
+    } else {
+      effectiveOrgId = dbUser?.organizationId || decodedAny?.organizationId || null;
+    }
+
+    request.user = {
+      id: dbUser?.id || userId || 'unknown-user',
+      email: dbUser?.email || decodedAny?.email || '',
+      name: dbUser ? `${dbUser.firstName} ${dbUser.lastName}`.trim() : (decodedAny?.name || 'User'),
+      role: effectiveRole,
+      organizationId: effectiveOrgId
+    } as any;
+
+    return request.user;
+  } catch (err) {
+    return null;
+  }
+};
+
 const authPlugin: FastifyPluginAsync = async (fastify, opts) => {
+  // Global hook: automatically populate request.user if session credentials are present
+  fastify.addHook('onRequest', async (request: FastifyRequest, reply: FastifyReply) => {
+    await extractUserFromRequest(fastify, request);
+  });
+
   fastify.decorate('requireAuth', async (request: FastifyRequest, reply: FastifyReply) => {
-    try {
-      const cookies = cookie.parse(request.headers.cookie || '');
-      
-      const candidateCookies = [
-        '__Secure-authjs.session-token',
-        'authjs.session-token',
-        '__Secure-next-auth.session-token',
-        'next-auth.session-token'
-      ];
-
-      let token = '';
-      let detectedSalt = '';
-
-      const authHeader = request.headers.authorization;
-      if (authHeader && authHeader.startsWith('Bearer ')) {
-        token = authHeader.substring(7).trim();
-      }
-
-      if (!token) {
-        for (const name of candidateCookies) {
-          if (cookies[name]) {
-            token = cookies[name];
-            detectedSalt = name;
-            break;
-          }
-        }
-      }
-
-      if (!token) {
-        return reply.code(401).send({ error: 'Unauthorized', message: 'Authentication required' });
-      }
-
-      const secretsToTry = [
-        process.env.AUTH_SECRET,
-        process.env.NEXTAUTH_SECRET,
-        process.env.JWT_SECRET,
-        "echo_jwt_secret_key_2026",
-        "fallback-dev-secret-if-env-fails-12345"
-      ].filter(Boolean) as string[];
-
-      const saltsToTry = Array.from(new Set([
-        detectedSalt,
-        '__Secure-authjs.session-token',
-        'authjs.session-token',
-        '__Secure-next-auth.session-token',
-        'next-auth.session-token'
-      ])).filter(Boolean);
-
-      let decoded = null;
-      for (const s of secretsToTry) {
-        for (const salt of saltsToTry) {
-          if (decoded) break;
-          try {
-            decoded = await decode({ token, secret: s, salt });
-          } catch (e) {
-            // continue trying other secrets/salts
-          }
-        }
-      }
-
-      if (!decoded) {
-        return reply.code(401).send({ error: 'Unauthorized', message: 'Invalid or expired authentication session' });
-      }
-
-      const decodedAny = decoded as any;
-      const userId = (decodedAny?.id || decodedAny?.sub) as string;
-      const impersonatedTenantId = cookies['echo_impersonate_tenant'];
-
-      let dbUser: any = null;
-      if (userId) {
-        try {
-          dbUser = await fastify.prisma.user.findUnique({
-            where: { id: userId },
-            select: { id: true, email: true, firstName: true, lastName: true, role: true, organizationId: true }
-          });
-        } catch {}
-      }
-      if (!dbUser && decodedAny?.email) {
-        try {
-          dbUser = await fastify.prisma.user.findUnique({
-            where: { email: decodedAny.email },
-            select: { id: true, email: true, firstName: true, lastName: true, role: true, organizationId: true }
-          });
-        } catch {}
-      }
-
-      const effectiveRole = dbUser?.role || decodedAny?.role || 'STUDENT';
-      
-      // CRITICAL SECURITY RULE: Only SUPER_ADMIN can impersonate a tenant!
-      // For any other role, they are strictly bound to their own DB organizationId!
-      let effectiveOrgId: string | null = null;
-      if (effectiveRole === 'SUPER_ADMIN') {
-        effectiveOrgId = impersonatedTenantId || null;
-      } else {
-        effectiveOrgId = dbUser?.organizationId || decodedAny?.organizationId || null;
-      }
-
-      request.user = {
-        id: dbUser?.id || userId || 'unknown-user',
-        email: dbUser?.email || decodedAny?.email || '',
-        name: dbUser ? `${dbUser.firstName} ${dbUser.lastName}`.trim() : (decodedAny?.name || 'User'),
-        role: effectiveRole,
-        organizationId: effectiveOrgId
-      } as any;
-    } catch (err) {
-      request.log.error(err);
-      return reply.code(401).send({ error: 'Unauthorized', message: 'Authentication failure' });
+    if (!request.user) {
+      await extractUserFromRequest(fastify, request);
+    }
+    if (!request.user) {
+      return reply.code(401).send({ error: 'Unauthorized', message: 'Authentication required' });
     }
   });
 
   fastify.decorate('requireRole', (roles: string[]) => {
     return async (request: FastifyRequest, reply: FastifyReply) => {
+      if (!request.user) {
+        await extractUserFromRequest(fastify, request);
+      }
       if (!request.user) {
         return reply.code(401).send({ error: 'Unauthorized', message: 'Not authenticated' });
       }
