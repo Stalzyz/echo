@@ -163,7 +163,7 @@ export const CertificatesService = {
 
       await prisma.certificate.create({
         data: {
-          certificateId: `LMS-${Date.now()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`,
+          certificateId: `CERT-${new Date().getFullYear()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
           studentId: payload.studentId,
           courseId: resolvedCourseId,
           grade: 'PASS',
