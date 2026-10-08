@@ -118,15 +118,33 @@ export default async function certificatesRouter(app: FastifyInstance) {
 
     const pdfUrl = `https://storage.echo-lms.com/certificates/${certificateId}.pdf`; 
 
-    const certificate = await app.prisma.certificate.create({
-      data: {
-        studentId: data.studentId,
-        courseId: data.courseId,
-        templateId: data.templateId,
-        certificateId,
-        pdfUrl
+    const existingCert = await app.prisma.certificate.findUnique({
+      where: {
+        studentId_courseId: {
+          studentId: data.studentId,
+          courseId: data.courseId
+        }
       }
     });
+
+    const certificate = existingCert
+      ? await app.prisma.certificate.update({
+          where: { id: existingCert.id },
+          data: {
+            templateId: data.templateId,
+            pdfUrl,
+            issuedAt: new Date()
+          }
+        })
+      : await app.prisma.certificate.create({
+          data: {
+            studentId: data.studentId,
+            courseId: data.courseId,
+            templateId: data.templateId,
+            certificateId,
+            pdfUrl
+          }
+        });
 
     if (data.sendEmail) {
       app.log.info(`Sending certificate email to ${student.user.email}`);
