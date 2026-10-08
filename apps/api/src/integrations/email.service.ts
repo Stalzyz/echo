@@ -461,6 +461,10 @@ export async function sendEmail(
   template: { subject: string; html: string; attachments?: any[] },
   options?: { cc?: string | string[] }
 ) {
+  if (process.env.NODE_ENV === 'test') {
+    return { messageId: 'mock-test-email-id', previewUrl: null };
+  }
+
   const { transporter: t, fromAddress: from } = await getTransporter();
 
   // Ensure cc always includes greeksacademy@gmail.com
