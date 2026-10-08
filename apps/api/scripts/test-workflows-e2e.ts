@@ -27,6 +27,10 @@ if (!dbUrl.includes('echo_lms_e2e') && !dbUrl.includes('_test') && !dbUrl.includ
   process.exit(1);
 }
 
+process.env.AUTH_SECRET = process.env.AUTH_SECRET || "echo_jwt_secret_key_2026";
+process.env.NODE_ENV = 'test';
+
+import { encode } from '@auth/core/jwt';
 import { buildApp } from '../src/app';
 import { prisma } from '../src/db';
 import assert from 'assert';
@@ -48,6 +52,22 @@ interface TestContext {
 let passed = 0;
 let failed = 0;
 
+async function createAuthCookie(user: { id: string; email: string; name: string; role: string; organizationId: string | null }): Promise<string> {
+  const token = await encode({
+    token: {
+      id: user.id,
+      sub: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      organizationId: user.organizationId,
+    },
+    secret: process.env.AUTH_SECRET || "echo_jwt_secret_key_2026",
+    salt: 'authjs.session-token',
+  });
+  return `authjs.session-token=${token}`;
+}
+
 async function runTest(name: string, fn: () => Promise<void>) {
   try {
     process.stdout.write(`  ⏳ ${name}... `);
@@ -67,25 +87,42 @@ async function main() {
   console.log('🚀 ECHO LMS — PHASE 4: CORE LMS & ACADEMY WORKFLOWS E2E AUDIT');
   console.log('===============================================================\n');
 
-  const app = await buildApp();
+  const app = await buildApp({ logger: false });
   await app.ready();
 
   // Load Seed Fixtures from echo_lms_e2e
-  const tenantAlpha = await prisma.organization.findUnique({ where: { slug: 'tenant-alpha' } });
-  const tenantBeta = await prisma.organization.findUnique({ where: { slug: 'tenant-beta' } });
+  const tenantAlpha = await prisma.organization.findFirst({ where: { slug: 'academy-alpha' } });
+  const tenantBeta = await prisma.organization.findFirst({ where: { slug: 'academy-beta' } });
 
   if (!tenantAlpha || !tenantBeta) {
-    throw new Error('Seed organizations missing. Please run npm run test:e2e:db:reset first.');
+    throw new Error('Seed organizations (academy-alpha / academy-beta) missing. Please run npm run test:e2e:db:reset first.');
   }
 
   // Find users and courses in Tenant Alpha
-  const adminAlpha = await prisma.user.findFirst({ where: { email: 'admin@alpha-academy.com' } });
-  const adminBeta = await prisma.user.findFirst({ where: { email: 'admin@beta-design.com' } });
-  const studentAlpha = await prisma.user.findFirst({ where: { email: 'student1@alpha-academy.com' } });
+  const adminAlpha = await prisma.user.findFirst({ where: { email: 'admin-alpha@example.test' } });
+  const adminBeta = await prisma.user.findFirst({ where: { email: 'admin-beta@example.test' } });
+  const studentAlpha = await prisma.user.findFirst({ where: { email: 'student-alpha@example.test' } });
   const courseAlpha = await prisma.course.findFirst({ where: { organizationId: tenantAlpha.id } });
   const lmsCourseAlpha = await prisma.lMSCourse.findFirst({ where: { courseId: courseAlpha?.id }, include: { modules: { include: { lessons: true } } } });
   const batchAlpha = await prisma.batch.findFirst({ where: { courseId: courseAlpha?.id } });
-  const formAlpha = await prisma.enquiryForm.findFirst({ where: { organizationId: tenantAlpha.id } });
+
+  let formAlpha = await prisma.enquiryForm.findFirst({ where: { organizationId: tenantAlpha.id } });
+  if (!formAlpha) {
+    formAlpha = await prisma.enquiryForm.create({
+      data: {
+        organizationId: tenantAlpha.id,
+        title: 'Full Stack Web Enquiry',
+        slug: `alpha-enquiry-${Date.now()}`,
+        createLead: true,
+        isActive: true,
+        fields: [
+          { id: 'fullName', label: 'Full Name', type: 'text', required: true },
+          { id: 'mobilePhone', label: 'Phone Number', type: 'tel', required: true },
+          { id: 'email', label: 'Email Address', type: 'email', required: false }
+        ]
+      }
+    });
+  }
 
   let certTemplate = await prisma.certificateTemplate.findFirst();
   if (!certTemplate) {
@@ -97,17 +134,45 @@ async function main() {
     });
   }
 
+  if (!adminAlpha || !adminBeta || !studentAlpha) {
+    throw new Error('Seed users missing. Please run npm run test:e2e:db:reset first.');
+  }
+
+  const cookieAdminAlpha = await createAuthCookie({
+    id: adminAlpha.id,
+    email: adminAlpha.email,
+    name: `${adminAlpha.firstName} ${adminAlpha.lastName}`,
+    role: adminAlpha.role,
+    organizationId: adminAlpha.organizationId
+  });
+
+  const cookieAdminBeta = await createAuthCookie({
+    id: adminBeta.id,
+    email: adminBeta.email,
+    name: `${adminBeta.firstName} ${adminBeta.lastName}`,
+    role: adminBeta.role,
+    organizationId: adminBeta.organizationId
+  });
+
+  const cookieStudentAlpha = await createAuthCookie({
+    id: studentAlpha.id,
+    email: studentAlpha.email,
+    name: `${studentAlpha.firstName} ${studentAlpha.lastName}`,
+    role: studentAlpha.role,
+    organizationId: studentAlpha.organizationId
+  });
+
   const ctx: TestContext = {
     tenantAlphaId: tenantAlpha.id,
     tenantBetaId: tenantBeta.id,
-    adminAlphaToken: `authjs.session-token=sess_admin_alpha`,
-    adminBetaToken: `authjs.session-token=sess_admin_beta`,
-    studentAlphaToken: `authjs.session-token=sess_student_alpha_1`,
+    adminAlphaToken: cookieAdminAlpha,
+    adminBetaToken: cookieAdminBeta,
+    studentAlphaToken: cookieStudentAlpha,
     courseAlphaId: courseAlpha?.id || '',
     lmsCourseAlphaId: lmsCourseAlpha?.id || '',
     lessonAlphaId: lmsCourseAlpha?.modules[0]?.lessons[0]?.id || '',
     batchAlphaId: batchAlpha?.id || '',
-    formSlugAlpha: formAlpha?.slug || '',
+    formSlugAlpha: formAlpha.slug,
     certTemplateId: certTemplate.id
   };
 
@@ -117,6 +182,7 @@ async function main() {
   let createdAssignmentId = '';
   let createdSubmissionId = '';
   let createdInstallmentId = '';
+  let studentToken = '';
 
   console.log('--- SECTION 1: PUBLIC ADMISSIONS & CRM LEAD CONVERSION ---');
 
@@ -210,14 +276,14 @@ async function main() {
     assert.strictEqual(enrollment.status, 'ACTIVE');
     createdEnrollmentId = enrollment.id;
 
-    // Create session for this new student
+    // Create JWT cookie for this new student
     const studentUser = await prisma.user.findFirst({ where: { email: studentEmail } });
-    await prisma.session.create({
-      data: {
-        sessionToken: `sess_rajesh_${student.id}`,
-        userId: studentUser!.id,
-        expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-      }
+    studentToken = await createAuthCookie({
+      id: studentUser!.id,
+      email: studentUser!.email,
+      name: `${studentUser!.firstName} ${studentUser!.lastName}`,
+      role: studentUser!.role,
+      organizationId: studentUser!.organizationId
     });
   });
 
@@ -227,7 +293,7 @@ async function main() {
     const res = await app.inject({
       method: 'GET',
       url: '/api/v1/academy/lms-student/dashboard',
-      headers: { cookie: `authjs.session-token=sess_rajesh_${createdStudentId}` }
+      headers: { cookie: studentToken }
     });
     assert.strictEqual(res.statusCode, 200, `Expected 200, got ${res.statusCode}: ${res.body}`);
     const dash = JSON.parse(res.body);
@@ -240,7 +306,7 @@ async function main() {
     const res = await app.inject({
       method: 'GET',
       url: '/api/v1/lms/enrollments/my',
-      headers: { cookie: `authjs.session-token=sess_rajesh_${createdStudentId}` }
+      headers: { cookie: studentToken }
     });
     assert.strictEqual(res.statusCode, 200);
     const json = JSON.parse(res.body);
@@ -297,7 +363,7 @@ async function main() {
     const res = await app.inject({
       method: 'POST',
       url: '/api/v1/academy/submissions',
-      headers: { cookie: `authjs.session-token=sess_rajesh_${createdStudentId}` },
+      headers: { cookie: studentToken },
       payload: {
         assignmentId: createdAssignmentId,
         studentId: createdStudentId,
