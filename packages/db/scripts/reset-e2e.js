@@ -74,11 +74,19 @@ try {
   });
 
   console.log(`🌱 [3/3] Running deterministic multi-tenant E2E seed...`);
-  execSync(`npx ts-node "${seedScript}"`, {
-    cwd: dbDir,
-    stdio: 'inherit',
-    env: { ...process.env, DATABASE_URL: e2eDbUrl, NODE_ENV: 'test' }
-  });
+  try {
+    execSync(`npx tsx "${seedScript}"`, {
+      cwd: dbDir,
+      stdio: 'inherit',
+      env: { ...process.env, DATABASE_URL: e2eDbUrl, NODE_ENV: 'test' }
+    });
+  } catch {
+    execSync(`npx ts-node --transpile-only "${seedScript}"`, {
+      cwd: dbDir,
+      stdio: 'inherit',
+      env: { ...process.env, DATABASE_URL: e2eDbUrl, NODE_ENV: 'test' }
+    });
+  }
 
   console.log(`\n🎉 [E2E Reset Complete] echo_lms_e2e is ready with multi-tenant test hierarchy!\n`);
 } catch (err) {
