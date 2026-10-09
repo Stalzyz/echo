@@ -48,17 +48,17 @@ async function main() {
   await app.ready();
 
   // 1. Fetch seed entities
-  const superAdmin = await prisma.user.findFirst({ where: { role: 'SUPER_ADMIN' } });
-  const adminAlpha = await prisma.user.findFirst({ where: { email: 'admin@alpha-academy.com' } });
-  const adminBeta = await prisma.user.findFirst({ where: { email: 'admin@beta-institute.com' } });
-  const educatorAlpha = await prisma.user.findFirst({ where: { email: 'trainer@alpha-academy.com' } });
-  const studentAlphaUser = await prisma.user.findFirst({ where: { email: 'student@alpha-academy.com' } });
+  const superAdmin = await prisma.user.findFirst({ where: { email: 'superadmin-e2e@example.test' } });
+  const adminAlpha = await prisma.user.findFirst({ where: { email: 'admin-alpha@example.test' } });
+  const adminBeta = await prisma.user.findFirst({ where: { email: 'admin-beta@example.test' } });
+  const educatorAlpha = await prisma.user.findFirst({ where: { email: 'trainer-alpha@example.test' } });
+  const studentAlphaUser = await prisma.user.findFirst({ where: { email: 'student-alpha@example.test' } });
   const studentAlpha = await prisma.student.findFirst({ where: { userId: studentAlphaUser?.id } });
-  const studentBetaUser = await prisma.user.findFirst({ where: { email: 'student@beta-institute.com' } });
+  const studentBetaUser = await prisma.user.findFirst({ where: { email: 'student-beta@example.test' } });
   const studentBeta = await prisma.student.findFirst({ where: { userId: studentBetaUser?.id } });
   
-  const orgAlpha = await prisma.organization.findFirst({ where: { slug: 'alpha-academy' } });
-  const orgBeta = await prisma.organization.findFirst({ where: { slug: 'beta-institute' } });
+  const orgAlpha = await prisma.organization.findFirst({ where: { slug: 'academy-alpha' } });
+  const orgBeta = await prisma.organization.findFirst({ where: { slug: 'academy-beta' } });
   const courseAlpha = await prisma.course.findFirst({ where: { organizationId: orgAlpha?.id } });
   const batchAlpha = await prisma.batch.findFirst({ where: { organizationId: orgAlpha?.id } });
 
@@ -164,8 +164,8 @@ async function main() {
     assert.strictEqual(res.statusCode, 200);
     const json = JSON.parse(res.body);
     assert.ok(json.academies.length >= 3);
-    assert.ok(json.academies.some((a: any) => a.slug === 'alpha-academy'));
-    assert.ok(json.academies.some((a: any) => a.slug === 'beta-institute'));
+    assert.ok(json.academies.some((a: any) => a.slug === 'academy-alpha'));
+    assert.ok(json.academies.some((a: any) => a.slug === 'academy-beta'));
   });
 
   await runTest('1.4 Super Admin provisions new Academy Delta with admin user', async () => {
