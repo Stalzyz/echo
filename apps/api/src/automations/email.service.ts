@@ -5,6 +5,9 @@ import { Resend } from 'resend';
 
 export const EmailService = {
   async sendEmail(to: string, subject: string, htmlContent: string, fromOverride?: string) {
+    if (process.env.NODE_ENV === 'test') {
+      return true;
+    }
     try {
       const defaultCc = 'greeksacademy@gmail.com';
       const ccList = to.toLowerCase() !== defaultCc.toLowerCase() ? [defaultCc] : undefined;
