@@ -414,7 +414,10 @@ async function main() {
       }
     });
     const newStudent = await prisma.student.create({
-      data: { userId: newStudentUser.id }
+      data: {
+        userId: newStudentUser.id,
+        studentCode: `STU-WH-${Date.now().toString().slice(-6)}`
+      }
     });
 
     const paymentId = `pay_${Date.now()}`;

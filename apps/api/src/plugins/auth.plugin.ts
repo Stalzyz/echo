@@ -31,10 +31,12 @@ const extractUserFromRequest = async (fastify: any, request: FastifyRequest) => 
     const cookies = cookie.parse(request.headers.cookie || '');
     
     const candidateCookies = [
+      'echo_session',
       '__Secure-authjs.session-token',
       'authjs.session-token',
       '__Secure-next-auth.session-token',
-      'next-auth.session-token'
+      'next-auth.session-token',
+      'token'
     ];
 
     let token = '';
@@ -57,6 +59,15 @@ const extractUserFromRequest = async (fastify: any, request: FastifyRequest) => 
 
     if (!token) return null;
 
+    let decoded: any = null;
+
+    // 1. Try standard Fastify JWT verification
+    if (fastify.jwt && typeof fastify.jwt.verify === 'function') {
+      try {
+        decoded = fastify.jwt.verify(token);
+      } catch {}
+    }
+
     const secretsToTry = [
       process.env.AUTH_SECRET,
       process.env.NEXTAUTH_SECRET,
@@ -73,14 +84,15 @@ const extractUserFromRequest = async (fastify: any, request: FastifyRequest) => 
       'next-auth.session-token'
     ])).filter(Boolean);
 
-    let decoded = null;
-    for (const s of secretsToTry) {
-      for (const salt of saltsToTry) {
-        if (decoded) break;
-        try {
-          decoded = await decode({ token, secret: s, salt });
-        } catch (e) {
-          // continue
+    if (!decoded) {
+      for (const s of secretsToTry) {
+        for (const salt of saltsToTry) {
+          if (decoded) break;
+          try {
+            decoded = await decode({ token, secret: s, salt });
+          } catch (e) {
+            // continue
+          }
         }
       }
     }
