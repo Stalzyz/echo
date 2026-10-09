@@ -47,12 +47,12 @@
 | Module | Route / Component | Primary API Endpoint | Prisma Model(s) | Auth Roles | Tenant Filter | CRUD | Integration | E2E Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Academy Dashboard** | `/dashboard` | `GET /api/v1/analytics/overview` | `Student`, `Lead`, `Invoice`, `Batch` | `ADMIN`, `MANAGER` | `organizationId` | R | Real-time Metrics | ⬜ |
-| **Admissions CRM** | `/dashboard/academy/admissions` | `GET/POST /api/v1/crm/leads` | `Lead`, `LeadActivity`, `Contact` | `ADMIN`, `STAFF` | `organizationId` | C, R, U, D | Pipeline / Lead Scoring | ⬜ |
-| **Lead Conversion** | `/dashboard/academy/admissions` | `POST /api/v1/academy/enroll` | `Lead`, `Student`, `Enrollment` | `ADMIN`, `STAFF` | `organizationId` | C, U | Lead to Student Pipeline | ⬜ |
+| **Admissions CRM** | `/dashboard/academy/admissions` | `GET/POST /api/v1/crm/leads` | `Lead`, `LeadActivity`, `Contact` | `ADMIN`, `STAFF` | `organizationId` | C, R, U, D | Pipeline / Lead Scoring | ✅ |
+| **Lead Conversion** | `/dashboard/academy/admissions` | `POST /api/v1/academy/enroll` | `Lead`, `Student`, `Enrollment` | `ADMIN`, `STAFF` | `organizationId` | C, U | Lead to Student Pipeline | ✅ |
 | **Call Intelligence** | `/dashboard/academy/calls` | `GET/POST /api/v1/calls` | `CallIntelligence`, `CallRecord` | `ADMIN`, `STAFF` | `organizationId` | C, R, U, D | AI Transcribe / Sentiment | ⬜ |
 | **Call Sync to CRM** | `/dashboard/academy/calls` | `POST /api/v1/calls/[id]/sync-crm` | `CallRecord`, `LeadActivity` | `ADMIN`, `STAFF` | `organizationId` | C, U | CRM Activity Sync | ⬜ |
-| **Dynamic Form Builder** | `/dashboard/academy/forms` | `GET/POST /api/v1/academy/dynamic-forms` | `EnquiryForm`, `FormSubmission` | `ADMIN`, `STAFF` | `organizationId` | C, R, U, D | Schema JSON Builder | ⬜ |
-| **Public Form Renderer** | `/f/[slug]` | `POST /api/v1/academy/dynamic-forms/submit` | `FormSubmission`, `Lead` | Public / Anon | Target Org Slug | C | Auto-creates Lead in CRM | ⬜ |
+| **Dynamic Form Builder** | `/dashboard/academy/forms` | `GET/POST /api/v1/academy/dynamic-forms` | `EnquiryForm`, `FormSubmission` | `ADMIN`, `STAFF` | `organizationId` | C, R, U, D | Schema JSON Builder | ✅ |
+| **Public Form Renderer** | `/f/[slug]` | `POST /api/v1/academy/dynamic-forms/submit` | `FormSubmission`, `Lead` | Public / Anon | Target Org Slug | C | Auto-creates Lead in CRM | ✅ |
 | **Walk-ins Kiosk** | `/dashboard/academy/walk-ins` | `GET/POST /api/v1/academy/walk-ins` | `WalkIn`, `Lead` | `ADMIN`, `STAFF` | `organizationId` | C, R, U, D | Reception Terminal | ⬜ |
 | **Kiosk Terminal View** | `/kiosk` & `/staff/kiosk` | `POST /api/v1/academy/walk-ins` | `WalkIn` | Public / Tablet | `organizationId` | C | Instant SMS/WhatsApp Ping | ⬜ |
 | **Demo Sessions** | `/dashboard/academy/demo-sessions` | `GET/POST /api/v1/academy/events` | `DemoSession`, `DemoRegistration` | `ADMIN`, `STAFF` | `organizationId` | C, R, U, D | Calendar / Meet Links | ⬜ |
@@ -64,15 +64,15 @@
 
 | Module | Route / Component | Primary API Endpoint | Prisma Model(s) | Auth Roles | Tenant Filter | CRUD | Integration | E2E Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **All Students Directory** | `/dashboard/academy/students` | `GET/POST /api/v1/academy/students` | `Student`, `User`, `Enrollment` | `ADMIN`, `STAFF` | `organizationId` | C, R, U, D | Student Profile & Passport | ⬜ |
+| **All Students Directory** | `/dashboard/academy/students` | `GET/POST /api/v1/academy/students` | `Student`, `User`, `Enrollment` | `ADMIN`, `STAFF` | `organizationId` | C, R, U, D | Student Profile & Passport | ✅ |
 | **Campus (Onsite) Students** | `/dashboard/academy/students/onsite` | `GET /api/v1/academy/students?type=ONSITE` | `Student`, `Geofence` | `ADMIN`, `STAFF` | `organizationId` | R, U | Campus RFID / Attendance | ⬜ |
 | **Remote (Online) Students** | `/dashboard/academy/students/online` | `GET /api/v1/academy/students?type=ONLINE` | `Student`, `User` | `ADMIN`, `STAFF` | `organizationId` | R, U | LMS Virtual Portal | ⬜ |
 | **Student Passport Card** | `/dashboard/academy/students/[id]/passport` | `GET /api/v1/academy/passport/[id]` | `Student`, `StudentBadge`, `Portfolio` | `ADMIN`, `STAFF`, `STUDENT` | `organizationId` | R, U | QR Digital Passport | ⬜ |
 | **Campus Faculty** | `/dashboard/academy/educators/onsite` | `GET/POST /api/v1/academy/educators` | `Educator`, `Employee`, `User` | `ADMIN` | `organizationId` | C, R, U, D | Biometric / Schedule | ⬜ |
 | **Remote Instructors** | `/dashboard/academy/educators/online` | `GET/POST /api/v1/academy/educators` | `Educator`, `User` | `ADMIN` | `organizationId` | C, R, U, D | Virtual Classroom Alloc | ⬜ |
-| **Batches & Courses** | `/dashboard/academy/batches` | `GET/POST /api/v1/academy/batches` | `Batch`, `Course`, `BatchSession` | `ADMIN`, `STAFF` | `organizationId` | C, R, U, D | Academic Scheduler | ⬜ |
-| **Class Attendance** | `/dashboard/academy/attendance` | `GET/POST /api/v1/academy/attendance` | `StudentAttendance`, `Session` | `ADMIN`, `STAFF`, `TRAINER` | `organizationId` | C, R, U | QR / Face Verification | ⬜ |
-| **QR Scanner Terminal** | `/scanner` | `POST /api/v1/academy/attendance/scan` | `StudentAttendance`, `Student` | `STAFF`, `TRAINER` | `organizationId` | C | Real-time Scan Ingestion | ⬜ |
+| **Batches & Courses** | `/dashboard/academy/batches` | `GET/POST /api/v1/academy/batches` | `Batch`, `Course`, `BatchSession` | `ADMIN`, `STAFF` | `organizationId` | C, R, U, D | Academic Scheduler | ✅ |
+| **Class Attendance** | `/dashboard/academy/attendance` | `GET/POST /api/v1/academy/attendance` | `StudentAttendance`, `Session` | `ADMIN`, `STAFF`, `TRAINER` | `organizationId` | C, R, U | QR / Face Verification | ✅ |
+| **QR Scanner Terminal** | `/scanner` | `POST /api/v1/academy/attendance/scan` | `StudentAttendance`, `Student` | `STAFF`, `TRAINER` | `organizationId` | C | Real-time Scan Ingestion | ✅ |
 | **Master Schedule** | `/dashboard/academy/schedule` | `GET /api/v1/academy/batches/with-course` | `BatchSession`, `Educator` | `ADMIN`, `STAFF` | `organizationId` | R, U | Calendar View | ⬜ |
 
 ---
@@ -81,9 +81,9 @@
 
 | Module | Route / Component | Primary API Endpoint | Prisma Model(s) | Auth Roles | Tenant Filter | CRUD | Integration | E2E Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Fee Collection Console** | `/dashboard/academy/fees` | `GET/POST /api/v1/finance/invoices` | `Invoice`, `Payment`, `Student` | `ADMIN`, `STAFF` | `organizationId` | C, R, U, D | Payment Receipts / GST | ⬜ |
-| **Student Fee Ledger** | `/dashboard/academy/fees/[studentId]` | `GET /api/v1/academy/fees/[studentId]` | `Invoice`, `FeeInstallment`, `Payment`| `ADMIN`, `STAFF` | `organizationId` | R, U | PDF Invoice Generator | ⬜ |
-| **Student EMI Plans** | `/dashboard/academy/fees/emi` | `GET/POST /api/v1/finance/subscriptions` | `FeeInstallment`, `BillingSchedule` | `ADMIN`, `STAFF` | `organizationId` | C, R, U | Auto-Debit / Overdue Calc | ⬜ |
+| **Fee Collection Console** | `/dashboard/academy/fees` | `GET/POST /api/v1/finance/invoices` | `Invoice`, `Payment`, `Student` | `ADMIN`, `STAFF` | `organizationId` | C, R, U, D | Payment Receipts / GST | ✅ |
+| **Student Fee Ledger** | `/dashboard/academy/fees/[studentId]` | `GET /api/v1/academy/fees/[studentId]` | `Invoice`, `FeeInstallment`, `Payment`| `ADMIN`, `STAFF` | `organizationId` | R, U | PDF Invoice Generator | ✅ |
+| **Student EMI Plans** | `/dashboard/academy/fees/emi` | `GET/POST /api/v1/finance/subscriptions` | `FeeInstallment`, `BillingSchedule` | `ADMIN`, `STAFF` | `organizationId` | C, R, U | Auto-Debit / Overdue Calc | ✅ |
 | **Coupons & Discounts** | `/dashboard/academy/coupons` | `GET/POST /api/v1/academy/marketplace` | `Product`, `MarketplaceItem` | `ADMIN` | `organizationId` | C, R, U, D | Checkout Discount Engine | ⬜ |
 | **Finance Settings** | `/dashboard/settings/finance` | `GET/PATCH /api/v1/settings/finance` | `FinanceSettings`, `Organization` | `ADMIN` | `organizationId` | R, U | Bank / UPI / GST Config | ⬜ |
 
@@ -124,13 +124,13 @@
 | Module | Route / Component | Primary API Endpoint | Prisma Model(s) | Auth Roles | Tenant Filter | CRUD | Integration | E2E Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Studio Dashboard** | `/dashboard/studio` | `GET /api/v1/lms/analytics` | `LMSCourse`, `Student`, `Assignment` | `EDUCATOR`, `ADMIN` | `organizationId` | R | Educator KPI Metrics | ⬜ |
-| **My Students (Studio)** | `/dashboard/studio/students` | `GET /api/v1/academy/students` | `Student`, `Enrollment` | `EDUCATOR`, `ADMIN` | `organizationId` | R | Student Progress Tracking | ⬜ |
-| **My Courses** | `/dashboard/studio/courses` | `GET/POST /api/v1/lms/courses` | `LMSCourse`, `LMSModule`, `LMSLesson` | `EDUCATOR`, `ADMIN` | `organizationId` | C, R, U, D | Curriculum Structure | ⬜ |
-| **Visual Course Builder**| `/dashboard/studio/course-builder` | `GET/PUT /api/v1/lms/courses/[id]` | `LMSCourse`, `LMSModule`, `LMSLesson` | `EDUCATOR`, `ADMIN` | `organizationId` | C, R, U, D | Video / Resource Uploader | ⬜ |
+| **My Students (Studio)** | `/dashboard/studio/students` | `GET /api/v1/academy/students` | `Student`, `Enrollment` | `EDUCATOR`, `ADMIN` | `organizationId` | R | Student Progress Tracking | ✅ |
+| **My Courses** | `/dashboard/studio/courses` | `GET/POST /api/v1/lms/courses` | `LMSCourse`, `LMSModule`, `LMSLesson` | `EDUCATOR`, `ADMIN` | `organizationId` | C, R, U, D | Curriculum Structure | ✅ |
+| **Visual Course Builder**| `/dashboard/studio/course-builder` | `GET/PUT /api/v1/lms/courses/[id]` | `LMSCourse`, `LMSModule`, `LMSLesson` | `EDUCATOR`, `ADMIN` | `organizationId` | C, R, U, D | Video / Resource Uploader | ✅ |
 | **Interactive Quiz Builder**| `/dashboard/studio/quiz-builder` | `GET/POST /api/v1/lms/quizzes` | `Quiz`, `QuizQuestion` | `EDUCATOR`, `ADMIN` | `organizationId` | C, R, U, D | Auto-Grading Engine | ⬜ |
 | **Student Quizzes** | `/dashboard/studio/quizzes` | `GET /api/v1/lms/quizzes/attempts` | `QuizAttempt`, `Student` | `EDUCATOR`, `ADMIN` | `organizationId` | R, U | Score Breakdown | ⬜ |
-| **Assignments & Submissions**| `/dashboard/studio/assignments` | `GET/POST /api/v1/lms/assignments` | `Assignment`, `AssignmentSubmission` | `EDUCATOR`, `ADMIN` | `organizationId` | C, R, U | AI Grading & Feedback | ⬜ |
-| **Certificate Generator**| `/dashboard/studio/certificates` | `GET/POST /api/v1/academy/certificates` | `Certificate`, `CertificateTemplate` | `EDUCATOR`, `ADMIN` | `organizationId` | C, R, U | PDF Generation & QR Hash | ⬜ |
+| **Assignments & Submissions**| `/dashboard/studio/assignments` | `GET/POST /api/v1/lms/assignments` | `Assignment`, `AssignmentSubmission` | `EDUCATOR`, `ADMIN` | `organizationId` | C, R, U | AI Grading & Feedback | ✅ |
+| **Certificate Generator**| `/dashboard/studio/certificates` | `GET/POST /api/v1/academy/certificates` | `Certificate`, `CertificateTemplate` | `EDUCATOR`, `ADMIN` | `organizationId` | C, R, U | PDF Generation & QR Hash | ✅ |
 | **Certificate Verification**| `/verify/[certificateId]` | `GET /api/v1/academy/certificates/verify` | `Certificate`, `Student`, `Course` | Public / Employer | Global Lookup | R | Tamper-Proof QR Hash | ⬜ |
 | **Studio Analytics** | `/dashboard/studio/analytics` | `GET /api/v1/lms/analytics/completion` | `LessonProgress`, `QuizAttempt` | `EDUCATOR`, `ADMIN` | `organizationId` | R | Course Retention Graphs | ⬜ |
 | **Live Studio Classroom**| `/dashboard/studio/live` | `GET/POST /api/v1/academy/events/live` | `CampusEvent`, `Session` | `EDUCATOR`, `ADMIN` | `organizationId` | C, R, U | WebRTC / Streaming Hook | ⬜ |
@@ -143,10 +143,10 @@
 
 | Module | Route / Component | Primary API Endpoint | Prisma Model(s) | Auth Roles | Tenant Filter | CRUD | Integration | E2E Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Student Dashboard** | `/student` | `GET /api/v1/academy/lms-student/dashboard` | `Enrollment`, `Attendance`, `Invoice` | `STUDENT` | `studentId` + `orgId` | R | Student Summary Hub | ⬜ |
-| **Course Learning Player** | `/student/learn/[courseId]` | `GET/POST /api/v1/lms/lessons/progress` | `LMSCourse`, `LMSLesson`, `Progress` | `STUDENT` | `studentId` + `orgId` | R, U | Video Streaming & Notes | ⬜ |
-| **Student Assignments** | `/student/assignments` | `GET/POST /api/v1/lms/assignments/submit`| `AssignmentSubmission`, `Assignment` | `STUDENT` | `studentId` + `orgId` | R, C | File Upload / Submissions | ⬜ |
-| **My Certificates** | `/dashboard/student/certificates` | `GET /api/v1/academy/certificates/my` | `Certificate` | `STUDENT` | `studentId` + `orgId` | R | PDF Download / LinkedIn | ⬜ |
+| **Student Dashboard** | `/student` | `GET /api/v1/academy/lms-student/dashboard` | `Enrollment`, `Attendance`, `Invoice` | `STUDENT` | `studentId` + `orgId` | R | Student Summary Hub | ✅ |
+| **Course Learning Player** | `/student/learn/[courseId]` | `GET/POST /api/v1/lms/lessons/progress` | `LMSCourse`, `LMSLesson`, `Progress` | `STUDENT` | `studentId` + `orgId` | R, U | Video Streaming & Notes | ✅ |
+| **Student Assignments** | `/student/assignments` | `GET/POST /api/v1/lms/assignments/submit`| `AssignmentSubmission`, `Assignment` | `STUDENT` | `studentId` + `orgId` | R, C | File Upload / Submissions | ✅ |
+| **My Certificates** | `/dashboard/student/certificates` | `GET /api/v1/academy/certificates/my` | `Certificate` | `STUDENT` | `studentId` + `orgId` | R | PDF Download / LinkedIn | ✅ |
 | **Student Profile & Edit** | `/student/profile` & `/edit` | `GET/PATCH /api/v1/academy/students/me` | `Student`, `User`, `Portfolio` | `STUDENT` | `studentId` | R, U | Profile Photo / Resume | ⬜ |
 | **Parent Portal** | `/portal/parent/[studentId]` | `GET /api/v1/academy/students/[id]/parent`| `Student`, `Attendance`, `Invoice` | Parent / OTP | `studentId` + `orgId` | R | Attendance & Fee Ledger | ⬜ |
 

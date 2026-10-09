@@ -3,6 +3,9 @@ import { prisma } from '../db';
 import { sendEmail, EmailTemplates } from '../integrations/email.service';
 
 export function initializeCronJobs() {
+  if (process.env.NODE_ENV === 'test') {
+    return;
+  }
   console.log('[Autopilot] Initializing Cron Jobs...');
 
   // 1. Abandoned Proposals Drip
