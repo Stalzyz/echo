@@ -325,11 +325,7 @@ export default async function superAdminRouter(app: FastifyInstance) {
       impersonatedTenantId: targetTenantId
     }, { expiresIn: '4h' });
 
-    reply.setCookie('echo_impersonate_tenant', targetTenantId, {
-      path: '/',
-      httpOnly: false,
-      sameSite: 'lax'
-    });
+    reply.header('Set-Cookie', `echo_impersonate_tenant=${targetTenantId}; Path=/; SameSite=Lax; Max-Age=14400`);
 
     // Record audit trail
     if (reqUser?.id) {
@@ -355,7 +351,7 @@ export default async function superAdminRouter(app: FastifyInstance) {
 
   // POST /api/v1/super-admin/impersonate/exit — Exit impersonation
   app.post('/impersonate/exit', async (req, reply) => {
-    reply.clearCookie('echo_impersonate_tenant', { path: '/' });
+    reply.header('Set-Cookie', 'echo_impersonate_tenant=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0');
     return {
       success: true,
       message: 'Impersonation ended. Returned to Super Admin root scope.'
