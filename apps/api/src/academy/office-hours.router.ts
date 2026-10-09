@@ -42,7 +42,7 @@ export default async function officeHoursRouter(app: FastifyInstance) {
     if (!mentorId) {
       const mentor = await app.prisma.user.findFirst({
         where: {
-          role: { in: ['EDUCATOR', 'ADMIN', 'TRAINER', 'STAFF'] },
+          role: { in: ['EDUCATOR', 'ADMIN', 'STAFF'] },
           ...(tenantId && !isGlobalSuperAdmin ? { organizationId: tenantId } : {})
         }
       });
