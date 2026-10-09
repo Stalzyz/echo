@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "test:e2e:security": "tsx scripts/test-tenant-isolation-e2e.ts",
     "test:e2e:workflows": "tsx scripts/test-workflows-e2e.ts",
+    "test:e2e:admin": "tsx scripts/test-admin-studio-e2e.ts",
     "dev": "tsx watch src/app.ts",
     "build": "NODE_OPTIONS=--max-old-space-size=4096 tsc",
     "start": "node dist/app.js"

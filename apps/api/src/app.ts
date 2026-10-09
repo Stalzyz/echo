@@ -230,6 +230,9 @@ export async function buildApp(opts: any = {}): Promise<any> {
   const vendorsModule = (await import('./vendors')).default;
   await app.register(vendorsModule, { prefix: '/api/v1/vendors' });
 
+  const superAdminModule = (await import('./super-admin/super-admin.router')).default;
+  await app.register(superAdminModule, { prefix: '/api/v1/super-admin' });
+
   // Telephony & Call Intelligence bridge endpoint
   app.get('/api/v1/calls', async (req, reply) => {
     const { leadId, counsellorId, status } = (req.query as any) || {};

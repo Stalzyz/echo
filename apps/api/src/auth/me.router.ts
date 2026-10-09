@@ -12,6 +12,20 @@ export default async function meRouter(app: FastifyInstance) {
         student: { select: { id: true } },
         employee: { select: { id: true } },
         clientProfile: { select: { id: true } },
+        organization: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            domain: true,
+            status: true,
+            subscription: true,
+            logoUrl: true,
+            academyLogoUrl: true,
+            primaryColor: true,
+            secondaryColor: true
+          }
+        }
       }
     });
 
@@ -27,6 +41,8 @@ export default async function meRouter(app: FastifyInstance) {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
+        organizationId: user.organizationId || null,
+        organization: user.organization || null,
         studentId: user.student?.id || null,
         employeeId: user.employee?.id || null,
         clientId: user.clientProfile?.id || null,
